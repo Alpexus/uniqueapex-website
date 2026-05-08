@@ -1,0 +1,112 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Container from "@/components/container.astro";
+import Link from "@/components/ui/link.astro";
+---
+
+<Layout title="How It Works">
+  <Container>
+
+    <!-- Hero -->
+    <div class="text-center max-w-3xl mx-auto mt-16 mb-24">
+      <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">The Process</p>
+      <h1 class="text-5xl font-bold mt-4 text-slate-800 leading-tight">
+        From first concern to <span class="text-violet-700">ongoing care</span>
+      </h1>
+      <p class="text-lg text-slate-500 mt-6 leading-relaxed">
+        UniqueApex removes the coordination burden from families. Here is exactly how it works — from the moment you sign up to the moment your child gets the support they need.
+      </p>
+    </div>
+
+    <!-- Steps -->
+    <div class="max-w-4xl mx-auto mb-32 space-y-48">
+
+      <!-- Step 1: image right -->
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div>
+          <span class="text-9xl font-bold text-violet-100">01</span>
+          <h2 class="text-3xl font-bold text-slate-800 mt-2">Create your child's profile</h2>
+          <p class="text-slate-500 mt-4 leading-relaxed text-lg">
+            Tell us about your child once — their age, diagnosis or area of concern, location, and the type of support you are looking for. No more re-entering the same information for every provider.
+          </p>
+          <ul class="mt-6 space-y-2">
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Takes less than 5 minutes</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Available in English and French</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Your data is private and secure</li>
+          </ul>
+        </div>
+        <div class="flex items-center justify-center">
+          <img src="/3.png" alt="Create profile illustration" class="w-1/2 max-w-[200px]" />
+        </div>
+      </div>
+
+      <!-- Step 2: image left -->
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div class="flex items-center justify-center">
+          <img src="/11.png" alt="Provider matching illustration" class="w-1/2 max-w-[200px]" />
+        </div>
+        <div>
+          <span class="text-9xl font-bold text-violet-100">02</span>
+          <h2 class="text-3xl font-bold text-slate-800 mt-2">We match and reach out to providers</h2>
+          <p class="text-slate-500 mt-4 leading-relaxed text-lg">
+            UniqueApex automatically matches your child's profile to verified speech-language, occupational, and behavioural therapy providers in your area — and contacts them on your behalf.
+          </p>
+          <ul class="mt-6 space-y-2">
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> One outreach batch per service type</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> 90-day provider protection rule</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> No cold calling required</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Step 3: image right -->
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div>
+          <span class="text-9xl font-bold text-violet-100">03</span>
+          <h2 class="text-3xl font-bold text-slate-800 mt-2">Track your waitlist status</h2>
+          <p class="text-slate-500 mt-4 leading-relaxed text-lg">
+            No more wondering where things stand. UniqueApex tracks responses and waitlist positions across all your matched providers — so you always know what is happening without having to chase anyone.
+          </p>
+          <ul class="mt-6 space-y-2">
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Real-time status updates</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> All providers in one place</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Alerts when a spot opens up</li>
+          </ul>
+        </div>
+        <div class="flex items-center justify-center">
+          <img src="/5.png" alt="Waitlist tracking illustration" class="w-1/2 max-w-[200px]" />
+        </div>
+      </div>
+
+      <!-- Step 4: image left -->
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div class="flex items-center justify-center">
+          <img src="/6.png" alt="Concierge support illustration" class="w-1/2 max-w-[200px]" />
+        </div>
+        <div>
+          <span class="text-9xl font-bold text-violet-100">04</span>
+          <h2 class="text-3xl font-bold text-slate-800 mt-2">Upgrade to Concierge when you need more</h2>
+          <p class="text-slate-500 mt-4 leading-relaxed text-lg">
+            When you need hands-on help, our Concierge service assigns you a dedicated human coordinator who handles follow-ups, documentation, and cross-service orchestration — so you can focus on your child.
+          </p>
+          <ul class="mt-6 space-y-2">
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Dedicated human coordinator</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Documentation support included</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> One-time fee, no subscription</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mb-24">
+      <h2 class="text-3xl font-bold text-slate-800">Ready to get started?</h2>
+      <p class="text-slate-500 mt-4 text-lg">Join the waitlist and be among the first families to access UniqueApex in Montréal.</p>
+      <div class="mt-8 flex justify-center">
+        <Link href="/waitlist" size="lg">Join the Waitlist</Link>
+      </div>
+    </div>
+
+  </Container>
+</Layout>
