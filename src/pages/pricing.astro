@@ -6,58 +6,54 @@ import PricingCard from "@/components/pricing.astro";
 
 const pricing = [
   {
-    name: "Personal",
-    price: "Free",
+    name: "Free",
+    price: "$0",
     popular: false,
     features: [
-      "Lifetime free",
-      "Up to 3 users",
-      "Unlimited Pages",
-      "Astro Sub domain",
-      "Basic Integrations",
-      "Community Support",
+      "One child profile",
+      "One outreach batch per service type",
+      "Automatic provider matching",
+      "Waitlist status tracking",
+      "English & French support",
+      "Community access",
     ],
     button: {
-      text: "Get Started",
-      link: "/",
+      text: "Get Started Free",
+      link: "/waitlist",
     },
   },
   {
-    name: "Startup",
-    price: {
-      monthly: "$19",
-      annual: "$16",
-      discount: "10%",
-      original: "$24",
-    },
+    name: "Monthly",
+    price: "$19/mo",
     popular: true,
     features: [
-      "All Free Features",
-      "Up to 20 users",
-      "20 Custom domains",
-      "Unlimited Collaborators",
-      "Advanced Integrations",
-      "Priority Support",
+      "Multiple child profiles",
+      "Unlimited outreach batches",
+      "Expert workshops access",
+      "Peer community access",
+      "Documentation tools",
+      "Priority support",
     ],
     button: {
-      text: "Get Started",
-      link: "#",
+      text: "Start Monthly Plan",
+      link: "/waitlist",
     },
   },
   {
-    name: "Enterprise",
-    price: "Custom",
+    name: "Concierge",
+    price: "$99",
+    onetime: true,
     popular: false,
     features: [
-      "All Pro Features",
-      "Unlimited Custom domains",
-      "99.99% Uptime SLA",
-      "SAML & SSO Integration",
-      "Dedicated Account Manager",
-      "24/7 Phone Support",
+      "Dedicated human coordinator",
+      "Provider follow-ups handled for you",
+      "Cross-service orchestration",
+      "Documentation support",
+      "Multi-service coordination",
+      "One engagement included",
     ],
     button: {
-      text: "Contact us",
+      text: "Get Concierge Support",
       link: "/contact",
     },
   },
@@ -67,15 +63,18 @@ const pricing = [
 <Layout title="Pricing">
   <Container>
     <Sectionhead>
-      <Fragment slot="title">Pricing</Fragment>
+      <Fragment slot="title">Simple, transparent <span class="text-violet-700">pricing</span></Fragment>
       <Fragment slot="desc">
-        Simple & Predictable pricing. No Surprises.
+        Choose the plan that fits where you are in your journey — start free, upgrade when you're ready.
       </Fragment>
     </Sectionhead>
 
-    <div
-      class="grid md:grid-cols-3 gap-10 mx-auto max-w-(--breakpoint-lg) mt-12">
+    <div class="grid md:grid-cols-3 gap-10 mx-auto max-w-screen-lg mt-12">
       {pricing.map((item) => <PricingCard plan={item} />)}
     </div>
+
+    <p class="text-center text-slate-500 mt-10 text-sm">
+      All prices in Canadian dollars. No hidden fees. Cancel anytime.
+    </p>
   </Container>
 </Layout>

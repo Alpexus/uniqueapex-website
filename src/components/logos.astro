@@ -1,18 +1,20 @@
----
-// @ts-ignore
-import { Icon } from "astro-icon/components";
----
-
 <div class="mt-24">
-  <h2 class="text-center text-slate-500">Works with your technologies</h2>
-  <div class="flex gap-8 md:gap-20 items-center justify-center mt-10 flex-wrap">
+  <div class="flex flex-col md:flex-row gap-8 md:gap-0 items-center justify-center divide-y md:divide-y-0 md:divide-x divide-slate-200">
+    
+    <div class="flex flex-col items-center text-center px-12">
+      <span class="text-4xl font-bold text-violet-700">1 Profile</span>
+      <span class="text-slate-500 mt-2 max-w-xs">Submitted once, shared with every provider automatically</span>
+    </div>
 
-    <Icon class="size-8 md:size-12" name="simple-icons:react" />
-    <Icon class="size-8 md:size-12" name="simple-icons:svelte" />
-    <Icon class="size-8 md:size-12" name="simple-icons:astro" />
-    <Icon class="size-8 md:size-16" name="simple-icons:tailwindcss" />
-    <Icon class="size-8 md:size-16" name="simple-icons:alpinedotjs" />
-    <Icon class="size-8 md:size-12" name="simple-icons:vercel" />
+    <div class="flex flex-col items-center text-center px-12">
+      <span class="text-4xl font-bold text-violet-700">EN | FR</span>
+      <span class="text-slate-500 mt-2 max-w-xs">Fully bilingual platform serving Montréal families</span>
+    </div>
+
+    <div class="flex flex-col items-center text-center px-12">
+      <span class="text-4xl font-bold text-violet-700">Montréal</span>
+      <span class="text-slate-500 mt-2 max-w-xs">Launching first in your city — more cities coming soon</span>
+    </div>
 
   </div>
 </div>

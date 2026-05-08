@@ -1,19 +1,76 @@
-<footer class="my-20">
-  <p class="text-center text-sm text-slate-500">
-    Copyright © {new Date().getFullYear()} Astroship. All rights reserved.
-  </p>
-  <!--
-    Can we ask you a favor 🙏
-    Please keep this backlink on your website if possible.
-    or Purchase a commercial license from https://web3templates.com
-  -->
-  <p class="text-center text-xs text-slate-500 mt-1">
-    Made by <a
-      href="https://web3templates.com"
-      target="_blank"
-      rel="noopener"
-      class="hover:underline">
-      Web3Templates
-    </a>
-  </p>
+---
+import { Icon } from "astro-icon/components";
+---
+
+<footer class="bg-slate-50 border-t border-slate-200 mt-20">
+  <div class="max-w-6xl mx-auto px-6 py-16">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+      
+      <!-- Left: Company -->
+      <div>
+        <a href="/" class="text-lg">
+          <span class="font-bold text-violet-700">Unique</span><span class="text-slate-500">Apex</span>
+        </a>
+        <p class="text-slate-500 mt-4 leading-relaxed max-w-xs">
+          Helping families of neurodivergent children find, coordinate, and manage therapy access — all in one place.
+        </p>
+      </div>
+
+      <!-- Middle: Quick Links -->
+      <div class="md:mx-auto">
+        <h3 class="font-semibold text-slate-800 mb-4">Quick Links</h3>
+        <ul class="space-y-3">
+          <li><a href="/" class="text-slate-500 hover:text-violet-700 transition">Home</a></li>
+          <li><a href="/howitworks" class="text-slate-500 hover:text-violet-700 transition">How It Works</a></li>
+          <li><a href="/about" class="text-slate-500 hover:text-violet-700 transition">About</a></li>
+          <li><a href="/pricing" class="text-slate-500 hover:text-violet-700 transition">Pricing</a></li>
+          <li><a href="/contact" class="text-slate-500 hover:text-violet-700 transition">Contact</a></li>
+          <li><a href="/waitlist" class="text-slate-500 hover:text-violet-700 transition">Join Waitlist</a></li>
+        </ul>
+      </div>
+
+      <!-- Right: Contact & Social -->
+      <div>
+        <h3 class="font-semibold text-slate-800 mb-4">Contact Us</h3>
+        <ul class="space-y-3">
+          <li>
+            <a href="mailto:contact@uniqueapex.com" class="text-slate-500 hover:text-violet-700 transition flex items-center gap-2">
+              <Icon name="uil:envelope" class="w-4 h-4" />
+              contact@uniqueapex.com
+            </a>
+          </li>
+          <li>
+            <span class="text-slate-500 flex items-center gap-2">
+              <Icon name="uil:map-marker" class="w-4 h-4" />
+              Montréal, Québec, Canada
+            </span>
+          </li>
+        </ul>
+
+        <h3 class="font-semibold text-slate-800 mt-8 mb-4">Follow Us</h3>
+        <div class="flex gap-4">
+          <a href="https://facebook.com" target="_blank" rel="noopener" class="text-slate-400 hover:text-violet-700 transition">
+            <Icon name="uil:facebook" class="w-6 h-6" />
+          </a>
+          <a href="https://instagram.com" target="_blank" rel="noopener" class="text-slate-400 hover:text-violet-700 transition">
+            <Icon name="uil:instagram" class="w-6 h-6" />
+          </a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener" class="text-slate-400 hover:text-violet-700 transition">
+            <Icon name="uil:linkedin" class="w-6 h-6" />
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="border-t border-slate-200 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-sm text-slate-400">
+        © {new Date().getFullYear()} UniqueApex. All rights reserved.
+      </p>
+      <p class="text-sm text-slate-400">
+        Montréal · English & French
+      </p>
+    </div>
+  </div>
 </footer>
