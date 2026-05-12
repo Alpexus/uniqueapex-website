@@ -5,6 +5,7 @@ import Features from "@/components/features.astro";
 import Faq from "@/components/faq.astro";
 import Hero from "@/components/hero.astro";
 import Logos from "@/components/logos.astro";
+import Howiteaser from "@/components/ui/howiteaser.astro";
 import Layout from "@/layouts/Layout.astro";
 ---
 
@@ -12,7 +13,10 @@ import Layout from "@/layouts/Layout.astro";
   <Container>
     <Hero />
     <Features />
-    <Logos />
+<div class="my-16">
+  <Howiteaser />
+</div>
+<Logos />
     <Faq />
     <Cta />
   </Container>
