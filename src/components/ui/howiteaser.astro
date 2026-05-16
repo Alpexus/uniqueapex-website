@@ -4,32 +4,47 @@ const steps = [
     number: "01",
     title: "Submit one profile",
     desc: "Fill in your child's needs once. UniqueApex stores it securely and uses it for every outreach.",
+    icon: "/icon-step1.png",
   },
   {
     number: "02",
     title: "We reach out for you",
     desc: "The platform contacts matched speech, OT, and behavioural providers in your area automatically.",
+    icon: "/icon-step2.png",
   },
   {
     number: "03",
     title: "You hear back",
     desc: "Providers respond directly to you. No chasing, no re-explaining, no repeated forms.",
+    icon: "/icon-step3.png",
   },
 ];
 ---
 
-<section class="py-16 bg-slate-50">
+<section class="py-12 my-8">
   <div class="max-w-5xl mx-auto px-6">
-    <h2 class="text-3xl font-bold text-center mb-2">How it works</h2>
-    <p class="text-center text-slate-500 mb-12">Three steps to stop waiting and start moving.</p>
-    <div class="grid md:grid-cols-3 gap-8">
+    <div class="text-center mb-16">
+      <p class="text-lg font-semibold text-violet-700 uppercase tracking-wide">How it works</p>
+      <h2 class="text-4xl font-bold mt-3 text-slate-800">Three steps to <span class="text-violet-700">stop waiting</span></h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-12">
       {steps.map((step) => (
         <div class="flex flex-col items-center text-center">
-          <span class="text-5xl font-bold text-violet-200 mb-3">{step.number}</span>
-          <h3 class="text-lg font-semibold mb-2">{step.title}</h3>
-          <p class="text-slate-500 text-sm leading-relaxed">{step.desc}</p>
+          <div class="relative mb-6">
+            <span class="absolute -top-4 -left-6 text-5xl font-bold text-violet-200">{step.number}</span>
+            <img src={step.icon} alt={step.title} class="w-52 h-52 relative z-10" />
+          </div>
+          <h3 class="text-2xl font-bold text-slate-800 mb-3">{step.title}</h3>
+          <p class="text-slate-500 leading-relaxed text-base max-w-[260px]">{step.desc}</p>
         </div>
       ))}
+    </div>
+
+    <div class="text-center mt-12">
+      <a href="/howitworks" class="text-violet-700 font-semibold text-lg uppercase tracking-wide hover:underline">
+        See the full process →
+      </a>
     </div>
   </div>
 </section>

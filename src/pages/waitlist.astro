@@ -1,0 +1,207 @@
+---
+import Container from "@/components/container.astro";
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout title="Join the Waitlist">
+  <Container>
+
+    <!-- Hero -->
+    <div class="text-center max-w-3xl mx-auto mt-16 mb-16">
+      <p class="text-2xl font-semibold text-violet-700 uppercase tracking-wide">Join the Waitlist</p>
+      <h1 class="text-5xl font-bold text-slate-800 leading-tight mt-3">
+        Be among the first <span class="text-violet-700">families in Montréal</span>
+      </h1>
+      <p class="text-slate-600 leading-relaxed text-lg mt-6">
+        UniqueApex is launching its pilot in Montréal. Join the waitlist and we will reach out as soon as access opens in your area.
+      </p>
+    </div>
+
+    <!-- Form -->
+    <div class="max-w-2xl mx-auto mb-24">
+      <form
+        action="https://api.web3forms.com/submit"
+        method="POST"
+        id="waitlist-form"
+        class="space-y-6"
+        novalidate>
+        <input type="hidden" name="access_key" value="f4d53ef2-b415-4409-85cb-637999c33e23" />
+        <input type="hidden" name="subject" value="New Waitlist Signup — UniqueApex" />
+        <input type="checkbox" class="hidden" style="display:none" name="botcheck" />
+
+        <!-- About You -->
+        <div class="bg-slate-50 rounded-2xl p-8 space-y-4">
+          <h2 class="text-lg font-bold text-slate-800">About you</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <input
+              type="text"
+              name="full_name"
+              placeholder="Full Name"
+              required
+              class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email Address"
+              required
+              class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
+            />
+          </div>
+          <input
+            type="tel"
+            name="phone"
+            placeholder="Phone Number (optional)"
+            class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
+          />
+          <div>
+            <label class="block text-sm font-medium text-slate-600 mb-3">Preferred Language</label>
+            <div class="flex gap-6">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="language" value="English" class="accent-violet-700" required />
+                <span class="text-slate-600">English</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="language" value="French" class="accent-violet-700" />
+                <span class="text-slate-600">French</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="language" value="Both" class="accent-violet-700" />
+                <span class="text-slate-600">Both</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- About Your Child -->
+        <div class="bg-slate-50 rounded-2xl p-8 space-y-4">
+          <h2 class="text-lg font-bold text-slate-800">About your child</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <select
+              name="child_age"
+              required
+              class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 text-slate-500 bg-white">
+              <option value="" disabled selected>Age Range</option>
+              <option value="0-3">0 – 3 years</option>
+              <option value="4-6">4 – 6 years</option>
+              <option value="7-10">7 – 10 years</option>
+              <option value="11+">11 years and older</option>
+            </select>
+            <select
+              name="diagnosis"
+              required
+              class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 text-slate-500 bg-white">
+              <option value="" disabled selected>Area of Concern</option>
+              <option value="Autism">Autism</option>
+              <option value="ADHD">ADHD</option>
+              <option value="Speech delay">Speech delay</option>
+              <option value="Language delay">Language delay</option>
+              <option value="Developmental delay">Developmental delay</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-600 mb-3">Services Needed</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="flex items-center gap-3 cursor-pointer bg-white border border-slate-200 rounded-xl px-4 py-3 hover:border-violet-300 transition-colors">
+                <input type="checkbox" name="service_slp" value="Speech-Language Therapy" class="accent-violet-700 w-4 h-4" />
+                <span class="text-slate-600 text-sm">Speech-Language Therapy</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer bg-white border border-slate-200 rounded-xl px-4 py-3 hover:border-violet-300 transition-colors">
+                <input type="checkbox" name="service_ot" value="Occupational Therapy" class="accent-violet-700 w-4 h-4" />
+                <span class="text-slate-600 text-sm">Occupational Therapy</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer bg-white border border-slate-200 rounded-xl px-4 py-3 hover:border-violet-300 transition-colors">
+                <input type="checkbox" name="service_aba" value="Behavioural Therapy" class="accent-violet-700 w-4 h-4" />
+                <span class="text-slate-600 text-sm">Behavioural Therapy</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer bg-white border border-slate-200 rounded-xl px-4 py-3 hover:border-violet-300 transition-colors">
+                <input type="checkbox" name="service_other" value="Other" class="accent-violet-700 w-4 h-4" />
+                <span class="text-slate-600 text-sm">Other</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location & Additional -->
+        <div class="bg-slate-50 rounded-2xl p-8 space-y-4">
+          <h2 class="text-lg font-bold text-slate-800">Location & additional info</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <input
+              type="text"
+              name="location"
+              placeholder="City / Borough in Montréal"
+              required
+              class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
+            />
+            <select
+              name="referral"
+              class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 text-slate-500 bg-white">
+              <option value="" disabled selected>How did you hear about us?</option>
+              <option value="Social media">Social media</option>
+              <option value="Google">Google</option>
+              <option value="Friend or family">Friend or family</option>
+              <option value="Healthcare provider">Healthcare provider</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <textarea
+            name="additional_info"
+            placeholder="Anything else you'd like us to know? (optional)"
+            class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none h-32 focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
+          ></textarea>
+        </div>
+
+        <!-- Submit -->
+        <div>
+          <button
+            type="submit"
+            class="w-full bg-violet-700 hover:bg-violet-800 text-white font-semibold py-4 px-8 rounded-full transition-colors duration-200 text-lg">
+            Join the Waitlist
+          </button>
+          <p class="text-slate-400 text-sm text-center mt-4">We will never share your information. You can unsubscribe at any time.</p>
+          <div id="waitlist-result" class="mt-4 text-center"></div>
+        </div>
+
+      </form>
+    </div>
+
+  </Container>
+</Layout>
+
+<script is:inline>
+  const form = document.getElementById("waitlist-form");
+  const result = document.getElementById("waitlist-result");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const object = Object.fromEntries(formData);
+    const json = JSON.stringify(object);
+
+    result.innerHTML = "Sending...";
+
+    fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: json,
+    })
+      .then(async (response) => {
+        let json = await response.json();
+        if (response.status == 200) {
+          result.classList.add("text-green-500");
+          result.innerHTML = "You are on the waitlist! We will be in touch soon.";
+          form.reset();
+        } else {
+          result.classList.add("text-red-500");
+          result.innerHTML = json.message;
+        }
+      })
+      .catch((error) => {
+        result.innerHTML = "Something went wrong. Please try again.";
+      });
+  });
+</script>

@@ -1,38 +1,73 @@
 ---
 import Contactform from "@/components/contactform.astro";
 import Container from "@/components/container.astro";
-import Sectionhead from "@/components/sectionhead.astro";
 import Layout from "@/layouts/Layout.astro";
 import { Icon } from "astro-icon/components";
 ---
 
 <Layout title="Contact">
   <Container>
-    <Sectionhead>
-      <Fragment slot="title">Contact</Fragment>
-      <Fragment slot="desc">Got questions? We are here to help.</Fragment>
-    </Sectionhead>
 
-    <div class="grid md:grid-cols-2 gap-10 mx-auto max-w-4xl mt-16">
-      <div>
-        <h2 class="font-medium text-2xl text-gray-800">Contact UniqueApex</h2>
-        <p class="text-lg leading-relaxed text-slate-500 mt-3">
-          Have a question or want to learn more? We are here to help. Fill in the form or reach us directly.
-        </p>
-        <div class="mt-5">
-          <div class="flex items-center mt-2 space-x-2 text-gray-600">
-            <Icon class="text-gray-400 w-4 h-4" name="uil:map-marker" />
-            <span>Montréal, Québec, Canada</span>
+    <div class="grid md:grid-cols-2 gap-16 items-start mt-16 mb-24">
+
+      <!-- Left: Contact Info -->
+      <div class="space-y-10">
+        <div>
+          <p class="text-2xl font-semibold text-violet-700 uppercase tracking-wide">Contact Us</p>
+          <h1 class="text-4xl font-bold text-slate-800 leading-tight mt-3">
+            Got questions? <span class="text-violet-700">We are here.</span>
+          </h1>
+          <p class="text-slate-600 leading-relaxed text-lg mt-6">
+            Whether you are a family looking for support, a provider wanting to join our network, or just curious about what we are building — we would love to hear from you.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <div class="flex items-start gap-4">
+            <div class="bg-violet-100 rounded-xl p-3 shrink-0">
+              <Icon class="text-violet-700 w-6 h-6" name="uil:envelope" />
+            </div>
+            <div>
+              <p class="font-bold text-slate-800">Email</p>
+              <a href="mailto:contact@uniqueapex.com" class="text-slate-500 text-sm hover:text-violet-700 transition-colors">contact@uniqueapex.com</a>
+            </div>
           </div>
-          <div class="flex items-center mt-2 space-x-2 text-gray-600">
-            <Icon class="text-gray-400 w-4 h-4" name="uil:envelope" />
-            <a href="mailto:contact@uniqueapex.com">contact@uniqueapex.com</a>
+          <div class="flex items-start gap-4">
+            <div class="bg-violet-100 rounded-xl p-3 shrink-0">
+              <Icon class="text-violet-700 w-6 h-6" name="uil:globe" />
+            </div>
+            <div>
+              <p class="font-bold text-slate-800">Website</p>
+              <a href="https://uniqueapex.com" class="text-slate-500 text-sm hover:text-violet-700 transition-colors">uniqueapex.com</a>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="bg-violet-100 rounded-xl p-3 shrink-0">
+              <Icon class="text-violet-700 w-6 h-6" name="uil:map-marker" />
+            </div>
+            <div>
+              <p class="font-bold text-slate-800">Location</p>
+              <p class="text-slate-500 text-sm">Montréal, Québec, Canada</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="bg-violet-100 rounded-xl p-3 shrink-0">
+              <Icon class="text-violet-700 w-6 h-6" name="uil:clock" />
+            </div>
+            <div>
+              <p class="font-bold text-slate-800">Response time</p>
+              <p class="text-slate-500 text-sm">Within one business day</p>
+            </div>
           </div>
         </div>
       </div>
-      <div>
+
+      <!-- Right: Form -->
+      <div class="pt-16 pl-16">
         <Contactform />
       </div>
+
     </div>
+
   </Container>
 </Layout>

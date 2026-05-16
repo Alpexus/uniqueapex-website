@@ -6,55 +6,90 @@ import Container from "@/components/container.astro";
 <Layout title="About">
   <Container>
 
-    <!-- Hero -->
-    <div class="text-center max-w-3xl mx-auto mt-16 mb-20">
-      <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">Our Story</p>
-      <h1 class="text-5xl font-bold mt-4 text-slate-800 leading-tight">
-        Built by a parent, <span class="text-violet-700">for every family</span>
-      </h1>
-      <p class="text-lg text-slate-500 mt-6 leading-relaxed">
-        UniqueApex was born from a deeply personal experience — navigating the overwhelming, fragmented world of neurodevelopmental support as a parent. We built the infrastructure families deserve.
-      </p>
+    <!-- Hero + Brand Story -->
+    <div class="grid md:grid-cols-2 gap-16 items-center mt-16 mb-32">
+      <div class="space-y-6">
+        <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">Our Story</p>
+        <h1 class="text-5xl font-bold text-slate-800 leading-tight">
+          Built by a parent, <span class="text-violet-700">for every family</span>
+        </h1>
+        <p class="text-slate-600 leading-relaxed text-lg">
+          Families are left to navigate fragmented systems alone — becoming researchers, schedulers, advocates, and coordinators on top of being caregivers.
+        </p>
+        <p class="text-slate-600 leading-relaxed text-lg">
+          Behind every appointment, assessment, and waitlist is a family trying to build the best possible path forward for their child.
+        </p>
+        <p class="text-slate-600 leading-relaxed text-lg">
+          UniqueApex was born from lived experience and a simple belief: families deserve better infrastructure, not just better intentions.
+        </p>
+      </div>
+      <div class="flex items-center justify-center">
+        <img src="/mom-overwhelmed.png" alt="Family journey illustration" class="w-full max-w-[560px]" />
+      </div>
+    </div>
+
+    <!-- Name meaning -->
+    <div class="bg-violet-50 rounded-3xl p-12 md:p-16 mb-32">
+      <div class="max-w-3xl mx-auto text-center">
+        <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide mb-4">The Name</p>
+        <h2 class="text-4xl font-bold text-slate-800 leading-tight mb-8">
+          What does <span class="text-violet-700">UniqueApex</span> mean?
+        </h2>
+        <div class="grid md:grid-cols-2 gap-8 text-left mt-8">
+          <div class="bg-white rounded-2xl p-8">
+            <h3 class="text-2xl font-bold text-violet-700 mb-3">Unique</h3>
+            <p class="text-slate-500 leading-relaxed text-lg">Every neurodivergent child is unique — with their own strengths, their own timeline, and their own path.</p>
+          </div>
+          <div class="bg-white rounded-2xl p-8">
+            <h3 class="text-2xl font-bold text-violet-700 mb-3">Apex</h3>
+            <p class="text-slate-500 leading-relaxed text-lg">Every family is climbing toward its own version of progress. UniqueApex exists to make that climb less isolating.</p>
+          </div>
+        </div>
+        <p class="text-slate-500 mt-10 text-xl italic font-medium">"Because different journeys deserve better support."</p>
+      </div>
     </div>
 
     <!-- Mission -->
-    <div class="grid md:grid-cols-2 gap-16 items-center mb-24">
+    <div class="grid md:grid-cols-2 gap-16 items-center mb-32">
+      <div class="flex items-center justify-center">
+        <img src="/climbing-family.png" alt="Climbing illustration" class="w-full max-w-[540px]" />
+      </div>
       <div>
         <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">Our Mission</p>
         <h2 class="text-4xl font-bold mt-3 text-slate-800 leading-tight">
           Coordination infrastructure, <span class="text-violet-700">not just a directory</span>
         </h2>
         <p class="text-slate-500 mt-6 leading-relaxed text-lg">
-          Families of neurodivergent children don't lack services — they lack the infrastructure to access them. UniqueApex fills that gap with a structured, automated coordination layer that works for families from first concern through ongoing care.
+          UniqueApex is a support ecosystem designed to help families navigate complex care journeys with greater clarity and better coordination.
         </p>
-      </div>
-      <div class="rounded-2xl overflow-hidden">
-        <img src="/2.png" alt="Family illustration" class="w-full object-cover" />
+        <p class="text-slate-500 mt-4 leading-relaxed text-lg">
+          We are starting with the most urgent pain point — connecting families with the right providers. Our long-term vision is to build a fully connected, accessible infrastructure for neurodivergent families everywhere.
+        </p>
       </div>
     </div>
 
     <!-- Values -->
-    <div class="mb-24">
+    <div class="mb-32">
       <div class="text-center mb-12">
         <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">Our Values</p>
         <h2 class="text-4xl font-bold mt-3 text-slate-800">What we stand for</h2>
       </div>
       <div class="grid md:grid-cols-2 gap-8">
         <div class="bg-slate-50 rounded-2xl p-8">
-          <h3 class="text-xl font-bold text-violet-700">Empathy</h3>
-          <p class="text-slate-500 mt-3 leading-relaxed">We start with the family. Every decision we make is grounded in the real experience of parents navigating an overwhelming system.</p>
+          <h3 class="text-2xl font-bold text-violet-700 mb-3">Empathy</h3>
+          <p class="text-slate-500 leading-relaxed text-lg">Every decision we make is grounded in the real experience of parents navigating an overwhelming system.</p>
         </div>
         <div class="bg-slate-50 rounded-2xl p-8">
-          <h3 class="text-xl font-bold text-violet-700">Clarity</h3>
-          <p class="text-slate-500 mt-3 leading-relaxed">No jargon, no confusion. We make complex systems simple so families can focus on their child — not on paperwork.</p>
+          <h3 class="text-2xl font-bold text-violet-700 mb-3">Clarity</h3>
+          <p class="text-slate-500 leading-relaxed text-lg">We make complex systems simple so families can focus on their child — not on paperwork.</p>
         </div>
         <div class="bg-slate-50 rounded-2xl p-8">
-          <h3 class="text-xl font-bold text-violet-700">Access</h3>
-          <p class="text-slate-500 mt-3 leading-relaxed">Every child deserves support regardless of language, location, or how overwhelmed their parents feel. We remove barriers, not add them.</p>
+          <h3 class="text-2xl font-bold text-violet-700 mb-3">Access</h3>
+          <p class="text-slate-500 leading-relaxed text-lg">Every child deserves support regardless of language, location, or how overwhelmed their parents feel.</p>
         </div>
         <div class="bg-slate-50 rounded-2xl p-8">
-          <h3 class="text-xl font-bold text-violet-700">Community</h3>
-          <p class="text-slate-500 mt-3 leading-relaxed">No family navigates alone. UniqueApex connects families with each other, with experts, and with the providers who can actually help.</p>
+          <h3 class="text-2xl font-bold text-violet-700 mb-3">Community</h3>
+          <p class="text-slate-500 leading-relaxed text-lg">No family navigates alone. UniqueApex connects families with each other, with experts, and with the right providers.</p>
         </div>
       </div>
     </div>
@@ -66,7 +101,7 @@ import Container from "@/components/container.astro";
           <img
             src="/headshot.jpeg"
             alt="Pelin İpek Temurcan"
-            class="w-48 h-48 rounded-full object-cover shadow-lg"
+            class="w-52 h-52 rounded-full object-cover shadow-lg"
           />
           <h3 class="font-bold text-xl mt-4 text-slate-800">Pelin İpek Temurcan</h3>
           <p class="text-violet-700 font-medium">Founder & CEO</p>
@@ -74,13 +109,16 @@ import Container from "@/components/container.astro";
         <div class="md:col-span-2">
           <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">A message from our Founder</p>
           <h2 class="text-3xl font-bold mt-3 text-slate-800 leading-tight">
-            "I built what I wish had existed."
+            "Behind every waitlist is a family that needed help yesterday."
           </h2>
           <p class="text-slate-500 mt-6 leading-relaxed text-lg">
-            When I started navigating the support system for my child, I was shocked by how fragmented everything was. I had to contact each provider individually, re-explain the same story over and over, and wait months with no visibility into where things stood. I have a background in project management and architecture — and even I found it overwhelming. I can only imagine how it feels for families who don't have that toolkit.
+            UniqueApex was born from my own journey as a parent. Finding the right providers, navigating waitlists, and managing endless coordination across disconnected services became a full-time job.
           </p>
           <p class="text-slate-500 mt-4 leading-relaxed text-lg">
-            UniqueApex is the coordination layer that should have always existed. We are starting in Montréal, serving English and French-speaking families, and we are just getting started.
+            I built UniqueApex so families can spend less time searching and coordinating, and more time on what actually matters.
+          </p>
+          <p class="text-violet-700 mt-6 text-lg font-medium italic">
+            Every child's journey is different. Every family deserves better support.
           </p>
         </div>
       </div>
