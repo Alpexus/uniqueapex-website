@@ -4,50 +4,49 @@ import Link from "@/components/ui/link.astro";
 const { plan } = Astro.props;
 ---
 
-<div class="relative flex flex-col w-full rounded-2xl p-8 bg-white border border-slate-200 shadow-sm">
-  
+<div class={`relative flex flex-col w-full rounded-3xl p-8 transition-all duration-200 ${plan.popular ? 'bg-violet-700 text-white shadow-xl scale-105' : 'bg-white border border-slate-200 hover:border-violet-200 hover:shadow-md'}`}>
+
   {plan.popular && (
     <div class="absolute -top-5 left-1/2 -translate-x-1/2">
-      <span class="bg-violet-700 text-white text-sm font-bold px-6 py-2 rounded-full uppercase tracking-widest whitespace-nowrap shadow-md">
+      <span class="bg-white text-violet-700 text-sm font-bold px-6 py-2 rounded-full uppercase tracking-widest whitespace-nowrap shadow-md">
         Most Popular
       </span>
     </div>
   )}
 
-  <h4 class="text-2xl font-bold text-slate-800 mt-2">
+  <div class="text-4xl mb-4">{plan.icon}</div>
+
+  <h4 class={`text-2xl font-bold mt-2 ${plan.popular ? 'text-white' : 'text-slate-800'}`}>
     {plan.name}
   </h4>
 
-  <div class="mt-4 mb-6 border-t border-slate-200"></div>
+  <p class={`text-sm mt-2 mb-6 leading-relaxed ${plan.popular ? 'text-violet-200' : 'text-slate-500'}`}>
+    {plan.description}
+  </p>
 
-  <div class="flex items-center gap-3">
-    <p class="text-5xl font-bold text-slate-800">
+  <div class="flex items-end gap-1 mb-8">
+    <p class={`text-5xl font-bold ${plan.popular ? 'text-white' : 'text-slate-800'}`}>
       {plan.price}
     </p>
-    {plan.onetime && (
-      <span class="bg-violet-100 text-violet-700 text-xs font-semibold px-3 py-1 rounded-full">
-        one-time
-      </span>
-    )}
+    <span class={`text-sm mb-2 ${plan.popular ? 'text-violet-200' : 'text-slate-400'}`}>
+      {plan.period}
+    </span>
   </div>
 
-  <p class="text-slate-400 text-sm mt-3 mb-6">Features</p>
-
   <ul class="space-y-3 flex-grow">
-    {plan.features.map((item) => (
+    {plan.features.map((item: any) => (
       <li class="flex items-center gap-3">
-        <span class="text-violet-700 shrink-0 w-5 text-lg leading-none">✓</span>
-        <span class="text-slate-600 text-sm whitespace-nowrap">{item}</span>
+        <span class={`shrink-0 w-5 text-lg leading-none ${plan.popular ? 'text-violet-200' : 'text-violet-700'}`}>✓</span>
+        <span class={`text-sm ${plan.popular ? 'text-violet-100' : 'text-slate-600'}`}>{item}</span>
       </li>
     ))}
   </ul>
 
   <div class="mt-10 flex justify-center">
-    <Link
+    
       href={plan.button.link || "#"}
-      block
-      style="primary">
+      class={`w-full text-center py-3 px-6 rounded-full font-semibold transition-colors duration-200 ${plan.popular ? 'bg-white text-violet-700 hover:bg-violet-50' : 'bg-violet-700 text-white hover:bg-violet-800'}`}>
       {plan.button.text || "Get Started"}
-    </Link>
+    </a>
   </div>
 </div>

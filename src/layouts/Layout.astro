@@ -20,8 +20,8 @@ const resolvedImageWithDomain = new URL(
 const { title } = Astro.props;
 
 const makeTitle = title
-  ? title + " | " + "Astroship"
-  : "Astroship - Starter Template for Astro with Tailwind CSS";
+  ? title + " | " + "UniqueApex"
+  : "UniqueApex — Therapy Coordination for Neurodivergent Families";
 ---
 
 <!doctype html>
@@ -31,26 +31,26 @@ const makeTitle = title
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="keywords" content="UniqueApex, Unique Apex, neurodivergent children, therapy coordination, autism support Montreal, ADHD support, speech therapy Montreal, occupational therapy, waitlist tracking, family support" />
 
-    <!-- <link rel="preload" as="image" href={src} alt="Hero" /> -->
     <SEO
       title={makeTitle}
-      description="Astroship is a starter website template for Astro built with TailwindCSS."
+      description="UniqueApex helps families of neurodivergent children coordinate therapy access — from first concern to ongoing care. Serving English and French families in Montréal."
       canonical={canonicalURL}
       twitter={{
-        creator: "@surjithctly",
-        site: "@web3templates",
+        creator: "@uniqueapex",
+        site: "@uniqueapex",
         card: "summary_large_image",
       }}
       openGraph={{
         basic: {
           url: canonicalURL,
           type: "website",
-          title: `Astroship - Starter Template for Astro`,
+          title: "UniqueApex — Therapy Coordination for Neurodivergent Families",
           image: resolvedImageWithDomain,
         },
         image: {
-          alt: "Astroship Homepage Screenshot",
+          alt: "UniqueApex — Helping families find therapy support in Montréal",
         },
       }}
     />
@@ -60,8 +60,6 @@ const makeTitle = title
     <slot />
     <Footer />
     <style is:global>
-      /* Improve Page speed */
-      /* https://css-tricks.com/almanac/properties/c/content-visibility/ */
       img {
         content-visibility: auto;
       }
