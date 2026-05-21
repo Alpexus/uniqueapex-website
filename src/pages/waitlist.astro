@@ -20,14 +20,9 @@ import Layout from "@/layouts/Layout.astro";
     <!-- Form -->
     <div class="max-w-2xl mx-auto mb-24">
       <form
-        action="https://api.web3forms.com/submit"
-        method="POST"
         id="waitlist-form"
         class="space-y-6"
         novalidate>
-        <input type="hidden" name="access_key" value="f4d53ef2-b415-4409-85cb-637999c33e23" />
-        <input type="hidden" name="subject" value="New Waitlist Signup — UniqueApex" />
-        <input type="checkbox" class="hidden" style="display:none" name="botcheck" />
 
         <!-- About You -->
         <div class="bg-slate-50 rounded-2xl p-8 space-y-4">
@@ -156,6 +151,7 @@ import Layout from "@/layouts/Layout.astro";
         <div>
           <button
             type="submit"
+            id="submit-btn"
             class="w-full bg-violet-700 hover:bg-violet-800 text-white font-semibold py-4 px-8 rounded-full transition-colors duration-200 text-lg">
             Join the Waitlist
           </button>
@@ -170,38 +166,67 @@ import Layout from "@/layouts/Layout.astro";
 </Layout>
 
 <script is:inline>
+  const SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+
   const form = document.getElementById("waitlist-form");
   const result = document.getElementById("waitlist-result");
+  const submitBtn = document.getElementById("submit-btn");
 
-  form.addEventListener("submit", function (e) {
+  form.addEventListener("submit", async function (e) {
     e.preventDefault();
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+    result.innerHTML = "";
+
     const formData = new FormData(form);
-    const object = Object.fromEntries(formData);
-    const json = JSON.stringify(object);
 
-    result.innerHTML = "Sending...";
+    const data = {
+      full_name: formData.get("full_name") || null,
+      email: formData.get("email") || null,
+      phone: formData.get("phone") || null,
+      language: formData.get("language") || null,
+      child_age: formData.get("child_age") || null,
+      diagnosis: formData.get("diagnosis") || null,
+      service_slp: formData.get("service_slp") || null,
+      service_ot: formData.get("service_ot") || null,
+      service_aba: formData.get("service_aba") || null,
+      service_other: formData.get("service_other") || null,
+      location: formData.get("location") || null,
+      referral: formData.get("referral") || null,
+      additional_info: formData.get("additional_info") || null,
+      status: "New"
+    };
 
-    fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: json,
-    })
-      .then(async (response) => {
-        let json = await response.json();
-        if (response.status == 200) {
-          result.classList.add("text-green-500");
-          result.innerHTML = "You are on the waitlist! We will be in touch soon.";
-          form.reset();
-        } else {
-          result.classList.add("text-red-500");
-          result.innerHTML = json.message;
-        }
-      })
-      .catch((error) => {
-        result.innerHTML = "Something went wrong. Please try again.";
+    try {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(data),
       });
+
+      if (response.ok) {
+        result.innerHTML = "<span class='text-green-500 font-medium'>You are on the waitlist! We will be in touch soon.</span>";
+        form.reset();
+        submitBtn.textContent = "Submitted!";
+      } else {
+        const error = await response.json();
+        console.error("Supabase error:", error);
+        result.innerHTML = "<span class='text-red-500'>Something went wrong. Please try again.</span>";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Join the Waitlist";
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      result.innerHTML = "<span class='text-red-500'>Something went wrong. Please try again.</span>";
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Join the Waitlist";
+    }
   });
 </script>
