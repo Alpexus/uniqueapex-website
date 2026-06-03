@@ -3,30 +3,6 @@ import Layout from "@/layouts/AdminLayout.astro";
 ---
 
 <Layout title="UniqueApex Admin">
-<style is:global>
-  .status-new { background: #ede9fe !important; color: #6d28d9 !important; }
-  .status-contacted { background: #dbeafe !important; color: #1d4ed8 !important; }
-  .status-matched { background: #dcfce7 !important; color: #15803d !important; }
-  .status-waitlisted { background: #fef9c3 !important; color: #a16207 !important; }
-  .status-closed { background: #f1f5f9 !important; color: #64748b !important; }
-  .status-select { padding: 5px 10px !important; border-radius: 8px !important; font-size: 12px !important; font-weight: 600 !important; border: none !important; outline: none !important; cursor: pointer !important; }
-  .name { font-weight: 600 !important; color: #1e293b !important; font-size: 14px !important; }
-  .sub { font-size: 11px !important; color: #94a3b8 !important; margin-top: 3px !important; display: block !important; }
-  .email { color: #475569 !important; font-size: 13px !important; }
-  td { padding: 14px 20px !important; border-bottom: 1px solid #f1f5f9 !important; vertical-align: top !important; }
-  th { text-align: left !important; padding: 10px 20px !important; font-size: 11px !important; font-weight: 600 !important; color: #94a3b8 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; white-space: nowrap !important; }
-  tr:last-child td { border-bottom: none !important; }
-  tr:hover td { background: #fafafa !important; }
-  table { width: 100% !important; border-collapse: collapse !important; font-size: 13px !important; }
-  .table-card { background: white !important; border-radius: 16px !important; border: 1px solid #e2e8f0 !important; overflow: hidden !important; }
-  .header { background: white !important; border-bottom: 1px solid #e2e8f0 !important; position: sticky !important; top: 0 !important; z-index: 10 !important; }
-  .gate-btn { width: 100% !important; background: #6d28d9 !important; color: white !important; font-weight: 600 !important; padding: 12px 24px !important; border: none !important; border-radius: 12px !important; font-size: 15px !important; cursor: pointer !important; }
-  .gate-btn:hover { background: #5b21b6 !important; }
-  .gate-card { background: white !important; border-radius: 20px !important; padding: 40px !important; width: 100% !important; max-width: 360px !important; text-align: center !important; box-shadow: 0 25px 50px rgba(0,0,0,0.3) !important; }
-  .gate-input { width: 100% !important; padding: 12px 16px !important; border: 1px solid #e2e8f0 !important; border-radius: 12px !important; font-size: 15px !important; text-align: center !important; color: #1e293b !important; outline: none !important; margin-bottom: 12px !important; display: block !important; }
-  #password-gate { position: fixed !important; inset: 0 !important; background: #0f172a !important; display: flex !important; align-items: center !important; justify-content: center !important; z-index: 50 !important; }
-  body { background: #f8fafc !important; min-height: 100vh !important; margin: 0 !important; }
-</style>
 
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
@@ -39,7 +15,7 @@ import Layout from "@/layouts/AdminLayout.astro";
   .gate-input { width: 100%; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 15px; text-align: center; color: #1e293b; outline: none; margin-bottom: 12px; display: block; }
   .gate-input:focus { border-color: #a78bfa; box-shadow: 0 0 0 3px #ede9fe; }
   .gate-error { color: #ef4444; font-size: 13px; margin-bottom: 12px; display: none; }
-  .gate-btn { width: 100%; background: #6d28d9; color: white; font-weight: 600; padding: 12px 24px; border: none; border-radius: 12px; font-size: 15px; cursor: pointer; }
+  .gate-btn { width: 100%; background: #6d28d9; color: white; font-weight: 600; padding: 12px 24px; border: none; border-radius: 12px; font-size: 15px; cursor: pointer; display: block; }
   .gate-btn:hover { background: #5b21b6; }
   #admin-dashboard { display: none; }
   .header { background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; }
@@ -175,7 +151,7 @@ import Layout from "@/layouts/AdminLayout.astro";
   </div>
 </div>
 
-<script>
+<script is:inline>
   const SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
   const ADMIN_PASSWORD = "qPL!gVM$#Wpj&n";
@@ -199,12 +175,12 @@ import Layout from "@/layouts/AdminLayout.astro";
   }
 
   document.getElementById("unlock-btn").addEventListener("click", unlock);
-  passwordInput.addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
+  passwordInput.addEventListener("keydown", function(e) { if (e.key === "Enter") unlock(); });
 
   async function loadFamilies() {
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist?select=*&order=created_at.desc`, {
-        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+      const res = await fetch(SUPABASE_URL + "/rest/v1/waitlist?select=*&order=created_at.desc", {
+        headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY }
       });
       allFamilies = await res.json();
       updateStats();
@@ -214,17 +190,17 @@ import Layout from "@/layouts/AdminLayout.astro";
 
   function updateStats() {
     const total = allFamilies.length;
-    const newCount = allFamilies.filter(f => !f.status || f.status === "New").length;
-    const matched = allFamilies.filter(f => f.status === "Matched").length;
-    document.getElementById("stats-bar").innerHTML = `
-      <span class="stat stat-total"><strong>${total}</strong> total</span>
-      <span class="stat stat-new"><strong>${newCount}</strong> new</span>
-      <span class="stat stat-matched"><strong>${matched}</strong> matched</span>
-    `;
+    const newCount = allFamilies.filter(function(f) { return !f.status || f.status === "New"; }).length;
+    const matched = allFamilies.filter(function(f) { return f.status === "Matched"; }).length;
+    document.getElementById("stats-bar").innerHTML =
+      '<span class="stat stat-total"><strong>' + total + '</strong> total</span>' +
+      '<span class="stat stat-new"><strong>' + newCount + '</strong> new</span>' +
+      '<span class="stat stat-matched"><strong>' + matched + '</strong> matched</span>';
   }
 
   function statusClass(s) {
-    return { New: "status-new", Contacted: "status-contacted", Matched: "status-matched", Waitlisted: "status-waitlisted", Closed: "status-closed" }[s] || "status-new";
+    var map = { New: "status-new", Contacted: "status-contacted", Matched: "status-matched", Waitlisted: "status-waitlisted", Closed: "status-closed" };
+    return map[s] || "status-new";
   }
 
   function renderTable(families) {
@@ -238,54 +214,54 @@ import Layout from "@/layouts/AdminLayout.astro";
     document.getElementById("empty-state").style.display = "none";
     document.getElementById("table-container").style.display = "block";
 
-    const tbody = document.getElementById("table-body");
-    tbody.innerHTML = families.map(f => {
-      const services = [f.service_slp, f.service_ot, f.service_aba, f.service_other].filter(Boolean).join(", ") || "—";
-      const date = new Date(f.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
-      const status = f.status || "New";
-      const sc = statusClass(status);
-      return `<tr>
-        <td><div class="name">${f.full_name || "—"}</div><span class="sub">${f.language || "—"}</span></td>
-        <td><div class="email">${f.email || "—"}</div><span class="sub">${f.phone || "—"}</span></td>
-        <td><div style="color:#475569;font-size:13px">${f.diagnosis || "—"}</div><span class="sub">${f.child_age ? f.child_age + " yrs" : "—"}</span></td>
-        <td style="max-width:180px;font-size:12px;color:#475569;line-height:1.5">${services}</td>
-        <td><div style="color:#475569;font-size:13px">${f.location || "—"}</div><span class="sub">${f.referral || "—"}</span></td>
-        <td style="color:#64748b;white-space:nowrap;font-size:13px">${date}</td>
-        <td><select class="status-select ${sc}" onchange="updateStatus(${f.id}, this.value, this)">
-          <option value="New" ${status==="New"?"selected":""}>New</option>
-          <option value="Contacted" ${status==="Contacted"?"selected":""}>Contacted</option>
-          <option value="Matched" ${status==="Matched"?"selected":""}>Matched</option>
-          <option value="Waitlisted" ${status==="Waitlisted"?"selected":""}>Waitlisted</option>
-          <option value="Closed" ${status==="Closed"?"selected":""}>Closed</option>
-        </select></td>
-      </tr>`;
+    var tbody = document.getElementById("table-body");
+    tbody.innerHTML = families.map(function(f) {
+      var services = [f.service_slp, f.service_ot, f.service_aba, f.service_other].filter(Boolean).join(", ") || "—";
+      var date = new Date(f.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
+      var status = f.status || "New";
+      var sc = statusClass(status);
+      return '<tr>' +
+        '<td><div class="name">' + (f.full_name || "—") + '</div><span class="sub">' + (f.language || "—") + '</span></td>' +
+        '<td><div class="email">' + (f.email || "—") + '</div><span class="sub">' + (f.phone || "—") + '</span></td>' +
+        '<td><div style="color:#475569;font-size:13px">' + (f.diagnosis || "—") + '</div><span class="sub">' + (f.child_age ? f.child_age + " yrs" : "—") + '</span></td>' +
+        '<td style="max-width:180px;font-size:12px;color:#475569;line-height:1.5">' + services + '</td>' +
+        '<td><div style="color:#475569;font-size:13px">' + (f.location || "—") + '</div><span class="sub">' + (f.referral || "—") + '</span></td>' +
+        '<td style="color:#64748b;white-space:nowrap;font-size:13px">' + date + '</td>' +
+        '<td><select class="status-select ' + sc + '" onchange="updateStatus(' + f.id + ', this.value, this)">' +
+        '<option value="New"' + (status==="New"?" selected":"") + '>New</option>' +
+        '<option value="Contacted"' + (status==="Contacted"?" selected":"") + '>Contacted</option>' +
+        '<option value="Matched"' + (status==="Matched"?" selected":"") + '>Matched</option>' +
+        '<option value="Waitlisted"' + (status==="Waitlisted"?" selected":"") + '>Waitlisted</option>' +
+        '<option value="Closed"' + (status==="Closed"?" selected":"") + '>Closed</option>' +
+        '</select></td>' +
+        '</tr>';
     }).join("");
-    document.getElementById("record-count").textContent = `Showing ${families.length} of ${allFamilies.length} families`;
+    document.getElementById("record-count").textContent = "Showing " + families.length + " of " + allFamilies.length + " families";
   }
 
-  async function updateStatus(id, newStatus, el) {
-    await fetch(`${SUPABASE_URL}/rest/v1/waitlist?id=eq.${id}`, {
+  function updateStatus(id, newStatus, el) {
+    fetch(SUPABASE_URL + "/rest/v1/waitlist?id=eq." + id, {
       method: "PATCH",
-      headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "return=minimal" },
+      headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", "Prefer": "return=minimal" },
       body: JSON.stringify({ status: newStatus })
     });
-    const f = allFamilies.find(f => f.id === id);
+    var f = allFamilies.find(function(f) { return f.id === id; });
     if (f) f.status = newStatus;
-    el.className = `status-select ${statusClass(newStatus)}`;
+    el.className = "status-select " + statusClass(newStatus);
     updateStats();
   }
   window.updateStatus = updateStatus;
 
   function applyFilters() {
-    const status = document.getElementById("filter-status").value;
-    const service = document.getElementById("filter-service").value;
-    const language = document.getElementById("filter-language").value;
-    const search = document.getElementById("filter-search").value.toLowerCase();
-    renderTable(allFamilies.filter(f => {
+    var status = document.getElementById("filter-status").value;
+    var service = document.getElementById("filter-service").value;
+    var language = document.getElementById("filter-language").value;
+    var search = document.getElementById("filter-search").value.toLowerCase();
+    renderTable(allFamilies.filter(function(f) {
       if (status && (f.status || "New") !== status) return false;
       if (language && f.language !== language) return false;
-      if (service && ![f.service_slp, f.service_ot, f.service_aba, f.service_other].includes(service)) return false;
-      if (search && !(f.full_name||"").toLowerCase().includes(search) && !(f.email||"").toLowerCase().includes(search)) return false;
+      if (service && [f.service_slp, f.service_ot, f.service_aba, f.service_other].indexOf(service) === -1) return false;
+      if (search && (f.full_name||"").toLowerCase().indexOf(search) === -1 && (f.email||"").toLowerCase().indexOf(search) === -1) return false;
       return true;
     }));
   }
@@ -294,8 +270,10 @@ import Layout from "@/layouts/AdminLayout.astro";
   document.getElementById("filter-service").addEventListener("change", applyFilters);
   document.getElementById("filter-language").addEventListener("change", applyFilters);
   document.getElementById("filter-search").addEventListener("input", applyFilters);
-  document.getElementById("clear-filters").addEventListener("click", () => {
-    ["filter-status","filter-service","filter-language"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("clear-filters").addEventListener("click", function() {
+    document.getElementById("filter-status").value = "";
+    document.getElementById("filter-service").value = "";
+    document.getElementById("filter-language").value = "";
     document.getElementById("filter-search").value = "";
     renderTable(allFamilies);
   });
