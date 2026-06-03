@@ -1,9 +1,17 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import Container from "@/components/container.astro";
+// UniqueApex Admin Dashboard - No layout/navbar
 ---
 
-<Layout title="UniqueApex Admin">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniqueApex Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50">
+
   <!-- Password Gate -->
   <div id="password-gate" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
     <div class="bg-white rounded-2xl p-10 w-full max-w-sm shadow-2xl text-center">
@@ -30,7 +38,7 @@ import Container from "@/components/container.astro";
   </div>
 
   <!-- Admin Dashboard -->
-  <div id="admin-dashboard" class="hidden min-h-screen bg-slate-50">
+  <div id="admin-dashboard" class="hidden min-h-screen">
 
     <!-- Header -->
     <div class="bg-white border-b border-slate-200 sticky top-0 z-10">
@@ -46,7 +54,7 @@ import Container from "@/components/container.astro";
             <p class="text-xs text-slate-500">Waitlist Dashboard</p>
           </div>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-4">
           <div id="stats-bar" class="flex gap-4 text-sm"></div>
           <button id="refresh-btn" class="text-slate-400 hover:text-violet-700 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,227 +133,227 @@ import Container from "@/components/container.astro";
       <p class="text-center text-slate-400 text-xs mt-4" id="record-count"></p>
     </div>
   </div>
-</Layout>
 
-<script is:inline>
-  const SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
-  const ADMIN_PASSWORD = "qPL!gVM$#Wpj&n";
+  <script>
+    const SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+    const ADMIN_PASSWORD = "qPL!gVM$#Wpj&n";
 
-  let allFamilies = [];
+    let allFamilies = [];
 
-  // ── Password Gate ──────────────────────────────────────────
-  const gate = document.getElementById("password-gate");
-  const dashboard = document.getElementById("admin-dashboard");
-  const passwordInput = document.getElementById("admin-password");
-  const unlockBtn = document.getElementById("unlock-btn");
-  const passwordError = document.getElementById("password-error");
+    // ── Password Gate ──────────────────────────────────────────
+    const gate = document.getElementById("password-gate");
+    const dashboard = document.getElementById("admin-dashboard");
+    const passwordInput = document.getElementById("admin-password");
+    const unlockBtn = document.getElementById("unlock-btn");
+    const passwordError = document.getElementById("password-error");
 
-  function unlock() {
-    if (passwordInput.value === ADMIN_PASSWORD) {
-      gate.style.display = "none";
-      dashboard.classList.remove("hidden");
-      loadFamilies();
-    } else {
-      passwordError.classList.remove("hidden");
-      passwordInput.value = "";
-      passwordInput.focus();
-    }
-  }
-
-  unlockBtn.addEventListener("click", unlock);
-  passwordInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") unlock();
-  });
-
-  // ── Load Data ──────────────────────────────────────────────
-  async function loadFamilies() {
-    document.getElementById("loading").classList.remove("hidden");
-    document.getElementById("table-container").classList.add("hidden");
-    document.getElementById("empty-state").classList.add("hidden");
-
-    try {
-      const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/waitlist?select=*&order=created_at.desc`,
-        {
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-          }
-        }
-      );
-      allFamilies = await response.json();
-      updateStats();
-      renderTable(allFamilies);
-    } catch (error) {
-      console.error("Error loading families:", error);
-    }
-  }
-
-  // ── Stats Bar ──────────────────────────────────────────────
-  function updateStats() {
-    const stats = {
-      total: allFamilies.length,
-      new: allFamilies.filter(f => f.status === "New" || !f.status).length,
-      matched: allFamilies.filter(f => f.status === "Matched").length,
-    };
-    document.getElementById("stats-bar").innerHTML = `
-      <span class="text-slate-500"><span class="font-bold text-slate-800">${stats.total}</span> total</span>
-      <span class="text-violet-600"><span class="font-bold">${stats.new}</span> new</span>
-      <span class="text-teal-600"><span class="font-bold">${stats.matched}</span> matched</span>
-    `;
-  }
-
-  // ── Render Table ───────────────────────────────────────────
-  function renderTable(families) {
-    document.getElementById("loading").classList.add("hidden");
-
-    if (families.length === 0) {
-      document.getElementById("empty-state").classList.remove("hidden");
-      document.getElementById("table-container").classList.add("hidden");
-      document.getElementById("record-count").textContent = "";
-      return;
-    }
-
-    document.getElementById("empty-state").classList.add("hidden");
-    document.getElementById("table-container").classList.remove("hidden");
-
-    const statusColors = {
-      "New": "bg-violet-100 text-violet-700",
-      "Contacted": "bg-blue-100 text-blue-700",
-      "Matched": "bg-green-100 text-green-700",
-      "Waitlisted": "bg-yellow-100 text-yellow-700",
-      "Closed": "bg-slate-100 text-slate-500",
-    };
-
-    const tbody = document.getElementById("table-body");
-    tbody.innerHTML = families.map(f => {
-      const services = [f.service_slp, f.service_ot, f.service_aba, f.service_other]
-        .filter(Boolean)
-        .join(", ") || "—";
-      const date = new Date(f.created_at).toLocaleDateString("en-CA", {
-        month: "short", day: "numeric", year: "numeric"
-      });
-      const status = f.status || "New";
-      const statusClass = statusColors[status] || "bg-slate-100 text-slate-500";
-
-      return `
-        <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-          <td class="px-5 py-4">
-            <div class="font-semibold text-slate-800">${f.full_name || "—"}</div>
-            <div class="text-xs text-slate-400 mt-0.5">${f.language || "—"}</div>
-          </td>
-          <td class="px-5 py-4">
-            <div class="text-slate-700">${f.email || "—"}</div>
-            <div class="text-xs text-slate-400 mt-0.5">${f.phone || "—"}</div>
-          </td>
-          <td class="px-5 py-4">
-            <div class="text-slate-700">${f.diagnosis || "—"}</div>
-            <div class="text-xs text-slate-400 mt-0.5">${f.child_age || "—"} yrs</div>
-          </td>
-          <td class="px-5 py-4 max-w-[180px]">
-            <div class="text-slate-700 text-xs leading-relaxed">${services}</div>
-          </td>
-          <td class="px-5 py-4">
-            <div class="text-slate-700">${f.location || "—"}</div>
-            <div class="text-xs text-slate-400 mt-0.5">${f.referral || "—"}</div>
-          </td>
-          <td class="px-5 py-4 text-slate-500 whitespace-nowrap">${date}</td>
-          <td class="px-5 py-4">
-            <select
-              class="status-select px-3 py-1.5 rounded-lg text-xs font-semibold border-0 outline-none cursor-pointer ${statusClass}"
-              data-id="${f.id}"
-              onchange="updateStatus(${f.id}, this.value, this)">
-              <option value="New" ${status === "New" ? "selected" : ""}>New</option>
-              <option value="Contacted" ${status === "Contacted" ? "selected" : ""}>Contacted</option>
-              <option value="Matched" ${status === "Matched" ? "selected" : ""}>Matched</option>
-              <option value="Waitlisted" ${status === "Waitlisted" ? "selected" : ""}>Waitlisted</option>
-              <option value="Closed" ${status === "Closed" ? "selected" : ""}>Closed</option>
-            </select>
-          </td>
-        </tr>
-      `;
-    }).join("");
-
-    document.getElementById("record-count").textContent =
-      `Showing ${families.length} of ${allFamilies.length} families`;
-  }
-
-  // ── Update Status ──────────────────────────────────────────
-  async function updateStatus(id, newStatus, selectEl) {
-    const statusColors = {
-      "New": "bg-violet-100 text-violet-700",
-      "Contacted": "bg-blue-100 text-blue-700",
-      "Matched": "bg-green-100 text-green-700",
-      "Waitlisted": "bg-yellow-100 text-yellow-700",
-      "Closed": "bg-slate-100 text-slate-500",
-    };
-
-    try {
-      const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/waitlist?id=eq.${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "return=minimal"
-          },
-          body: JSON.stringify({ status: newStatus })
-        }
-      );
-
-      if (response.ok) {
-        // Update local data
-        const family = allFamilies.find(f => f.id === id);
-        if (family) family.status = newStatus;
-        // Update select color
-        selectEl.className = `status-select px-3 py-1.5 rounded-lg text-xs font-semibold border-0 outline-none cursor-pointer ${statusColors[newStatus]}`;
-        updateStats();
+    function unlock() {
+      if (passwordInput.value === ADMIN_PASSWORD) {
+        gate.style.display = "none";
+        dashboard.classList.remove("hidden");
+        loadFamilies();
+      } else {
+        passwordError.classList.remove("hidden");
+        passwordInput.value = "";
+        passwordInput.focus();
       }
-    } catch (error) {
-      console.error("Error updating status:", error);
     }
-  }
-  window.updateStatus = updateStatus;
 
-  // ── Filters ────────────────────────────────────────────────
-  function applyFilters() {
-    const status = document.getElementById("filter-status").value;
-    const service = document.getElementById("filter-service").value;
-    const language = document.getElementById("filter-language").value;
-    const search = document.getElementById("filter-search").value.toLowerCase();
-
-    let filtered = allFamilies.filter(f => {
-      if (status && (f.status || "New") !== status) return false;
-      if (language && f.language !== language) return false;
-      if (service) {
-        const services = [f.service_slp, f.service_ot, f.service_aba, f.service_other];
-        if (!services.includes(service)) return false;
-      }
-      if (search) {
-        const name = (f.full_name || "").toLowerCase();
-        const email = (f.email || "").toLowerCase();
-        if (!name.includes(search) && !email.includes(search)) return false;
-      }
-      return true;
+    unlockBtn.addEventListener("click", unlock);
+    passwordInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") unlock();
     });
 
-    renderTable(filtered);
-  }
+    // ── Load Data ──────────────────────────────────────────────
+    async function loadFamilies() {
+      document.getElementById("loading").classList.remove("hidden");
+      document.getElementById("table-container").classList.add("hidden");
+      document.getElementById("empty-state").classList.add("hidden");
 
-  document.getElementById("filter-status").addEventListener("change", applyFilters);
-  document.getElementById("filter-service").addEventListener("change", applyFilters);
-  document.getElementById("filter-language").addEventListener("change", applyFilters);
-  document.getElementById("filter-search").addEventListener("input", applyFilters);
-  document.getElementById("clear-filters").addEventListener("click", () => {
-    document.getElementById("filter-status").value = "";
-    document.getElementById("filter-service").value = "";
-    document.getElementById("filter-language").value = "";
-    document.getElementById("filter-search").value = "";
-    renderTable(allFamilies);
-  });
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/waitlist?select=*&order=created_at.desc`,
+          {
+            headers: {
+              "apikey": SUPABASE_KEY,
+              "Authorization": `Bearer ${SUPABASE_KEY}`,
+            }
+          }
+        );
+        allFamilies = await response.json();
+        updateStats();
+        renderTable(allFamilies);
+      } catch (error) {
+        console.error("Error loading families:", error);
+      }
+    }
 
-  document.getElementById("refresh-btn").addEventListener("click", loadFamilies);
-</script>
+    // ── Stats Bar ──────────────────────────────────────────────
+    function updateStats() {
+      const stats = {
+        total: allFamilies.length,
+        new: allFamilies.filter(f => f.status === "New" || !f.status).length,
+        matched: allFamilies.filter(f => f.status === "Matched").length,
+      };
+      document.getElementById("stats-bar").innerHTML = `
+        <span class="text-slate-500"><span class="font-bold text-slate-800">${stats.total}</span> total</span>
+        <span class="text-violet-600"><span class="font-bold">${stats.new}</span> new</span>
+        <span class="text-teal-600"><span class="font-bold">${stats.matched}</span> matched</span>
+      `;
+    }
+
+    // ── Render Table ───────────────────────────────────────────
+    function renderTable(families) {
+      document.getElementById("loading").classList.add("hidden");
+
+      if (families.length === 0) {
+        document.getElementById("empty-state").classList.remove("hidden");
+        document.getElementById("table-container").classList.add("hidden");
+        document.getElementById("record-count").textContent = "";
+        return;
+      }
+
+      document.getElementById("empty-state").classList.add("hidden");
+      document.getElementById("table-container").classList.remove("hidden");
+
+      const statusColors = {
+        "New": "bg-violet-100 text-violet-700",
+        "Contacted": "bg-blue-100 text-blue-700",
+        "Matched": "bg-green-100 text-green-700",
+        "Waitlisted": "bg-yellow-100 text-yellow-700",
+        "Closed": "bg-slate-100 text-slate-500",
+      };
+
+      const tbody = document.getElementById("table-body");
+      tbody.innerHTML = families.map(f => {
+        const services = [f.service_slp, f.service_ot, f.service_aba, f.service_other]
+          .filter(Boolean)
+          .join(", ") || "—";
+        const date = new Date(f.created_at).toLocaleDateString("en-CA", {
+          month: "short", day: "numeric", year: "numeric"
+        });
+        const status = f.status || "New";
+        const statusClass = statusColors[status] || "bg-slate-100 text-slate-500";
+
+        return `
+          <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+            <td class="px-5 py-4">
+              <div class="font-semibold text-slate-800">${f.full_name || "—"}</div>
+              <div class="text-xs text-slate-400 mt-0.5">${f.language || "—"}</div>
+            </td>
+            <td class="px-5 py-4">
+              <div class="text-slate-700">${f.email || "—"}</div>
+              <div class="text-xs text-slate-400 mt-0.5">${f.phone || "—"}</div>
+            </td>
+            <td class="px-5 py-4">
+              <div class="text-slate-700">${f.diagnosis || "—"}</div>
+              <div class="text-xs text-slate-400 mt-0.5">${f.child_age ? f.child_age + ' yrs' : '—'}</div>
+            </td>
+            <td class="px-5 py-4 max-w-[180px]">
+              <div class="text-slate-700 text-xs leading-relaxed">${services}</div>
+            </td>
+            <td class="px-5 py-4">
+              <div class="text-slate-700">${f.location || "—"}</div>
+              <div class="text-xs text-slate-400 mt-0.5">${f.referral || "—"}</div>
+            </td>
+            <td class="px-5 py-4 text-slate-500 whitespace-nowrap">${date}</td>
+            <td class="px-5 py-4">
+              <select
+                class="status-select px-3 py-1.5 rounded-lg text-xs font-semibold border-0 outline-none cursor-pointer ${statusClass}"
+                data-id="${f.id}"
+                onchange="updateStatus(${f.id}, this.value, this)">
+                <option value="New" ${status === "New" ? "selected" : ""}>New</option>
+                <option value="Contacted" ${status === "Contacted" ? "selected" : ""}>Contacted</option>
+                <option value="Matched" ${status === "Matched" ? "selected" : ""}>Matched</option>
+                <option value="Waitlisted" ${status === "Waitlisted" ? "selected" : ""}>Waitlisted</option>
+                <option value="Closed" ${status === "Closed" ? "selected" : ""}>Closed</option>
+              </select>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      document.getElementById("record-count").textContent =
+        `Showing ${families.length} of ${allFamilies.length} families`;
+    }
+
+    // ── Update Status ──────────────────────────────────────────
+    async function updateStatus(id, newStatus, selectEl) {
+      const statusColors = {
+        "New": "bg-violet-100 text-violet-700",
+        "Contacted": "bg-blue-100 text-blue-700",
+        "Matched": "bg-green-100 text-green-700",
+        "Waitlisted": "bg-yellow-100 text-yellow-700",
+        "Closed": "bg-slate-100 text-slate-500",
+      };
+
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/waitlist?id=eq.${id}`,
+          {
+            method: "PATCH",
+            headers: {
+              "apikey": SUPABASE_KEY,
+              "Authorization": `Bearer ${SUPABASE_KEY}`,
+              "Content-Type": "application/json",
+              "Prefer": "return=minimal"
+            },
+            body: JSON.stringify({ status: newStatus })
+          }
+        );
+
+        if (response.ok) {
+          const family = allFamilies.find(f => f.id === id);
+          if (family) family.status = newStatus;
+          selectEl.className = `status-select px-3 py-1.5 rounded-lg text-xs font-semibold border-0 outline-none cursor-pointer ${statusColors[newStatus]}`;
+          updateStats();
+        }
+      } catch (error) {
+        console.error("Error updating status:", error);
+      }
+    }
+    window.updateStatus = updateStatus;
+
+    // ── Filters ────────────────────────────────────────────────
+    function applyFilters() {
+      const status = document.getElementById("filter-status").value;
+      const service = document.getElementById("filter-service").value;
+      const language = document.getElementById("filter-language").value;
+      const search = document.getElementById("filter-search").value.toLowerCase();
+
+      let filtered = allFamilies.filter(f => {
+        if (status && (f.status || "New") !== status) return false;
+        if (language && f.language !== language) return false;
+        if (service) {
+          const services = [f.service_slp, f.service_ot, f.service_aba, f.service_other];
+          if (!services.includes(service)) return false;
+        }
+        if (search) {
+          const name = (f.full_name || "").toLowerCase();
+          const email = (f.email || "").toLowerCase();
+          if (!name.includes(search) && !email.includes(search)) return false;
+        }
+        return true;
+      });
+
+      renderTable(filtered);
+    }
+
+    document.getElementById("filter-status").addEventListener("change", applyFilters);
+    document.getElementById("filter-service").addEventListener("change", applyFilters);
+    document.getElementById("filter-language").addEventListener("change", applyFilters);
+    document.getElementById("filter-search").addEventListener("input", applyFilters);
+    document.getElementById("clear-filters").addEventListener("click", () => {
+      document.getElementById("filter-status").value = "";
+      document.getElementById("filter-service").value = "";
+      document.getElementById("filter-language").value = "";
+      document.getElementById("filter-search").value = "";
+      renderTable(allFamilies);
+    });
+
+    document.getElementById("refresh-btn").addEventListener("click", loadFamilies);
+  </script>
+
+</body>
+</html>
