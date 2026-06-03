@@ -28,20 +28,24 @@ import Layout from "@/layouts/Layout.astro";
         <div class="bg-slate-50 rounded-2xl p-8 space-y-4">
           <h2 class="text-lg font-bold text-slate-800">About you</h2>
           <div class="grid grid-cols-2 gap-4">
-            <input
-              type="text"
-              name="full_name"
-              placeholder="Full Name"
-              required
-              class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email Address"
-              required
-              class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
-            />
+            <div>
+              <input
+                type="text"
+                name="full_name"
+                placeholder="Full Name"
+                class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
+              />
+              <p id="error-full_name" class="text-red-500 text-xs mt-1 hidden"></p>
+            </div>
+            <div>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
+              />
+              <p id="error-email" class="text-red-500 text-xs mt-1 hidden"></p>
+            </div>
           </div>
           <input
             type="tel"
@@ -53,7 +57,7 @@ import Layout from "@/layouts/Layout.astro";
             <label class="block text-sm font-medium text-slate-600 mb-3">Preferred Language</label>
             <div class="flex gap-6">
               <label class="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="language" value="English" class="accent-violet-700" required />
+                <input type="radio" name="language" value="English" class="accent-violet-700" />
                 <span class="text-slate-600">English</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
@@ -65,6 +69,7 @@ import Layout from "@/layouts/Layout.astro";
                 <span class="text-slate-600">Both</span>
               </label>
             </div>
+            <p id="error-language" class="text-red-500 text-xs mt-1 hidden"></p>
           </div>
         </div>
 
@@ -72,28 +77,32 @@ import Layout from "@/layouts/Layout.astro";
         <div class="bg-slate-50 rounded-2xl p-8 space-y-4">
           <h2 class="text-lg font-bold text-slate-800">About your child</h2>
           <div class="grid grid-cols-2 gap-4">
-            <select
-              name="child_age"
-              required
-              class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 text-slate-500 bg-white">
-              <option value="" disabled selected>Age Range</option>
-              <option value="0-3">0 – 3 years</option>
-              <option value="4-6">4 – 6 years</option>
-              <option value="7-10">7 – 10 years</option>
-              <option value="11+">11 years and older</option>
-            </select>
-            <select
-              name="diagnosis"
-              required
-              class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 text-slate-500 bg-white">
-              <option value="" disabled selected>Area of Concern</option>
-              <option value="Autism">Autism</option>
-              <option value="ADHD">ADHD</option>
-              <option value="Speech delay">Speech delay</option>
-              <option value="Language delay">Language delay</option>
-              <option value="Developmental delay">Developmental delay</option>
-              <option value="Other">Other</option>
-            </select>
+            <div>
+              <select
+                name="child_age"
+                class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 text-slate-500 bg-white">
+                <option value="" disabled selected>Age Range</option>
+                <option value="0-3">0 – 3 years</option>
+                <option value="4-6">4 – 6 years</option>
+                <option value="7-10">7 – 10 years</option>
+                <option value="11+">11 years and older</option>
+              </select>
+              <p id="error-child_age" class="text-red-500 text-xs mt-1 hidden"></p>
+            </div>
+            <div>
+              <select
+                name="diagnosis"
+                class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 text-slate-500 bg-white">
+                <option value="" disabled selected>Area of Concern</option>
+                <option value="Autism">Autism</option>
+                <option value="ADHD">ADHD</option>
+                <option value="Speech delay">Speech delay</option>
+                <option value="Language delay">Language delay</option>
+                <option value="Developmental delay">Developmental delay</option>
+                <option value="Other">Other</option>
+              </select>
+              <p id="error-diagnosis" class="text-red-500 text-xs mt-1 hidden"></p>
+            </div>
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-600 mb-3">Services Needed</label>
@@ -115,6 +124,7 @@ import Layout from "@/layouts/Layout.astro";
                 <span class="text-slate-600 text-sm">Other</span>
               </label>
             </div>
+            <p id="error-services" class="text-red-500 text-xs mt-1 hidden"></p>
           </div>
         </div>
 
@@ -122,13 +132,15 @@ import Layout from "@/layouts/Layout.astro";
         <div class="bg-slate-50 rounded-2xl p-8 space-y-4">
           <h2 class="text-lg font-bold text-slate-800">Location & additional info</h2>
           <div class="grid grid-cols-2 gap-4">
-            <input
-              type="text"
-              name="location"
-              placeholder="City / Borough in Montréal"
-              required
-              class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
-            />
+            <div>
+              <input
+                type="text"
+                name="location"
+                placeholder="City / Borough in Montréal"
+                class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
+              />
+              <p id="error-location" class="text-red-500 text-xs mt-1 hidden"></p>
+            </div>
             <select
               name="referral"
               class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 text-slate-500 bg-white">
@@ -173,14 +185,79 @@ import Layout from "@/layouts/Layout.astro";
   const result = document.getElementById("waitlist-result");
   const submitBtn = document.getElementById("submit-btn");
 
+  function showError(id, msg) {
+    var el = document.getElementById(id);
+    if (el) { el.textContent = msg; el.classList.remove("hidden"); }
+  }
+
+  function clearErrors() {
+    ["error-full_name","error-email","error-language","error-child_age","error-diagnosis","error-services","error-location"].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) { el.textContent = ""; el.classList.add("hidden"); }
+    });
+    document.querySelectorAll(".border-red-400").forEach(function(el) {
+      el.classList.remove("border-red-400");
+    });
+  }
+
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
+    clearErrors();
+
+    var formData = new FormData(form);
+    var valid = true;
+
+    if (!formData.get("full_name") || !formData.get("full_name").trim()) {
+      showError("error-full_name", "Please enter your full name.");
+      document.querySelector("[name='full_name']").classList.add("border-red-400");
+      valid = false;
+    }
+
+    var email = formData.get("email") || "";
+    if (!email.trim() || !email.includes("@")) {
+      showError("error-email", "Please enter a valid email address.");
+      document.querySelector("[name='email']").classList.add("border-red-400");
+      valid = false;
+    }
+
+    if (!formData.get("language")) {
+      showError("error-language", "Please select a preferred language.");
+      valid = false;
+    }
+
+    if (!formData.get("child_age")) {
+      showError("error-child_age", "Please select an age range.");
+      document.querySelector("[name='child_age']").classList.add("border-red-400");
+      valid = false;
+    }
+
+    if (!formData.get("diagnosis")) {
+      showError("error-diagnosis", "Please select an area of concern.");
+      document.querySelector("[name='diagnosis']").classList.add("border-red-400");
+      valid = false;
+    }
+
+    var anyService = formData.get("service_slp") || formData.get("service_ot") || formData.get("service_aba") || formData.get("service_other");
+    if (!anyService) {
+      showError("error-services", "Please select at least one service.");
+      valid = false;
+    }
+
+    if (!formData.get("location") || !formData.get("location").trim()) {
+      showError("error-location", "Please enter your city or borough.");
+      document.querySelector("[name='location']").classList.add("border-red-400");
+      valid = false;
+    }
+
+    if (!valid) {
+      var firstError = document.querySelector("[id^='error-']:not(.hidden)");
+      if (firstError) firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Submitting...";
     result.innerHTML = "";
-
-    const formData = new FormData(form);
 
     const data = {
       full_name: formData.get("full_name") || null,
