@@ -35,7 +35,7 @@ import Layout from "@/layouts/Layout.astro";
                 placeholder="Full Name"
                 class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
               />
-              <p id="error-full_name" class="text-red-500 text-xs mt-1 hidden"></p>
+              <p id="error-full_name" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></p>
             </div>
             <div>
               <input
@@ -44,7 +44,7 @@ import Layout from "@/layouts/Layout.astro";
                 placeholder="Email Address"
                 class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
               />
-              <p id="error-email" class="text-red-500 text-xs mt-1 hidden"></p>
+              <p id="error-email" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></p>
             </div>
           </div>
           <input
@@ -69,7 +69,7 @@ import Layout from "@/layouts/Layout.astro";
                 <span class="text-slate-600">Both</span>
               </label>
             </div>
-            <p id="error-language" class="text-red-500 text-xs mt-1 hidden"></p>
+            <p id="error-language" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></p>
           </div>
         </div>
 
@@ -87,7 +87,7 @@ import Layout from "@/layouts/Layout.astro";
                 <option value="7-10">7 – 10 years</option>
                 <option value="11+">11 years and older</option>
               </select>
-              <p id="error-child_age" class="text-red-500 text-xs mt-1 hidden"></p>
+              <p id="error-child_age" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></p>
             </div>
             <div>
               <select
@@ -101,7 +101,7 @@ import Layout from "@/layouts/Layout.astro";
                 <option value="Developmental delay">Developmental delay</option>
                 <option value="Other">Other</option>
               </select>
-              <p id="error-diagnosis" class="text-red-500 text-xs mt-1 hidden"></p>
+              <p id="error-diagnosis" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></p>
             </div>
           </div>
           <div>
@@ -124,7 +124,7 @@ import Layout from "@/layouts/Layout.astro";
                 <span class="text-slate-600 text-sm">Other</span>
               </label>
             </div>
-            <p id="error-services" class="text-red-500 text-xs mt-1 hidden"></p>
+            <p id="error-services" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></p>
           </div>
         </div>
 
@@ -139,7 +139,7 @@ import Layout from "@/layouts/Layout.astro";
                 placeholder="City / Borough in Montréal"
                 class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
               />
-              <p id="error-location" class="text-red-500 text-xs mt-1 hidden"></p>
+              <p id="error-location" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></p>
             </div>
             <select
               name="referral"
@@ -181,85 +181,88 @@ import Layout from "@/layouts/Layout.astro";
   const SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
 
-  const form = document.getElementById("waitlist-form");
-  const result = document.getElementById("waitlist-result");
-  const submitBtn = document.getElementById("submit-btn");
+  var form = document.getElementById("waitlist-form");
+  var result = document.getElementById("waitlist-result");
+  var submitBtn = document.getElementById("submit-btn");
 
   function showError(id, msg) {
     var el = document.getElementById(id);
-    if (el) { el.textContent = msg; el.classList.remove("hidden"); }
+    if (el) {
+      el.textContent = msg;
+      el.style.display = "block";
+    }
   }
 
   function clearErrors() {
-    ["error-full_name","error-email","error-language","error-child_age","error-diagnosis","error-services","error-location"].forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el) { el.textContent = ""; el.classList.add("hidden"); }
-    });
-    document.querySelectorAll(".border-red-400").forEach(function(el) {
-      el.classList.remove("border-red-400");
-    });
+    var ids = ["error-full_name","error-email","error-language","error-child_age","error-diagnosis","error-services","error-location"];
+    for (var i = 0; i < ids.length; i++) {
+      var el = document.getElementById(ids[i]);
+      if (el) { el.textContent = ""; el.style.display = "none"; }
+    }
   }
 
-  form.addEventListener("submit", async function (e) {
+  form.addEventListener("submit", function(e) {
     e.preventDefault();
+    e.stopPropagation();
     clearErrors();
 
     var formData = new FormData(form);
     var valid = true;
 
-    if (!formData.get("full_name") || !formData.get("full_name").trim()) {
+    var fullName = formData.get("full_name");
+    if (!fullName || fullName.trim() === "") {
       showError("error-full_name", "Please enter your full name.");
-      document.querySelector("[name='full_name']").classList.add("border-red-400");
       valid = false;
     }
 
-    var email = formData.get("email") || "";
-    if (!email.trim() || !email.includes("@")) {
+    var email = formData.get("email");
+    if (!email || email.trim() === "" || email.indexOf("@") === -1) {
       showError("error-email", "Please enter a valid email address.");
-      document.querySelector("[name='email']").classList.add("border-red-400");
       valid = false;
     }
 
-    if (!formData.get("language")) {
+    var language = formData.get("language");
+    if (!language) {
       showError("error-language", "Please select a preferred language.");
       valid = false;
     }
 
-    if (!formData.get("child_age")) {
+    var childAge = formData.get("child_age");
+    if (!childAge) {
       showError("error-child_age", "Please select an age range.");
-      document.querySelector("[name='child_age']").classList.add("border-red-400");
       valid = false;
     }
 
-    if (!formData.get("diagnosis")) {
+    var diagnosis = formData.get("diagnosis");
+    if (!diagnosis) {
       showError("error-diagnosis", "Please select an area of concern.");
-      document.querySelector("[name='diagnosis']").classList.add("border-red-400");
       valid = false;
     }
 
-    var anyService = formData.get("service_slp") || formData.get("service_ot") || formData.get("service_aba") || formData.get("service_other");
-    if (!anyService) {
+    var slp = formData.get("service_slp");
+    var ot = formData.get("service_ot");
+    var aba = formData.get("service_aba");
+    var other = formData.get("service_other");
+    if (!slp && !ot && !aba && !other) {
       showError("error-services", "Please select at least one service.");
       valid = false;
     }
 
-    if (!formData.get("location") || !formData.get("location").trim()) {
+    var location = formData.get("location");
+    if (!location || location.trim() === "") {
       showError("error-location", "Please enter your city or borough.");
-      document.querySelector("[name='location']").classList.add("border-red-400");
       valid = false;
     }
 
     if (!valid) {
-      var firstError = document.querySelector("[id^='error-']:not(.hidden)");
-      if (firstError) firstError.scrollIntoView({ behavior: "smooth", block: "center" });
-      return;
+      return false;
     }
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Submitting...";
     result.innerHTML = "";
 
-    const data = {
+    var data = {
       full_name: formData.get("full_name") || null,
       email: formData.get("email") || null,
       phone: formData.get("phone") || null,
@@ -276,34 +279,29 @@ import Layout from "@/layouts/Layout.astro";
       status: "New"
     };
 
-    try {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`,
-          "Prefer": "return=minimal"
-        },
-        body: JSON.stringify(data),
-      });
-
+    fetch(SUPABASE_URL + "/rest/v1/waitlist", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify(data),
+    }).then(function(response) {
       if (response.ok) {
-        result.innerHTML = "<span class='text-green-500 font-medium'>You are on the waitlist! We will be in touch soon.</span>";
+        result.innerHTML = "<span style='color:#22c55e;font-weight:500'>You are on the waitlist! We will be in touch soon.</span>";
         form.reset();
         submitBtn.textContent = "Submitted!";
       } else {
-        const error = await response.json();
-        console.error("Supabase error:", error);
-        result.innerHTML = "<span class='text-red-500'>Something went wrong. Please try again.</span>";
+        result.innerHTML = "<span style='color:#ef4444'>Something went wrong. Please try again.</span>";
         submitBtn.disabled = false;
         submitBtn.textContent = "Join the Waitlist";
       }
-    } catch (error) {
-      console.error("Network error:", error);
-      result.innerHTML = "<span class='text-red-500'>Something went wrong. Please try again.</span>";
+    }).catch(function() {
+      result.innerHTML = "<span style='color:#ef4444'>Something went wrong. Please try again.</span>";
       submitBtn.disabled = false;
       submitBtn.textContent = "Join the Waitlist";
-    }
+    });
   });
 </script>
