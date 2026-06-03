@@ -1,6 +1,32 @@
 ---
 // UniqueApex Admin Dashboard
 ---
+<style is:global>
+  #password-gate, #admin-dashboard { all: initial; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  #password-gate * , #admin-dashboard * { box-sizing: border-box; }
+  .status-new { background: #ede9fe !important; color: #6d28d9 !important; }
+  .status-contacted { background: #dbeafe !important; color: #1d4ed8 !important; }
+  .status-matched { background: #dcfce7 !important; color: #15803d !important; }
+  .status-waitlisted { background: #fef9c3 !important; color: #a16207 !important; }
+  .status-closed { background: #f1f5f9 !important; color: #64748b !important; }
+  .status-select { padding: 5px 10px !important; border-radius: 8px !important; font-size: 12px !important; font-weight: 600 !important; border: none !important; outline: none !important; cursor: pointer !important; }
+  .name { font-weight: 600 !important; color: #1e293b !important; font-size: 14px !important; }
+  .sub { font-size: 11px !important; color: #94a3b8 !important; margin-top: 3px !important; display: block !important; }
+  .email { color: #475569 !important; font-size: 13px !important; }
+  td { padding: 14px 20px !important; border-bottom: 1px solid #f1f5f9 !important; vertical-align: top !important; }
+  th { text-align: left !important; padding: 10px 20px !important; font-size: 11px !important; font-weight: 600 !important; color: #94a3b8 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; white-space: nowrap !important; }
+  tr:last-child td { border-bottom: none !important; }
+  tr:hover td { background: #fafafa !important; }
+  table { width: 100% !important; border-collapse: collapse !important; font-size: 13px !important; }
+  .table-card { background: white !important; border-radius: 16px !important; border: 1px solid #e2e8f0 !important; overflow: hidden !important; }
+  .header { background: white !important; border-bottom: 1px solid #e2e8f0 !important; position: sticky !important; top: 0 !important; z-index: 10 !important; }
+  .gate-btn { width: 100% !important; background: #6d28d9 !important; color: white !important; font-weight: 600 !important; padding: 12px 24px !important; border: none !important; border-radius: 12px !important; font-size: 15px !important; cursor: pointer !important; }
+  .gate-btn:hover { background: #5b21b6 !important; }
+  .gate-card { background: white !important; border-radius: 20px !important; padding: 40px !important; width: 100% !important; max-width: 360px !important; text-align: center !important; box-shadow: 0 25px 50px rgba(0,0,0,0.3) !important; }
+  .gate-input { width: 100% !important; padding: 12px 16px !important; border: 1px solid #e2e8f0 !important; border-radius: 12px !important; font-size: 15px !important; text-align: center !important; color: #1e293b !important; outline: none !important; margin-bottom: 12px !important; display: block !important; }
+  #password-gate { position: fixed !important; inset: 0 !important; background: #0f172a !important; display: flex !important; align-items: center !important; justify-content: center !important; z-index: 50 !important; }
+  body { background: #f8fafc !important; min-height: 100vh !important; margin: 0 !important; }
+</style>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,71 +37,32 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
     body { background: #f8fafc; min-height: 100vh; }
-
-    /* Password Gate */
-    #password-gate {
-      position: fixed; inset: 0; background: #0f172a;
-      display: flex; align-items: center; justify-content: center; z-index: 50;
-    }
-    .gate-card {
-      background: white; border-radius: 20px; padding: 40px;
-      width: 100%; max-width: 360px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-    }
-    .gate-icon {
-      width: 56px; height: 56px; background: #ede9fe; border-radius: 16px;
-      display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
-    }
+    #password-gate { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 50; }
+    .gate-card { background: white; border-radius: 20px; padding: 40px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
+    .gate-icon { width: 56px; height: 56px; background: #ede9fe; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
     .gate-title { font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
     .gate-sub { font-size: 14px; color: #94a3b8; margin-bottom: 24px; }
-    .gate-input {
-      width: 100%; padding: 12px 16px; border: 1px solid #e2e8f0;
-      border-radius: 12px; font-size: 15px; text-align: center; color: #1e293b;
-      outline: none; margin-bottom: 12px;
-    }
+    .gate-input { width: 100%; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 15px; text-align: center; color: #1e293b; outline: none; margin-bottom: 12px; display: block; }
     .gate-input:focus { border-color: #a78bfa; box-shadow: 0 0 0 3px #ede9fe; }
     .gate-error { color: #ef4444; font-size: 13px; margin-bottom: 12px; display: none; }
-    .gate-btn {
-      width: 100%; background: #6d28d9; color: white; font-weight: 600;
-      padding: 12px 24px; border: none; border-radius: 12px; font-size: 15px;
-      cursor: pointer;
-    }
+    .gate-btn { width: 100%; background: #6d28d9; color: white; font-weight: 600; padding: 12px 24px; border: none; border-radius: 12px; font-size: 15px; cursor: pointer; }
     .gate-btn:hover { background: #5b21b6; }
-
-    /* Dashboard */
     #admin-dashboard { display: none; }
-
-    /* Header */
     .header { background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; }
-    .header-inner {
-      max-width: 1280px; margin: 0 auto; padding: 14px 24px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
+    .header-inner { max-width: 1280px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
     .header-left { display: flex; align-items: center; gap: 12px; }
-    .header-icon {
-      width: 32px; height: 32px; background: #6d28d9; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .header-icon { width: 32px; height: 32px; background: #6d28d9; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
     .header-title { font-size: 15px; font-weight: 700; color: #1e293b; }
     .header-sub { font-size: 12px; color: #94a3b8; }
     .header-right { display: flex; align-items: center; gap: 20px; }
     #stats-bar { display: flex; gap: 16px; font-size: 14px; }
     .refresh-btn { background: none; border: none; cursor: pointer; color: #94a3b8; padding: 4px; }
     .refresh-btn:hover { color: #6d28d9; }
-
-    /* Filters */
-    .filters {
-      max-width: 1280px; margin: 0 auto; padding: 16px 24px;
-      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
-    }
-    .filter-select, .filter-input {
-      padding: 8px 14px; background: white; border: 1px solid #e2e8f0;
-      border-radius: 10px; font-size: 13px; color: #475569; outline: none;
-    }
+    .filters { max-width: 1280px; margin: 0 auto; padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .filter-select, .filter-input { padding: 8px 14px; background: white; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13px; color: #475569; outline: none; }
     .filter-input { width: 220px; }
     .clear-btn { background: none; border: none; font-size: 13px; color: #94a3b8; cursor: pointer; padding: 8px; }
     .clear-btn:hover { color: #6d28d9; }
-
-    /* Table */
     .table-wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px 48px; }
     .table-card { background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; }
     #loading { text-align: center; padding: 64px 0; color: #94a3b8; font-size: 14px; }
@@ -83,35 +70,20 @@
     .table-scroll { overflow-x: auto; display: none; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     thead { background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
-    th {
-      text-align: left; padding: 10px 20px;
-      font-size: 11px; font-weight: 600; color: #94a3b8;
-      text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;
-    }
+    th { text-align: left; padding: 10px 20px; font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
     td { padding: 14px 20px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #fafafa; }
     .name { font-weight: 600; color: #1e293b; font-size: 14px; }
-    .sub { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+    .sub { font-size: 11px; color: #94a3b8; margin-top: 3px; display: block; }
     .email { color: #475569; font-size: 13px; }
     .record-count { text-align: center; color: #94a3b8; font-size: 12px; margin-top: 12px; }
-
-    /* Status badge dropdown */
-    .status-select {
-      padding: 5px 10px; border-radius: 8px; font-size: 12px;
-      font-weight: 600; border: none; outline: none; cursor: pointer; appearance: none;
-      padding-right: 24px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236d28d9' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 8px center;
-    }
+    .status-select { padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; border: none; outline: none; cursor: pointer; }
     .status-new { background: #ede9fe; color: #6d28d9; }
     .status-contacted { background: #dbeafe; color: #1d4ed8; }
     .status-matched { background: #dcfce7; color: #15803d; }
     .status-waitlisted { background: #fef9c3; color: #a16207; }
     .status-closed { background: #f1f5f9; color: #64748b; }
-
-    /* Stats */
     .stat { font-size: 14px; }
     .stat strong { font-weight: 700; }
     .stat-total strong { color: #1e293b; }
@@ -121,7 +93,6 @@
 </head>
 <body>
 
-  <!-- Password Gate -->
   <div id="password-gate">
     <div class="gate-card">
       <div class="gate-icon">
@@ -137,10 +108,7 @@
     </div>
   </div>
 
-  <!-- Admin Dashboard -->
   <div id="admin-dashboard">
-
-    <!-- Header -->
     <div class="header">
       <div class="header-inner">
         <div class="header-left">
@@ -165,7 +133,6 @@
       </div>
     </div>
 
-    <!-- Filters -->
     <div class="filters">
       <select id="filter-status" class="filter-select">
         <option value="">All Statuses</option>
@@ -191,7 +158,6 @@
       <button id="clear-filters" class="clear-btn">Clear filters</button>
     </div>
 
-    <!-- Table -->
     <div class="table-wrap">
       <div class="table-card">
         <div id="loading">Loading families...</div>
@@ -221,10 +187,8 @@
     const SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
     const ADMIN_PASSWORD = "qPL!gVM$#Wpj&n";
-
     let allFamilies = [];
 
-    // Password Gate
     const gate = document.getElementById("password-gate");
     const dashboard = document.getElementById("admin-dashboard");
     const passwordInput = document.getElementById("admin-password");
@@ -245,7 +209,6 @@
     document.getElementById("unlock-btn").addEventListener("click", unlock);
     passwordInput.addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
 
-    // Load Data
     async function loadFamilies() {
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist?select=*&order=created_at.desc`, {
@@ -290,24 +253,21 @@
         const status = f.status || "New";
         const sc = statusClass(status);
         return `<tr>
-          <td><div class="name">${f.full_name || "—"}</div><div class="sub">${f.language || "—"}</div></td>
-          <td><div class="email">${f.email || "—"}</div><div class="sub">${f.phone || "—"}</div></td>
-          <td><div style="color:#475569">${f.diagnosis || "—"}</div><div class="sub">${f.child_age ? f.child_age + " yrs" : "—"}</div></td>
+          <td><div class="name">${f.full_name || "—"}</div><span class="sub">${f.language || "—"}</span></td>
+          <td><div class="email">${f.email || "—"}</div><span class="sub">${f.phone || "—"}</span></td>
+          <td><div style="color:#475569;font-size:13px">${f.diagnosis || "—"}</div><span class="sub">${f.child_age ? f.child_age + " yrs" : "—"}</span></td>
           <td style="max-width:180px;font-size:12px;color:#475569;line-height:1.5">${services}</td>
-          <td><div style="color:#475569">${f.location || "—"}</div><div class="sub">${f.referral || "—"}</div></td>
+          <td><div style="color:#475569;font-size:13px">${f.location || "—"}</div><span class="sub">${f.referral || "—"}</span></td>
           <td style="color:#64748b;white-space:nowrap;font-size:13px">${date}</td>
-          <td>
-            <select class="status-select ${sc}" onchange="updateStatus(${f.id}, this.value, this)">
-              <option value="New" ${status==="New"?"selected":""}>New</option>
-              <option value="Contacted" ${status==="Contacted"?"selected":""}>Contacted</option>
-              <option value="Matched" ${status==="Matched"?"selected":""}>Matched</option>
-              <option value="Waitlisted" ${status==="Waitlisted"?"selected":""}>Waitlisted</option>
-              <option value="Closed" ${status==="Closed"?"selected":""}>Closed</option>
-            </select>
-          </td>
+          <td><select class="status-select ${sc}" onchange="updateStatus(${f.id}, this.value, this)">
+            <option value="New" ${status==="New"?"selected":""}>New</option>
+            <option value="Contacted" ${status==="Contacted"?"selected":""}>Contacted</option>
+            <option value="Matched" ${status==="Matched"?"selected":""}>Matched</option>
+            <option value="Waitlisted" ${status==="Waitlisted"?"selected":""}>Waitlisted</option>
+            <option value="Closed" ${status==="Closed"?"selected":""}>Closed</option>
+          </select></td>
         </tr>`;
       }).join("");
-
       document.getElementById("record-count").textContent = `Showing ${families.length} of ${allFamilies.length} families`;
     }
 
