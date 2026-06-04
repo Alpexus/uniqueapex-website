@@ -1,5 +1,29 @@
 ---
 import Link from "@/components/ui/link.astro";
+
+interface Props {
+  lang?: "en" | "fr";
+}
+
+const { lang = "en" } = Astro.props;
+const prefix = lang === "fr" ? "/fr" : "";
+
+const t = {
+  en: {
+    heading: "Your child deserves support.",
+    headingAccent: "We help you find it.",
+    body: "UniqueApex helps families of neurodivergent children coordinate therapy access — from first concern to ongoing care. No more waiting alone.",
+    cta1: "Join the Waitlist",
+    cta2: "How It Works",
+  },
+  fr: {
+    heading: "Votre enfant mérite du soutien.",
+    headingAccent: "On vous aide à le trouver.",
+    body: "UniqueApex aide les familles d'enfants neurodivergents à coordonner l'accès aux thérapies — de la première préoccupation au suivi continu. Fini l'attente en solitaire.",
+    cta1: "Rejoindre la liste d'attente",
+    cta2: "Comment ça marche",
+  },
+}[lang];
 ---
 
 <main
@@ -7,28 +31,28 @@ import Link from "@/components/ui/link.astro";
   <div class="md:order-1 hidden md:flex md:items-center md:justify-end pl-12">
     <img
       src="/hero-family.png"
-      alt="Family with neurodivergent children"
+      alt={lang === "fr" ? "Famille avec enfants neurodivergents" : "Family with neurodivergent children"}
       class="w-full max-w-lg"
     />
   </div>
   <div>
     <h1
       class="text-5xl lg:text-6xl xl:text-7xl font-bold lg:tracking-tight xl:tracking-tighter">
-      Your child deserves support. <span class="text-violet-600">We help you find it.</span>
+      {t.heading} <span class="text-violet-600">{t.headingAccent}</span>
     </h1>
     <p class="text-lg mt-4 text-slate-600 max-w-xl">
-      UniqueApex helps families of neurodivergent children coordinate therapy access — from first concern to ongoing care. No more waiting alone.
+      {t.body}
     </p>
     <div class="mt-6 flex flex-col sm:flex-row gap-3">
-      <Link href="/waitlist" class="flex gap-1 items-center justify-center">
-        Join the Waitlist
+      <Link href={prefix + "/waitlist"} class="flex gap-1 items-center justify-center">
+        {t.cta1}
       </Link>
       <Link
         size="lg"
         style="outline"
-        href="/howitworks"
+        href={prefix + "/howitworks"}
         class="flex gap-1 items-center justify-center border-violet-600 text-violet-700 hover:bg-violet-50">
-        How It Works
+        {t.cta2}
       </Link>
     </div>
   </div>

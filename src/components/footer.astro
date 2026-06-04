@@ -1,5 +1,43 @@
 ---
 import { Icon } from "astro-icon/components";
+
+interface Props {
+  lang?: "en" | "fr";
+}
+
+const { lang = "en" } = Astro.props;
+const prefix = lang === "fr" ? "/fr" : "";
+
+const t = {
+  en: {
+    tagline: "Helping families of neurodivergent children find, coordinate, and manage therapy access — all in one place.",
+    quickLinks: "Quick Links",
+    home: "Home",
+    how: "How It Works",
+    about: "About",
+    pricing: "Pricing",
+    contact: "Contact",
+    waitlist: "Join Waitlist",
+    contactUs: "Contact Us",
+    followUs: "Follow Us",
+    rights: "UniqueApex. All rights reserved.",
+    bottom: "Montréal · English & French",
+  },
+  fr: {
+    tagline: "Aider les familles d'enfants neurodivergents à trouver, coordonner et gérer l'accès aux thérapies — au même endroit.",
+    quickLinks: "Liens rapides",
+    home: "Accueil",
+    how: "Comment ça marche",
+    about: "À propos",
+    pricing: "Tarifs",
+    contact: "Contact",
+    waitlist: "Liste d'attente",
+    contactUs: "Nous joindre",
+    followUs: "Suivez-nous",
+    rights: "UniqueApex. Tous droits réservés.",
+    bottom: "Montréal · Anglais & Français",
+  },
+}[lang];
 ---
 
 <footer class="bg-slate-50 border-t border-slate-200 mt-20">
@@ -8,31 +46,31 @@ import { Icon } from "astro-icon/components";
       
       <!-- Left: Company -->
       <div>
-        <a href="/" class="flex items-center gap-2">
+        <a href={prefix + "/"} class="flex items-center gap-2">
           <img src="/Logo.png" alt="UniqueApex" class="h-10 w-auto" />
           <span class="text-lg"><span class="font-bold text-slate-800">Unique</span><span class="font-bold text-violet-700">Apex</span></span>
         </a>
         <p class="text-slate-500 mt-4 leading-relaxed max-w-xs">
-          Helping families of neurodivergent children find, coordinate, and manage therapy access — all in one place.
+          {t.tagline}
         </p>
       </div>
 
       <!-- Middle: Quick Links -->
       <div class="md:mx-auto">
-        <h3 class="font-semibold text-slate-800 mb-4">Quick Links</h3>
+        <h3 class="font-semibold text-slate-800 mb-4">{t.quickLinks}</h3>
         <ul class="space-y-3">
-          <li><a href="/" class="text-slate-500 hover:text-violet-700 transition">Home</a></li>
-          <li><a href="/howitworks" class="text-slate-500 hover:text-violet-700 transition">How It Works</a></li>
-          <li><a href="/about" class="text-slate-500 hover:text-violet-700 transition">About</a></li>
-          <li><a href="/pricing" class="text-slate-500 hover:text-violet-700 transition">Pricing</a></li>
-          <li><a href="/contact" class="text-slate-500 hover:text-violet-700 transition">Contact</a></li>
-          <li><a href="/waitlist" class="text-slate-500 hover:text-violet-700 transition">Join Waitlist</a></li>
+          <li><a href={prefix + "/"} class="text-slate-500 hover:text-violet-700 transition">{t.home}</a></li>
+          <li><a href={prefix + "/howitworks"} class="text-slate-500 hover:text-violet-700 transition">{t.how}</a></li>
+          <li><a href={prefix + "/about"} class="text-slate-500 hover:text-violet-700 transition">{t.about}</a></li>
+          <li><a href={prefix + "/pricing"} class="text-slate-500 hover:text-violet-700 transition">{t.pricing}</a></li>
+          <li><a href={prefix + "/contact"} class="text-slate-500 hover:text-violet-700 transition">{t.contact}</a></li>
+          <li><a href={prefix + "/waitlist"} class="text-slate-500 hover:text-violet-700 transition">{t.waitlist}</a></li>
         </ul>
       </div>
 
       <!-- Right: Contact & Social -->
       <div>
-        <h3 class="font-semibold text-slate-800 mb-4">Contact Us</h3>
+        <h3 class="font-semibold text-slate-800 mb-4">{t.contactUs}</h3>
         <ul class="space-y-3">
           <li>
             <a href="mailto:contact@uniqueapex.com" class="text-slate-500 hover:text-violet-700 transition flex items-center gap-2">
@@ -48,7 +86,7 @@ import { Icon } from "astro-icon/components";
           </li>
         </ul>
 
-        <h3 class="font-semibold text-slate-800 mt-8 mb-4">Follow Us</h3>
+        <h3 class="font-semibold text-slate-800 mt-8 mb-4">{t.followUs}</h3>
         <div class="flex gap-4">
           <a href="https://facebook.com" target="_blank" rel="noopener" class="text-slate-400 hover:text-violet-700 transition">
             <Icon name="uil:facebook" class="w-6 h-6" />
@@ -67,10 +105,10 @@ import { Icon } from "astro-icon/components";
     <!-- Bottom bar -->
     <div class="border-t border-slate-200 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
       <p class="text-sm text-slate-400">
-        © {new Date().getFullYear()} UniqueApex. All rights reserved.
+        © {new Date().getFullYear()} {t.rights}
       </p>
       <p class="text-sm text-slate-400">
-        Montréal · English & French
+        {t.bottom}
       </p>
     </div>
   </div>

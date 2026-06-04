@@ -2,13 +2,46 @@
 import Container from "@/components/container.astro";
 import Link from "@/components/ui/link.astro";
 import { Astronav, MenuItems, MenuIcon } from "astro-navbar";
+
+interface Props {
+  lang?: "en" | "fr";
+}
+
+const { lang = "en" } = Astro.props;
+
+const prefix = lang === "fr" ? "/fr" : "";
+
+const nav = {
+  en: {
+    home: "Home",
+    how: "How It Works",
+    about: "About",
+    pricing: "Pricing",
+    contact: "Contact",
+    waitlist: "Join Waitlist",
+  },
+  fr: {
+    home: "Accueil",
+    how: "Comment ça marche",
+    about: "À propos",
+    pricing: "Tarifs",
+    contact: "Contact",
+    waitlist: "Liste d'attente",
+  },
+}[lang];
+
+// Build the path for the language toggle
+const currentPath = Astro.url.pathname;
+const altPath = lang === "fr"
+  ? currentPath.replace(/^\/fr/, "") || "/"
+  : "/fr" + currentPath;
 ---
 
 <Container>
   <header class="flex flex-col lg:flex-row justify-between items-center my-5">
     <Astronav>
       <div class="flex w-full lg:w-auto items-center justify-between">
-        <a href="/" class="flex items-center gap-2">
+        <a href={prefix + "/"} class="flex items-center gap-2">
           <img src="/Logo.png" alt="UniqueApex" class="h-10 w-auto" />
           <span class="text-lg"><span class="font-bold text-slate-800">Unique</span><span class="font-bold text-violet-700">Apex</span></span>
         </a>
@@ -18,25 +51,34 @@ import { Astronav, MenuItems, MenuIcon } from "astro-navbar";
       </div>
       <MenuItems class="hidden w-full lg:w-auto mt-2 lg:flex lg:mt-0">
         <ul class="flex flex-col lg:flex-row lg:gap-3">
-          <li><a href="/" class="flex lg:px-3 py-2 text-gray-600 hover:text-violet-700">Home</a></li>
-          <li><a href="/howitworks" class="flex lg:px-3 py-2 text-gray-600 hover:text-violet-700">How It Works</a></li>
-          <li><a href="/about" class="flex lg:px-3 py-2 text-gray-600 hover:text-violet-700">About</a></li>
-          <li><a href="/pricing" class="flex lg:px-3 py-2 text-gray-600 hover:text-violet-700">Pricing</a></li>
-          <li><a href="/contact" class="flex lg:px-3 py-2 text-gray-600 hover:text-violet-700">Contact</a></li>
+          <li><a href={prefix + "/"} class="flex lg:px-3 py-2 text-gray-600 hover:text-violet-700">{nav.home}</a></li>
+          <li><a href={prefix + "/howitworks"} class="flex lg:px-3 py-2 text-gray-600 hover:text-violet-700">{nav.how}</a></li>
+          <li><a href={prefix + "/about"} class="flex lg:px-3 py-2 text-gray-600 hover:text-violet-700">{nav.about}</a></li>
+          <li><a href={prefix + "/pricing"} class="flex lg:px-3 py-2 text-gray-600 hover:text-violet-700">{nav.pricing}</a></li>
+          <li><a href={prefix + "/contact"} class="flex lg:px-3 py-2 text-gray-600 hover:text-violet-700">{nav.contact}</a></li>
         </ul>
         <div class="lg:hidden flex items-center mt-3 gap-4">
-          <Link href="/waitlist" style="muted" block size="md">Join Waitlist</Link>
+          <div class="flex items-center gap-1 text-sm font-medium mb-2">
+            <a href={lang === "fr" ? (currentPath.replace(/^\/fr/, "") || "/") : currentPath}
+               class={lang === "en" ? "text-violet-700 font-bold" : "text-gray-400 hover:text-violet-700"}>EN</a>
+            <span class="text-gray-300">|</span>
+            <a href={lang === "en" ? "/fr" + currentPath : currentPath}
+               class={lang === "fr" ? "text-violet-700 font-bold" : "text-gray-400 hover:text-violet-700"}>FR</a>
+          </div>
+          <Link href={prefix + "/waitlist"} style="muted" block size="md">{nav.waitlist}</Link>
         </div>
       </MenuItems>
     </Astronav>
     <div>
       <div class="hidden lg:flex items-center gap-4">
         <div class="flex items-center gap-1 text-sm font-medium">
-          <button class="text-violet-700 font-bold">EN</button>
+          <a href={lang === "fr" ? (currentPath.replace(/^\/fr/, "") || "/") : currentPath}
+             class={lang === "en" ? "text-violet-700 font-bold" : "text-gray-400 hover:text-violet-700"}>EN</a>
           <span class="text-gray-300">|</span>
-          <button class="text-gray-400 hover:text-violet-700">FR</button>
+          <a href={lang === "en" ? "/fr" + currentPath : currentPath}
+             class={lang === "fr" ? "text-violet-700 font-bold" : "text-gray-400 hover:text-violet-700"}>FR</a>
         </div>
-        <Link href="/waitlist" size="md">Join Waitlist</Link>
+        <Link href={prefix + "/waitlist"} size="md">{nav.waitlist}</Link>
       </div>
     </div>
   </header>

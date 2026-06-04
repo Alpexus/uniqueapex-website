@@ -1,15 +1,35 @@
 ---
 import Link from "./ui/link.astro";
+
+interface Props {
+  lang?: "en" | "fr";
+}
+
+const { lang = "en" } = Astro.props;
+const prefix = lang === "fr" ? "/fr" : "";
+
+const t = {
+  en: {
+    heading: "Every child deserves support.",
+    body: "UniqueApex helps families of neurodivergent children find, coordinate, and manage therapy access — all in one place.",
+    cta: "Join the Waitlist",
+  },
+  fr: {
+    heading: "Chaque enfant mérite du soutien.",
+    body: "UniqueApex aide les familles d'enfants neurodivergents à trouver, coordonner et gérer l'accès aux thérapies — au même endroit.",
+    cta: "Rejoindre la liste d'attente",
+  },
+}[lang];
 ---
 
 <div class="bg-violet-800 w-screen relative left-1/2 right-1/2 -mx-[50vw] mt-20 py-20 px-8 flex flex-col items-center text-center">
   <h2 class="text-white text-4xl md:text-6xl tracking-tight max-w-3xl">
-    Every child deserves support.
+    {t.heading}
   </h2>
   <p class="text-violet-200 mt-4 text-lg md:text-xl max-w-2xl">
-    UniqueApex helps families of neurodivergent children find, coordinate, and manage therapy access — all in one place.
+    {t.body}
   </p>
   <div class="flex mt-5">
-    <Link href="/waitlist" style="inverted">Join the Waitlist</Link>
+    <Link href={prefix + "/waitlist"} style="inverted">{t.cta}</Link>
   </div>
 </div>

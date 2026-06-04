@@ -1,0 +1,117 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Container from "@/components/container.astro";
+import Link from "@/components/ui/link.astro";
+---
+
+<Layout title="Comment ça marche" lang="fr">
+  <Container>
+
+    <!-- Hero -->
+    <div class="grid md:grid-cols-2 gap-16 items-center mt-16 mb-24">
+      <div class="space-y-6">
+        <p class="text-2xl font-semibold text-violet-700 uppercase tracking-wide">Comment ça marche</p>
+        <h1 class="text-5xl font-bold text-slate-800 leading-tight">
+          Votre chemin vers le soutien, <span class="text-violet-700">en quatre étapes</span>
+        </h1>
+        <p class="text-slate-600 leading-relaxed text-lg">
+          La plupart des familles passent des mois à faire des appels, à remplir les mêmes formulaires et à attendre sans nouvelles — devenant coordinatrices en plus d'être aidantes. UniqueApex remplace ce fardeau par un processus structuré et automatisé pour que vous puissiez vous concentrer sur ce qui compte vraiment : votre enfant.
+        </p>
+      </div>
+      <div class="flex items-center justify-center">
+        <img src="/mom-overwhelmed.png" alt="Illustration d'un parent débordé" class="w-full max-w-[520px]" />
+      </div>
+    </div>
+
+    <!-- Steps -->
+    <div class="mb-32 space-y-24">
+
+      <!-- Step 1 -->
+      <div class="grid md:grid-cols-2 gap-8 items-start">
+        <div class="flex items-start justify-center">
+          <img src="/step1-profile.png" alt="Illustration de création de profil" class="w-full max-w-[437px]" />
+        </div>
+        <div>
+          <span class="text-6xl font-bold text-violet-200">01</span>
+          <h2 class="text-3xl font-bold text-slate-800 mt-2">Créez le profil de votre enfant</h2>
+          <p class="text-slate-500 mt-4 leading-relaxed text-lg">
+            Parlez-nous de votre enfant une seule fois — son âge, son diagnostic ou sa préoccupation, sa localisation et le type de soutien recherché. Plus besoin de ressaisir les mêmes informations pour chaque professionnel.
+          </p>
+          <ul class="mt-6 space-y-2">
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Prend moins de 5 minutes</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Disponible en français et en anglais</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Vos données sont privées et sécurisées</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="grid md:grid-cols-2 gap-8 items-start">
+        <div>
+          <span class="text-6xl font-bold text-violet-200">02</span>
+          <h2 class="text-3xl font-bold text-slate-800 mt-2">On contacte les professionnels pour vous</h2>
+          <p class="text-slate-500 mt-4 leading-relaxed text-lg">
+            UniqueApex jumelle automatiquement le profil de votre enfant avec des professionnels vérifiés en orthophonie, ergothérapie et thérapie comportementale dans votre région — et les contacte en votre nom.
+          </p>
+          <ul class="mt-6 space-y-2">
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Une demande de contact par type de service</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Règle de protection de 90 jours</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Aucun appel à froid nécessaire</li>
+          </ul>
+        </div>
+        <div class="flex items-start justify-center">
+          <img src="/step2-providers.png" alt="Illustration du jumelage" class="w-full max-w-[460px]" />
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="grid md:grid-cols-2 gap-8 items-start">
+        <div class="flex items-start justify-center">
+          <img src="/step3-waitlist.png" alt="Illustration du suivi de liste d'attente" class="w-full max-w-[441px]" />
+        </div>
+        <div>
+          <span class="text-6xl font-bold text-violet-200">03</span>
+          <h2 class="text-3xl font-bold text-slate-800 mt-2">Suivez l'état de vos listes d'attente</h2>
+          <p class="text-slate-500 mt-4 leading-relaxed text-lg">
+            Fini de se demander où en sont les choses. UniqueApex suit les réponses et les positions sur les listes d'attente de tous vos professionnels jumelés — pour que vous sachiez toujours ce qui se passe sans avoir à relancer personne.
+          </p>
+          <ul class="mt-6 space-y-2">
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Mises à jour en temps réel</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Tous les professionnels au même endroit</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Alertes quand une place se libère</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="grid md:grid-cols-2 gap-8 items-start">
+        <div>
+          <span class="text-6xl font-bold text-violet-200">04</span>
+          <h2 class="text-3xl font-bold text-slate-800 mt-2">Obtenez de l'aide concrète quand vous en avez besoin</h2>
+          <p class="text-slate-500 mt-4 leading-relaxed text-lg">
+            Quand vous avez besoin de plus de soutien, notre service de conciergerie vous assigne un coordonnateur humain dédié qui gère les suivis, la documentation et la coordination entre services — pour que vous puissiez vous concentrer sur votre enfant.
+          </p>
+          <ul class="mt-6 space-y-2">
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Coordonnateur humain dédié</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Soutien à la documentation inclus</li>
+            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Frais uniques, aucun abonnement</li>
+          </ul>
+        </div>
+        <div class="flex items-start justify-center">
+          <img src="/step4-concierge.png" alt="Illustration du service de conciergerie" class="w-full max-w-[450px]" />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mb-24">
+      <h2 class="text-3xl font-bold text-slate-800">Prêt à commencer?</h2>
+      <p class="text-slate-500 mt-4 text-lg">Inscrivez-vous à la liste d'attente et soyez parmi les premières familles à accéder à UniqueApex à Montréal.</p>
+      <div class="mt-8 flex justify-center">
+        <Link href="/fr/waitlist" size="lg">Rejoindre la liste d'attente</Link>
+      </div>
+    </div>
+
+  </Container>
+</Layout>

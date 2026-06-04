@@ -8,6 +8,7 @@ import "../styles/global.css";
 
 export interface Props {
   title: string;
+  lang?: "en" | "fr";
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
@@ -17,25 +18,44 @@ const resolvedImageWithDomain = new URL(
   Astro.site
 ).toString();
 
-const { title } = Astro.props;
+const { title, lang = "en" } = Astro.props;
+
+const siteTitle = lang === "fr"
+  ? "UniqueApex — Coordination thérapeutique pour familles neurodivergentes"
+  : "UniqueApex — Therapy Coordination for Neurodivergent Families";
+
+const siteDescription = lang === "fr"
+  ? "UniqueApex aide les familles d'enfants neurodivergents à coordonner l'accès aux thérapies — de la première préoccupation au suivi continu. Service en français et en anglais à Montréal."
+  : "UniqueApex helps families of neurodivergent children coordinate therapy access — from first concern to ongoing care. Serving English and French families in Montréal.";
 
 const makeTitle = title
   ? title + " | " + "UniqueApex"
-  : "UniqueApex — Therapy Coordination for Neurodivergent Families";
+  : siteTitle;
+
+const altLang = lang === "fr" ? "en" : "fr";
+const altPath = lang === "fr"
+  ? Astro.url.pathname.replace(/^\/fr/, "") || "/"
+  : "/fr" + Astro.url.pathname;
+const altURL = new URL(altPath, Astro.site).toString();
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="keywords" content="UniqueApex, Unique Apex, neurodivergent children, therapy coordination, autism support Montreal, ADHD support, speech therapy Montreal, occupational therapy, waitlist tracking, family support" />
+    <meta name="keywords" content={lang === "fr"
+      ? "UniqueApex, Unique Apex, enfants neurodivergents, coordination thérapeutique, soutien autisme Montréal, soutien TDAH, orthophonie Montréal, ergothérapie, suivi liste d'attente, soutien familial"
+      : "UniqueApex, Unique Apex, neurodivergent children, therapy coordination, autism support Montreal, ADHD support, speech therapy Montreal, occupational therapy, waitlist tracking, family support"} />
+
+    <link rel="alternate" hreflang={lang} href={canonicalURL} />
+    <link rel="alternate" hreflang={altLang} href={altURL} />
 
     <SEO
       title={makeTitle}
-      description="UniqueApex helps families of neurodivergent children coordinate therapy access — from first concern to ongoing care. Serving English and French families in Montréal."
+      description={siteDescription}
       canonical={canonicalURL}
       twitter={{
         creator: "@uniqueapex",
@@ -46,19 +66,21 @@ const makeTitle = title
         basic: {
           url: canonicalURL,
           type: "website",
-          title: "UniqueApex — Therapy Coordination for Neurodivergent Families",
+          title: siteTitle,
           image: resolvedImageWithDomain,
         },
         image: {
-          alt: "UniqueApex — Helping families find therapy support in Montréal",
+          alt: lang === "fr"
+            ? "UniqueApex — Aider les familles à trouver du soutien thérapeutique à Montréal"
+            : "UniqueApex — Helping families find therapy support in Montréal",
         },
       }}
     />
   </head>
   <body>
-    <Navbar />
+    <Navbar lang={lang} />
     <slot />
-    <Footer />
+    <Footer lang={lang} />
     <style is:global>
       img {
         content-visibility: auto;

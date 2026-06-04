@@ -1,42 +1,75 @@
 ---
-const faqs = [
-  {
-    question: "How does UniqueApex work?",
-    answer:
-      "You create one child profile with your child's needs and location. UniqueApex automatically matches and reaches out to verified therapy providers on your behalf — no more cold-calling or repeated form-filling.",
-  },
-  {
-    question: "What types of therapy does UniqueApex support?",
-    answer:
-      "We currently support speech-language therapy and occupational therapy, with behavioural therapy coming soon. More service types will be added as we expand.",
-  },
-  {
-    question: "Is UniqueApex free to use?",
-    answer:
-      "Yes — the core platform is free. Families can submit one child profile and receive one outreach batch per service type at no cost. Our Concierge service is available as a paid upgrade.",
-  },
-  {
-    question: "Is my child's information kept private?",
-    answer:
-      "Absolutely. Your child's profile is only shared with providers you are matched with. We follow strict data privacy standards and never sell your information.",
-  },
-  {
-    question: "When is UniqueApex launching?",
-    answer:
-      "We are launching our pilot in Montréal, serving both English and French-speaking families. Join the waitlist to be among the first families to get access.",
-  },
-];
+interface Props {
+  lang?: "en" | "fr";
+}
+
+const { lang = "en" } = Astro.props;
+const prefix = lang === "fr" ? "/fr" : "";
+
+const allFaqs = {
+  en: [
+    {
+      question: "How does UniqueApex work?",
+      answer: "You create one child profile with your child's needs and location. UniqueApex automatically matches and reaches out to verified therapy providers on your behalf — no more cold-calling or repeated form-filling.",
+    },
+    {
+      question: "What types of therapy does UniqueApex support?",
+      answer: "We currently support speech-language therapy and occupational therapy, with behavioural therapy coming soon. More service types will be added as we expand.",
+    },
+    {
+      question: "Is UniqueApex free to use?",
+      answer: "Yes — the core platform is free. Families can submit one child profile and receive one outreach batch per service type at no cost. Our Concierge service is available as a paid upgrade.",
+    },
+    {
+      question: "Is my child's information kept private?",
+      answer: "Absolutely. Your child's profile is only shared with providers you are matched with. We follow strict data privacy standards and never sell your information.",
+    },
+    {
+      question: "When is UniqueApex launching?",
+      answer: "We are launching our pilot in Montréal, serving both English and French-speaking families. Join the waitlist to be among the first families to get access.",
+    },
+  ],
+  fr: [
+    {
+      question: "Comment fonctionne UniqueApex?",
+      answer: "Vous créez un profil avec les besoins et la localisation de votre enfant. UniqueApex jumelle automatiquement et contacte les professionnels vérifiés en votre nom — plus besoin de faire des appels ou de remplir les mêmes formulaires à répétition.",
+    },
+    {
+      question: "Quels types de thérapie UniqueApex soutient-il?",
+      answer: "Nous offrons actuellement l'orthophonie et l'ergothérapie, avec la thérapie comportementale à venir bientôt. D'autres types de services seront ajoutés au fur et à mesure de notre croissance.",
+    },
+    {
+      question: "Est-ce que UniqueApex est gratuit?",
+      answer: "Oui — le cœur de la plateforme est gratuit. Les familles peuvent soumettre un profil enfant et recevoir une demande de contact par type de service sans frais. Notre service de conciergerie est offert comme option payante.",
+    },
+    {
+      question: "Les informations de mon enfant sont-elles protégées?",
+      answer: "Absolument. Le profil de votre enfant est partagé uniquement avec les professionnels jumelés. Nous respectons des normes strictes de confidentialité et ne vendons jamais vos informations.",
+    },
+    {
+      question: "Quand est-ce que UniqueApex sera lancé?",
+      answer: "Nous lançons notre projet pilote à Montréal, pour les familles francophones et anglophones. Inscrivez-vous à la liste d'attente pour être parmi les premières familles à y avoir accès.",
+    },
+  ],
+};
+
+const faqs = allFaqs[lang];
+
+const section = {
+  en: { label: "FAQ'S", heading: "Frequently Asked Questions", helpText: "Can't find what you're looking for?", link: "Contact Us →" },
+  fr: { label: "FAQ", heading: "Questions fréquentes", helpText: "Vous ne trouvez pas ce que vous cherchez?", link: "Contactez-nous →" },
+}[lang];
 ---
 
 <div class="mt-24 grid md:grid-cols-2 gap-16">
   <div>
-    <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">FAQ'S</p>
+    <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{section.label}</p>
     <h2 class="text-4xl font-bold mt-3 leading-tight">
-      Frequently Asked Questions
+      {section.heading}
     </h2>
-<p class="text-slate-500 mt-6">Can't find what you're looking for?</p>
-    <a href="/contact" class="inline-flex items-center gap-2 text-violet-700 font-semibold mt-2 hover:underline">
-      Contact Us →
+    <p class="text-slate-500 mt-6">{section.helpText}</p>
+    <a href={prefix + "/contact"} class="inline-flex items-center gap-2 text-violet-700 font-semibold mt-2 hover:underline">
+      {section.link}
     </a>
   </div>
 

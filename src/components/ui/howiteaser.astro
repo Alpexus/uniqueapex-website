@@ -1,31 +1,67 @@
 ---
-const steps = [
-  {
-    number: "01",
-    title: "Submit one profile",
-    desc: "Fill in your child's needs once. UniqueApex stores it securely and uses it for every outreach.",
-    icon: "/icon-step1.png",
-  },
-  {
-    number: "02",
-    title: "We reach out for you",
-    desc: "The platform contacts matched speech, OT, and behavioural providers in your area automatically.",
-    icon: "/icon-step2.png",
-  },
-  {
-    number: "03",
-    title: "You hear back",
-    desc: "Providers respond directly to you. No chasing, no re-explaining, no repeated forms.",
-    icon: "/icon-step3.png",
-  },
-];
+interface Props {
+  lang?: "en" | "fr";
+}
+
+const { lang = "en" } = Astro.props;
+const prefix = lang === "fr" ? "/fr" : "";
+
+const allSteps = {
+  en: [
+    {
+      number: "01",
+      title: "Submit one profile",
+      desc: "Fill in your child's needs once. UniqueApex stores it securely and uses it for every outreach.",
+      icon: "/icon-step1.png",
+    },
+    {
+      number: "02",
+      title: "We reach out for you",
+      desc: "The platform contacts matched speech, OT, and behavioural providers in your area automatically.",
+      icon: "/icon-step2.png",
+    },
+    {
+      number: "03",
+      title: "You hear back",
+      desc: "Providers respond directly to you. No chasing, no re-explaining, no repeated forms.",
+      icon: "/icon-step3.png",
+    },
+  ],
+  fr: [
+    {
+      number: "01",
+      title: "Soumettez un profil",
+      desc: "Remplissez les besoins de votre enfant une seule fois. UniqueApex le conserve en sécurité et l'utilise pour chaque demande.",
+      icon: "/icon-step1.png",
+    },
+    {
+      number: "02",
+      title: "On contacte pour vous",
+      desc: "La plateforme contacte automatiquement les professionnels en orthophonie, ergothérapie et thérapie comportementale dans votre région.",
+      icon: "/icon-step2.png",
+    },
+    {
+      number: "03",
+      title: "Vous recevez des réponses",
+      desc: "Les professionnels vous répondent directement. Plus besoin de relancer, de tout réexpliquer ou de remplir les mêmes formulaires.",
+      icon: "/icon-step3.png",
+    },
+  ],
+};
+
+const steps = allSteps[lang];
+
+const section = {
+  en: { label: "How it works", heading: "Three steps to", accent: "stop waiting", link: "See the full process →" },
+  fr: { label: "Comment ça marche", heading: "Trois étapes pour", accent: "arrêter d'attendre", link: "Voir le processus complet →" },
+}[lang];
 ---
 
 <section class="py-12 my-8">
   <div class="max-w-5xl mx-auto px-6">
     <div class="text-center mb-16">
-      <p class="text-lg font-semibold text-violet-700 uppercase tracking-wide">How it works</p>
-      <h2 class="text-4xl font-bold mt-3 text-slate-800">Three steps to <span class="text-violet-700">stop waiting</span></h2>
+      <p class="text-lg font-semibold text-violet-700 uppercase tracking-wide">{section.label}</p>
+      <h2 class="text-4xl font-bold mt-3 text-slate-800">{section.heading} <span class="text-violet-700">{section.accent}</span></h2>
     </div>
 
     <div class="grid md:grid-cols-3 gap-12">
@@ -42,8 +78,8 @@ const steps = [
     </div>
 
     <div class="text-center mt-12">
-      <a href="/howitworks" class="text-violet-700 font-semibold text-lg uppercase tracking-wide hover:underline">
-        See the full process →
+      <a href={prefix + "/howitworks"} class="text-violet-700 font-semibold text-lg uppercase tracking-wide hover:underline">
+        {section.link}
       </a>
     </div>
   </div>
