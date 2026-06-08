@@ -86,5 +86,23 @@ const altURL = new URL(altPath, Astro.site).toString();
         content-visibility: auto;
       }
     </style>
+    <script is:inline>
+      /* Swap Sign In → My Account in navbar if user is logged in */
+      (function () {
+        try {
+          var s = JSON.parse(localStorage.getItem("ua_session") || "null");
+          if (!s || !s.access_token) return;
+          if (Math.floor(Date.now() / 1000) >= (s.expires_at || 0) - 60) return;
+          document.querySelectorAll(".nav-cta-wrap").forEach(function (wrap) {
+            var isFr = wrap.getAttribute("data-lang") === "fr";
+            var a = wrap.querySelector("a");
+            if (a) {
+              a.textContent = isFr ? "Mon compte" : "My Account";
+              a.href = "/account";
+            }
+          });
+        } catch (e) {}
+      })();
+    </script>
   </body>
 </html>

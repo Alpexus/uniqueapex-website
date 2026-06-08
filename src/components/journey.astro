@@ -1,0 +1,103 @@
+---
+// @ts-ignore
+import { Icon } from "astro-icon/components";
+import Link from "@/components/ui/link.astro";
+
+interface Props {
+  lang?: "en" | "fr";
+}
+
+const { lang = "en" } = Astro.props;
+const prefix = lang === "fr" ? "/fr" : "";
+
+const content = {
+  en: {
+    label: "Your journey",
+    heading: "UniqueApex stays with your family through every stage —",
+    headingAccent: "not just the first search.",
+    body: "Start building your child's profile today. The earlier you begin, the more it grows with them.",
+    startHere: "Start here",
+    cta: "Begin your child's profile",
+    stages: [
+      { label: "First Concern", icon: "bx:bxs-heart" },
+      { label: "Assessment", icon: "bx:bxs-report" },
+      { label: "First Provider", icon: "bx:bxs-user-voice" },
+      { label: "Ongoing Therapy", icon: "bx:bxs-conversation" },
+      { label: "School Entry", icon: "bx:bxs-graduation" },
+      { label: "IEP & Transitions", icon: "bx:bxs-file" },
+      { label: "Adolescence", icon: "bx:bxs-user" },
+      { label: "Adult Services", icon: "bx:bxs-briefcase" },
+    ],
+  },
+  fr: {
+    label: "Votre parcours",
+    heading: "UniqueApex accompagne votre famille à chaque étape —",
+    headingAccent: "pas seulement à la première recherche.",
+    body: "Commencez à bâtir le profil de votre enfant dès aujourd'hui. Plus tôt vous commencez, plus il grandit avec lui.",
+    startHere: "Commencez ici",
+    cta: "Commencer le profil de votre enfant",
+    stages: [
+      { label: "Premières préoccupations", icon: "bx:bxs-heart" },
+      { label: "Évaluation", icon: "bx:bxs-report" },
+      { label: "Premier professionnel", icon: "bx:bxs-user-voice" },
+      { label: "Thérapie continue", icon: "bx:bxs-conversation" },
+      { label: "Entrée à l'école", icon: "bx:bxs-graduation" },
+      { label: "Plan d'intervention", icon: "bx:bxs-file" },
+      { label: "Adolescence", icon: "bx:bxs-user" },
+      { label: "Services aux adultes", icon: "bx:bxs-briefcase" },
+    ],
+  },
+}[lang];
+---
+
+<section class="py-16 my-8">
+  <div class="text-center max-w-3xl mx-auto mb-16">
+    <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{content.label}</p>
+    <h2 class="text-3xl md:text-4xl font-bold mt-3 text-slate-800 leading-tight">
+      {content.heading} <span class="text-violet-700">{content.headingAccent}</span>
+    </h2>
+    <p class="text-slate-500 mt-6 text-lg">{content.body}</p>
+  </div>
+
+  <!-- Desktop: horizontal timeline -->
+  <div class="hidden md:block relative">
+    <div class="absolute top-7 left-[6%] right-[6%] h-0.5 bg-gradient-to-r from-violet-200 via-violet-500 to-violet-200"></div>
+    <div class="relative flex justify-between">
+      {content.stages.map((stage, i) => (
+        <div class="flex flex-col items-center" style="width: 12.5%;">
+          <div class={`w-14 h-14 rounded-full flex items-center justify-center z-10 ${i === 0 ? "bg-violet-700 border-2 border-violet-700" : "bg-white border-2 border-violet-300"}`}>
+            <Icon class={i === 0 ? "text-white w-6 h-6" : "text-violet-600 w-6 h-6"} name={stage.icon} />
+          </div>
+          {i === 0 && (
+            <span class="mt-2 text-[11px] font-bold text-violet-700 uppercase tracking-wide">{content.startHere}</span>
+          )}
+          <p class={`text-sm font-medium text-center text-slate-700 px-1 ${i === 0 ? "mt-1" : "mt-3"}`}>{stage.label}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Mobile: vertical timeline -->
+  <div class="md:hidden relative pl-2">
+    <div class="absolute top-5 bottom-5 left-[26px] w-0.5 bg-gradient-to-b from-violet-200 via-violet-500 to-violet-200"></div>
+    <div class="space-y-5">
+      {content.stages.map((stage, i) => (
+        <div class="flex items-center gap-4">
+          <div class={`w-12 h-12 rounded-full flex items-center justify-center z-10 shrink-0 ${i === 0 ? "bg-violet-700 border-2 border-violet-700" : "bg-white border-2 border-violet-300"}`}>
+            <Icon class={i === 0 ? "text-white w-5 h-5" : "text-violet-600 w-5 h-5"} name={stage.icon} />
+          </div>
+          <div>
+            <p class="font-medium text-slate-700">{stage.label}</p>
+            {i === 0 && (
+              <span class="text-[11px] font-bold text-violet-700 uppercase tracking-wide">{content.startHere}</span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="text-center mt-16">
+    <Link href={prefix + "/waitlist"} size="lg">{content.cta}</Link>
+  </div>
+</section>

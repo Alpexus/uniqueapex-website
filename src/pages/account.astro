@@ -1,0 +1,230 @@
+---
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout title="My Account">
+  <div class="max-w-5xl mx-auto px-6 py-12">
+
+    <!-- Loading -->
+    <div id="loading" class="text-center py-24">
+      <div class="inline-block w-8 h-8 border-4 border-violet-200 border-t-violet-700 rounded-full animate-spin"></div>
+    </div>
+
+    <!-- Dashboard (hidden until loaded) -->
+    <div id="dashboard" style="display:none">
+
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
+        <div>
+          <h1 class="text-3xl font-bold text-slate-800">My account</h1>
+          <p class="text-slate-500 mt-1">Signed in as <span id="user-email" class="font-medium text-slate-700"></span></p>
+        </div>
+        <button id="logout-btn" class="self-start sm:self-auto px-5 py-2 rounded-full border border-slate-300 text-slate-600 font-medium hover:bg-slate-50 transition-colors text-sm">
+          Sign out
+        </button>
+      </div>
+
+      <!-- Section grid -->
+      <div class="space-y-10">
+
+        <!-- 1. Child Profiles -->
+        <section>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-slate-800">Child profiles</h2>
+            <a href="/passport" class="text-sm font-semibold text-violet-700 hover:underline">+ Add profile</a>
+          </div>
+          <div id="passport-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+          <div id="passport-empty" style="display:none" class="bg-slate-50 rounded-2xl p-8 text-center border-2 border-dashed border-slate-200">
+            <p class="text-slate-500 mb-4">No child profiles yet. Create one to get started.</p>
+            <a href="/passport" class="inline-block bg-violet-700 text-white font-semibold px-6 py-2.5 rounded-full hover:bg-violet-800 transition-colors text-sm">Create child profile</a>
+          </div>
+        </section>
+
+        <!-- 2. Matching & Waitlist -->
+        <section>
+          <h2 class="text-xl font-bold text-slate-800 mb-4">Provider matching</h2>
+          <div id="matching-section" class="bg-white border border-slate-200 rounded-2xl p-6">
+            <div id="matching-content">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- 3–5: Coming soon grid -->
+        <section>
+          <h2 class="text-xl font-bold text-slate-800 mb-4">Coming soon</h2>
+          <div class="grid sm:grid-cols-3 gap-4">
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 opacity-70">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                </div>
+                <span class="text-xs font-semibold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">In development</span>
+              </div>
+              <h3 class="font-bold text-slate-800">AI Document Analysis</h3>
+              <p class="text-slate-500 text-sm mt-1">Upload reports and get plain-language summaries. Key findings auto-fill your child's passport.</p>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 opacity-70">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                </div>
+                <span class="text-xs font-semibold bg-violet-100 text-violet-700 px-2.5 py-1 rounded-full">In development</span>
+              </div>
+              <h3 class="font-bold text-slate-800">Expert Workshops</h3>
+              <p class="text-slate-500 text-sm mt-1">Live sessions with psychologists, OTs, and autism specialists — plus a peer community of families.</p>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 opacity-70">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                </div>
+                <span class="text-xs font-semibold bg-green-100 text-green-700 px-2.5 py-1 rounded-full">In development</span>
+              </div>
+              <h3 class="font-bold text-slate-800">Funding Navigator</h3>
+              <p class="text-slate-500 text-sm mt-1">Every grant, subsidy, and tax credit your family qualifies for — with direct application links.</p>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script is:inline>
+  var UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+  var UA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+
+  function getSession(){try{return JSON.parse(localStorage.getItem("ua_session")||"null");}catch{return null;}}
+  function setSession(d){var s=Object.assign({},d,{expires_at:Math.floor(Date.now()/1000)+(d.expires_in||3600)});localStorage.setItem("ua_session",JSON.stringify(s));return s;}
+  function clearSession(){localStorage.removeItem("ua_session");}
+  function isValid(s){return s&&s.access_token&&Math.floor(Date.now()/1000)<(s.expires_at||0)-60;}
+  function authHdr(t){return{"apikey":UA_KEY,"Authorization":"Bearer "+t,"Content-Type":"application/json"};}
+
+  function getCompletionPct(d) {
+    if (!d) return 0;
+    var checks = [
+      d.childProfile && d.childProfile.firstName,
+      d.household && d.household.g1name,
+      d.diagnosis && (d.diagnosis.status || (d.diagnosis.diagnoses && d.diagnosis.diagnoses.length)),
+      d.birth && (d.birth.pregnancy || d.birth.gestation || (d.birth.milestones && d.birth.milestones.firstWord)),
+      d.communication && (d.communication.style || (d.communication.means && d.communication.means.length)),
+      d.sensory && Object.values(d.sensory).some(function(v){return v&&v.length;}),
+      d.dailyLiving && d.dailyLiving.eating,
+      d.health && (d.health.pediatrician || d.health.medications),
+      d.behaviour && d.behaviour.challenges && d.behaviour.challenges.length,
+      d.strengths && (d.strengths.strengths || d.strengths.interests),
+      d.education && (d.education.schoolName || d.education.schoolType),
+      d.therapy && d.therapy.length > 0,
+      d.goals && (d.goals.mainConcerns || (d.goals.priorities && d.goals.priorities.length))
+    ];
+    return Math.round(checks.filter(Boolean).length / 13 * 100);
+  }
+
+  async function getValidSession(){
+    var s=getSession();
+    if(isValid(s))return s;
+    if(s&&s.refresh_token){
+      var r=await fetch(UA_URL+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{"apikey":UA_KEY,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:s.refresh_token})});
+      if(r.ok)return setSession(await r.json());
+    }
+    return null;
+  }
+
+  function formatDate(iso){try{return new Date(iso).toLocaleDateString("en-CA",{year:"numeric",month:"short",day:"numeric"});}catch{return "";}}
+
+  function renderPassports(passports){
+    var grid=document.getElementById("passport-grid");
+    var empty=document.getElementById("passport-empty");
+    if(!passports.length){empty.style.display="block";return;}
+    empty.style.display="none";
+    var html="";
+    passports.forEach(function(p){
+      var cp=(p.data&&p.data.childProfile)||{};
+      var name=[cp.firstName,cp.lastName].filter(Boolean).join(" ")||"Unnamed child";
+      var dob=cp.dob?"Born "+formatDate(cp.dob):"";
+      var diagnoses=(p.data&&p.data.diagnosis&&p.data.diagnosis.diagnoses)||[];
+      var diagStr=diagnoses.length?diagnoses.slice(0,2).join(", ")+(diagnoses.length>2?"…":""):"";
+      var updated="Updated "+formatDate(p.updated_at||p.created_at);
+      var pct=getCompletionPct(p.data);
+      var pctColor=pct<34?"#ef4444":pct<67?"#f59e0b":"#22c55e";
+      html+='<div class="bg-white border border-slate-200 rounded-2xl p-6 hover:border-violet-200 hover:shadow-sm transition-all flex flex-col">';
+      html+='<div class="w-12 h-12 bg-violet-100 rounded-full flex items-center justify-center mb-4"><span class="text-xl font-bold text-violet-700">'+name.charAt(0).toUpperCase()+'</span></div>';
+      html+='<h3 class="font-bold text-lg text-slate-800">'+name+'</h3>';
+      if(dob)html+='<p class="text-slate-500 text-sm mt-0.5">'+dob+'</p>';
+      if(diagStr)html+='<p class="text-violet-600 text-xs font-medium mt-1">'+diagStr+'</p>';
+      html+='<div class="mt-3"><div class="flex justify-between items-center mb-1"><span class="text-xs text-slate-400">Profile complete</span><span class="text-xs font-semibold" style="color:'+pctColor+'">'+pct+'%</span></div>';
+      html+='<div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full rounded-full" style="width:'+pct+'%;background:'+pctColor+'"></div></div></div>';
+      html+='<p class="text-slate-400 text-xs mt-2">'+updated+'</p>';
+      html+='<div class="flex gap-2 mt-4">';
+      html+='<a href="/passport?id='+p.id+'" class="flex-1 text-center text-sm font-semibold py-2 rounded-full border border-violet-700 text-violet-700 hover:bg-violet-50 transition-colors">Edit profile</a>';
+      html+='</div></div>';
+    });
+    html+='<a href="/passport" class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center gap-2 hover:border-violet-300 hover:bg-violet-50 transition-all min-h-[180px]">';
+    html+='<span class="w-10 h-10 bg-white border-2 border-slate-200 rounded-full flex items-center justify-center text-xl text-slate-400">+</span>';
+    html+='<span class="text-slate-500 font-medium text-sm">Add child profile</span></a>';
+    grid.innerHTML=html;
+  }
+
+  function renderMatching(email, waitlist){
+    var el=document.getElementById("matching-content");
+    var statusBar = '';
+    if(waitlist&&waitlist.length){
+      var w=waitlist[0];
+      var statusColors={"New":"bg-violet-100 text-violet-700","Contacted":"bg-blue-100 text-blue-700","Matched":"bg-green-100 text-green-700","Waitlisted":"bg-yellow-100 text-yellow-700","Closed":"bg-slate-100 text-slate-500"};
+      var sc=statusColors[w.status]||statusColors["New"];
+      statusBar=
+        '<div class="flex items-center justify-between flex-wrap gap-3 mb-4">'+
+        '<div>'+
+        '<p class="font-semibold text-slate-800">Application on file</p>'+
+        '<p class="text-slate-500 text-sm mt-0.5">Submitted '+formatDate(w.created_at)+' · Services: '+[w.service_slp&&"Speech",w.service_ot&&"OT",w.service_aba&&"ABA",w.service_other&&"Other"].filter(Boolean).join(", ")+'</p>'+
+        '</div>'+
+        '<span class="px-3 py-1 rounded-full text-sm font-semibold '+sc+'">'+w.status+'</span>'+
+        '</div>';
+    } else {
+      statusBar=
+        '<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">'+
+        '<div>'+
+        '<p class="font-semibold text-slate-800">Not on the waitlist yet</p>'+
+        '<p class="text-slate-500 text-sm mt-1">Sign up and we\'ll reach out to matched providers on your behalf when outreach launches.</p>'+
+        '</div>'+
+        '<a href="/waitlist" class="shrink-0 border border-violet-700 text-violet-700 font-semibold px-5 py-2 rounded-full hover:bg-violet-50 transition-colors text-sm">Join waitlist</a>'+
+        '</div>';
+    }
+    el.innerHTML = statusBar +
+      '<div class="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl p-4">'+
+      '<span class="shrink-0 bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-full mt-0.5">Coming soon</span>'+
+      '<p class="text-slate-600 text-sm leading-relaxed">Provider outreach and waitlist tracking are in active development. When this launches, UniqueApex will contact matched speech, OT, and behaviour therapists on your behalf — and track their responses so you don\'t have to. You\'ll get an email the moment this goes live.</p>'+
+      '</div>';
+  }
+
+  (async function init(){
+    var s=await getValidSession();
+    if(!s){window.location.href="/login";return;}
+
+    document.getElementById("loading").style.display="none";
+    document.getElementById("dashboard").style.display="block";
+    document.getElementById("user-email").textContent=s.user&&s.user.email?s.user.email:"";
+
+    // Load passports and waitlist in parallel
+    var [pResp,wResp]=await Promise.all([
+      fetch(UA_URL+"/rest/v1/passports?select=*&order=updated_at.desc",{headers:authHdr(s.access_token)}),
+      fetch(UA_URL+"/rest/v1/waitlist?email=eq."+encodeURIComponent(s.user.email)+"&select=*&order=created_at.desc",{headers:authHdr(s.access_token)})
+    ]);
+
+    var passports=pResp.ok?await pResp.json():[];
+    var waitlist=wResp.ok?await wResp.json():[];
+
+    renderPassports(Array.isArray(passports)?passports:[]);
+    renderMatching(s.user.email, Array.isArray(waitlist)?waitlist:[]);
+
+    document.getElementById("logout-btn").addEventListener("click",function(){
+      fetch(UA_URL+"/auth/v1/logout",{method:"POST",headers:authHdr(s.access_token)}).finally(function(){clearSession();window.location.href="/";});
+    });
+  })();
+</script>

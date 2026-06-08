@@ -1,0 +1,846 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Container from "@/components/container.astro";
+
+const inputCls = "w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white";
+const cardCls = "bg-slate-50 rounded-2xl p-6 md:p-8 space-y-5";
+const labelCls = "block text-sm font-medium text-slate-600 mb-2";
+const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slate-200 rounded-xl px-4 py-3 hover:border-violet-300 transition-colors text-slate-600 text-sm";
+const sel = inputCls + " text-slate-500";
+const sub = "text-sm text-slate-500 -mt-2";
+const ynOpts = ["Yes","No"];
+---
+
+<Layout title="Family Passport">
+  <Container>
+    <div class="max-w-3xl mx-auto mt-12 mb-24">
+
+      <div class="text-center mb-6">
+        <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">Family Passport</p>
+        <h1 class="text-4xl font-bold text-slate-800 leading-tight mt-2">
+          Build your child's <span class="text-violet-700">profile</span>
+        </h1>
+      </div>
+
+      <!-- Purpose explanation -->
+      <div class="bg-violet-50 border border-violet-100 rounded-2xl p-5 md:p-6 mb-8">
+        <p class="text-slate-700 leading-relaxed">
+          <span class="font-semibold text-violet-800">This is your child's portable profile.</span>
+          Fill it in once and keep it updated. Whenever you meet a new provider, therapist, or school,
+          export it as a PDF and share it — instead of re-explaining your child's story every time.
+        </p>
+        <p class="text-slate-600 leading-relaxed mt-3 text-sm">
+          At the end you'll choose <span class="font-medium">exactly which sections to include</span> in each PDF,
+          so every provider gets only what's relevant to them. Fill in what you know — only the name is required to start.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-between mb-4">
+        <p class="text-xs text-slate-400">Changes are saved when you click Save & close or Save Passport.</p>
+        <button id="save-close-btn" class="text-sm font-semibold text-slate-600 border border-slate-300 px-4 py-2 rounded-full hover:bg-slate-50 transition-colors">
+          Save &amp; close
+        </button>
+      </div>
+
+      <div class="mb-8">
+        <div class="flex justify-between items-center mb-2">
+          <span id="step-label" class="text-sm font-semibold text-violet-700">Step 1 of 13 · Child Profile</span>
+          <span id="step-pct" class="text-sm text-slate-400">8%</span>
+        </div>
+        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div id="progress-bar" class="h-full bg-violet-600 rounded-full transition-all duration-300" style="width:8%"></div>
+        </div>
+      </div>
+
+      <form id="passport-form" novalidate>
+
+        <!-- 1 CHILD PROFILE -->
+        <div class="form-step" data-step="1">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Child Profile</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label class={labelCls}>First name *</label>
+                <input type="text" name="firstName" class={inputCls} placeholder="Child's first name" />
+                <p id="err-firstName" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">Please enter your child's first name.</p>
+              </div>
+              <div>
+                <label class={labelCls}>Last name *</label>
+                <input type="text" name="lastName" class={inputCls} placeholder="Child's last name" />
+                <p id="err-lastName" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">Please enter your child's last name.</p>
+              </div>
+              <div><label class={labelCls}>Date of birth</label><input type="date" name="dob" class={inputCls} /></div>
+              <div>
+                <label class={labelCls}>Gender *</label>
+                <select name="gender" class={sel}>
+                  <option value="">Select...</option>
+                  <option value="Female">Female</option><option value="Male">Male</option>
+                  <option value="Non-binary">Non-binary</option>
+                  <option value="Prefer not to say">Prefer not to say</option>
+                  <option value="Other">Other</option>
+                </select>
+                <p id="err-gender" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">Please make a selection.</p>
+              </div>
+              <div><label class={labelCls}>City / region</label><input type="text" name="city" class={inputCls} placeholder="e.g. Montréal, QC" /></div>
+              <div><label class={labelCls}>Country</label><input type="text" name="country" class={inputCls} placeholder="e.g. Canada" /></div>
+              <div><label class={labelCls}>Health insurance # (e.g. RAMQ — optional)</label><input type="text" name="healthInsurance" class={inputCls} placeholder="Optional" /></div>
+              <div><label class={labelCls}>Language(s) spoken at home</label><input type="text" name="homeLanguages" class={inputCls} placeholder="e.g. English, French" /></div>
+              <div><label class={labelCls}>Language child understands best</label><input type="text" name="bestLanguage" class={inputCls} placeholder="e.g. English" /></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 PARENTS & HOUSEHOLD -->
+        <div class="form-step" data-step="2" style="display:none">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Parents & Household</h2>
+            <div class="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+              <p class="font-medium text-slate-700 text-sm">Parent / Guardian 1</p>
+              <div class="grid md:grid-cols-2 gap-3">
+                <input type="text" name="g1name" class={inputCls} placeholder="Full name" />
+                <select name="g1rel" class={sel}>
+                  <option value="">Relationship to child...</option>
+                  <option>Mother</option><option>Father</option><option>Guardian</option><option>Other</option>
+                </select>
+                <input type="email" name="g1email" class={inputCls} placeholder="Email" />
+                <input type="tel" name="g1phone" class={inputCls} placeholder="Phone" />
+              </div>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+              <p class="font-medium text-slate-700 text-sm">Parent / Guardian 2 (optional)</p>
+              <div class="grid md:grid-cols-2 gap-3">
+                <input type="text" name="g2name" class={inputCls} placeholder="Full name" />
+                <select name="g2rel" class={sel}>
+                  <option value="">Relationship to child...</option>
+                  <option>Mother</option><option>Father</option><option>Guardian</option><option>Other</option>
+                </select>
+                <input type="email" name="g2email" class={inputCls} placeholder="Email" />
+                <input type="tel" name="g2phone" class={inputCls} placeholder="Phone" />
+              </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label class={labelCls}>Legal custody</label>
+                <select name="custody" class={sel}>
+                  <option value="">Select...</option>
+                  <option>Guardians together</option><option>Joint custody</option><option>Single custody</option><option>Other</option>
+                </select>
+              </div>
+              <div>
+                <label class={labelCls}>Family status</label>
+                <select name="maritalStatus" class={sel}>
+                  <option value="">Select...</option>
+                  <option>Married</option><option>Living together</option><option>Separated</option>
+                  <option>Divorced</option><option>Single</option><option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class={labelCls}>Who the child lives with</label>
+              <div class="grid sm:grid-cols-3 gap-2">
+                {["Both parents","Mother","Father","Siblings","Grandparents","Foster family","Other"].map((o) => (<label class={chip}><input type="checkbox" name="livesWith" value={o} class="accent-violet-700 w-4 h-4" /> {o}</label>))}
+              </div>
+            </div>
+            <div><label class={labelCls}>Siblings (name, age, relationship)</label><textarea name="siblings" class={inputCls + " h-20"} placeholder="e.g. Sara, 8, sister"></textarea></div>
+            <div>
+              <label class={labelCls}>Do you receive government funding?</label>
+              <div class="flex gap-2 mb-2">
+                {ynOpts.map((o) => (<label class={chip + " flex-1 justify-center"}><input type="radio" name="funding" value={o} class="accent-violet-700" /> {o}</label>))}
+              </div>
+              <input type="text" name="fundingType" class={inputCls} placeholder="If yes, which programs / subsidies?" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 DIAGNOSIS & FAMILY HISTORY -->
+        <div class="form-step" data-step="3" style="display:none">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Diagnosis</h2>
+            <div>
+              <label class={labelCls}>Diagnosis status</label>
+              <div class="grid sm:grid-cols-3 gap-2">
+                {["Diagnosed","Assessment Pending","Self-Identified Concerns"].map((o) => (<label class={chip}><input type="radio" name="diagnosisStatus" value={o} class="accent-violet-700" /> {o}</label>))}
+              </div>
+            </div>
+            <div>
+              <label class={labelCls}>Diagnoses (select any that apply)</label>
+              <div class="grid sm:grid-cols-3 gap-2">
+                {["Autism","ADHD","Speech / Language Disorder","Global Developmental Delay","Intellectual Disability","Learning Difficulty","Dyspraxia / DCD","Sensory Processing","Anxiety","Depression","OCD","Tourette's / Tics","Epilepsy / Seizures","Genetic Condition","Other"].map((o) => (<label class={chip}><input type="checkbox" name="diagnoses" value={o} class="accent-violet-700 w-4 h-4" /> {o}</label>))}
+              </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div><label class={labelCls}>Diagnosed / referred by</label><input type="text" name="diagnosedBy" class={inputCls} placeholder="Professional name & title" /></div>
+              <div><label class={labelCls}>Date of diagnosis</label><input type="text" name="diagnosisDate" class={inputCls} placeholder="e.g. March 2024" /></div>
+            </div>
+            <div><label class={labelCls}>If awaiting assessment — with whom / where?</label><input type="text" name="awaitingAssessment" class={inputCls} placeholder="Optional" /></div>
+
+            <h2 class="text-lg font-bold text-slate-800 pt-2">Family History</h2>
+            <p class={sub}>Conditions present in close relatives (helps professionals understand the full picture).</p>
+            <div class="grid sm:grid-cols-3 gap-2">
+              {["Developmental / language delay","Learning difficulties","Autism","ADHD","Anxiety","Depression","OCD","Bipolar","Tourette's / tics","Intellectual disability","Epilepsy / seizures","Genetic disorder","Substance use"].map((o) => (<label class={chip}><input type="checkbox" name="familyHistory" value={o} class="accent-violet-700 w-4 h-4" /> {o}</label>))}
+            </div>
+            <div><label class={labelCls}>Notes (relation to child, details)</label><textarea name="familyHistoryNotes" class={inputCls + " h-16"} placeholder="e.g. Maternal uncle — autism"></textarea></div>
+          </div>
+        </div>
+
+        <!-- 4 BIRTH & DEVELOPMENT -->
+        <div class="form-step" data-step="4" style="display:none">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Birth & Development</h2>
+            <div><label class={labelCls}>Pregnancy (any complications)</label><textarea name="pregnancy" class={inputCls + " h-16"} placeholder="Optional"></textarea></div>
+            <div class="grid md:grid-cols-3 gap-4">
+              <div><label class={labelCls}>Weeks at birth</label><input type="text" name="gestation" class={inputCls} placeholder="e.g. 40" /></div>
+              <div><label class={labelCls}>Birth weight</label><input type="text" name="birthWeight" class={inputCls} placeholder="e.g. 3.2 kg" /></div>
+              <div><label class={labelCls}>Lost / regressed skills?</label>
+                <select name="regression" class={sel}><option value="">Select...</option><option>No</option><option>Yes</option></select>
+              </div>
+            </div>
+            <div><label class={labelCls}>Birth / post-birth complications</label><textarea name="birthComplications" class={inputCls + " h-16"} placeholder="e.g. breathing difficulty, feeding issues, tongue tie"></textarea></div>
+            <div>
+              <label class={labelCls}>Developmental milestones (approx. age reached — leave blank if unsure)</label>
+              <div class="grid sm:grid-cols-2 gap-3">
+                {[
+                  {n:"msSit",l:"Sat unsupported"},{n:"msCrawl",l:"Crawled"},{n:"msWalk",l:"Walked"},
+                  {n:"msFirstWord",l:"First words"},{n:"msPhrases",l:"2-word phrases"},{n:"msSentences",l:"Simple sentences"},
+                  {n:"msToiletDay",l:"Toilet trained (day)"},{n:"msToiletNight",l:"Toilet trained (night)"},
+                ].map((f) => (
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm text-slate-500 w-40 shrink-0">{f.l}</span>
+                    <input type="text" name={f.n} class={inputCls + " py-2"} placeholder="age" />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div><label class={labelCls}>If skills were lost, describe</label><textarea name="regressionNotes" class={inputCls + " h-16"} placeholder="Optional"></textarea></div>
+          </div>
+        </div>
+
+        <!-- 5 COMMUNICATION -->
+        <div class="form-step" data-step="5" style="display:none">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Communication Profile</h2>
+            <div>
+              <label class={labelCls}>Communication style</label>
+              <div class="grid sm:grid-cols-2 gap-2">
+                {["Fluent Verbal","Verbal","Limited Verbal","Non-Speaking"].map((o) => (<label class={chip}><input type="radio" name="commStyle" value={o} class="accent-violet-700" /> {o}</label>))}
+              </div>
+            </div>
+            <div>
+              <label class={labelCls}>Primary means of communication (select any)</label>
+              <div class="grid sm:grid-cols-3 gap-2">
+                {["Words","Sentences","Sounds","Pictures (PECS)","Sign language","Device / AAC app","No primary means yet"].map((o) => (<label class={chip}><input type="checkbox" name="commMeans" value={o} class="accent-violet-700 w-4 h-4" /> {o}</label>))}
+              </div>
+            </div>
+            <div>
+              <label class={labelCls}>Can express needs</label>
+              <select name="canExpressNeeds" class={sel}>
+                <option value="">Select...</option><option>Consistently</option><option>Sometimes</option><option>Rarely</option>
+              </select>
+            </div>
+            <div>
+              <label class={labelCls}>Communication challenges (select any)</label>
+              <div class="grid sm:grid-cols-2 gap-2">
+                {["Requesting","Conversation","Question Answering","Emotional Expression","Social Communication"].map((o) => (<label class={chip}><input type="checkbox" name="commChallenges" value={o} class="accent-violet-700 w-4 h-4" /> {o}</label>))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 SENSORY (expanded) -->
+        <div class="form-step" data-step="6" style="display:none">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Sensory Profile</h2>
+            <p class={sub}>Select anything your child is sensitive to (avoids) or seeks out. Detailed is fine — at export you can choose whether to include this section.</p>
+            {[
+              {group:"Auditory (sound)", items:["Loud sounds","Crowded / noisy places","Sudden sounds","Specific sounds (vacuum, hand dryer)","Covers ears","Seeks loud sounds / makes noise"]},
+              {group:"Visual (sight)", items:["Bright lights","Fluorescent lighting","Visual clutter","Fascinated by spinning / moving objects","Avoids eye contact","Seeks visual stimulation"]},
+              {group:"Tactile (touch)", items:["Clothing tags / seams","Haircuts","Tooth brushing","Nail cutting","Avoids messy play","Sensitive to light touch","Seeks deep pressure / tight hugs","Mouths / chews objects"]},
+              {group:"Oral & taste", items:["Limited food textures","Strong flavours","Food temperature","Chews non-food items","Seeks crunchy / chewy foods"]},
+              {group:"Smell", items:["Sensitive to smells","Seeks out smells"]},
+              {group:"Movement (vestibular)", items:["Seeks movement (spinning, swinging)","Avoids movement","Fearful when feet leave ground","Constantly moving / can't sit still"]},
+              {group:"Body awareness", items:["Bumps into things / clumsy","Rough play","Seeks deep pressure","Unaware of body position"]},
+              {group:"Other", items:["Insensitive to temperature","High pain tolerance","Strong difficulty with transitions"]},
+            ].map((g) => (
+              <div>
+                <label class={labelCls}>{g.group}</label>
+                <div class="grid sm:grid-cols-3 gap-2">
+                  {g.items.map((it) => (<label class={chip}><input type="checkbox" name={"sensory_" + g.group} value={it} class="accent-violet-700 w-4 h-4" /> {it}</label>))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <!-- 7 DAILY LIVING -->
+        <div class="form-step" data-step="7" style="display:none">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Daily Living Skills</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+              {[
+                {name:"eating", label:"Independent eating", opts:["Independent","With support","Not yet"]},
+                {name:"dressing", label:"Independent dressing", opts:["Independent","With support","Not yet"]},
+                {name:"toileting", label:"Toilet training status", opts:["Fully trained","In progress","Not started","Not applicable"]},
+                {name:"sleep", label:"Sleep quality", opts:["Good","Variable","Poor"]},
+                {name:"safety", label:"Safety awareness", opts:["Strong","Developing","Limited"]},
+                {name:"multiStep", label:"Follows multi-step instructions", opts:["Yes","Sometimes","No"]},
+                {name:"groupActivities", label:"Participates in group activities", opts:["Yes","Sometimes","No"]},
+                {name:"feeding", label:"Eating / feeding difficulties", opts:["None","Mild","Significant"]},
+              ].map((f) => (
+                <div>
+                  <label class={labelCls}>{f.label}</label>
+                  <select name={f.name} class={sel}><option value="">Select...</option>{f.opts.map((o) => <option value={o}>{o}</option>)}</select>
+                </div>
+              ))}
+            </div>
+            <div><label class={labelCls}>Dietary restrictions</label><input type="text" name="dietaryRestrictions" class={inputCls} placeholder="e.g. gluten-free, no nuts" /></div>
+          </div>
+        </div>
+
+        <!-- 8 HEALTH & MEDICAL -->
+        <div class="form-step" data-step="8" style="display:none">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Health & Medical</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div><label class={labelCls}>Pediatrician / GP</label><input type="text" name="pediatrician" class={inputCls} placeholder="Name" /></div>
+              <div><label class={labelCls}>Other specialists following your child</label><input type="text" name="specialists" class={inputCls} placeholder="e.g. neurologist" /></div>
+            </div>
+            <div>
+              <label class={labelCls}>Dominant hand</label>
+              <div class="flex gap-2">
+                {["Right","Left","Both"].map((o) => (<label class={chip + " flex-1 justify-center"}><input type="radio" name="handedness" value={o} class="accent-violet-700" /> {o}</label>))}
+              </div>
+            </div>
+            <div class="grid md:grid-cols-3 gap-4">
+              <div><label class={labelCls}>Food allergies</label><input type="text" name="allergyFood" class={inputCls} placeholder="Optional" /></div>
+              <div><label class={labelCls}>Environmental allergies</label><input type="text" name="allergyEnv" class={inputCls} placeholder="Optional" /></div>
+              <div><label class={labelCls}>Other allergies</label><input type="text" name="allergyOther" class={inputCls} placeholder="Optional" /></div>
+            </div>
+            <div><label class={labelCls}>Allergy reactions & treatment (e.g. EpiPen)</label><input type="text" name="allergyTreatment" class={inputCls} placeholder="Optional" /></div>
+            <div><label class={labelCls}>Medical conditions / chronic illnesses</label><textarea name="medicalConditions" class={inputCls + " h-16"} placeholder="e.g. asthma, recurrent ear infections"></textarea></div>
+            <div><label class={labelCls}>Current medications (name, dose, frequency, purpose)</label><textarea name="medications" class={inputCls + " h-16"} placeholder="One per line"></textarea></div>
+            <div><label class={labelCls}>Past medications (and why stopped)</label><textarea name="pastMedications" class={inputCls + " h-16"} placeholder="Optional"></textarea></div>
+            <div><label class={labelCls}>Surgeries / hospitalizations</label><textarea name="surgeries" class={inputCls + " h-16"} placeholder="Optional"></textarea></div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div><label class={labelCls}>Last eye exam</label><input type="text" name="lastEyeExam" class={inputCls} placeholder="e.g. June 2024" /></div>
+              <div><label class={labelCls}>Wears glasses?</label>
+                <div class="flex gap-2">{ynOpts.map((o) => (<label class={chip + " flex-1 justify-center"}><input type="radio" name="glasses" value={o} class="accent-violet-700" /> {o}</label>))}</div>
+              </div>
+              <div><label class={labelCls}>Last hearing test</label><input type="text" name="lastHearingTest" class={inputCls} placeholder="e.g. 2023" /></div>
+              <div><label class={labelCls}>Recurrent ear infections / PE tubes?</label>
+                <div class="flex gap-2">{ynOpts.map((o) => (<label class={chip + " flex-1 justify-center"}><input type="radio" name="earInfections" value={o} class="accent-violet-700" /> {o}</label>))}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9 BEHAVIOUR & SOCIAL -->
+        <div class="form-step" data-step="9" style="display:none">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Behaviour & Social</h2>
+            <div>
+              <label class={labelCls}>Behaviour challenges (select any)</label>
+              <div class="grid sm:grid-cols-3 gap-2">
+                {["Meltdowns","Aggression","Self-Injury","Elopement / flight risk","Anxiety","Rigidity / difficulty with change","Emotional Regulation","Repetitive behaviours","Defiance / non-compliance","Hyperactivity / impulsivity"].map((o) => (<label class={chip}><input type="checkbox" name="behaviourChallenges" value={o} class="accent-violet-700 w-4 h-4" /> {o}</label>))}
+              </div>
+            </div>
+            <div>
+              <label class={labelCls}>Frequency</label>
+              <select name="behaviourFrequency" class={sel}><option value="">Select...</option><option>Daily</option><option>Weekly</option><option>Occasionally</option><option>Rarely</option></select>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div><label class={labelCls}>Triggers</label><textarea name="triggers" class={inputCls + " h-20"} placeholder="What tends to set things off?"></textarea></div>
+              <div><label class={labelCls}>Strategies tried (what worked / didn't)</label><textarea name="strategies" class={inputCls + " h-20"} placeholder="What helps, what doesn't"></textarea></div>
+            </div>
+            <div class="grid md:grid-cols-3 gap-4">
+              {[
+                {name:"peersInterest", label:"Shows interest in peers"},
+                {name:"peersInteract", label:"Interacts with peers"},
+                {name:"followsInstructions", label:"Follows familiar instructions"},
+              ].map((f) => (
+                <div><label class={labelCls}>{f.label}</label>
+                  <select name={f.name} class={sel}><option value="">Select...</option><option>Yes</option><option>Sometimes</option><option>No</option></select>
+                </div>
+              ))}
+            </div>
+            <div>
+              <label class={labelCls}>Ever expelled or suspended from school?</label>
+              <div class="flex gap-2 mb-2">{ynOpts.map((o) => (<label class={chip + " flex-1 justify-center"}><input type="radio" name="suspended" value={o} class="accent-violet-700" /> {o}</label>))}</div>
+              <input type="text" name="suspendedNotes" class={inputCls} placeholder="If yes, briefly explain" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 10 STRENGTHS & INTERESTS -->
+        <div class="form-step" data-step="10" style="display:none">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Strengths & Interests</h2>
+            <p class={sub}>This helps providers connect with your child — and ABA teams use favourite things as motivators.</p>
+            <div><label class={labelCls}>Strengths</label><textarea name="strengthsText" class={inputCls + " h-20"} placeholder="e.g. strong memory, visual learner, kind"></textarea></div>
+            <div><label class={labelCls}>Interests & favourite things</label><textarea name="interests" class={inputCls + " h-20"} placeholder="e.g. trains, music, building blocks, bubbles"></textarea></div>
+            <div><label class={labelCls}>Dislikes / things that upset them</label><textarea name="dislikes" class={inputCls + " h-20"} placeholder="e.g. loud noises, being rushed"></textarea></div>
+          </div>
+        </div>
+
+        <!-- 11 EDUCATION -->
+        <div class="form-step" data-step="11" style="display:none">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Education Profile</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div><label class={labelCls}>School / daycare name</label><input type="text" name="schoolName" class={inputCls} placeholder="Optional" /></div>
+              <div><label class={labelCls}>School type</label>
+                <select name="schoolType" class={sel}><option value="">Select...</option><option>Mainstream</option><option>Specialized</option><option>Homeschool</option><option>Daycare / preschool</option><option>Not in school yet</option><option>Other</option></select>
+              </div>
+              <div><label class={labelCls}>Grade / year</label><input type="text" name="grade" class={inputCls} placeholder="e.g. Grade 2" /></div>
+              <div><label class={labelCls}>School board (if applicable)</label><input type="text" name="schoolBoard" class={inputCls} placeholder="Optional" /></div>
+              <div><label class={labelCls}>Has an IEP / intervention plan</label>
+                <div class="flex gap-2">{ynOpts.map((o) => (<label class={chip + " flex-1 justify-center"}><input type="radio" name="hasIEP" value={o} class="accent-violet-700" /> {o}</label>))}</div>
+              </div>
+              <div><label class={labelCls}>Level of classroom support</label>
+                <select name="classroomSupport" class={sel}><option value="">Select...</option><option>None</option><option>Part-time aide</option><option>Full-time aide</option><option>Other</option></select>
+              </div>
+            </div>
+            <div><label class={labelCls}>Support provided through an agency?</label><input type="text" name="agencySupport" class={inputCls} placeholder="If yes, which agency?" /></div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div><label class={labelCls}>Academic concerns</label><textarea name="schoolChallenges" class={inputCls + " h-20"} placeholder="What's hard at school?"></textarea></div>
+              <div><label class={labelCls}>School strengths</label><textarea name="schoolStrengths" class={inputCls + " h-20"} placeholder="What's going well?"></textarea></div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div><label class={labelCls}>Upcoming school transition</label><input type="text" name="upcomingTransition" class={inputCls} placeholder="e.g. Starting Grade 3 in Sept" /></div>
+              <div><label class={labelCls}>Flight risk at school?</label>
+                <div class="flex gap-2">{ynOpts.map((o) => (<label class={chip + " flex-1 justify-center"}><input type="radio" name="flightRisk" value={o} class="accent-violet-700" /> {o}</label>))}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 12 THERAPY & SERVICES -->
+        <div class="form-step" data-step="12" style="display:none">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Therapy & Services</h2>
+            <p class={sub}>Toggle on any therapy your child currently receives and add the details.</p>
+            {["Speech Therapy","Occupational Therapy","ABA / Behaviour","Psychology","Psychiatry","Physiotherapy","Social Skills Group","Infant Stimulation","Other"].map((t) => (
+              <div class="bg-white border border-slate-200 rounded-xl p-4">
+                <label class="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" class="therapy-toggle accent-violet-700 w-4 h-4" data-therapy={t} />
+                  <span class="font-medium text-slate-700">{t}</span>
+                </label>
+                <div class="therapy-fields mt-4 grid md:grid-cols-2 gap-3" data-fields={t} style="display:none">
+                  <input type="text" data-field="provider" class={inputCls} placeholder="Provider name" />
+                  <input type="text" data-field="frequency" class={inputCls} placeholder="Frequency (e.g. weekly)" />
+                  <input type="date" data-field="startDate" class={inputCls} />
+                  <select data-field="progress" class={sel}>
+                    <option value="">Progress rating...</option>
+                    <option value="1">1 · Just started</option><option value="2">2 · Some progress</option>
+                    <option value="3">3 · Steady progress</option><option value="4">4 · Strong progress</option>
+                    <option value="5">5 · Goals nearly met</option>
+                  </select>
+                  <textarea data-field="goals" class={inputCls + " h-16 md:col-span-2"} placeholder="Current goals"></textarea>
+                </div>
+              </div>
+            ))}
+            <div><label class={labelCls}>Past services received (type, provider, dates)</label><textarea name="pastServices" class={inputCls + " h-20"} placeholder="Optional"></textarea></div>
+            <div>
+              <label class={labelCls}>Currently on a waitlist for any services?</label>
+              <div class="flex gap-2 mb-2">{ynOpts.map((o) => (<label class={chip + " flex-1 justify-center"}><input type="radio" name="onWaitlist" value={o} class="accent-violet-700" /> {o}</label>))}</div>
+              <input type="text" name="waitlistDetails" class={inputCls} placeholder="If yes, which services / where?" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 13 GOALS & FOCUS -->
+        <div class="form-step" data-step="13" style="display:none">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Goals & Focus</h2>
+            <div><label class={labelCls}>Your main concerns right now</label><textarea name="mainConcerns" class={inputCls + " h-24"} placeholder="What's worrying you most at this time?"></textarea></div>
+            <div>
+              <label class={labelCls}>Top priorities (select any)</label>
+              <div class="grid sm:grid-cols-2 gap-2">
+                {["Communication","Friendships","Emotional Regulation","School Success","Independence","Daily Living Skills","Transition Planning","Employment Preparation"].map((o) => (<label class={chip}><input type="checkbox" name="goals" value={o} class="accent-violet-700 w-4 h-4" /> {o}</label>))}
+              </div>
+            </div>
+            <div><label class={labelCls}>Specific areas / behaviours you'd like help with</label><textarea name="focusAreas" class={inputCls + " h-20"} placeholder="Optional"></textarea></div>
+            <div><label class={labelCls}>Anything else?</label><textarea name="goalsOther" class={inputCls + " h-16"} placeholder="Optional"></textarea></div>
+          </div>
+        </div>
+
+        <!-- REVIEW & EXPORT -->
+        <div class="form-step" data-step="14" style="display:none">
+          <div class={cardCls}>
+            <h2 class="text-lg font-bold text-slate-800">Review & export</h2>
+            <p class={sub}>Tick the sections to include in the PDF you'll share, then download. Untick anything a particular provider doesn't need.</p>
+            <div class="flex flex-wrap gap-3 pt-1">
+              <button type="button" id="select-all" class="text-sm text-violet-700 font-medium hover:underline">Select all</button>
+              <button type="button" id="select-none" class="text-sm text-slate-400 font-medium hover:underline">Clear all</button>
+            </div>
+            <div id="review-output" class="space-y-3 mt-2"></div>
+            <button type="button" id="export-pdf" class="w-full mt-2 px-8 py-3 rounded-full border-2 border-violet-700 text-violet-700 font-semibold hover:bg-violet-50 transition-colors">Download PDF</button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between mt-6">
+          <button type="button" id="back-btn" class="px-6 py-3 rounded-full border border-slate-300 text-slate-600 font-semibold hover:bg-slate-50 transition-colors" style="visibility:hidden">Back</button>
+          <button type="button" id="next-btn" class="px-8 py-3 rounded-full bg-violet-700 hover:bg-violet-800 text-white font-semibold transition-colors">Next</button>
+        </div>
+        <div id="save-result" class="mt-4 text-center"></div>
+
+      </form>
+    </div>
+  </Container>
+
+  <!-- Off-screen print view, shown only when printing -->
+  <div id="print-view"></div>
+</Layout>
+
+<style is:global>
+  #print-view { position: fixed; left: -9999px; top: 0; width: 700px; }
+  @media print {
+    body * { visibility: hidden !important; }
+    #print-view, #print-view * { visibility: visible !important; }
+    #print-view { position: absolute; left: 0; top: 0; width: 100%; padding: 24px; font-family: system-ui, sans-serif; }
+  }
+  .pv-header { margin-bottom: 22px; border-bottom: 2px solid #6d28d9; padding-bottom: 10px; }
+  .pv-header h1 { font-size: 22px; margin: 0 0 2px; color: #1e293b; }
+  .pv-header .sub { color: #64748b; font-size: 12px; }
+  .pv-section { margin-bottom: 16px; page-break-inside: avoid; }
+  .pv-title { font-weight: 700; font-size: 14px; color: #6d28d9; margin-bottom: 6px; }
+  .pv-row { display: flex; justify-content: space-between; gap: 24px; font-size: 12px; padding: 3px 0; border-bottom: 1px solid #f1f5f9; }
+  .pv-label { color: #64748b; } .pv-val { color: #0f172a; text-align: right; }
+</style>
+
+<script is:inline>
+  var currentStep = 1;
+  var totalSteps = 13;
+  var sectionNames = ["Child Profile","Parents & Household","Diagnosis & Family History","Birth & Development","Communication","Sensory Profile","Daily Living","Health & Medical","Behaviour & Social","Strengths & Interests","Education","Therapy & Services","Goals & Focus"];
+
+  var form = document.getElementById("passport-form");
+  var backBtn = document.getElementById("back-btn");
+  var nextBtn = document.getElementById("next-btn");
+  var stepLabel = document.getElementById("step-label");
+  var stepPct = document.getElementById("step-pct");
+  var progressBar = document.getElementById("progress-bar");
+  var saveResult = document.getElementById("save-result");
+  var reviewStep = totalSteps + 1;
+
+  function showStep(n) {
+    var steps = document.querySelectorAll(".form-step");
+    for (var i = 0; i < steps.length; i++) {
+      steps[i].style.display = (parseInt(steps[i].getAttribute("data-step")) === n) ? "block" : "none";
+    }
+    backBtn.style.visibility = n === 1 ? "hidden" : "visible";
+    if (n <= totalSteps) {
+      stepLabel.textContent = "Step " + n + " of " + totalSteps + " · " + sectionNames[n - 1];
+      var pct = Math.round((n / totalSteps) * 100);
+      stepPct.textContent = pct + "%"; progressBar.style.width = pct + "%";
+      nextBtn.textContent = n === totalSteps ? "Review & export" : "Next";
+    } else {
+      stepLabel.textContent = "Review & export"; stepPct.textContent = "100%"; progressBar.style.width = "100%";
+      nextBtn.textContent = "Save Passport";
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  var toggles = document.querySelectorAll(".therapy-toggle");
+  for (var i = 0; i < toggles.length; i++) {
+    toggles[i].addEventListener("change", function (e) {
+      var name = e.target.getAttribute("data-therapy");
+      document.querySelector('.therapy-fields[data-fields="' + name + '"]').style.display = e.target.checked ? "grid" : "none";
+    });
+  }
+
+  function getRadio(n){var el=form.querySelector('input[name="'+n+'"]:checked');return el?el.value:"";}
+  function getChecks(n){var els=form.querySelectorAll('input[name="'+n+'"]:checked');var o=[];for(var i=0;i<els.length;i++)o.push(els[i].value);return o;}
+  function getVal(n){var el=form.querySelector('[name="'+n+'"]');return el?el.value:"";}
+
+  function buildPassport() {
+    var therapies = [];
+    var tt = document.querySelectorAll(".therapy-toggle");
+    for (var i = 0; i < tt.length; i++) {
+      if (tt[i].checked) {
+        var name = tt[i].getAttribute("data-therapy");
+        var box = document.querySelector('.therapy-fields[data-fields="' + name + '"]');
+        therapies.push({ type:name, provider:box.querySelector('[data-field="provider"]').value, frequency:box.querySelector('[data-field="frequency"]').value, startDate:box.querySelector('[data-field="startDate"]').value, progress:box.querySelector('[data-field="progress"]').value, goals:box.querySelector('[data-field="goals"]').value });
+      }
+    }
+    return {
+      childProfile: { firstName:getVal("firstName"), lastName:getVal("lastName"), dob:getVal("dob"), gender:getVal("gender"), city:getVal("city"), country:getVal("country"), healthInsurance:getVal("healthInsurance"), homeLanguages:getVal("homeLanguages"), bestLanguage:getVal("bestLanguage") },
+      household: { g1name:getVal("g1name"), g1rel:getVal("g1rel"), g1email:getVal("g1email"), g1phone:getVal("g1phone"), g2name:getVal("g2name"), g2rel:getVal("g2rel"), g2email:getVal("g2email"), g2phone:getVal("g2phone"), custody:getVal("custody"), maritalStatus:getVal("maritalStatus"), livesWith:getChecks("livesWith"), siblings:getVal("siblings"), funding:getRadio("funding"), fundingType:getVal("fundingType") },
+      diagnosis: { status:getRadio("diagnosisStatus"), diagnoses:getChecks("diagnoses"), diagnosedBy:getVal("diagnosedBy"), date:getVal("diagnosisDate"), awaiting:getVal("awaitingAssessment"), familyHistory:getChecks("familyHistory"), familyHistoryNotes:getVal("familyHistoryNotes") },
+      birth: { pregnancy:getVal("pregnancy"), gestation:getVal("gestation"), birthWeight:getVal("birthWeight"), complications:getVal("birthComplications"), regression:getVal("regression"), regressionNotes:getVal("regressionNotes"), milestones:{ sit:getVal("msSit"), crawl:getVal("msCrawl"), walk:getVal("msWalk"), firstWord:getVal("msFirstWord"), phrases:getVal("msPhrases"), sentences:getVal("msSentences"), toiletDay:getVal("msToiletDay"), toiletNight:getVal("msToiletNight") } },
+      communication: { style:getRadio("commStyle"), means:getChecks("commMeans"), canExpressNeeds:getVal("canExpressNeeds"), challenges:getChecks("commChallenges") },
+      sensory: { auditory:getChecks("sensory_Auditory (sound)"), visual:getChecks("sensory_Visual (sight)"), tactile:getChecks("sensory_Tactile (touch)"), oral:getChecks("sensory_Oral & taste"), smell:getChecks("sensory_Smell"), movement:getChecks("sensory_Movement (vestibular)"), body:getChecks("sensory_Body awareness"), other:getChecks("sensory_Other") },
+      dailyLiving: { eating:getVal("eating"), dressing:getVal("dressing"), toileting:getVal("toileting"), sleep:getVal("sleep"), safety:getVal("safety"), multiStep:getVal("multiStep"), groupActivities:getVal("groupActivities"), feeding:getVal("feeding"), dietaryRestrictions:getVal("dietaryRestrictions") },
+      health: { handedness:getRadio("handedness"), pediatrician:getVal("pediatrician"), specialists:getVal("specialists"), allergyFood:getVal("allergyFood"), allergyEnv:getVal("allergyEnv"), allergyOther:getVal("allergyOther"), allergyTreatment:getVal("allergyTreatment"), medicalConditions:getVal("medicalConditions"), medications:getVal("medications"), pastMedications:getVal("pastMedications"), surgeries:getVal("surgeries"), lastEyeExam:getVal("lastEyeExam"), glasses:getRadio("glasses"), lastHearingTest:getVal("lastHearingTest"), earInfections:getRadio("earInfections") },
+      behaviour: { challenges:getChecks("behaviourChallenges"), frequency:getVal("behaviourFrequency"), triggers:getVal("triggers"), strategies:getVal("strategies"), peersInterest:getVal("peersInterest"), peersInteract:getVal("peersInteract"), followsInstructions:getVal("followsInstructions"), suspended:getRadio("suspended"), suspendedNotes:getVal("suspendedNotes") },
+      strengths: { strengths:getVal("strengthsText"), interests:getVal("interests"), dislikes:getVal("dislikes") },
+      education: { schoolName:getVal("schoolName"), schoolType:getVal("schoolType"), grade:getVal("grade"), schoolBoard:getVal("schoolBoard"), hasIEP:getRadio("hasIEP"), classroomSupport:getVal("classroomSupport"), agencySupport:getVal("agencySupport"), challenges:getVal("schoolChallenges"), strengths:getVal("schoolStrengths"), upcomingTransition:getVal("upcomingTransition"), flightRisk:getRadio("flightRisk") },
+      therapy: therapies,
+      services: { pastServices:getVal("pastServices"), onWaitlist:getRadio("onWaitlist"), waitlistDetails:getVal("waitlistDetails") },
+      goals: { mainConcerns:getVal("mainConcerns"), priorities:getChecks("goals"), focusAreas:getVal("focusAreas"), other:getVal("goalsOther") },
+    };
+  }
+
+  function buildSections(p) {
+    var cp=p.childProfile, hh=p.household, dg=p.diagnosis, b=p.birth, m=b.milestones, hl=p.health, bh=p.behaviour, ed=p.education, s=p.sensory;
+    var secs = [
+      {key:"childProfile", title:"Child Profile", rows:[["First name",cp.firstName],["Last name",cp.lastName],["Date of birth",cp.dob],["Gender",cp.gender],["City",cp.city],["Country",cp.country],["Health insurance #",cp.healthInsurance],["Home languages",cp.homeLanguages],["Understands best",cp.bestLanguage]]},
+      {key:"household", title:"Parents & Household", rows:[["Guardian 1",cp1(hh.g1name,hh.g1rel)],["Guardian 1 contact",[hh.g1email,hh.g1phone].filter(Boolean).join(" · ")],["Guardian 2",cp1(hh.g2name,hh.g2rel)],["Custody",hh.custody],["Family status",hh.maritalStatus],["Lives with",hh.livesWith],["Siblings",hh.siblings],["Government funding",hh.funding],["Funding type",hh.fundingType]]},
+      {key:"diagnosis", title:"Diagnosis & Family History", rows:[["Status",dg.status],["Diagnoses",dg.diagnoses],["Diagnosed/referred by",dg.diagnosedBy],["Date",dg.date],["Awaiting assessment",dg.awaiting],["Family history",dg.familyHistory],["Family notes",dg.familyHistoryNotes]]},
+      {key:"birth", title:"Birth & Development", rows:[["Pregnancy",b.pregnancy],["Weeks at birth",b.gestation],["Birth weight",b.birthWeight],["Complications",b.complications],["Milestones",[m.sit&&"sit "+m.sit,m.crawl&&"crawl "+m.crawl,m.walk&&"walk "+m.walk,m.firstWord&&"1st word "+m.firstWord,m.phrases&&"phrases "+m.phrases,m.sentences&&"sentences "+m.sentences,m.toiletDay&&"toilet day "+m.toiletDay,m.toiletNight&&"toilet night "+m.toiletNight].filter(Boolean).join(", ")],["Lost skills",b.regression],["Lost skills notes",b.regressionNotes]]},
+      {key:"communication", title:"Communication", rows:[["Style",p.communication.style],["Primary means",p.communication.means],["Can express needs",p.communication.canExpressNeeds],["Challenges",p.communication.challenges]]},
+      {key:"sensory", title:"Sensory Profile", rows:[["Auditory",s.auditory],["Visual",s.visual],["Tactile",s.tactile],["Oral & taste",s.oral],["Smell",s.smell],["Movement",s.movement],["Body awareness",s.body],["Other",s.other]]},
+      {key:"dailyLiving", title:"Daily Living", rows:[["Eating",p.dailyLiving.eating],["Dressing",p.dailyLiving.dressing],["Toileting",p.dailyLiving.toileting],["Sleep",p.dailyLiving.sleep],["Safety",p.dailyLiving.safety],["Multi-step",p.dailyLiving.multiStep],["Group activities",p.dailyLiving.groupActivities],["Feeding difficulties",p.dailyLiving.feeding],["Dietary restrictions",p.dailyLiving.dietaryRestrictions]]},
+      {key:"health", title:"Health & Medical", rows:[["Dominant hand",hl.handedness],["Pediatrician/GP",hl.pediatrician],["Specialists",hl.specialists],["Allergies",[hl.allergyFood,hl.allergyEnv,hl.allergyOther].filter(Boolean).join(", ")],["Allergy treatment",hl.allergyTreatment],["Medical conditions",hl.medicalConditions],["Medications",hl.medications],["Past medications",hl.pastMedications],["Surgeries",hl.surgeries],["Last eye exam",hl.lastEyeExam],["Glasses",hl.glasses],["Last hearing test",hl.lastHearingTest],["Ear infections",hl.earInfections]]},
+      {key:"behaviour", title:"Behaviour & Social", rows:[["Challenges",bh.challenges],["Frequency",bh.frequency],["Triggers",bh.triggers],["Strategies",bh.strategies],["Interest in peers",bh.peersInterest],["Interacts with peers",bh.peersInteract],["Follows instructions",bh.followsInstructions],["Suspended/expelled",bh.suspended],["Notes",bh.suspendedNotes]]},
+      {key:"strengths", title:"Strengths & Interests", rows:[["Strengths",p.strengths.strengths],["Interests",p.strengths.interests],["Dislikes",p.strengths.dislikes]]},
+      {key:"education", title:"Education", rows:[["School name",ed.schoolName],["Type",ed.schoolType],["Grade",ed.grade],["Board",ed.schoolBoard],["Has IEP",ed.hasIEP],["Classroom support",ed.classroomSupport],["Agency support",ed.agencySupport],["Academic concerns",ed.challenges],["Strengths",ed.strengths],["Upcoming transition",ed.upcomingTransition],["Flight risk",ed.flightRisk]]},
+    ];
+    var tRows = [];
+    if (p.therapy.length) { for (var i=0;i<p.therapy.length;i++){ var t=p.therapy[i]; tRows.push([t.type, [t.provider,t.frequency,t.startDate,(t.progress?"progress "+t.progress:""),t.goals].filter(Boolean).join(" · ")]); } }
+    tRows.push(["Past services",p.services.pastServices]); tRows.push(["On a waitlist",p.services.onWaitlist]); tRows.push(["Waitlist details",p.services.waitlistDetails]);
+    secs.push({key:"therapy", title:"Therapy & Services", rows:tRows});
+    secs.push({key:"goals", title:"Goals & Focus", rows:[["Main concerns",p.goals.mainConcerns],["Priorities",p.goals.priorities],["Focus areas",p.goals.focusAreas],["Other",p.goals.other]]});
+    return secs;
+  }
+  function cp1(name, rel){ return name ? (name + (rel?" ("+rel+")":"")) : "—"; }
+  function fmt(v){ if(Array.isArray(v)) return v.length?v.join(", "):"—"; return (v===""||v==null)?"—":v; }
+
+  function renderReview() {
+    var secs = buildSections(buildPassport());
+    var h = "";
+    for (var i=0;i<secs.length;i++){
+      var sec = secs[i];
+      h += '<div class="bg-white border border-slate-200 rounded-xl p-4">';
+      h += '<label class="flex items-center gap-2 mb-2 cursor-pointer"><input type="checkbox" class="sec-include accent-violet-700 w-4 h-4" data-key="'+sec.key+'" checked><span class="font-semibold text-slate-800">'+sec.title+'</span></label>';
+      h += '<div class="space-y-1">';
+      for (var j=0;j<sec.rows.length;j++){ h += '<div class="flex justify-between gap-4 text-sm"><span class="text-slate-400">'+sec.rows[j][0]+'</span><span class="text-slate-700 text-right">'+fmt(sec.rows[j][1])+'</span></div>'; }
+      h += '</div></div>';
+    }
+    document.getElementById("review-output").innerHTML = h;
+  }
+
+  function exportPDF() {
+    var p = buildPassport();
+    var secs = buildSections(p);
+    var included = {};
+    document.querySelectorAll(".sec-include").forEach(function(cb){ included[cb.getAttribute("data-key")] = cb.checked; });
+    var name = [p.childProfile.firstName, p.childProfile.lastName].filter(Boolean).join(" ") || "Family Passport";
+    var today = new Date().toLocaleDateString();
+    var html = '<div class="pv-header"><h1>'+name+' — Family Passport</h1><div class="sub">Generated '+today+' · UniqueApex</div></div>';
+    for (var i=0;i<secs.length;i++){
+      if (!included[secs[i].key]) continue;
+      var sec = secs[i];
+      html += '<div class="pv-section"><div class="pv-title">'+sec.title+'</div>';
+      for (var j=0;j<sec.rows.length;j++){ html += '<div class="pv-row"><span class="pv-label">'+sec.rows[j][0]+'</span><span class="pv-val">'+fmt(sec.rows[j][1])+'</span></div>'; }
+      html += '</div>';
+    }
+    document.getElementById("print-view").innerHTML = html;
+    window.print();
+  }
+
+  document.getElementById("export-pdf").addEventListener("click", exportPDF);
+  document.getElementById("select-all").addEventListener("click", function(){ document.querySelectorAll(".sec-include").forEach(function(cb){cb.checked=true;}); });
+  document.getElementById("select-none").addEventListener("click", function(){ document.querySelectorAll(".sec-include").forEach(function(cb){cb.checked=false;}); });
+
+  // ── Auth helpers ──────────────────────────────────────────────────────────
+  var UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+  var UA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+  var editingId = null; // passport UUID if editing existing
+
+  function getSession() {
+    try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch { return null; }
+  }
+  function setSession(data) {
+    var s = Object.assign({}, data, { expires_at: Math.floor(Date.now()/1000) + (data.expires_in || 3600) });
+    localStorage.setItem("ua_session", JSON.stringify(s)); return s;
+  }
+  function isValid(s) { return s && s.access_token && Math.floor(Date.now()/1000) < (s.expires_at || 0) - 60; }
+  function authHeaders(token) { return { "apikey": UA_KEY, "Authorization": "Bearer " + token, "Content-Type": "application/json" }; }
+
+  async function getValidSession() {
+    var s = getSession();
+    if (isValid(s)) return s;
+    if (s && s.refresh_token) {
+      var r = await fetch(UA_URL + "/auth/v1/token?grant_type=refresh_token", {
+        method: "POST", headers: { "apikey": UA_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: s.refresh_token })
+      });
+      if (r.ok) return setSession(await r.json());
+    }
+    return null;
+  }
+
+  // ── Pre-fill form from saved passport data ────────────────────────────────
+  function loadPassport(p) {
+    function sv(name, val) { var el = form.querySelector('[name="'+name+'"]'); if (el && val != null && val !== "") el.value = val; }
+    function sr(name, val) { if (!val) return; var el = form.querySelector('input[name="'+name+'"][value="'+CSS.escape(val)+'"]'); if (el) el.checked = true; }
+    function sc(name, vals) { if (!vals || !vals.length) return; form.querySelectorAll('input[name="'+name+'"]').forEach(function(cb){ cb.checked = vals.indexOf(cb.value) !== -1; }); }
+    var cp=p.childProfile||{}, hh=p.household||{}, dg=p.diagnosis||{}, b=p.birth||{}, m=b.milestones||{};
+    var comm=p.communication||{}, sen=p.sensory||{}, dl=p.dailyLiving||{}, hl=p.health||{};
+    var bh=p.behaviour||{}, str=p.strengths||{}, ed=p.education||{}, svc=p.services||{}, g=p.goals||{};
+
+    sv("firstName",cp.firstName); sv("lastName",cp.lastName); sv("dob",cp.dob); sv("gender",cp.gender);
+    sv("city",cp.city); sv("country",cp.country); sv("healthInsurance",cp.healthInsurance);
+    sv("homeLanguages",cp.homeLanguages); sv("bestLanguage",cp.bestLanguage);
+
+    sv("g1name",hh.g1name); sv("g1rel",hh.g1rel); sv("g1email",hh.g1email); sv("g1phone",hh.g1phone);
+    sv("g2name",hh.g2name); sv("g2rel",hh.g2rel); sv("g2email",hh.g2email); sv("g2phone",hh.g2phone);
+    sv("custody",hh.custody); sv("maritalStatus",hh.maritalStatus);
+    sc("livesWith",hh.livesWith); sv("siblings",hh.siblings); sr("funding",hh.funding); sv("fundingType",hh.fundingType);
+
+    sr("diagnosisStatus",dg.status); sc("diagnoses",dg.diagnoses);
+    sv("diagnosedBy",dg.diagnosedBy); sv("diagnosisDate",dg.date); sv("awaitingAssessment",dg.awaiting);
+    sc("familyHistory",dg.familyHistory); sv("familyHistoryNotes",dg.familyHistoryNotes);
+
+    sv("pregnancy",b.pregnancy); sv("gestation",b.gestation); sv("birthWeight",b.birthWeight);
+    sv("birthComplications",b.complications); sv("regression",b.regression); sv("regressionNotes",b.regressionNotes);
+    sv("msSit",m.sit); sv("msCrawl",m.crawl); sv("msWalk",m.walk); sv("msFirstWord",m.firstWord);
+    sv("msPhrases",m.phrases); sv("msSentences",m.sentences); sv("msToiletDay",m.toiletDay); sv("msToiletNight",m.toiletNight);
+
+    sr("commStyle",comm.style); sc("commMeans",comm.means); sv("canExpressNeeds",comm.canExpressNeeds); sc("commChallenges",comm.challenges);
+
+    sc("sensory_Auditory (sound)",sen.auditory); sc("sensory_Visual (sight)",sen.visual);
+    sc("sensory_Tactile (touch)",sen.tactile); sc("sensory_Oral & taste",sen.oral);
+    sc("sensory_Smell",sen.smell); sc("sensory_Movement (vestibular)",sen.movement);
+    sc("sensory_Body awareness",sen.body); sc("sensory_Other",sen.other);
+
+    sv("eating",dl.eating); sv("dressing",dl.dressing); sv("toileting",dl.toileting); sv("sleep",dl.sleep);
+    sv("safety",dl.safety); sv("multiStep",dl.multiStep); sv("groupActivities",dl.groupActivities);
+    sv("feeding",dl.feeding); sv("dietaryRestrictions",dl.dietaryRestrictions);
+
+    sr("handedness",hl.handedness); sv("pediatrician",hl.pediatrician); sv("specialists",hl.specialists);
+    sv("allergyFood",hl.allergyFood); sv("allergyEnv",hl.allergyEnv); sv("allergyOther",hl.allergyOther);
+    sv("allergyTreatment",hl.allergyTreatment); sv("medicalConditions",hl.medicalConditions);
+    sv("medications",hl.medications); sv("pastMedications",hl.pastMedications); sv("surgeries",hl.surgeries);
+    sv("lastEyeExam",hl.lastEyeExam); sr("glasses",hl.glasses); sv("lastHearingTest",hl.lastHearingTest); sr("earInfections",hl.earInfections);
+
+    sc("behaviourChallenges",bh.challenges); sv("behaviourFrequency",bh.frequency);
+    sv("triggers",bh.triggers); sv("strategies",bh.strategies);
+    sv("peersInterest",bh.peersInterest); sv("peersInteract",bh.peersInteract);
+    sv("followsInstructions",bh.followsInstructions); sr("suspended",bh.suspended); sv("suspendedNotes",bh.suspendedNotes);
+
+    sv("strengthsText",str.strengths); sv("interests",str.interests); sv("dislikes",str.dislikes);
+
+    sv("schoolName",ed.schoolName); sv("schoolType",ed.schoolType); sv("grade",ed.grade);
+    sv("schoolBoard",ed.schoolBoard); sr("hasIEP",ed.hasIEP); sv("classroomSupport",ed.classroomSupport);
+    sv("agencySupport",ed.agencySupport); sv("schoolChallenges",ed.challenges);
+    sv("schoolStrengths",ed.strengths); sv("upcomingTransition",ed.upcomingTransition); sr("flightRisk",ed.flightRisk);
+
+    if (p.therapy && p.therapy.length) {
+      p.therapy.forEach(function(t) {
+        var tog = form.querySelector('.therapy-toggle[data-therapy="'+t.type+'"]');
+        if (!tog) return; tog.checked = true;
+        var box = document.querySelector('.therapy-fields[data-fields="'+t.type+'"]');
+        if (!box) return; box.style.display = "grid";
+        if (t.provider) box.querySelector('[data-field="provider"]').value = t.provider;
+        if (t.frequency) box.querySelector('[data-field="frequency"]').value = t.frequency;
+        if (t.startDate) box.querySelector('[data-field="startDate"]').value = t.startDate;
+        if (t.progress) box.querySelector('[data-field="progress"]').value = t.progress;
+        if (t.goals) box.querySelector('[data-field="goals"]').value = t.goals;
+      });
+    }
+
+    sv("pastServices",svc.pastServices); sr("onWaitlist",svc.onWaitlist); sv("waitlistDetails",svc.waitlistDetails);
+    sv("mainConcerns",g.mainConcerns); sc("goals",g.priorities); sv("focusAreas",g.focusAreas); sv("goalsOther",g.other);
+  }
+
+  // ── Save & close ─────────────────────────────────────────────────────────
+  async function saveAndClose() {
+    var btn = document.getElementById("save-close-btn");
+    btn.disabled = true; btn.textContent = "Saving...";
+    var s = await getValidSession();
+    if (!s) { window.location.href = "/login"; return; }
+    var payload = { user_id: s.user.id, data: buildPassport() };
+    var method = editingId ? "PATCH" : "POST";
+    var url = UA_URL + "/rest/v1/passports" + (editingId ? "?id=eq." + editingId : "");
+    var hdrs = Object.assign({}, authHeaders(s.access_token), { "Prefer": editingId ? "return=minimal" : "return=representation" });
+    try {
+      var r = await fetch(url, { method: method, headers: hdrs, body: JSON.stringify(editingId ? { data: payload.data } : payload) });
+      if (r.ok && !editingId) { var rows = await r.json(); if (rows && rows[0]) editingId = rows[0].id; }
+      window.location.href = "/account";
+    } catch(e) {
+      btn.disabled = false; btn.textContent = "Save & close";
+    }
+  }
+  document.getElementById("save-close-btn").addEventListener("click", saveAndClose);
+  var authBanner = document.createElement("div");
+  authBanner.id = "auth-banner";
+  authBanner.style.cssText = "margin-bottom:16px;padding:12px 16px;border-radius:12px;font-size:14px;display:none";
+  document.querySelector(".max-w-3xl").insertBefore(authBanner, document.querySelector(".mb-8"));
+
+  (async function initPassport() {
+    var s = await getValidSession();
+    var params = new URLSearchParams(window.location.search);
+    var passportId = params.get("id");
+
+    if (s && s.user) {
+      var email = s.user.email || "";
+      authBanner.style.background = "#f5f3ff"; authBanner.style.border = "1px solid #ddd6fe";
+      authBanner.style.color = "#5b21b6"; authBanner.style.display = "block";
+      authBanner.innerHTML = "Signed in as <strong>" + email + "</strong> · <a href='/account' style='color:#6d28d9;font-weight:600'>My account</a>";
+
+      if (passportId) {
+        editingId = passportId;
+        var r = await fetch(UA_URL + "/rest/v1/passports?id=eq." + passportId + "&select=*", { headers: authHeaders(s.access_token) });
+        if (r.ok) {
+          var rows = await r.json();
+          if (rows && rows[0] && rows[0].data) {
+            loadPassport(rows[0].data);
+            authBanner.innerHTML = "Editing: <strong>" + (rows[0].data.childProfile && rows[0].data.childProfile.firstName ? rows[0].data.childProfile.firstName + " " + (rows[0].data.childProfile.lastName||"") : "child profile") + "</strong> · <a href='/account' style='color:#6d28d9;font-weight:600'>My account</a>";
+          }
+        }
+      }
+    } else {
+      authBanner.style.background = "#fef9c3"; authBanner.style.border = "1px solid #fde68a";
+      authBanner.style.color = "#854d0e"; authBanner.style.display = "block";
+      authBanner.innerHTML = "You're not signed in. <a href='/login' style='color:#854d0e;font-weight:600;text-decoration:underline'>Sign in</a> or <a href='/signup' style='color:#854d0e;font-weight:600;text-decoration:underline'>create an account</a> to save your passport.";
+    }
+  })();
+
+  nextBtn.addEventListener("click", function () {
+    if (currentStep === 1) {
+      var ok = true;
+      var fn = form.querySelector('[name="firstName"]'), efn = document.getElementById("err-firstName");
+      var ln = form.querySelector('[name="lastName"]'), eln = document.getElementById("err-lastName");
+      var gd = form.querySelector('[name="gender"]'), egd = document.getElementById("err-gender");
+      if (!fn.value.trim()) { efn.style.display="block"; ok=false; } else { efn.style.display="none"; }
+      if (!ln.value.trim()) { eln.style.display="block"; ok=false; } else { eln.style.display="none"; }
+      if (!gd.value) { egd.style.display="block"; ok=false; } else { egd.style.display="none"; }
+      if (!ok) { window.scrollTo({top:0,behavior:"smooth"}); return; }
+    }
+    if (currentStep === totalSteps) { currentStep = reviewStep; renderReview(); showStep(reviewStep); return; }
+    if (currentStep === reviewStep) {
+      // Save to Supabase
+      (async function doSave() {
+        nextBtn.disabled = true; nextBtn.textContent = "Saving...";
+        var s = await getValidSession();
+        if (!s) {
+          saveResult.innerHTML = '<span style="color:#ef4444">Please <a href="/login" style="font-weight:600;text-decoration:underline">sign in</a> to save your passport.</span>';
+          nextBtn.disabled = false; nextBtn.textContent = "Save Passport"; return;
+        }
+        var payload = { user_id: s.user.id, data: buildPassport() };
+        var method = editingId ? "PATCH" : "POST";
+        var url = UA_URL + "/rest/v1/passports" + (editingId ? "?id=eq." + editingId : "");
+        var headers = Object.assign({}, authHeaders(s.access_token), { "Prefer": editingId ? "return=minimal" : "return=representation" });
+        var r = await fetch(url, { method: method, headers: headers, body: JSON.stringify(editingId ? { data: payload.data } : payload) });
+        if (r.ok) {
+          if (!editingId) { var rows = await r.json(); if (rows && rows[0]) editingId = rows[0].id; }
+          var childName = (payload.data.childProfile && payload.data.childProfile.firstName) || "child";
+          saveResult.innerHTML = '<span style="color:#22c55e;font-weight:500">✓ ' + childName + "'s passport saved. <a href='/account' style='color:#16a34a;text-decoration:underline'>View my account →</a></span>";
+          nextBtn.style.display = "none";
+        } else {
+          saveResult.innerHTML = '<span style="color:#ef4444">Something went wrong. Please try again.</span>';
+          nextBtn.disabled = false; nextBtn.textContent = "Save Passport";
+        }
+      })();
+      return;
+    }
+    currentStep++; showStep(currentStep);
+  });
+
+  backBtn.addEventListener("click", function () {
+    if (currentStep === reviewStep) { currentStep = totalSteps; } else if (currentStep > 1) { currentStep--; }
+    nextBtn.style.display = "inline-block"; saveResult.innerHTML = ""; showStep(currentStep);
+  });
+
+  showStep(1);
+</script>
