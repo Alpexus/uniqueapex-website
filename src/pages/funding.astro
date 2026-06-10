@@ -1,0 +1,158 @@
+---
+import Layout from "@/layouts/Layout.astro";
+
+const programs = [
+  {
+    name: "Disability Tax Credit (DTC)",
+    level: "Federal",
+    summary: "A non-refundable federal tax credit that reduces the income tax a family owes. It is the gateway program — approval unlocks the RDSP and the Child Disability Benefit.",
+    eligibility: "A child with a severe and prolonged impairment in physical or mental functions lasting at least 12 months. Autism, intellectual disability, and severe ADHD may qualify based on functional impact, not diagnosis alone.",
+    amount: "Reduces federal tax by up to ~$1,787/year (2026), plus provincial credits. Can be claimed retroactively up to 10 years.",
+    apply: "Apply with CRA Form T2201 (a medical practitioner completes part of it).",
+    link: "https://www.canada.ca/en/revenue-agency/services/tax/individuals/segments/tax-credits-deductions-persons-disabilities/disability-tax-credit.html",
+  },
+  {
+    name: "Child Disability Benefit (CDB)",
+    level: "Federal",
+    summary: "A tax-free monthly payment for families caring for a child under 18 who qualifies for the Disability Tax Credit.",
+    eligibility: "Requires DTC approval for the child. Paid automatically alongside the Canada Child Benefit once the DTC is in place.",
+    amount: "Up to $3,411/year ($284.25/month) per eligible child for July 2025–June 2026. Reduced above $81,222 adjusted family net income.",
+    apply: "No separate application — granted once the DTC is approved and your taxes are filed.",
+    link: "https://www.canada.ca/en/revenue-agency/services/child-family-benefits/child-disability-benefit.html",
+  },
+  {
+    name: "Registered Disability Savings Plan (RDSP)",
+    level: "Federal",
+    summary: "A long-term savings plan for a person eligible for the DTC. The government adds matching grants and income-tested bonds that can far exceed your own contributions.",
+    eligibility: "Requires DTC approval. Can be opened by a parent for a child under 18.",
+    amount: "Canada Disability Savings Grant matches up to $3,500/year; Canada Disability Savings Bond pays up to $1,000/year for lower-income families (no contribution required). Up to $70,000 in grants and $20,000 in bonds over a lifetime.",
+    apply: "Open an RDSP at a participating bank or credit union after DTC approval.",
+    link: "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/registered-disability-savings-plan-rdsp.html",
+  },
+  {
+    name: "Supplement for Handicapped Children",
+    level: "Quebec",
+    summary: "A monthly payment from Retraite Québec to families caring for a child whose disability significantly limits their daily activities.",
+    eligibility: "Child under 18 with a physical impairment or mental-function disability expected to last at least one year. Paid regardless of family income.",
+    amount: "$241/month per eligible child (2026), the same amount for every eligible child.",
+    apply: "Apply through Retraite Québec — a physician, OT, or other professional who has assessed your child completes part of the form.",
+    link: "https://www.quebec.ca/en/family-and-support-for-individuals/childhood/supplement-for-handicapped-children",
+  },
+  {
+    name: "Supplement for Handicapped Children Requiring Exceptional Care",
+    level: "Quebec",
+    summary: "Additional financial assistance for families of children with severe and multiple disabilities, or whose medical condition requires complex care.",
+    eligibility: "Child with multiple serious disabilities and/or a health condition requiring complex medical care, expected to last at least one year.",
+    amount: "Two tiers (2026): Tier 1 approximately $1,191/month, Tier 2 approximately $792/month, in addition to the standard Supplement.",
+    apply: "Apply through Retraite Québec with the professional assessment section completed.",
+    link: "https://www.quebec.ca/en/family-and-support-for-individuals/childhood/supplement-for-handicapped-children-exceptional-care",
+  },
+  {
+    name: "Family Allowance (Allocation famille)",
+    level: "Quebec",
+    summary: "Financial assistance from Retraite Québec to all eligible families with a dependent child under 18, plus an annual school-supplies supplement.",
+    eligibility: "Any family with a dependent child under 18 living with them. Amount varies by income and number of children.",
+    amount: "Varies by family. Includes a school-supplies supplement of $127/child (ages 4–16) for 2026–2027.",
+    apply: "Usually automatic after a birth is registered in Québec; otherwise apply through Retraite Québec.",
+    link: "https://www.rrq.gouv.qc.ca/en/programmes/soutien_enfants/Pages/soutien_enfants.aspx",
+  },
+  {
+    name: "Family Support Program",
+    level: "Quebec",
+    summary: "Benefits for families of a child with a disability or autism spectrum disorder to pay for respite, childcare, and occasional assistance — to help prevent caregiver burnout.",
+    eligibility: "Families who live with and care daily for a child with a physical or intellectual disability or ASD, and need support to manage the associated stress and fatigue.",
+    amount: "Varies. Managed locally by each CISSS / CIUSSS based on need and available resources.",
+    apply: "Contact your local CISSS or CIUSSS, or the Office des personnes handicapées du Québec.",
+    link: "https://www.quebec.ca/en/health/health-system-and-services/assistive-devices-disabilities-and-handicaps/family-support-program",
+  },
+];
+---
+
+<Layout title="Funding Navigator">
+  <div class="max-w-4xl mx-auto px-6 py-12">
+
+    <div id="loading" class="text-center py-24">
+      <div class="inline-block w-8 h-8 border-4 border-violet-200 border-t-violet-700 rounded-full animate-spin"></div>
+    </div>
+
+    <div id="content" style="display:none">
+      <a href="/account" class="text-sm text-violet-700 font-semibold hover:underline">← Back to my account</a>
+
+      <div class="mt-4 mb-2">
+        <h1 class="text-3xl font-bold text-slate-800">Funding <span class="text-violet-700">Navigator</span></h1>
+        <p class="text-slate-500 mt-2 max-w-2xl">Grants, tax credits, and support programs your family may qualify for in Québec and across Canada. Most provincial programs flow from one federal approval — the Disability Tax Credit — so it's often the first step.</p>
+      </div>
+
+      <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-sm text-amber-800 mb-6">
+        Amounts and eligibility shown are current as of 2026 and can change. Always confirm details on each program's official page before applying. This is general information, not financial or legal advice.
+      </div>
+
+      <div class="flex gap-2 mb-6">
+        <button class="fbtn px-4 py-2 rounded-full text-sm font-semibold border" data-filter="all">All programs</button>
+        <button class="fbtn px-4 py-2 rounded-full text-sm font-semibold border" data-filter="Federal">Federal</button>
+        <button class="fbtn px-4 py-2 rounded-full text-sm font-semibold border" data-filter="Quebec">Québec</button>
+      </div>
+
+      <div id="program-list" class="space-y-4">
+        {programs.map((p) => (
+          <div class="program-card bg-white border border-slate-200 rounded-2xl p-6" data-level={p.level}>
+            <div class="flex items-start justify-between gap-4 mb-2">
+              <h2 class="font-bold text-lg text-slate-800">{p.name}</h2>
+              <span class={`shrink-0 text-xs font-semibold px-3 py-1 rounded-full ${p.level === "Federal" ? "bg-blue-100 text-blue-700" : "bg-violet-100 text-violet-700"}`}>{p.level === "Quebec" ? "Québec" : p.level}</span>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed">{p.summary}</p>
+            <div class="grid sm:grid-cols-2 gap-3 mt-4">
+              <div class="bg-slate-50 rounded-xl p-3">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Who qualifies</p>
+                <p class="text-sm text-slate-600">{p.eligibility}</p>
+              </div>
+              <div class="bg-slate-50 rounded-xl p-3">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Amount</p>
+                <p class="text-sm text-slate-600">{p.amount}</p>
+              </div>
+            </div>
+            <p class="text-sm text-slate-500 mt-3"><span class="font-medium text-slate-700">How to apply:</span> {p.apply}</p>
+            <a href={p.link} target="_blank" rel="noopener" class="inline-flex items-center gap-1 mt-4 text-violet-700 font-semibold text-sm hover:underline">
+              Official page &amp; application →
+            </a>
+          </div>
+        ))}
+      </div>
+
+      <p class="text-center text-slate-400 text-sm mt-8">More programs and a personalized "what you qualify for" tool are on the way.</p>
+    </div>
+  </div>
+</Layout>
+
+<script is:inline>
+  var UA_URL="https://eghqufgiudxjkbsddtnx.supabase.co";
+  var UA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+  function getSession(){try{return JSON.parse(localStorage.getItem("ua_session")||"null");}catch{return null;}}
+  function setSession(d){var s=Object.assign({},d,{expires_at:Math.floor(Date.now()/1000)+(d.expires_in||3600)});localStorage.setItem("ua_session",JSON.stringify(s));return s;}
+  function isValid(s){return s&&s.access_token&&Math.floor(Date.now()/1000)<(s.expires_at||0)-60;}
+  async function getValidSession(){var s=getSession();if(isValid(s))return s;if(s&&s.refresh_token){var r=await fetch(UA_URL+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{"apikey":UA_KEY,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:s.refresh_token})});if(r.ok)return setSession(await r.json());}return null;}
+
+  (async function(){
+    var s=await getValidSession();
+    if(!s){window.location.href="/login";return;}
+    document.getElementById("loading").style.display="none";
+    document.getElementById("content").style.display="block";
+
+    var active="all";
+    function applyFilter(){
+      document.querySelectorAll(".program-card").forEach(function(c){
+        c.style.display=(active==="all"||c.getAttribute("data-level")===active)?"block":"none";
+      });
+      document.querySelectorAll(".fbtn").forEach(function(b){
+        var on=b.getAttribute("data-filter")===active;
+        b.style.background=on?"#6d28d9":"#fff";
+        b.style.color=on?"#fff":"#64748b";
+        b.style.borderColor=on?"#6d28d9":"#e2e8f0";
+      });
+    }
+    document.querySelectorAll(".fbtn").forEach(function(b){
+      b.addEventListener("click",function(){active=b.getAttribute("data-filter");applyFilter();});
+    });
+    applyFilter();
+  })();
+</script>

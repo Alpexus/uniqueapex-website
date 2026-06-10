@@ -1,8 +1,11 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import { DOMAINS, CONTRIBUTIONS, SCALE_META } from "@/config/wheelConfig.js";
+const wheelConfigJSON = JSON.stringify({ DOMAINS, CONTRIBUTIONS, SCALE_META });
 ---
 
 <Layout title="My Account">
+  <script type="application/json" id="ua-wheel-config" set:html={wheelConfigJSON}></script>
   <div class="max-w-5xl mx-auto px-6 py-12">
 
     <!-- Loading -->
@@ -40,7 +43,17 @@ import Layout from "@/layouts/Layout.astro";
           </div>
         </section>
 
-        <!-- 2. Matching & Waitlist -->
+        <!-- 2. Support wheel -->
+        <section id="wheel-section" style="display:none">
+          <h2 class="text-xl font-bold text-slate-800 mb-1">Support wheel</h2>
+          <p class="text-slate-500 text-sm mb-4">A visual reflection of the support ratings you entered — lighter means managing well, darker means more support needed.</p>
+          <div class="bg-white border border-slate-200 rounded-2xl p-6">
+            <div id="wheel-tabs" class="flex flex-wrap gap-2 mb-4"></div>
+            <div id="wheel-body"></div>
+          </div>
+        </section>
+
+        <!-- 3. Matching & Waitlist -->
         <section>
           <h2 class="text-xl font-bold text-slate-800 mb-4">Provider matching</h2>
           <div id="matching-section" class="bg-white border border-slate-200 rounded-2xl p-6">
@@ -50,43 +63,43 @@ import Layout from "@/layouts/Layout.astro";
           </div>
         </section>
 
-        <!-- 3–5: Coming soon grid -->
+        <!-- Tools -->
         <section>
-          <h2 class="text-xl font-bold text-slate-800 mb-4">Coming soon</h2>
+          <h2 class="text-xl font-bold text-slate-800 mb-4">Tools & resources</h2>
           <div class="grid sm:grid-cols-3 gap-4">
 
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 opacity-70">
+            <a href="/documents" class="group bg-white border border-slate-200 rounded-2xl p-6 hover:border-violet-200 hover:shadow-sm transition-all">
               <div class="flex items-center justify-between mb-3">
                 <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
                   <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                 </div>
-                <span class="text-xs font-semibold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">In development</span>
+                <span class="text-xs font-semibold bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full">Vault ready · AI soon</span>
               </div>
-              <h3 class="font-bold text-slate-800">AI Document Analysis</h3>
-              <p class="text-slate-500 text-sm mt-1">Upload reports and get plain-language summaries. Key findings auto-fill your child's passport.</p>
-            </div>
+              <h3 class="font-bold text-slate-800 group-hover:text-violet-700 transition-colors">Document Vault &amp; AI</h3>
+              <p class="text-slate-500 text-sm mt-1">Store reports in one place. AI summaries that auto-fill the passport are coming soon.</p>
+            </a>
 
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 opacity-70">
-              <div class="flex items-center justify-between mb-3">
-                <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
-                  <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                </div>
-                <span class="text-xs font-semibold bg-violet-100 text-violet-700 px-2.5 py-1 rounded-full">In development</span>
-              </div>
-              <h3 class="font-bold text-slate-800">Expert Workshops</h3>
-              <p class="text-slate-500 text-sm mt-1">Live sessions with psychologists, OTs, and autism specialists — plus a peer community of families.</p>
-            </div>
-
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 opacity-70">
+            <a href="/funding" class="group bg-white border border-slate-200 rounded-2xl p-6 hover:border-violet-200 hover:shadow-sm transition-all">
               <div class="flex items-center justify-between mb-3">
                 <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
                   <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                 </div>
-                <span class="text-xs font-semibold bg-green-100 text-green-700 px-2.5 py-1 rounded-full">In development</span>
+                <span class="text-xs font-semibold bg-green-100 text-green-700 px-2.5 py-1 rounded-full">Available</span>
               </div>
-              <h3 class="font-bold text-slate-800">Funding Navigator</h3>
-              <p class="text-slate-500 text-sm mt-1">Every grant, subsidy, and tax credit your family qualifies for — with direct application links.</p>
-            </div>
+              <h3 class="font-bold text-slate-800 group-hover:text-violet-700 transition-colors">Funding Navigator</h3>
+              <p class="text-slate-500 text-sm mt-1">Every grant, subsidy, and tax credit your family may qualify for — with official application links.</p>
+            </a>
+
+            <a href="/workshops" class="group bg-white border border-slate-200 rounded-2xl p-6 hover:border-violet-200 hover:shadow-sm transition-all">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                </div>
+                <span class="text-xs font-semibold bg-green-100 text-green-700 px-2.5 py-1 rounded-full">Available</span>
+              </div>
+              <h3 class="font-bold text-slate-800 group-hover:text-violet-700 transition-colors">Expert Workshops</h3>
+              <p class="text-slate-500 text-sm mt-1">Live online sessions with psychologists, OTs, and autism specialists — register and join.</p>
+            </a>
 
           </div>
         </section>
@@ -108,22 +121,29 @@ import Layout from "@/layouts/Layout.astro";
 
   function getCompletionPct(d) {
     if (!d) return 0;
+    var s = d.sensory || {};
+    var senses = ["auditory","visual","tactile","oral","smell","movement","body"];
+    var sensoryFilled = senses.some(function(k){ var o=s[k]; return o && (o.typical || (o.signs && o.signs.length)); });
+    var ch = (d.behaviour && d.behaviour.challenges) || {};
+    var behFilled = typeof ch === "object" && !Array.isArray(ch) && Object.values(ch).some(function(v){return v;});
+    var scalesFilled = d.scales && Object.keys(d.scales).length >= 6;
     var checks = [
-      d.childProfile && d.childProfile.firstName,
-      d.household && d.household.g1name,
+      d.childProfile && d.childProfile.firstName && d.childProfile.dob,          // child profile with DOB
+      d.household && d.household.g1name && d.household.g1email,                   // parent info
       d.diagnosis && (d.diagnosis.status || (d.diagnosis.diagnoses && d.diagnosis.diagnoses.length)),
-      d.birth && (d.birth.pregnancy || d.birth.gestation || (d.birth.milestones && d.birth.milestones.firstWord)),
-      d.communication && (d.communication.style || (d.communication.means && d.communication.means.length)),
-      d.sensory && Object.values(d.sensory).some(function(v){return v&&v.length;}),
-      d.dailyLiving && d.dailyLiving.eating,
-      d.health && (d.health.pediatrician || d.health.medications),
-      d.behaviour && d.behaviour.challenges && d.behaviour.challenges.length,
+      d.birth && (d.birth.pregnancy || (d.birth.milestones && d.birth.milestones.firstWord)),
+      d.communication && (d.communication.style || d.communication.canExpressNeeds),
+      sensoryFilled,
+      d.dailyLiving && (d.dailyLiving.eating || d.dailyLiving.dressing),
+      d.health && (d.health.pediatrician || d.health.medicalConditions),
+      behFilled,
       d.strengths && (d.strengths.strengths || d.strengths.interests),
-      d.education && (d.education.schoolName || d.education.schoolType),
+      d.education && (d.education.schoolName || d.education.schoolType || d.education.hasIEP),
       d.therapy && d.therapy.length > 0,
-      d.goals && (d.goals.mainConcerns || (d.goals.priorities && d.goals.priorities.length))
+      d.goals && (d.goals.mainConcerns || (d.goals.priorities && d.goals.priorities.length)),
+      scalesFilled,
     ];
-    return Math.round(checks.filter(Boolean).length / 13 * 100);
+    return Math.round(checks.filter(Boolean).length / 14 * 100);
   }
 
   async function getValidSession(){
@@ -136,7 +156,16 @@ import Layout from "@/layouts/Layout.astro";
     return null;
   }
 
-  function formatDate(iso){try{return new Date(iso).toLocaleDateString("en-CA",{year:"numeric",month:"short",day:"numeric"});}catch{return "";}}
+  function formatDate(iso){
+    try {
+      if (typeof iso === "string" && /^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+        var pr = iso.split("-");
+        var ld = new Date(parseInt(pr[0],10), parseInt(pr[1],10)-1, parseInt(pr[2],10));
+        return ld.toLocaleDateString("en-CA",{year:"numeric",month:"short",day:"numeric"});
+      }
+      return new Date(iso).toLocaleDateString("en-CA",{year:"numeric",month:"short",day:"numeric"});
+    } catch(e){ return ""; }
+  }
 
   function renderPassports(passports){
     var grid=document.getElementById("passport-grid");
@@ -162,13 +191,221 @@ import Layout from "@/layouts/Layout.astro";
       html+='<div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full rounded-full" style="width:'+pct+'%;background:'+pctColor+'"></div></div></div>';
       html+='<p class="text-slate-400 text-xs mt-2">'+updated+'</p>';
       html+='<div class="flex gap-2 mt-4">';
-      html+='<a href="/passport?id='+p.id+'" class="flex-1 text-center text-sm font-semibold py-2 rounded-full border border-violet-700 text-violet-700 hover:bg-violet-50 transition-colors">Edit profile</a>';
+      html+='<a href="/passport?id='+p.id+'" class="flex-1 text-center text-sm font-semibold py-2 rounded-full border border-violet-700 text-violet-700 hover:bg-violet-50 transition-colors">Edit</a>';
+      html+='<a href="/passport?id='+p.id+'&export=1" class="flex-1 text-center text-sm font-semibold py-2 rounded-full bg-violet-700 text-white hover:bg-violet-800 transition-colors">Export PDF</a>';
       html+='</div></div>';
     });
     html+='<a href="/passport" class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center gap-2 hover:border-violet-300 hover:bg-violet-50 transition-all min-h-[180px]">';
     html+='<span class="w-10 h-10 bg-white border-2 border-slate-200 rounded-full flex items-center justify-center text-xl text-slate-400">+</span>';
     html+='<span class="text-slate-500 font-medium text-sm">Add child profile</span></a>';
     grid.innerHTML=html;
+  }
+
+  // ── Support wheel ──────────────────────────────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════════════
+  // WHEEL SCORING ENGINE  —  deterministic, data-driven, 0–100 per domain
+  // The wheel is an OUTPUT generated from the whole passport. To add a new
+  // question later, add ONE row to CONTRIBUTIONS — no other code changes.
+  // Every scorer returns a "support need" fraction 0..1, or null if unanswered.
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // WHEEL SCORING ENGINE — config-driven (reads /src/config/wheelConfig.js,
+  // injected into the page as JSON). Add a question in the config → it scores
+  // here automatically. Scorers return ABILITY 0..1 (1=strong), or null.
+  // ══════════════════════════════════════════════════════════════════════════
+  var CFG = (function(){ try { return JSON.parse(document.getElementById("ua-wheel-config").textContent); } catch(e){ return {DOMAINS:[],CONTRIBUTIONS:[],SCALE_META:{}}; } })();
+  var DOMAINS = CFG.DOMAINS;
+
+  function parseAgeMonths(s){
+    if(s==null) return null; s=(""+s).toLowerCase().trim(); if(!s) return null;
+    var num=parseFloat((s.replace(/[^0-9.]/g," ").trim().split(/\s+/)[0]));
+    if(isNaN(num)) return null;
+    if(s.indexOf("year")>-1||s.indexOf("yr")>-1) return num*12;
+    if(s.indexOf("month")>-1||s.indexOf("mo")>-1) return num;
+    return num<=8 ? num*12 : num;
+  }
+  // Apply a scorer by type name (+optional param). Returns ABILITY 0..1 or null.
+  function applyScorer(type, param, v){
+    switch(type){
+      case "scale4":    { if(v===""||v==null) return null; var n=parseInt(v); return isNaN(n)?null:Math.max(0,Math.min(1,n/4)); }
+      case "scale4rev": { if(v===""||v==null) return null; var n2=parseInt(v); return isNaN(n2)?null:Math.max(0,Math.min(1,(4-n2)/4)); }
+      case "ysnAble":   { if(!v) return null; return v==="Yes"?1 : v==="Sometimes"?0.5 : v==="No"?0 : null; }
+      case "freqChallenge": { if(!v) return null; return v==="Rarely"?0.75 : v==="Sometimes"?0.5 : v==="Often"?0.25 : v==="Daily"?0 : null; }
+      case "commStyle": { if(!v) return null; return v==="Fluent Verbal"?0.9 : v==="Verbal"?0.65 : v==="Limited Verbal"?0.3 : v==="Non-Speaking"?0 : null; }
+      case "expressNeeds": { if(!v) return null; return v==="Consistently"?1 : v==="Sometimes"?0.5 : v==="Rarely"?0 : null; }
+      case "independence": { if(!v||v==="Not applicable") return null; return (v==="Independent"||v==="Fully trained")?1 : (v==="With support"||v==="In progress")?0.5 : (v==="Not yet"||v==="Not started")?0 : null; }
+      case "quality":   { if(!v) return null; return (v==="Good"||v==="Strong")?1 : (v==="Variable"||v==="Developing")?0.5 : (v==="Poor"||v==="Limited")?0 : null; }
+      case "classroomSupport": { if(!v) return null; return v==="None"?1 : v==="Part-time aide"?0.5 : v==="Full-time aide"?0 : v==="Other"?0.5 : null; }
+      case "feeding":   { if(!v) return null; return v==="None"?1 : v==="Mild"?0.5 : v==="Significant"?0 : null; }
+      case "sensorySev": {
+        if(!v||typeof v!=="object") return null;
+        if(v.typical) return 1;
+        if(v.signs && v.signs.length){ var sev=v.severity; return sev==="Significant"?0.15 : sev==="Moderate"?0.4 : sev==="Mild"?0.66 : 0.5; }
+        return null;
+      }
+      case "countNeed": { if(!Array.isArray(v)||v.length===0) return null; return Math.max(0, 1 - Math.min(1, v.length/(param||5))); }
+      case "challengeCount": { if(!Array.isArray(v)) return null; if(v.length===0) return 1; return Math.max(0, 1 - Math.min(1, v.length/(param||5))); }
+      case "hasNoMeans": { if(!Array.isArray(v)) return null; return v.indexOf("No primary means yet")>-1 ? 0 : null; }
+      case "hasAny":    { if(!Array.isArray(v)) return null; var hit=(param||[]).some(function(x){return v.indexOf(x)>-1;}); return hit?0.3:null; }
+      case "milestone": { var mm=parseAgeMonths(v); if(mm==null) return null; return Math.max(0,Math.min(1, 1-((mm-(param||12))/(param||12)) )); }
+      default: return null;
+    }
+  }
+
+  function getPath(d, path){ var parts=path.split("."), o=d; for(var i=0;i<parts.length;i++){ if(o==null) return undefined; o=o[parts[i]]; } return o; }
+
+  // Engine: returns { DomainName: {ability:0..1, score:0-100 need, confidence, fields} }
+  function scoreWheel(d){
+    d = d || {};
+    var acc = {};
+    DOMAINS.forEach(function(n){ acc[n]={sum:0,weight:0,count:0}; });
+    CFG.CONTRIBUTIONS.forEach(function(c){
+      var ability = applyScorer(c.type, c.param, getPath(d, c.field));
+      if(ability===null||ability===undefined) return;
+      var a = acc[c.domain];
+      a.sum += ability * c.weight; a.weight += c.weight; a.count += 1;
+    });
+    var out = {};
+    DOMAINS.forEach(function(n){
+      var a = acc[n];
+      if(a.weight===0){ out[n]={score:null, ability:null, confidence:"none", fields:0}; return; }
+      var ability = a.sum/a.weight;            // 0..1, higher = stronger
+      out[n] = {
+        ability: ability,
+        score: Math.round((1-ability)*100),    // support-need 0..100
+        confidence: a.count>=10?"high":a.count>=5?"medium":"low",
+        fields: a.count
+      };
+    });
+    return out;
+  }
+
+  // ── Render the 8-domain wheel SVG. mode: "needs" | "strengths" ─────────────
+  function generateWheelSVG(scored, mode){
+    var cx=240, cy=210, r0=24, R=130, rings=5, n=DOMAINS.length;
+    var step=(R-r0)/rings, seg=2*Math.PI/n;
+    var shortLabels={"Communication":"Communication","Social Connection":"Social","Sensory Processing":"Sensory","Flexibility & Transitions":"Flexibility","Emotional Regulation":"Emotional","Executive Function":"Executive","Daily Living Skills":"Daily living","Learning & Play":"Learning & play"};
+    function pt(r,a){ return [(cx+r*Math.cos(a)).toFixed(2),(cy+r*Math.sin(a)).toFixed(2)]; }
+    function sector(ir,or_,a0,a1){
+      var p0=pt(ir,a0),p1=pt(or_,a0),p2=pt(or_,a1),p3=pt(ir,a1);
+      return "M"+p0[0]+","+p0[1]+" L"+p1[0]+","+p1[1]+" A"+or_+","+or_+" 0 0 1 "+p2[0]+","+p2[1]+" L"+p3[0]+","+p3[1]+" A"+ir+","+ir+" 0 0 0 "+p0[0]+","+p0[1]+" Z";
+    }
+    var svg="";
+    for(var i=0;i<n;i++){
+      var name=DOMAINS[i];
+      var a0=-Math.PI/2+i*seg, a1=a0+seg;
+      var dm=scored[name]||{score:null};
+      var hue=Math.round(i/n*360);
+      var filled;
+      if(dm.score==null){ filled=0; }
+      else { var v = mode==="strengths" ? (100-dm.score) : dm.score; filled=Math.round(v/100*rings); }
+      for(var j=1;j<=rings;j++){
+        var ir=r0+(j-1)*step, or_=r0+j*step;
+        var fill = (dm.score!=null && j<=filled) ? "hsl("+hue+",70%,"+(84-j*9)+"%)" : (dm.score!=null ? "#eef2f7" : "#f1f5f9");
+        svg+='<path d="'+sector(ir,or_,a0,a1)+'" fill="'+fill+'" stroke="#fff" stroke-width="1.5"/>';
+      }
+      var mid=a0+seg/2, lp=pt(R+13,mid);
+      var anchor = Math.cos(mid)>0.25?"start":(Math.cos(mid)<-0.25?"end":"middle");
+      svg+='<text x="'+lp[0]+'" y="'+lp[1]+'" font-size="10" fill="#475569" text-anchor="'+anchor+'" dominant-baseline="middle">'+shortLabels[name]+'</text>';
+    }
+    svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r0+'" fill="#fff" stroke="#e2e8f0"/>';
+    return '<svg viewBox="0 0 480 420" width="100%" style="max-width:440px;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg">'+svg+'</svg>';
+  }
+
+  function confidenceBadge(conf){
+    var map={high:["High","#16a34a","#dcfce7"],medium:["Medium","#b45309","#fef3c7"],low:["Low","#64748b","#f1f5f9"],none:["No data","#94a3b8","#f8fafc"]};
+    var m=map[conf]||map.none;
+    return '<span style="font-size:11px;font-weight:600;color:'+m[1]+';background:'+m[2]+';padding:2px 8px;border-radius:9999px">'+m[0]+'</span>';
+  }
+
+  function renderWheels(passports){
+    var section=document.getElementById("wheel-section");
+    var tabsEl=document.getElementById("wheel-tabs");
+    var bodyEl=document.getElementById("wheel-body");
+    if(!passports.length){ section.style.display="none"; return; }
+    section.style.display="block";
+
+    var mode="needs"; // or "strengths"
+
+    function showWheel(idx){
+      var p=passports[idx];
+      var scored=scoreWheel(p.data);
+      var scoredCount=DOMAINS.filter(function(n){return scored[n].score!=null;}).length;
+
+      if(scoredCount<3){
+        var cp=(p.data&&p.data.childProfile)||{};
+        bodyEl.innerHTML='<div class="text-center py-10"><p class="text-slate-500 mb-4">Fill in more of the passport for '+(cp.firstName||"this child")+' (communication, sensory, behaviour, daily living) to generate the profile wheel.</p><a href="/passport?id='+p.id+'" class="inline-block bg-violet-700 text-white font-semibold px-6 py-2.5 rounded-full hover:bg-violet-800 transition-colors text-sm">Continue editing passport →</a></div>';
+        highlightTabs(idx); return;
+      }
+
+      // Calculate completeness of wheel-contributing questions
+      var totalContrib = CFG.CONTRIBUTIONS.length;
+      var answeredContrib = CFG.CONTRIBUTIONS.filter(function(c){ var v=getPath(p.data||{},c.field); return v!==null&&v!==undefined&&v!==""; }).length;
+      var wheelPct = Math.round(answeredContrib/totalContrib*100);
+      var lowConfDomains = DOMAINS.filter(function(n){ return scored[n].confidence==="low"; });
+
+      var completenessWarning = "";
+      if(wheelPct<70){
+        completenessWarning='<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:#92400e">'+
+          '<strong>Wheel is '+wheelPct+'% complete</strong> — '+answeredContrib+' of '+totalContrib+' contributing questions answered. '+
+          (lowConfDomains.length?'Low confidence in: '+lowConfDomains.join(", ")+'. ':'')+
+          '<a href="/passport?id='+p.id+'" style="color:#78350f;font-weight:600;text-decoration:underline">Complete more sections →</a></div>';
+      }
+
+      var toggle='<div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">'+
+        '<button class="mode-btn" data-mode="needs" style="border:1px solid #e2e8f0;border-radius:9999px;padding:5px 14px;font-size:13px;font-weight:600;cursor:pointer">Support needs</button>'+
+        '<button class="mode-btn" data-mode="strengths" style="border:1px solid #e2e8f0;border-radius:9999px;padding:5px 14px;font-size:13px;font-weight:600;cursor:pointer">Strengths</button></div>';
+
+      var svg=generateWheelSVG(scored, mode);
+
+      // legend with score + confidence
+      var legend='<div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+      DOMAINS.forEach(function(nm){
+        var dm=scored[nm];
+        var shown = dm.score==null ? "—" : (mode==="strengths" ? (100-dm.score) : dm.score);
+        legend+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;padding:4px 8px;background:#fff;border:1px solid #f1f5f9;border-radius:8px">'+
+          '<span style="color:#475569">'+nm+'</span>'+
+          '<span style="display:flex;align-items:center;gap:6px"><span style="font-weight:700;color:#334155">'+shown+(dm.score==null?"":"")+'</span>'+confidenceBadge(dm.confidence)+'</span></div>';
+      });
+      legend+='</div>';
+
+      var label = mode==="strengths"
+        ? 'Showing <strong>strengths</strong> — fuller petals mean stronger areas.'
+        : 'Showing <strong>support needs</strong> — fuller petals mean more support is helpful.';
+
+      var disclaimer='<div class="bg-amber-50 border border-amber-100 rounded-xl p-3 mt-4 text-center"><p class="text-amber-800 text-xs leading-relaxed"><strong>Preliminary profile — not a diagnosis or assessment.</strong> Generated automatically from your passport answers across every section. Confidence reflects how many related questions you\'ve completed. For any concerns, speak with a qualified professional.</p></div>';
+
+      bodyEl.innerHTML=completenessWarning+toggle+'<p style="text-align:center;font-size:13px;color:#64748b;margin-bottom:6px">'+label+'</p>'+svg+legend+disclaimer;
+
+      bodyEl.querySelectorAll(".mode-btn").forEach(function(b){
+        var on=b.getAttribute("data-mode")===mode;
+        b.style.background=on?"#6d28d9":"#fff"; b.style.color=on?"#fff":"#64748b"; b.style.borderColor=on?"#6d28d9":"#e2e8f0";
+        b.addEventListener("click",function(){ mode=b.getAttribute("data-mode"); showWheel(idx); });
+      });
+      highlightTabs(idx);
+    }
+
+    function highlightTabs(idx){
+      tabsEl.querySelectorAll(".wheel-tab").forEach(function(b){
+        var on=parseInt(b.getAttribute("data-idx"))===idx;
+        b.style.background=on?"#6d28d9":"#fff"; b.style.color=on?"#fff":"#64748b"; b.style.borderColor=on?"#6d28d9":"#e2e8f0";
+      });
+    }
+
+    if(passports.length>1){
+      var th="";
+      passports.forEach(function(p,idx){
+        var cp=(p.data&&p.data.childProfile)||{};
+        th+='<button class="wheel-tab" data-idx="'+idx+'" style="border:1px solid #e2e8f0;border-radius:9999px;padding:6px 16px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s">'+(cp.firstName||"Child "+(idx+1))+'</button>';
+      });
+      tabsEl.innerHTML=th;
+      tabsEl.querySelectorAll(".wheel-tab").forEach(function(b){
+        b.addEventListener("click",function(){showWheel(parseInt(b.getAttribute("data-idx")));});
+      });
+    } else { tabsEl.innerHTML=""; }
+
+    showWheel(0);
   }
 
   function renderMatching(email, waitlist){
@@ -221,6 +458,7 @@ import Layout from "@/layouts/Layout.astro";
     var waitlist=wResp.ok?await wResp.json():[];
 
     renderPassports(Array.isArray(passports)?passports:[]);
+    renderWheels(Array.isArray(passports)?passports:[]);
     renderMatching(s.user.email, Array.isArray(waitlist)?waitlist:[]);
 
     document.getElementById("logout-btn").addEventListener("click",function(){

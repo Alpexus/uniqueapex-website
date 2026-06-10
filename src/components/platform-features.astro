@@ -8,11 +8,9 @@ interface Props {
 
 const { lang = "en" } = Astro.props;
 
-// Status badge styles by key
 const badgeStyles = {
-  beta: "bg-violet-100 text-violet-700",
-  dev: "bg-amber-100 text-amber-700",
-  phase3: "bg-slate-100 text-slate-500",
+  beta: "bg-green-100 text-green-700",
+  soon: "bg-slate-100 text-slate-400",
 };
 
 const content = {
@@ -20,7 +18,7 @@ const content = {
     heading: "Much more than a",
     headingAccent: "search tool",
     body: "UniqueApex is a long-term support system that grows with your family — from first concern through every stage of your child's development. Here's everything we're building.",
-    badges: { beta: "Available in Beta", dev: "In Development", phase3: "Coming · Phase 3" },
+    badges: { beta: "Available in Beta", soon: "Coming Soon" },
     features: [
       {
         title: "Provider Matching & Outreach",
@@ -32,31 +30,31 @@ const content = {
         title: "Family Passport",
         description: "One portable child profile that captures your child's full history — diagnosis, therapy records, communication profile, school contacts — and travels with them to every provider, school, and transition.",
         icon: "bx:bxs-id-card",
-        status: "dev",
+        status: "beta",
       },
       {
         title: "Government Funding Navigator",
         description: "Every grant, subsidy, tax credit, and support programme your family qualifies for, across every jurisdiction — with plain-language explanations and direct application links.",
         icon: "bx:bxs-bank",
-        status: "dev",
+        status: "beta",
       },
       {
         title: "Expert Workshops & Peer Community",
         description: "Live sessions with psychologists, occupational therapists, and autism specialists, plus a peer community of families who understand what you are navigating.",
         icon: "bx:bxs-group",
-        status: "dev",
+        status: "beta",
       },
       {
         title: "AI Document Intelligence",
         description: "Upload diagnosis reports, therapy notes, or IEP documents. The platform reads them, summarises key findings in plain language, and updates your child's Passport automatically.",
         icon: "bx:bxs-file-find",
-        status: "phase3",
+        status: "soon",
       },
       {
         title: "Transition Alert System",
         description: "Proactive alerts 60–90 days before a therapist contract ends, a programme closes, or a school year transitions — so you are never caught without a plan.",
         icon: "bx:bxs-bell",
-        status: "phase3",
+        status: "soon",
       },
     ],
   },
@@ -64,7 +62,7 @@ const content = {
     heading: "Bien plus qu'un",
     headingAccent: "outil de recherche",
     body: "UniqueApex est un système de soutien à long terme qui grandit avec votre famille — de la première préoccupation à chaque étape du développement de votre enfant. Voici tout ce que nous bâtissons.",
-    badges: { beta: "Offert en version bêta", dev: "En développement", phase3: "À venir · Phase 3" },
+    badges: { beta: "Offert en version bêta", soon: "À venir" },
     features: [
       {
         title: "Jumelage et démarches auprès des professionnels",
@@ -76,31 +74,31 @@ const content = {
         title: "Passeport familial",
         description: "Un profil enfant portable qui rassemble tout l'historique de votre enfant — diagnostic, dossiers de thérapie, profil de communication, contacts scolaires — et le suit chez chaque professionnel, école et transition.",
         icon: "bx:bxs-id-card",
-        status: "dev",
+        status: "beta",
       },
       {
         title: "Navigateur de financement gouvernemental",
         description: "Chaque subvention, crédit d'impôt et programme de soutien auquel votre famille a droit, dans toutes les juridictions — avec des explications en langage clair et des liens directs vers les demandes.",
         icon: "bx:bxs-bank",
-        status: "dev",
+        status: "beta",
       },
       {
         title: "Ateliers d'experts et communauté de pairs",
         description: "Des séances en direct avec des psychologues, ergothérapeutes et spécialistes de l'autisme, ainsi qu'une communauté de familles qui comprennent ce que vous vivez.",
         icon: "bx:bxs-group",
-        status: "dev",
+        status: "beta",
       },
       {
         title: "Intelligence documentaire par IA",
         description: "Téléversez des rapports de diagnostic, des notes de thérapie ou des plans d'intervention. La plateforme les lit, résume les points clés en langage clair et met à jour le Passeport de votre enfant automatiquement.",
         icon: "bx:bxs-file-find",
-        status: "phase3",
+        status: "soon",
       },
       {
         title: "Système d'alertes de transition",
         description: "Des alertes proactives de 60 à 90 jours avant la fin d'un contrat de thérapie, la fermeture d'un programme ou un changement d'année scolaire — pour ne jamais être pris au dépourvu.",
         icon: "bx:bxs-bell",
-        status: "phase3",
+        status: "soon",
       },
     ],
   },
@@ -119,7 +117,7 @@ const content = {
 <div class="grid sm:grid-cols-2 md:grid-cols-3 mt-16 gap-6">
   {
     content.features.map((item) => (
-      <div class="flex flex-col p-6 rounded-2xl border border-slate-100 transition-all duration-200 hover:border-violet-200 hover:bg-violet-50/50 hover:shadow-sm">
+      <a href="/signup" class={`feature-link group flex flex-col p-6 rounded-2xl border border-slate-100 transition-all duration-200 cursor-pointer hover:border-violet-200 hover:bg-violet-50/50 hover:shadow-sm`}>
         <div class="flex items-center justify-between mb-4">
           <div class="bg-violet-100 rounded-xl p-2.5 w-12 h-12 flex items-center justify-center">
             <Icon class="text-violet-600 w-6 h-6" name={item.icon} />
@@ -128,9 +126,22 @@ const content = {
             {content.badges[item.status as keyof typeof content.badges]}
           </span>
         </div>
-        <h3 class="font-semibold text-lg text-slate-800">{item.title}</h3>
+        <h3 class="font-semibold text-lg text-slate-800 group-hover:text-violet-700 transition-colors">{item.title}</h3>
         <p class="text-slate-500 mt-2 leading-relaxed text-[15px]">{item.description}</p>
-      </div>
+      </a>
     ))
   }
 </div>
+
+<script is:inline>
+  (function () {
+    try {
+      var s = JSON.parse(localStorage.getItem("ua_session") || "null");
+      if (!s || !s.access_token) return;
+      if (Math.floor(Date.now() / 1000) >= (s.expires_at || 0) - 60) return;
+      document.querySelectorAll(".feature-link").forEach(function (a) {
+        a.setAttribute("href", "/account");
+      });
+    } catch (e) {}
+  })();
+</script>

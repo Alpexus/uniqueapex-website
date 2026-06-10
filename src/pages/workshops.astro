@@ -1,0 +1,143 @@
+---
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout title="Workshops">
+  <div class="max-w-3xl mx-auto px-6 py-12">
+
+    <div id="loading" class="text-center py-24">
+      <div class="inline-block w-8 h-8 border-4 border-violet-200 border-t-violet-700 rounded-full animate-spin"></div>
+    </div>
+
+    <div id="content" style="display:none">
+      <a href="/account" class="text-sm text-violet-700 font-semibold hover:underline">← Back to my account</a>
+
+      <div class="mt-4 mb-6">
+        <h1 class="text-3xl font-bold text-slate-800">Expert <span class="text-violet-700">workshops</span></h1>
+        <p class="text-slate-500 mt-2 max-w-2xl">Live online sessions with psychologists, occupational therapists, and autism specialists. Register below — you'll get the join link here and by email before the session.</p>
+      </div>
+
+      <div id="workshop-list" class="space-y-4"></div>
+
+      <div id="workshop-empty" style="display:none" class="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-10 text-center">
+        <p class="text-slate-500">No upcoming workshops right now — check back soon. We add new sessions regularly.</p>
+      </div>
+
+      <div id="setup-notice" style="display:none" class="bg-white border border-slate-200 rounded-2xl p-6 text-center">
+        <p class="text-slate-500 text-sm">Workshops are being set up. Check back shortly.</p>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script is:inline>
+  var UA_URL="https://eghqufgiudxjkbsddtnx.supabase.co";
+  var UA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+  function getSession(){try{return JSON.parse(localStorage.getItem("ua_session")||"null");}catch{return null;}}
+  function setSession(d){var s=Object.assign({},d,{expires_at:Math.floor(Date.now()/1000)+(d.expires_in||3600)});localStorage.setItem("ua_session",JSON.stringify(s));return s;}
+  function isValid(s){return s&&s.access_token&&Math.floor(Date.now()/1000)<(s.expires_at||0)-60;}
+  function authHdr(t){return{"apikey":UA_KEY,"Authorization":"Bearer "+t,"Content-Type":"application/json"};}
+  async function getValidSession(){var s=getSession();if(isValid(s))return s;if(s&&s.refresh_token){var r=await fetch(UA_URL+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{"apikey":UA_KEY,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:s.refresh_token})});if(r.ok)return setSession(await r.json());}return null;}
+
+  function fmtWhen(iso, mins){
+    try{
+      var d=new Date(iso);
+      var datePart=d.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
+      var timePart=d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
+      return datePart+" · "+timePart+(mins?" ("+mins+" min)":"");
+    }catch{return iso;}
+  }
+  function locBadge(t){
+    if(t==="meet")return "Online · Google Meet";
+    if(t==="platform")return "Online · UniqueApex";
+    return "Online · Zoom";
+  }
+
+  var SESSION=null, REGISTERED={};
+
+  function render(workshops){
+    var listEl=document.getElementById("workshop-list");
+    var emptyEl=document.getElementById("workshop-empty");
+    if(!workshops.length){ emptyEl.style.display="block"; listEl.innerHTML=""; return; }
+    emptyEl.style.display="none";
+    var html="";
+    workshops.forEach(function(w){
+      var reg=!!REGISTERED[w.id];
+      html+='<div class="bg-white border border-slate-200 rounded-2xl p-6" data-id="'+w.id+'">';
+      html+='<div class="flex items-start justify-between gap-3 mb-1">';
+      html+='<h2 class="font-bold text-lg text-slate-800">'+w.title+'</h2>';
+      html+='<span class="shrink-0 text-xs font-semibold bg-violet-100 text-violet-700 px-2.5 py-1 rounded-full">'+locBadge(w.location_type)+'</span>';
+      html+='</div>';
+      html+='<p class="text-violet-700 text-sm font-medium">'+fmtWhen(w.starts_at, w.duration_minutes)+'</p>';
+      if(w.presenter)html+='<p class="text-slate-500 text-sm mt-0.5">'+w.presenter+(w.presenter_title?" · "+w.presenter_title:"")+'</p>';
+      if(w.description)html+='<p class="text-slate-600 text-sm mt-3 leading-relaxed">'+w.description+'</p>';
+
+      html+='<div class="mt-4 reg-area">';
+      if(reg){
+        html+='<div class="flex items-center gap-2 mb-3"><span class="text-green-600 font-semibold text-sm">✓ You\'re registered</span></div>';
+        if(w.join_url){
+          html+='<a href="'+w.join_url+'" target="_blank" rel="noopener" class="inline-block bg-violet-700 text-white font-semibold px-6 py-2.5 rounded-full hover:bg-violet-800 transition-colors text-sm mr-2">Join the session →</a>';
+        } else {
+          html+='<p class="text-slate-500 text-sm mb-2">The join link will be emailed to you before the session.</p>';
+        }
+        html+='<button class="cancel-btn text-sm text-slate-400 hover:text-red-500 font-medium" data-id="'+w.id+'">Cancel registration</button>';
+      } else {
+        html+='<button class="reg-btn bg-violet-700 text-white font-semibold px-6 py-2.5 rounded-full hover:bg-violet-800 transition-colors text-sm" data-id="'+w.id+'">Register</button>';
+      }
+      html+='</div></div>';
+    });
+    listEl.innerHTML=html;
+    bindButtons();
+  }
+
+  var ALL=[];
+  function bindButtons(){
+    document.querySelectorAll(".reg-btn").forEach(function(b){
+      b.addEventListener("click",async function(){
+        b.disabled=true; b.textContent="Registering...";
+        var id=b.getAttribute("data-id");
+        var r=await fetch(UA_URL+"/rest/v1/workshop_registrations",{
+          method:"POST",
+          headers:Object.assign({},authHdr(SESSION.access_token),{"Prefer":"return=minimal"}),
+          body:JSON.stringify({workshop_id:id, user_id:SESSION.user.id})
+        });
+        if(r.ok||r.status===409){ REGISTERED[id]=true; render(ALL); }
+        else { b.disabled=false; b.textContent="Register"; alert("Could not register. Please try again."); }
+      });
+    });
+    document.querySelectorAll(".cancel-btn").forEach(function(b){
+      b.addEventListener("click",async function(){
+        if(!confirm("Cancel your registration for this workshop?"))return;
+        var id=b.getAttribute("data-id");
+        await fetch(UA_URL+"/rest/v1/workshop_registrations?workshop_id=eq."+id+"&user_id=eq."+SESSION.user.id,{
+          method:"DELETE", headers:authHdr(SESSION.access_token)
+        });
+        delete REGISTERED[id]; render(ALL);
+      });
+    });
+  }
+
+  (async function(){
+    SESSION=await getValidSession();
+    if(!SESSION){window.location.href="/login";return;}
+    document.getElementById("loading").style.display="none";
+    document.getElementById("content").style.display="block";
+
+    var nowIso=new Date().toISOString();
+    var wr;
+    try{
+      wr=await fetch(UA_URL+"/rest/v1/workshops?select=*&starts_at=gte."+nowIso+"&order=starts_at.asc",{headers:authHdr(SESSION.access_token)});
+    }catch(e){ document.getElementById("setup-notice").style.display="block"; return; }
+    if(!wr.ok){ document.getElementById("setup-notice").style.display="block"; return; }
+    ALL=await wr.json();
+    if(!Array.isArray(ALL))ALL=[];
+
+    // Load this user's registrations
+    try{
+      var rr=await fetch(UA_URL+"/rest/v1/workshop_registrations?select=workshop_id",{headers:authHdr(SESSION.access_token)});
+      if(rr.ok){ (await rr.json()).forEach(function(r){ REGISTERED[r.workshop_id]=true; }); }
+    }catch(e){}
+
+    render(ALL);
+  })();
+</script>
