@@ -1,0 +1,88 @@
+---
+/* ============================================================
+   AiPanel.astro — renders the recommendation engine's output.
+   ONE component, two looks:
+     <AiPanel section="all" variant="board" title="Recommended next steps" />
+     <AiPanel section="funding" />            // per-section panel
+   It reads the active child's passport (same ua_session pattern as
+   the rest of the app), runs src/lib/recommendations.js, and shows
+   the relevant slice. Falls back to an empty profile so it always
+   renders something useful.
+   ============================================================ */
+import "../styles/aipanel.css";
+export interface Props { section?: string; variant?: "panel" | "board"; title?: string; limit?: number }
+const { section = "all", variant = "panel", title } = Astro.props;
+const limit = Astro.props.limit ?? (variant === "board" ? 8 : 3);
+const heading = title || (variant === "board" ? "Recommended next steps" : "Suggested for this section");
+---
+<aside class:list={["ai-panel", variant]} data-ai-section={section} data-variant={variant} data-limit={limit}>
+  <div class="ai-head">
+    <span class="ai-spark"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.3l1.1 3.2a3 3 0 001.9 1.9L15.2 7.5l-3.2 1.1a3 3 0 00-1.9 1.9L9 13.7l-1.1-3.2a3 3 0 00-1.9-1.9L2.8 7.5l3.2-1.1a3 3 0 001.9-1.9L8 1.3z"/></svg></span>
+    <span class="ai-title">{heading}<small data-ai-sub>Personalised from your child's profile</small></span>
+  </div>
+  <div class="ai-list" data-ai-list>
+    <div class="ai-empty">Loading suggestions…</div>
+  </div>
+</aside>
+
+<script>
+  import { getRecommendations, forSection, childFirstName } from "../lib/recommendations.js";
+
+  const SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+  const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+
+  async function loadActivePassport() {
+    try {
+      const raw = localStorage.getItem("ua_session");
+      const s = raw ? JSON.parse(raw) : null;
+      if (!s || !s.access_token) return null;
+      const res = await fetch(SUPABASE_URL + "/rest/v1/passports?select=id,data", {
+        headers: { apikey: ANON, Authorization: "Bearer " + s.access_token }
+      });
+      if (!res.ok) return null;
+      const rows = await res.json();
+      if (!rows || !rows.length) return null;
+      const active = localStorage.getItem("ua_active_child") || rows[0].id;
+      const row = rows.find((r) => r.id === active) || rows[0];
+      return row.data || {};
+    } catch (e) { return null; }
+  }
+
+  const ICON = { warn: "!", todo: "+", info: "i", done: "\u2713" };
+  function esc(s){ return String(s).replace(/[&<>"]/g, (c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c])); }
+
+  function render(panels, data) {
+    const recs = getRecommendations(data, {});
+    const name = childFirstName(data || {});
+    panels.forEach((el) => {
+      const sec = el.dataset.aiSection;
+      const variant = el.dataset.variant;
+      const limit = parseInt(el.dataset.limit || "3", 10);
+      let items = sec === "all" ? recs : forSection(recs, sec);
+      if (variant !== "board") items = items.filter((r) => r.severity !== "done");
+      items = items.slice(0, limit);
+
+      const sub = el.querySelector("[data-ai-sub]");
+      if (sub) sub.textContent = variant === "board" ? ("Prioritised for " + name) : ("Based on " + name + "'s profile");
+
+      const list = el.querySelector("[data-ai-list]");
+      if (!items.length) { list.innerHTML = '<div class="ai-empty">You&#39;re all caught up here.</div>'; return; }
+      list.innerHTML = items.map((r) => {
+        const reason = r.reason ? '<div class="ai-it-reason">' + esc(r.reason) + "</div>" : "";
+        const cta = r.cta ? '<span class="ai-cta">' + esc(r.cta) + " \u2192</span>" : "";
+        const tc = r.severity === "done" ? "ai-it-title done" : "ai-it-title";
+        return '<a class="ai-item" href="' + r.href + '">' +
+          '<span class="ai-ic ' + r.severity + '">' + ICON[r.severity] + "</span>" +
+          '<span class="ai-body"><span class="' + tc + '">' + esc(r.title) + "</span>" + reason + "</span>" +
+          cta + "</a>";
+      }).join("");
+    });
+  }
+
+  (async () => {
+    const panels = Array.from(document.querySelectorAll(".ai-panel[data-ai-section]"));
+    if (!panels.length) return;
+    const data = await loadActivePassport();
+    render(panels, data || {});
+  })();
+</script>

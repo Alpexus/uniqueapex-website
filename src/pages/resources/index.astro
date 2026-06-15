@@ -1,0 +1,23 @@
+---
+import AppFormLayout from "@/layouts/AppFormLayout.astro";
+import SectionTabs from "@/components/SectionTabs.astro";
+import AiPanel from "@/components/AiPanel.astro";
+import "@/styles/mock.css";
+---
+<AppFormLayout title="Resources" activeNav="resources">
+  <SectionTabs section="resources" active="" />
+  <h1 class="page-title">Where are you right now?</h1>
+  <p class="page-sub">Each collection bundles the guides, workshops and articles that fit your stage. Or use the tabs above to browse by type.</p>
+
+  <div class="col-grid">
+    <a class="col-card" style="--c1:#FEF3C7" href="/resources/guides"><span class="emoji">🧭</span><h3>I'm worried my child may be autistic</h3><p>Signs, next steps, and how to get an assessment.</p></a>
+    <a class="col-card" style="--c1:#EDE9FE" href="/resources/guides"><span class="emoji">🌱</span><h3>We just got a diagnosis</h3><p>What it means and what to do first.</p></a>
+    <a class="col-card" style="--c1:#DCFCE7" href="/resources/guides"><span class="emoji">🗣️</span><h3>We need therapy</h3><p>Finding speech, OT and behaviour support.</p></a>
+    <a class="col-card" style="--c1:#DBEAFE" href="/resources/guides"><span class="emoji">💰</span><h3>We need funding</h3><p>Credits, supplements and how to apply.</p></a>
+    <a class="col-card" style="--c1:#FCE7F3" href="/resources/guides"><span class="emoji">🏫</span><h3>School is difficult</h3><p>IEPs, accommodations and advocacy.</p></a>
+    <a class="col-card" style="--c1:#FFE4E6" href="/resources/guides"><span class="emoji">🌅</span><h3>Preparing for adulthood</h3><p>Transition, independence and planning.</p></a>
+  </div>
+
+  <h2 class="mk-sec-title">Picked for your child</h2>
+  <AiPanel section="resources" />
+</AppFormLayout>

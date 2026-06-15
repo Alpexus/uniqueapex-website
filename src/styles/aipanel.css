@@ -1,0 +1,41 @@
+/* ============================================================
+   aipanel.css — recommendation panel + dashboard board
+   ============================================================ */
+.ai-panel{
+  --warn:#C2410C; --todo:#6D28D9; --info:#0E7490; --done:#15803D;
+  border:1px solid var(--line,#E7E3F2);
+  border-radius:16px;
+  background:linear-gradient(180deg,#FBFAFF, #FFFFFF);
+  padding:16px 18px;
+  margin:0 0 22px;
+}
+.ai-panel.board{padding:18px 20px;}
+
+.ai-head{display:flex;align-items:center;gap:9px;margin:0 0 12px;}
+.ai-spark{
+  width:26px;height:26px;border-radius:8px;flex:0 0 auto;
+  display:grid;place-items:center;color:#fff;
+  background:linear-gradient(135deg,#A78BFA,#6D28D9);
+}
+.ai-spark svg{width:15px;height:15px;display:block}
+.ai-title{font:600 14.5px/1.2 var(--display,"Bricolage Grotesque",sans-serif);color:var(--ink,#1F1A2E);}
+.ai-title small{display:block;font:400 12px/1.4 var(--body,"Inter",sans-serif);color:var(--muted,#7B7491);margin-top:2px;font-weight:400;}
+
+.ai-list{display:flex;flex-direction:column;gap:8px;}
+.ai-item{
+  display:flex;align-items:flex-start;gap:11px;
+  padding:11px 12px;border:1px solid var(--line,#EEE9F7);border-radius:12px;background:#fff;
+  text-decoration:none;
+}
+.ai-item:hover{border-color:#D9CEF3;background:#FCFBFF;}
+.ai-ic{width:20px;height:20px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;margin-top:1px;font-size:11px;font-weight:700;color:#fff;}
+.ai-ic.warn{background:var(--warn)} .ai-ic.todo{background:var(--todo)} .ai-ic.info{background:var(--info)} .ai-ic.done{background:var(--done)}
+.ai-body{flex:1 1 auto;min-width:0}
+.ai-it-title{font:600 13.5px/1.35 var(--body,"Inter",sans-serif);color:var(--ink,#1F1A2E);}
+.ai-it-title.done{color:var(--muted,#7B7491);font-weight:500;}
+.ai-it-reason{font:400 12.5px/1.45 var(--body,"Inter",sans-serif);color:var(--muted,#7B7491);margin-top:2px;}
+.ai-cta{align-self:center;flex:0 0 auto;font:600 12px/1 var(--body,"Inter",sans-serif);color:var(--violet-700,#6D28D9);white-space:nowrap;}
+.ai-empty{font:400 13px/1.5 var(--body,"Inter",sans-serif);color:var(--muted,#7B7491);padding:4px 2px;}
+
+/* compact per-section panel: hide the dashboard-only intro */
+.ai-panel.panel .ai-it-reason{display:block}

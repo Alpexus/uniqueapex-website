@@ -1,0 +1,185 @@
+---
+/* ============================================================
+   AppLayout.astro — authenticated app shell (dashboard layout)
+   ------------------------------------------------------------
+   Renders the shared sidebar + this layout's top header
+   (child switcher / search / notifications) + the shared mobile
+   bottom bar. No marketing navbar/footer — that's the clean
+   "no nav bar above" app feel.
+
+   The sidebar and bottom bar now live in shared components
+   (src/components/Sidebar.astro, BottomBar.astro) so the nav,
+   logo, and routes are defined in ONE place for the whole app.
+
+   Usage:
+     import AppLayout from "../layouts/AppLayout.astro";
+     <AppLayout title="Dashboard" activeNav="dashboard"> … </AppLayout>
+
+   activeNav: dashboard | child | documents | funding | providers |
+              resources | settings
+   ============================================================ */
+import "../styles/app.css";
+import Sidebar from "../components/Sidebar.astro";
+import BottomBar from "../components/BottomBar.astro";
+
+export interface Props {
+  title?: string;
+  activeNav?: string;
+}
+const { title = "UniqueApex", activeNav = "dashboard" } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} · UniqueApex</title>
+  <link rel="icon" href="/Logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="scrim" id="ua-scrim"></div>
+  <div class="shell">
+
+    <!-- ============ SIDEBAR (shared) ============ -->
+    <Sidebar activeNav={activeNav} />
+
+    <!-- ============ MAIN ============ -->
+    <div class="main">
+      <header class="header">
+        <button class="burger" id="ua-burger" aria-label="Open menu">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="#494060" stroke-width="1.6"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/></svg>
+        </button>
+
+        <div class="child-switch">
+          <button class="child-switch-btn" id="ua-child-btn" aria-haspopup="true">
+            <span class="child-avatar" id="ua-child-avatar">·</span>
+            <span id="ua-child-name">Select child</span>
+            <svg class="chev" viewBox="0 0 16 16" fill="none" stroke-width="1.8"><path d="M4.5 6.5L8 10l3.5-3.5"/></svg>
+          </button>
+          <div class="child-menu" id="ua-child-menu" role="menu">
+            <!-- populated from Supabase; this is the fallback -->
+            <div style="padding:10px;font-size:.82rem;color:var(--muted)" id="ua-child-empty">No children yet.</div>
+            <hr />
+            <a class="row add" href="/passport">+ Add a child</a>
+          </div>
+        </div>
+
+        <div class="search">
+          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.6"><circle cx="7" cy="7" r="4.4"/><path d="M10.4 10.4L14 14"/></svg>
+          <input type="search" placeholder="Search documents, providers, programs…" />
+        </div>
+
+        <div class="header-right">
+          <button class="icon-btn" aria-label="Notifications">
+            <svg viewBox="0 0 16 16" fill="none" stroke-width="1.6"><path d="M8 2a4 4 0 014 4c0 3 1.2 4 1.2 4H2.8S4 9 4 6a4 4 0 014-4zM6.6 13a1.5 1.5 0 002.8 0"/></svg>
+            <span class="dot"></span>
+          </button>
+          <a class="icon-btn" href="/settings" aria-label="Account"><span class="avatar" id="ua-hdr-avatar" style="width:26px;height:26px;font-size:.62rem">·</span></a>
+        </div>
+      </header>
+
+      <main class="content">
+        <slot />
+      </main>
+    </div>
+  </div>
+
+  <!-- ============ MOBILE BOTTOM BAR (shared) ============ -->
+  <BottomBar activeNav={activeNav} />
+
+  <!-- ============ SHELL BEHAVIOUR ============ -->
+  <script is:inline>
+    (function () {
+      // --- Supabase config (anon key is public; protected by RLS) ---
+      // TODO: move these to import.meta.env (PUBLIC_SUPABASE_URL / _ANON_KEY).
+      var SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+      var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+
+      // --- Auth guard: same ua_session pattern as the rest of the app ---
+      var raw = localStorage.getItem("ua_session");
+      var session = null;
+      try { session = raw ? JSON.parse(raw) : null; } catch (e) {}
+      if (!session || !session.access_token) {
+        location.href = "/login";
+        return;
+      }
+
+      // --- Sidebar drawer (mobile) ---
+      var sidebar = document.getElementById("ua-sidebar");
+      var scrim = document.getElementById("ua-scrim");
+      function openNav() { sidebar.classList.add("open"); scrim.classList.add("open"); }
+      function closeNav() { sidebar.classList.remove("open"); scrim.classList.remove("open"); }
+      document.getElementById("ua-burger").addEventListener("click", openNav);
+      scrim.addEventListener("click", closeNav);
+
+      // --- Account chips from session ---
+      var user = session.user || {};
+      var email = user.email || "";
+      var initial = (email[0] || "U").toUpperCase();
+      ["ua-side-avatar", "ua-hdr-avatar"].forEach(function (id) {
+        var el = document.getElementById(id); if (el) el.textContent = initial;
+      });
+      var sideName = document.getElementById("ua-side-name");
+      if (sideName && email) sideName.textContent = email.split("@")[0];
+
+      // --- Child switcher menu open/close ---
+      var childBtn = document.getElementById("ua-child-btn");
+      var childMenu = document.getElementById("ua-child-menu");
+      childBtn.addEventListener("click", function (e) {
+        e.stopPropagation(); childMenu.classList.toggle("open");
+      });
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest(".child-switch")) childMenu.classList.remove("open");
+      });
+
+      // --- Load children (passports) for the switcher ---
+      function colorFor(i) {
+        var c = [["#A78BFA", "#6D28D9"], ["#5EEAD4", "#0E8C82"], ["#FCD34D", "#A8650A"], ["#F9A8D4", "#B14A66"]];
+        return c[i % c.length];
+      }
+      fetch(SUPABASE_URL + "/rest/v1/passports?select=id,data", {
+        headers: { apikey: ANON, Authorization: "Bearer " + session.access_token }
+      })
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (rows) {
+          if (!rows || !rows.length) return;
+          var active = localStorage.getItem("ua_active_child") || rows[0].id;
+          var menu = document.getElementById("ua-child-menu");
+          var empty = document.getElementById("ua-child-empty");
+          if (empty) empty.remove();
+
+          var frag = "";
+          rows.forEach(function (row, i) {
+            var cp = (row.data && row.data.childProfile) || {};
+            var name = [cp.firstName, cp.lastName].filter(Boolean).join(" ") || "Child";
+            var dx = (row.data && row.data.diagnosis && row.data.diagnosis.summary) || cp.city || "";
+            var grad = colorFor(i);
+            var sel = row.id === active ? " sel" : "";
+            frag = '<button class="row' + sel + '" data-id="' + row.id + '">' +
+              '<span class="child-avatar" style="background:linear-gradient(135deg,' + grad[0] + ',' + grad[1] + ')">' +
+              (name[0] || "C").toUpperCase() + '</span>' +
+              '<span>' + name + (dx ? '<small>' + dx + '</small>' : '') + '</span></button>' + frag;
+            if (row.id === active) {
+              document.getElementById("ua-child-name").textContent = name;
+              var av = document.getElementById("ua-child-avatar");
+              av.textContent = (name[0] || "C").toUpperCase();
+              av.style.background = "linear-gradient(135deg," + grad[0] + "," + grad[1] + ")";
+            }
+          });
+          menu.insertAdjacentHTML("afterbegin", frag);
+
+          menu.querySelectorAll(".row[data-id]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              localStorage.setItem("ua_active_child", btn.dataset.id);
+              location.reload();
+            });
+          });
+        })
+        .catch(function () { /* offline / no rows — switcher stays in fallback state */ });
+    })();
+  </script>
+</body>
+</html>

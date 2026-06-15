@@ -1,0 +1,38 @@
+/* SectionTabs — minimal structural styles for in-page secondary nav.
+   Imported by SectionTabs.astro. Kept intentionally plain (this is an IA
+   change, not a visual one); restyle later if desired. */
+
+.sectiontabs {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line, #EAE7F3);
+  margin: 0 0 22px;
+  -webkit-overflow-scrolling: touch;
+}
+.sectiontab {
+  flex: 0 0 auto;
+  padding: 11px 14px;
+  font: 500 14px/1 var(--body, "Inter", sans-serif);
+  color: var(--muted, #7B7491);
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.sectiontab:hover { color: var(--ink, #221B36); }
+.sectiontab.active {
+  color: var(--violet-700, #6D28D9);
+  border-bottom-color: var(--violet-700, #6D28D9);
+  font-weight: 600;
+}
+
+/* Any page that renders the section tab bar gets the wide canvas
+   (fixes the narrow document vault and makes every section page wide). */
+main.content:has(.sectiontabs){max-width:1260px;}
+
+/* Generic placeholder block for scaffolded pages */
+.page-title{font:600 22px/1.2 var(--display,"Bricolage Grotesque",sans-serif);color:var(--ink,#1F1A2E);margin:4px 0 4px;}
+.page-sub{color:var(--muted,#7B7491);font:400 14px/1.6 var(--body,"Inter",sans-serif);margin:0 0 18px;}
+.ua-stub{padding:26px;border:1px dashed var(--line,#E7E3F2);border-radius:14px;background:#fff;color:var(--muted,#7B7491);font:400 14px/1.7 var(--body,"Inter",sans-serif);}
+.ua-stub b{color:var(--ink,#1F1A2E);font-weight:600;}

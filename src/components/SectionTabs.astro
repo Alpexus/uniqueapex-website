@@ -1,0 +1,30 @@
+---
+// ============================================================
+// SectionTabs — in-page secondary navigation.
+// Usage on any section page:
+//   <SectionTabs section="documents" active="reports" />
+// The sidebar highlights the SECTION (activeNav); this bar
+// highlights the active TAB within it. Tab definitions come
+// from src/config/sections.js (single source of truth).
+// ============================================================
+import "../styles/sectiontabs.css";
+import { SECTIONS } from "../config/sections.js";
+
+export interface Props {
+  section: string; // "child" | "documents" | "funding" | "providers" | "resources" | "settings"
+  active: string;  // the active tab key within that section
+}
+const { section, active } = Astro.props;
+const tabs = SECTIONS[section] || [];
+---
+{tabs.length > 0 && (
+  <nav class="sectiontabs" aria-label="Section navigation">
+    {tabs.map((t) => (
+      <a
+        class={t.key === active ? "sectiontab active" : "sectiontab"}
+        href={t.href}
+        aria-current={t.key === active ? "page" : undefined}
+      >{t.label}</a>
+    ))}
+  </nav>
+)}

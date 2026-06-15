@@ -1,6 +1,5 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import Container from "@/components/container.astro";
+import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import { SCALE_QUESTIONS, SCALE_IDS } from "@/config/wheelConfig.js";
 
 const inputCls = "w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white";
@@ -19,9 +18,9 @@ const scale4 = [
 ];
 ---
 
-<Layout title="Family Passport">
-  <Container>
-    <div class="max-w-3xl mx-auto mt-10 mb-24">
+<AppFormLayout title="Family Passport" activeNav="profiles">
+  <div class="form-canvas">
+    <div class="max-w-3xl mx-auto mt-2 mb-24">
 
       <div class="mb-10 text-center">
         <h1 class="text-3xl font-bold text-slate-800">
@@ -658,11 +657,11 @@ const scale4 = [
 
       </form>
     </div>
-  </Container>
 
   <!-- Off-screen print view, shown only when printing -->
   <div id="print-view"></div>
-</Layout>
+  </div>
+</AppFormLayout>
 
 <style is:global>
   #print-view { position: fixed; left: -9999px; top: 0; width: 700px; }
@@ -1123,3 +1122,4 @@ const scale4 = [
 
   showStep(1);
 </script>
+

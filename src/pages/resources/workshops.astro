@@ -1,0 +1,258 @@
+---
+import AppFormLayout from "@/layouts/AppFormLayout.astro";
+import SectionTabs from "@/components/SectionTabs.astro";
+import "../../styles/workshops.css"; // imported like app-shell.css — reliably applied
+---
+
+<AppFormLayout title="Resources" activeNav="resources">
+  <div class="w-page">
+    <SectionTabs section="resources" active="workshops" />
+    <h1 class="page-title">Upcoming <em>workshops</em></h1>
+    <p class="page-sub">
+      Live sessions and Q&amp;As for parents — diagnosis, school, funding and daily life.
+      Reserve a spot and we'll send you the join link.
+    </p>
+
+    <div class="w-note" id="wNote" hidden>
+      <span class="pill sample">Sample sessions</span>
+      <span id="wNoteText">These are examples while we schedule the first workshops. You'll be able to reserve once they're published.</span>
+    </div>
+
+    <div class="w-cols">
+      <!-- Upcoming (left, main) -->
+      <div class="w-main-col">
+        <div class="w-up-head">Upcoming</div>
+        <div id="wList" class="w-list">
+          <div class="w-loading"><p>Loading workshops…</p></div>
+        </div>
+      </div>
+
+      <!-- Calendar (right) -->
+      <div class="w-cal" id="wCal">
+        <div class="w-cal-top">
+          <span class="w-cal-month" id="wCalMonth">—</span>
+          <div class="w-cal-nav">
+            <button type="button" id="wPrev" aria-label="Previous month">‹</button>
+            <button type="button" id="wNext" aria-label="Next month">›</button>
+          </div>
+        </div>
+        <div class="w-dow"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+        <div class="w-days" id="wDays"></div>
+        <div class="w-cal-legend"><i></i> Workshop scheduled</div>
+      </div>
+    </div>
+  </div>
+</AppFormLayout>
+
+<script is:inline>
+  (function () {
+    var SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+    var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+
+    // ---- session + token refresh (same ua_session pattern as the app) ----
+    function readSession() {
+      try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch (e) { return null; }
+    }
+    function saveSession(s) { localStorage.setItem("ua_session", JSON.stringify(s)); }
+
+    var session = readSession();
+    if (!session || !session.access_token) { location.href = "/login"; return; }
+    var userId = (session.user && session.user.id) || null;
+
+    function refresh() {
+      if (!session.refresh_token) return Promise.reject();
+      return fetch(SUPABASE_URL + "/auth/v1/token?grant_type=refresh_token", {
+        method: "POST",
+        headers: { apikey: ANON, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: session.refresh_token })
+      }).then(function (r) {
+        if (!r.ok) throw new Error("refresh failed");
+        return r.json();
+      }).then(function (d) {
+        session.access_token = d.access_token;
+        session.refresh_token = d.refresh_token || session.refresh_token;
+        session.expires_at = d.expires_at || (Math.floor(Date.now() / 1000) + (d.expires_in || 3600));
+        if (d.user) { session.user = { id: d.user.id, email: d.user.email }; userId = d.user.id; }
+        saveSession(session);
+      });
+    }
+
+    // fetch with auth; on 401 try one refresh then retry
+    function api(path, opts, retried) {
+      opts = opts || {};
+      opts.headers = Object.assign({ apikey: ANON, Authorization: "Bearer " + session.access_token }, opts.headers || {});
+      return fetch(SUPABASE_URL + path, opts).then(function (r) {
+        if (r.status === 401 && !retried) {
+          return refresh().then(function () { return api(path, opts, true); })
+            .catch(function () { location.href = "/login"; });
+        }
+        return r;
+      });
+    }
+
+    // ---- formatting helpers ----
+    var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    var DOWS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    function fmtWhen(iso, mins) {
+      var d = new Date(iso);
+      var date = DOWS[d.getDay()] + ", " + MON[d.getMonth()] + " " + d.getDate();
+      var h = d.getHours(), m = d.getMinutes();
+      var ap = h >= 12 ? "PM" : "AM"; var h12 = h % 12 || 12;
+      var time = h12 + (m ? ":" + (m < 10 ? "0" + m : m) : "") + " " + ap;
+      var dur = mins ? " · " + (mins % 60 === 0 ? mins / 60 + "h" : mins + " min") : "";
+      return date + " · " + time + dur;
+    }
+    function locBadge(type) {
+      var label = type === "meet" ? "Online · Google Meet" : type === "platform" ? "Online · UniqueApex" : "Online · Zoom";
+      var vid = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="12" height="12" rx="2"/><path d="m15 10 6-3v10l-6-3"/></svg>';
+      return '<span class="w-badge">' + vid + esc(label) + "</span>";
+    }
+    function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]; }); }
+    function ymd(d) { return d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate(); }
+
+    // ---- sample workshops (used only when the table is empty / not ready) ----
+    function sampleSet() {
+      var now = new Date();
+      function future(days, hour) { var d = new Date(now); d.setDate(d.getDate() + days); d.setHours(hour, 0, 0, 0); return d.toISOString(); }
+      return [
+        { id: "s1", title: "Understanding your child's evaluation report", description: "What the scores mean, the questions to ask, and how to turn a report into a plan.", presenter: "Dr. Camille Roy", presenter_title: "Clinical psychologist", starts_at: future(4, 19), duration_minutes: 60, location_type: "zoom", capacity: 40, _sample: true },
+        { id: "s2", title: "Navigating the school plan d'intervention", description: "A walk-through of the IEP process in Québec and how to prepare for the meeting.", presenter: "Mélanie Tremblay", presenter_title: "Special-education advisor", starts_at: future(11, 18), duration_minutes: 45, location_type: "meet", capacity: 60, _sample: true },
+        { id: "s3", title: "Funding 101: allowances, credits & grants", description: "The main sources of financial support for families, and how to apply for each.", presenter: "UniqueApex team", presenter_title: "Family coordination", starts_at: future(19, 12), duration_minutes: 60, location_type: "platform", capacity: 100, _sample: true }
+      ];
+    }
+
+    // ---- state ----
+    var workshops = [];
+    var registered = {};        // workshop_id -> true
+    var isSample = false;
+    var view = new Date();      // calendar month being shown
+    view.setDate(1);
+
+    // ---- calendar ----
+    function eventDayKeys() {
+      var keys = {};
+      workshops.forEach(function (w) { var d = new Date(w.starts_at); keys[ymd(d)] = true; });
+      return keys;
+    }
+    function renderCalendar() {
+      var y = view.getFullYear(), mo = view.getMonth();
+      document.getElementById("wCalMonth").textContent = MON[mo] + " " + y;
+      var first = new Date(y, mo, 1).getDay();
+      var days = new Date(y, mo + 1, 0).getDate();
+      var prevDays = new Date(y, mo, 0).getDate();
+      var keys = eventDayKeys();
+      var today = new Date();
+      var html = "";
+      for (var i = 0; i < first; i++) html += '<div class="w-day other">' + (prevDays - first + 1 + i) + "</div>";
+      for (var d = 1; d <= days; d++) {
+        var cls = "w-day";
+        if (keys[y + "-" + mo + "-" + d]) cls += " hasev";
+        if (today.getFullYear() === y && today.getMonth() === mo && today.getDate() === d) cls += " today";
+        html += '<div class="' + cls + '">' + d + "</div>";
+      }
+      var cells = first + days, tail = (7 - (cells % 7)) % 7;
+      for (var t = 1; t <= tail; t++) html += '<div class="w-day other">' + t + "</div>";
+      document.getElementById("wDays").innerHTML = html;
+    }
+    document.getElementById("wPrev").addEventListener("click", function () { view.setMonth(view.getMonth() - 1); renderCalendar(); });
+    document.getElementById("wNext").addEventListener("click", function () { view.setMonth(view.getMonth() + 1); renderCalendar(); });
+
+    // ---- card render ----
+    function cardHTML(w) {
+      var d = new Date(w.starts_at);
+      var grad = "background:linear-gradient(135deg,#a78bfa 0%,#6d28d9 100%)";
+      var by = [w.presenter, w.presenter_title].filter(Boolean).map(esc).join(" · ");
+      var cap = w.capacity ? '<span class="w-cap">' + w.capacity + " spots</span>" : "";
+      var isReg = !!registered[w.id];
+      var side;
+      if (w._sample) {
+        side = '<button class="w-btn ghost" disabled>Sample</button>'
+             + '<div class="w-spill">Reserving opens once published.</div>';
+      } else if (isReg) {
+        side = '<button class="w-btn ghost" data-act="cancel" data-id="' + esc(w.id) + '">Reserved ✓</button>'
+             + (w.join_url ? '<a class="w-join" href="' + esc(w.join_url) + '" target="_blank" rel="noopener">Join link →</a>' : "")
+             + '<div class="w-status" data-status="' + esc(w.id) + '"></div>';
+      } else {
+        side = '<button class="w-btn primary" data-act="reserve" data-id="' + esc(w.id) + '">Reserve a spot</button>'
+             + '<div class="w-status" data-status="' + esc(w.id) + '"></div>';
+      }
+      return '<div class="w-card">'
+        + '<div class="w-date" style="' + grad + '"><span class="w-mon">' + MON[d.getMonth()].toUpperCase() + '</span><span class="w-dnum">' + d.getDate() + '</span></div>'
+        + '<div class="w-body">'
+        +   '<div class="w-title">' + esc(w.title) + '</div>'
+        +   (by ? '<div class="w-by">' + by + '</div>' : "")
+        +   '<div class="w-meta"><span class="w-when">' + fmtWhen(w.starts_at, w.duration_minutes) + '</span>' + locBadge(w.location_type) + cap + '</div>'
+        +   (w.description ? '<p class="w-desc">' + esc(w.description) + '</p>' : "")
+        + '</div>'
+        + '<div class="w-side">' + side + '</div>'
+        + '</div>';
+    }
+
+    function renderList() {
+      var el = document.getElementById("wList");
+      if (!workshops.length) {
+        el.innerHTML = '<div class="w-empty"><div class="w-eic"><svg viewBox="0 0 24 24" fill="none" stroke="#6D28D9" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></div><h3>No workshops scheduled yet</h3><p>We\'re lining up the first sessions. Check back soon — or you\'ll see them here the moment they\'re published.</p></div>';
+        return;
+      }
+      el.innerHTML = workshops.map(cardHTML).join("");
+      el.querySelectorAll("[data-act]").forEach(function (btn) {
+        btn.addEventListener("click", function () { onAction(btn); });
+      });
+    }
+
+    // ---- reserve / cancel ----
+    function setStatus(id, msg, isErr) {
+      var s = document.querySelector('[data-status="' + id + '"]');
+      if (s) { s.textContent = msg || ""; s.className = "w-status" + (isErr ? " err" : ""); }
+    }
+    function onAction(btn) {
+      var id = btn.getAttribute("data-id");
+      var act = btn.getAttribute("data-act");
+      btn.disabled = true;
+      if (act === "reserve") {
+        api("/rest/v1/workshop_registrations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Prefer: "return=minimal" },
+          body: JSON.stringify({ workshop_id: id, user_id: userId })
+        }).then(function (r) {
+          if (r && (r.ok || r.status === 409)) { registered[id] = true; renderList(); }
+          else { btn.disabled = false; setStatus(id, "Couldn't reserve — try again.", true); }
+        }).catch(function () { btn.disabled = false; setStatus(id, "Couldn't reserve — try again.", true); });
+      } else {
+        api("/rest/v1/workshop_registrations?workshop_id=eq." + encodeURIComponent(id) + "&user_id=eq." + encodeURIComponent(userId), {
+          method: "DELETE", headers: { Prefer: "return=minimal" }
+        }).then(function (r) {
+          if (r && r.ok) { delete registered[id]; renderList(); }
+          else { btn.disabled = false; setStatus(id, "Couldn't cancel — try again.", true); }
+        }).catch(function () { btn.disabled = false; setStatus(id, "Couldn't cancel — try again.", true); });
+      }
+    }
+
+    // ---- load ----
+    function showSamples() {
+      isSample = true;
+      workshops = sampleSet();
+      document.getElementById("wNote").hidden = false;
+      renderCalendar(); renderList();
+    }
+
+    var nowISO = new Date().toISOString();
+    Promise.all([
+      api("/rest/v1/workshops?select=*&published=eq.true&starts_at=gte." + encodeURIComponent(nowISO) + "&order=starts_at.asc"),
+      userId ? api("/rest/v1/workshop_registrations?select=workshop_id&user_id=eq." + encodeURIComponent(userId)) : Promise.resolve(null)
+    ]).then(function (res) {
+      var wRes = res[0], rRes = res[1];
+      if (!wRes || !wRes.ok) { showSamples(); return; }  // table missing / error → samples
+      return wRes.json().then(function (rows) {
+        return (rRes && rRes.ok ? rRes.json() : Promise.resolve([])).then(function (regs) {
+          (regs || []).forEach(function (x) { registered[x.workshop_id] = true; });
+          if (!rows || !rows.length) { showSamples(); return; }  // empty → samples
+          workshops = rows;
+          renderCalendar(); renderList();
+        });
+      });
+    }).catch(function () { showSamples(); });
+
+    renderCalendar(); // initial paint before data resolves
+  })();
+</script>

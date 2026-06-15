@@ -1,0 +1,137 @@
+---
+import AppFormLayout from "@/layouts/AppFormLayout.astro";
+import SectionTabs from "@/components/SectionTabs.astro";
+import "../../styles/guides.css"; // imported like app-shell.css — reliably applied
+
+const C = {
+  diagnosis: { a: "#2dd4bf", b: "#0d9488", dot: "#0d9488" },
+  school:    { a: "#a78bfa", b: "#6d28d9", dot: "#6d28d9" },
+  funding:   { a: "#4ade80", b: "#2f9e63", dot: "#2f9e63" },
+  therapy:   { a: "#fbbf6b", b: "#d98324", dot: "#c2740f" },
+  daily:     { a: "#f9a8c4", b: "#d65a7a", dot: "#d65a7a" },
+};
+const PATHS = {
+  diagnosis: `<path d="M9 4h6a1 1 0 0 1 1 1a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2a1 1 0 0 1 1-1Z"/><path d="M8 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2"/><path d="m9 14 2 2 4-4"/>`,
+  school: `<path d="M22 9 12 5 2 9l10 4 10-4Z"/><path d="M6 10.5V16c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5.5"/><path d="M22 9v5"/>`,
+  funding: `<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/>`,
+  therapy: `<path d="M7.5 21A4.5 4.5 0 0 1 3 16.5C3 12 7 7.5 12 4c5 3.5 9 8 9 12.5A4.5 4.5 0 0 1 16.5 21c-1.7 0-3.2-.9-4.5-2.5C10.7 20.1 9.2 21 7.5 21Z"/>`,
+  daily: `<path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/><path d="M9.5 20v-5h5v5"/>`,
+};
+const icon = (cat, size) =>
+  `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="position:relative">${PATHS[cat]}</svg>`;
+const tile = (cat, h) =>
+  `background:linear-gradient(135deg,${C[cat].a} 0%,${C[cat].b} 100%);${h}`;
+
+const featured = {
+  cat: "diagnosis", category: "Diagnosis",
+  title: "Getting an autism or ADHD diagnosis in Québec",
+  blurb: "Public vs private evaluation, realistic wait times, and exactly what to gather before your first appointment — so the process moves as fast as it can.",
+  read: "8 min read",
+};
+const guides = [
+  { cat: "school", category: "School & IEP", title: "Building your child's plan d'intervention", blurb: "How the school's intervention plan works, the rights you have, and how to walk into the meeting prepared.", read: "6 min read" },
+  { cat: "funding", category: "Funding", title: "Funding therapy: allowances, credits & grants", blurb: "The Supplement for Handicapped Children, the disability tax credit, and where to look when those run out.", read: "7 min read" },
+  { cat: "therapy", category: "Therapy", title: "Managing SLP and OT waitlists", blurb: "How CLSC and private waitlists differ, and how to run several in parallel without losing track of any.", read: "5 min read" },
+  { cat: "therapy", category: "Therapy", title: "Your first therapy sessions", blurb: "What to bring, what to ask, and how to set goals you'll actually come back to a month later.", read: "4 min read" },
+  { cat: "daily", category: "Daily life", title: "Calmer routines at home", blurb: "Small sensory and structure changes that make mornings, meals, and bedtime noticeably easier.", read: "6 min read" },
+  { cat: "school", category: "School & IEP", title: "Switching schools or changing grades", blurb: "Keeping support in place when your child moves classrooms, schools, or into a new stage.", read: "5 min read" },
+];
+const filters = [
+  { key: "all", label: "All" }, { key: "diagnosis", label: "Diagnosis" },
+  { key: "school", label: "School & IEP" }, { key: "funding", label: "Funding" },
+  { key: "therapy", label: "Therapy" }, { key: "daily", label: "Daily life" },
+];
+---
+
+<AppFormLayout title="Resources" activeNav="resources">
+  <div class="g-page">
+    <SectionTabs section="resources" active="guides" />
+    <h1 class="page-title">Parent <em>guides</em></h1>
+    <p class="page-sub">
+      Plain-language walkthroughs for the Québec journey — diagnosis, school, funding and
+      day-to-day life. Written for parents, in EN&nbsp;/&nbsp;FR.
+    </p>
+
+    <div class="g-samplenote">
+      <span class="pill wait">Sample guides</span>
+      <span>Previews of guides we're writing now — full versions on the way.</span>
+    </div>
+
+    <a class="g-featured" href="#0" data-guide>
+      <div class="g-art" style={tile(featured.cat, "min-height:200px")}>
+        <Fragment set:html={icon(featured.cat, 46)} />
+      </div>
+      <div class="g-fbody">
+        <span class="g-eyebrow" style={`--dot:${C[featured.cat].dot}`}>{featured.category}</span>
+        <h2 class="g-ftitle">{featured.title}</h2>
+        <p class="g-fblurb">{featured.blurb}</p>
+        <div class="g-foot">
+          <span class="g-read">{featured.read}</span>
+          <span class="g-go">Read guide&nbsp;→</span>
+        </div>
+        <p class="g-soon" hidden>Full guide coming soon — we're writing these now.</p>
+      </div>
+    </a>
+
+    <div class="g-chips" role="tablist" aria-label="Filter guides by topic">
+      {filters.map((f, i) => (
+        <button class={`g-chip${i === 0 ? " active" : ""}`} data-filter={f.key} type="button" aria-pressed={i === 0 ? "true" : "false"}>{f.label}</button>
+      ))}
+    </div>
+
+    <div class="g-grid" id="guideGrid">
+      {guides.map((g) => (
+        <a class="g-card" href="#0" data-cat={g.cat} data-guide>
+          <div class="g-art" style={tile(g.cat, "height:116px")}>
+            <Fragment set:html={icon(g.cat, 32)} />
+          </div>
+          <div class="g-cbody">
+            <span class="g-eyebrow" style={`--dot:${C[g.cat].dot}`}>{g.category}</span>
+            <h3 class="g-ctitle">{g.title}</h3>
+            <p class="g-cblurb">{g.blurb}</p>
+            <div class="g-foot">
+              <span class="g-read">{g.read}</span>
+              <span class="g-go">Read&nbsp;→</span>
+            </div>
+            <p class="g-soon" hidden>Coming soon</p>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <div class="g-empty" id="guideEmpty" hidden>
+      <p>No guides in this topic yet — pick another, or check back soon.</p>
+    </div>
+  </div>
+</AppFormLayout>
+
+<script is:inline>
+  (function () {
+    try { if (!localStorage.getItem("ua_session")) { window.location.href = "/login"; return; } } catch (e) {}
+    var chips = document.querySelectorAll(".g-chip");
+    var cards = document.querySelectorAll(".g-card");
+    var empty = document.getElementById("guideEmpty");
+    function applyFilter(key) {
+      var shown = 0;
+      cards.forEach(function (c) {
+        var match = key === "all" || c.getAttribute("data-cat") === key;
+        c.style.display = match ? "" : "none";
+        if (match) shown++;
+      });
+      if (empty) empty.hidden = shown !== 0;
+    }
+    chips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        chips.forEach(function (c) { c.classList.remove("active"); c.setAttribute("aria-pressed", "false"); });
+        chip.classList.add("active"); chip.setAttribute("aria-pressed", "true");
+        applyFilter(chip.getAttribute("data-filter"));
+      });
+    });
+    document.querySelectorAll("[data-guide]").forEach(function (el) {
+      el.addEventListener("click", function (e) {
+        e.preventDefault();
+        var note = el.querySelector(".g-soon"); if (note) note.hidden = !note.hidden;
+      });
+    });
+  })();
+</script>

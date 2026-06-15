@@ -24,6 +24,13 @@ import Layout from "@/layouts/Layout.astro";
         class="space-y-6"
         novalidate>
 
+        <!-- honeypot: hidden from people, bots tend to fill it. NOT a real table column. -->
+        <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden">
+          <label>Company (leave empty)
+            <input type="text" name="company" tabindex="-1" autocomplete="off" />
+          </label>
+        </div>
+
         <!-- About You -->
         <div class="bg-slate-50 rounded-2xl p-8 space-y-4">
           <h2 class="text-lg font-bold text-slate-800">About you</h2>
@@ -159,8 +166,12 @@ import Layout from "@/layouts/Layout.astro";
           ></textarea>
         </div>
 
+        <!-- Cloudflare Turnstile -->
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer is:inline></script>
+
         <!-- Submit -->
         <div>
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAADlSug3Xc8zF8CaJ" style="margin:0 auto 12px;display:flex;justify-content:center"></div>
           <button
             type="submit"
             id="submit-btn"
@@ -185,6 +196,10 @@ import Layout from "@/layouts/Layout.astro";
   var result = document.getElementById("waitlist-result");
   var submitBtn = document.getElementById("submit-btn");
 
+  // bot defenses
+  var formLoadTime = Date.now();
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   function showError(id, msg) {
     var el = document.getElementById(id);
     if (el) {
@@ -201,12 +216,29 @@ import Layout from "@/layouts/Layout.astro";
     }
   }
 
+  function fakeSuccess() {
+    // bot detected — pretend it worked so they move on, but never POST
+    result.innerHTML = "<span style='color:#22c55e;font-weight:500'>You are on the waitlist! We will be in touch soon.</span>";
+    form.reset();
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitted!";
+  }
+
   form.addEventListener("submit", function(e) {
     e.preventDefault();
     e.stopPropagation();
     clearErrors();
 
     var formData = new FormData(form);
+
+    // --- bot checks: honeypot filled, or submitted impossibly fast ---
+    var honey = formData.get("company");
+    var tooFast = (Date.now() - formLoadTime) < 2500;
+    if ((honey && honey.trim() !== "") || tooFast) {
+      fakeSuccess();
+      return false;
+    }
+
     var valid = true;
 
     var fullName = formData.get("full_name");
@@ -216,7 +248,7 @@ import Layout from "@/layouts/Layout.astro";
     }
 
     var email = formData.get("email");
-    if (!email || email.trim() === "" || email.indexOf("@") === -1) {
+    if (!email || !EMAIL_RE.test(email.trim())) {
       showError("error-email", "Please enter a valid email address.");
       valid = false;
     }
@@ -262,6 +294,14 @@ import Layout from "@/layouts/Layout.astro";
     submitBtn.textContent = "Submitting...";
     result.innerHTML = "";
 
+    var token = (window.turnstile && window.turnstile.getResponse) ? window.turnstile.getResponse() : "";
+    if (!token) {
+      result.innerHTML = "<span style='color:#ef4444'>Please complete the verification box above.</span>";
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Join the Waitlist";
+      return false;
+    }
+
     var data = {
       full_name: formData.get("full_name") || null,
       email: formData.get("email") || null,
@@ -276,20 +316,18 @@ import Layout from "@/layouts/Layout.astro";
       location: formData.get("location") || null,
       referral: formData.get("referral") || null,
       additional_info: formData.get("additional_info") || null,
-      status: "New"
+      company: honey || null,
+      turnstileToken: token
     };
 
-    fetch(SUPABASE_URL + "/rest/v1/waitlist", {
+    fetch(SUPABASE_URL + "/functions/v1/waitlist-submit", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": SUPABASE_KEY,
-        "Authorization": "Bearer " + SUPABASE_KEY,
-        "Prefer": "return=minimal"
-      },
-      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json", "apikey": SUPABASE_KEY },
+      body: JSON.stringify(data)
     }).then(function(response) {
-      if (response.ok) {
+      return response.json().catch(function(){ return { ok: response.ok }; });
+    }).then(function(out) {
+      if (out && out.ok) {
         result.innerHTML = "<span style='color:#22c55e;font-weight:500'>You are on the waitlist! We will be in touch soon.</span>";
         form.reset();
         submitBtn.textContent = "Submitted!";
@@ -297,11 +335,14 @@ import Layout from "@/layouts/Layout.astro";
         result.innerHTML = "<span style='color:#ef4444'>Something went wrong. Please try again.</span>";
         submitBtn.disabled = false;
         submitBtn.textContent = "Join the Waitlist";
+        if (window.turnstile && window.turnstile.reset) window.turnstile.reset();
       }
     }).catch(function() {
       result.innerHTML = "<span style='color:#ef4444'>Something went wrong. Please try again.</span>";
       submitBtn.disabled = false;
       submitBtn.textContent = "Join the Waitlist";
+      if (window.turnstile && window.turnstile.reset) window.turnstile.reset();
     });
+
   });
 </script>

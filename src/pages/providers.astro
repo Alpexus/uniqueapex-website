@@ -1,0 +1,20 @@
+---
+import AppFormLayout from "@/layouts/AppFormLayout.astro";
+import SectionTabs from "@/components/SectionTabs.astro";
+import AiPanel from "@/components/AiPanel.astro";
+import "@/styles/mock.css";
+---
+<AppFormLayout title="Providers" activeNav="providers">
+  <SectionTabs section="providers" active="matches" />
+  <h1 class="page-title">Provider Matches</h1>
+  <p class="page-sub">Therapists and services matched to your child's needs and your area.</p>
+
+  <AiPanel section="providers" />
+
+  <div class="mk-grid">
+    <div class="mk-card"><h3>Speech-Language Pathologist</h3><p>Orthophoniste · pediatric</p><div class="mk-meta"><span class="mk-tag">3 km</span><span class="mk-tag warn">Waitlist</span></div></div>
+    <div class="mk-card"><h3>Occupational Therapist</h3><p>Sensory &amp; motor skills</p><div class="mk-meta"><span class="mk-tag">5 km</span><span class="mk-tag">Accepting</span></div></div>
+    <div class="mk-card"><h3>ABA / Behaviour Services</h3><p>Early intervention</p><div class="mk-meta"><span class="mk-tag">Virtual</span></div></div>
+    <div class="mk-card"><h3>Child Psychologist</h3><p>Assessment &amp; support</p><div class="mk-meta"><span class="mk-tag">8 km</span><span class="mk-tag muted">Inquire</span></div></div>
+  </div>
+</AppFormLayout>

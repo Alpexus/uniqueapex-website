@@ -1,0 +1,54 @@
+---
+import AppFormLayout from "@/layouts/AppFormLayout.astro";
+import SectionTabs from "@/components/SectionTabs.astro";
+import AiPanel from "@/components/AiPanel.astro";
+import "@/styles/mock.css";
+---
+<AppFormLayout title="My Child" activeNav="child">
+  <SectionTabs section="child" active="overview" />
+
+  <h1 class="page-title" data-rec-name>Your child</h1>
+  <p class="page-sub">The full record — everything you've captured, in one place. Day-to-day next steps live on the Dashboard.</p>
+
+  <div class="mk-grid" style="margin-bottom:4px">
+    <div class="mk-card"><h3>Profile</h3><p data-f-profile>Name, date of birth and location.</p></div>
+    <div class="mk-card"><h3>Diagnosis</h3><p data-f-dx>Not recorded yet.</p></div>
+    <div class="mk-card"><h3>Support Wheel</h3><p>Sensory, communication, social and daily living.</p><div class="mk-meta"><a class="mk-tag" href="/child/support-wheel">Open wheel →</a></div></div>
+  </div>
+
+  <h2 class="mk-sec-title">Jump to</h2>
+  <div class="col-grid">
+    <a class="col-card" style="--c1:#EEF2FF" href="/child/development"><span class="emoji">🧩</span><h3>Development Profile</h3><p>Milestones and areas of growth.</p></a>
+    <a class="col-card" style="--c1:#F0FDFA" href="/child/progress"><span class="emoji">📈</span><h3>Progress</h3><p>Track change over time.</p></a>
+    <a class="col-card" style="--c1:#FFF7ED" href="/child/timeline"><span class="emoji">🗓️</span><h3>Timeline</h3><p>Key events and appointments.</p></a>
+    <a class="col-card" style="--c1:#FDF2F8" href="/child/assessments"><span class="emoji">📋</span><h3>Assessments</h3><p>Reports and evaluations.</p></a>
+  </div>
+
+  <h2 class="mk-sec-title">Suggested for this section</h2>
+  <AiPanel section="child" />
+</AppFormLayout>
+
+<script is:inline>
+  (function () {
+    var SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+    var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) return;
+    fetch(SUPABASE_URL + "/rest/v1/passports?select=id,data", { headers: { apikey: ANON, Authorization: "Bearer " + s.access_token } })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (rows) {
+        if (!rows || !rows.length) return;
+        var active = localStorage.getItem("ua_active_child") || rows[0].id;
+        var row = rows.find(function (x) { return x.id === active; }) || rows[0];
+        var d = row.data || {}, cp = d.childProfile || {};
+        var name = [cp.firstName, cp.lastName].filter(Boolean).join(" ");
+        if (name) { var h = document.querySelector("[data-rec-name]"); if (h) h.textContent = name; }
+        var bits = [cp.dob ? ("Born " + cp.dob) : null, cp.city || cp.location || null].filter(Boolean);
+        var pf = document.querySelector("[data-f-profile]"); if (pf && bits.length) pf.textContent = bits.join(" · ");
+        var dx = (d.diagnosis && (d.diagnosis.summary || d.diagnosis.primary || d.diagnosis.label)) || null;
+        var dxe = document.querySelector("[data-f-dx]"); if (dxe && dx) dxe.textContent = dx;
+      })
+      .catch(function () {});
+  })();
+</script>

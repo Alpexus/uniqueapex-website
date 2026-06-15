@@ -1,0 +1,68 @@
+/* ============================================================
+   settings.css — forms, toggles, radio cards, plan/billing rows
+   ============================================================ */
+.set-wrap{max-width:780px;}
+.set-section{border:1px solid var(--line,#E7E3F2);border-radius:16px;background:#fff;padding:18px 20px;margin:0 0 16px;}
+.set-section > h2{font:600 15px/1.2 var(--display,"Bricolage Grotesque",sans-serif);color:var(--ink,#1F1A2E);margin:0 0 3px;}
+.set-section > p.desc{font:400 13px/1.5 var(--body,"Inter",sans-serif);color:var(--muted,#7B7491);margin:0 0 12px;}
+
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-top:1px solid var(--line,#F1EEF8);}
+.set-section > .set-row:first-of-type{border-top:none;}
+.set-row .l{min-width:0;}
+.set-row .l h3{font:600 13.5px/1.3 var(--body,"Inter",sans-serif);color:var(--ink,#1F1A2E);margin:0 0 2px;}
+.set-row .l p{font:400 12.5px/1.45 var(--body,"Inter",sans-serif);color:var(--muted,#7B7491);margin:0;}
+
+.set-field{display:flex;flex-direction:column;gap:6px;padding:10px 0;}
+.set-field > label{font:600 12.5px/1 var(--body,"Inter",sans-serif);color:var(--ink,#1F1A2E);}
+.set-input{width:100%;border:1px solid var(--line,#DCD7EC);border-radius:10px;padding:10px 12px;font:400 14px/1.3 var(--body,"Inter",sans-serif);color:var(--ink,#1F1A2E);background:#fff;box-sizing:border-box;}
+.set-input:focus{outline:none;border-color:var(--violet-700,#6D28D9);box-shadow:0 0 0 3px rgba(109,40,217,.12);}
+.set-hint{font:400 12px/1.4 var(--body,"Inter",sans-serif);color:var(--muted,#7B7491);}
+
+.set-actions{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.set-btn{border:none;border-radius:10px;padding:9px 14px;font:600 13px/1 var(--body,"Inter",sans-serif);cursor:pointer;background:var(--violet-700,#6D28D9);color:#fff;}
+.set-btn.ghost{background:#fff;color:var(--ink,#1F1A2E);border:1px solid var(--line,#DCD7EC);}
+.set-btn.danger{background:#fff;color:#B42318;border:1px solid #F3C2BD;}
+.set-btn.danger.solid{background:#B42318;color:#fff;border:none;}
+
+/* toggle switch */
+.toggle{position:relative;display:inline-block;width:42px;height:24px;flex:0 0 auto;}
+.toggle input{opacity:0;width:0;height:0;position:absolute;margin:0;}
+.toggle .tk{position:absolute;inset:0;background:#D8D3E6;border-radius:999px;transition:.18s;}
+.toggle .tk::before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.18s;box-shadow:0 1px 2px rgba(0,0,0,.2);}
+.toggle input:checked + .tk{background:var(--violet-700,#6D28D9);}
+.toggle input:checked + .tk::before{transform:translateX(18px);}
+
+/* always-on pill */
+.always{font:600 11px/1 var(--body,"Inter",sans-serif);padding:6px 10px;border-radius:999px;background:#ECFDF5;color:#15803D;white-space:nowrap;}
+
+/* segmented control */
+.seg{display:inline-flex;border:1px solid var(--line,#DCD7EC);border-radius:10px;overflow:hidden;background:#fff;}
+.seg button{border:none;background:#fff;padding:8px 16px;font:600 13px/1 var(--body,"Inter",sans-serif);color:var(--muted,#7B7491);cursor:pointer;}
+.seg button + button{border-left:1px solid var(--line,#DCD7EC);}
+.seg button.on{background:var(--violet-700,#6D28D9);color:#fff;}
+
+/* radio cards */
+.radio-cards{display:flex;flex-direction:column;gap:10px;}
+.radio-card{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line,#DCD7EC);border-radius:12px;padding:13px 14px;cursor:pointer;}
+.radio-card input{margin-top:3px;accent-color:var(--violet-700,#6D28D9);}
+.radio-card.sel{border-color:var(--violet-700,#6D28D9);background:#FBFAFF;}
+.radio-card h3{font:600 13.5px/1.3 var(--body,"Inter",sans-serif);color:var(--ink,#1F1A2E);margin:0 0 2px;}
+.radio-card p{font:400 12.5px/1.4 var(--body,"Inter",sans-serif);color:var(--muted,#7B7491);margin:0;}
+
+/* checkbox list (export sections) */
+.check-list{display:flex;flex-direction:column;gap:10px;margin:2px 0 4px;}
+.check-list label{display:flex;gap:10px;align-items:center;font:400 13.5px/1.3 var(--body,"Inter",sans-serif);color:var(--ink,#1F1A2E);cursor:pointer;}
+.check-list input{accent-color:var(--violet-700,#6D28D9);width:16px;height:16px;}
+
+/* plan + billing */
+.plan-banner{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid var(--line,#E7E3F2);border-radius:14px;padding:16px 18px;background:linear-gradient(160deg,#F5F3FF,#fff);margin-bottom:14px;}
+.plan-banner .pn{font:700 18px/1.1 var(--display,"Bricolage Grotesque",sans-serif);color:var(--ink,#1F1A2E);}
+.plan-banner .pp{font:400 12.5px/1.5 var(--body,"Inter",sans-serif);color:var(--muted,#7B7491);margin-top:3px;max-width:48ch;}
+.pill{font:600 11px/1 var(--body,"Inter",sans-serif);padding:6px 11px;border-radius:999px;background:#EDE9FE;color:var(--violet-700,#6D28D9);white-space:nowrap;}
+.inv-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid var(--line,#F1EEF8);font:400 13px/1.4 var(--body,"Inter",sans-serif);color:var(--ink,#1F1A2E);}
+.set-section > .inv-row:first-of-type{border-top:none;}
+.inv-row a{color:var(--violet-700,#6D28D9);text-decoration:none;font-weight:600;}
+
+/* danger zone */
+.danger-zone{border-color:#F3C2BD !important;background:#FFFBFA;}
+.danger-zone > h2{color:#B42318;}

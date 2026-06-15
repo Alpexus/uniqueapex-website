@@ -1,0 +1,87 @@
+---
+import AppFormLayout from "@/layouts/AppFormLayout.astro";
+import SectionTabs from "@/components/SectionTabs.astro";
+import "@/styles/settings.css";
+---
+<AppFormLayout title="Settings" activeNav="settings">
+  <SectionTabs section="settings" active="account" />
+  <div class="set-wrap">
+    <h1 class="page-title">Account</h1>
+    <p class="page-sub">Your identity and how you sign in. Nothing about your child, billing or notifications lives here.</p>
+
+    <div class="set-section">
+      <h2>Identity</h2>
+      <div class="set-field">
+        <label for="set-name">Full name</label>
+        <input class="set-input" id="set-name" type="text" placeholder="Primary account holder" />
+      </div>
+      <div class="set-field">
+        <label for="set-email">Email address</label>
+        <input class="set-input" id="set-email" type="email" placeholder="you@email.com" />
+        <span class="set-hint">Used to sign in and for important account contact.</span>
+      </div>
+      <div class="set-row">
+        <div class="l"><h3>Password</h3><p>Change the password you use to sign in.</p></div>
+        <button class="set-btn ghost" type="button">Change password</button>
+      </div>
+      <div class="set-row">
+        <div class="l"><h3>Login method</h3><p>Email and password. Google / Apple sign-in coming later.</p></div>
+        <span class="always" style="background:#F4F3F8;color:#7B7491">Email</span>
+      </div>
+    </div>
+
+    <div class="set-section">
+      <h2>Preferences</h2>
+      <div class="set-row">
+        <div class="l"><h3>Preferred language</h3><p>Used across the app and your emails.</p></div>
+        <div class="seg" data-pref="lang"><button data-val="en" class="on" type="button">English</button><button data-val="fr" type="button">Français</button></div>
+      </div>
+      <div class="set-field">
+        <label for="set-tz">Time zone</label>
+        <input class="set-input" id="set-tz" type="text" placeholder="Auto-detected" />
+        <span class="set-hint">Detected automatically — edit if it's wrong.</span>
+      </div>
+    </div>
+
+    <div class="set-actions"><button class="set-btn" type="button">Save changes</button></div>
+  </div>
+</AppFormLayout>
+
+
+<script is:inline>
+  (function(){
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch(e){}
+    if (s && s.user && s.user.email) { var em = document.getElementById('set-email'); if (em && !em.value) em.value = s.user.email; }
+    try { var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; var t = document.getElementById('set-tz'); if (t && !t.value) t.value = tz; } catch(e){}
+  })();
+</script>
+
+<script is:inline>
+  (function () {
+    function K(n){ return "ua_pref_" + n; }
+    document.querySelectorAll('input[type=checkbox][data-pref]').forEach(function(c){
+      var v = localStorage.getItem(K(c.dataset.pref));
+      if (v !== null) c.checked = v === "1";
+      c.addEventListener('change', function(){ localStorage.setItem(K(c.dataset.pref), c.checked ? "1" : "0"); });
+    });
+    document.querySelectorAll('.seg[data-pref]').forEach(function(seg){
+      var key = seg.dataset.pref, saved = localStorage.getItem(K(key));
+      var btns = seg.querySelectorAll('button');
+      btns.forEach(function(b){
+        if (saved !== null) b.classList.toggle('on', b.dataset.val === saved);
+        b.addEventListener('click', function(){
+          btns.forEach(function(x){ x.classList.remove('on'); });
+          b.classList.add('on'); localStorage.setItem(K(key), b.dataset.val);
+        });
+      });
+    });
+    document.querySelectorAll('.radio-card input[type=radio]').forEach(function(r){
+      r.addEventListener('change', function(){
+        document.querySelectorAll('.radio-card input[name="'+r.name+'"]').forEach(function(x){
+          x.closest('.radio-card').classList.toggle('sel', x.checked);
+        });
+      });
+    });
+  })();
+</script>
