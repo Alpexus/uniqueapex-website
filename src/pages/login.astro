@@ -29,8 +29,8 @@ import Layout from "@/layouts/Layout.astro";
           Sign In
         </button>
         <p class="text-center text-sm text-slate-500">
-          Don't have an account?
-          <a href="/signup" class="text-violet-700 font-semibold hover:underline">Create one →</a>
+          Invite-only for now.
+          <a href="/waitlist" class="text-violet-700 font-semibold hover:underline">Join the waitlist →</a>
         </p>
       </div>
 
@@ -51,7 +51,6 @@ import Layout from "@/layouts/Layout.astro";
     try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch { return null; }
   }
 
-  // Already logged in → go to account
   var existing = getSession();
   if (existing && existing.access_token && Math.floor(Date.now()/1000) < (existing.expires_at || 0) - 60) {
     window.location.href = "/account";
