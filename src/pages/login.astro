@@ -3,6 +3,11 @@ import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout title="Sign In">
+  <!-- Email-confirmed banner -->
+  <div id="confirmed-banner" style="display:none;position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:50;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 20px;border-radius:9999px;font-size:14px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.08)">
+    ✓ Email confirmed — you can sign in now
+  </div>
+
   <div class="min-h-screen flex items-center justify-center px-4 py-16">
     <div class="w-full max-w-md">
 
@@ -28,10 +33,9 @@ import Layout from "@/layouts/Layout.astro";
         <button id="signin-btn" class="w-full bg-violet-700 hover:bg-violet-800 text-white font-semibold py-3 rounded-full transition-colors">
           Sign In
         </button>
-<p class="text-center text-sm text-slate-500">
-  Don't have an account?
-  <a href="/signup" class="text-violet-700 font-semibold hover:underline">Create one →</a>
-</p>
+        <p class="text-center text-sm text-slate-500">
+          Don't have an account?
+          <a href="/signup" class="text-violet-700 font-semibold hover:underline">Create one →</a>
         </p>
       </div>
 
@@ -42,6 +46,23 @@ import Layout from "@/layouts/Layout.astro";
 <script is:inline>
   var UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
   var UA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+
+  // Show "Email confirmed" banner if arriving from a confirmation link
+  (function(){
+    var params = new URLSearchParams(window.location.search);
+    if(params.get("confirmed") === "1"){
+      var b = document.getElementById("confirmed-banner");
+      if(b){
+        b.style.display = "block";
+        history.replaceState(null, "", "/login");
+        setTimeout(function(){
+          b.style.transition = "opacity .5s";
+          b.style.opacity = "0";
+          setTimeout(function(){ b.style.display = "none"; }, 500);
+        }, 6000);
+      }
+    }
+  })();
 
   function setSession(data) {
     var s = Object.assign({}, data, { expires_at: Math.floor(Date.now()/1000) + (data.expires_in || 3600) });
