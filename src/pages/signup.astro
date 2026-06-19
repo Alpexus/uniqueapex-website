@@ -155,7 +155,8 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
         Your information is stored securely and only accessible by you. We never share personal data with third parties.
       </p>
 
-      <p id="err-general" style="display:none;color:#ef4444;font-size:14px;text-align:center"></p>
+      <!-- General warning banner (shown when fields are missing) -->
+      <div id="err-general" style="display:none" class="bg-red-50 border border-red-200 text-red-600 text-sm font-medium rounded-xl px-4 py-3 text-center"></div>
 
       <button type="submit" id="signup-btn" class="w-full bg-violet-700 hover:bg-violet-800 text-white font-semibold py-3.5 rounded-full transition-colors text-base">
         Create my account
@@ -217,7 +218,21 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
   function getServiceVal(name){var box=document.querySelector('input[name="'+name+'"]');return (box&&box.checked)?box.value:null;}
   function showErr(id,msg){var el=document.getElementById(id);if(el){el.textContent=msg;el.style.display="block";}}
   function hideErr(id){var el=document.getElementById(id);if(el)el.style.display="none";}
-  function clearErrors(){["err-parentFirst","err-parentLast","err-email","err-password","err-confirm","err-childFirst","err-city","err-general"].forEach(hideErr);}
+
+  var REQUIRED_FIELDS=["parentFirst","parentLast","email","password","confirm","childFirst","city"];
+
+  function clearErrors(){
+    ["err-parentFirst","err-parentLast","err-email","err-password","err-confirm","err-childFirst","err-city","err-general"].forEach(hideErr);
+    // reset red borders
+    REQUIRED_FIELDS.forEach(function(n){
+      var el=document.querySelector('[name="'+n+'"]');
+      if(el) el.style.borderColor="";
+    });
+  }
+  function markInvalid(name){
+    var el=document.querySelector('[name="'+name+'"]');
+    if(el) el.style.borderColor="#ef4444";
+  }
 
   function resetTurnstile(){ try{ if(window.turnstile) window.turnstile.reset(); }catch(e){} }
 
@@ -225,23 +240,40 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
     e.preventDefault();
     clearErrors();
     var ok=true;
+    var firstBad=null;
 
     var parentFirst=val("parentFirst"), parentLast=val("parentLast");
     var email=val("email"), password=val("password"), confirm=val("confirm");
     var childFirst=val("childFirst"), city=val("city");
 
-    if(!parentFirst){showErr("err-parentFirst","Required.");ok=false;}
-    if(!parentLast){showErr("err-parentLast","Required.");ok=false;}
-    if(!email||email.indexOf("@")===-1){showErr("err-email","Please enter a valid email.");ok=false;}
-    if(password.length<8||!checkPw(password).upper||!checkPw(password).lower||!checkPw(password).num){showErr("err-password","Password doesn't meet requirements.");ok=false;}
-    if(password!==confirm){showErr("err-confirm","Passwords don't match.");ok=false;}
-    if(!childFirst){showErr("err-childFirst","Required.");ok=false;}
-    if(!city){showErr("err-city","Required for matching.");ok=false;}
-    if(!ok)return;
+    if(!parentFirst){showErr("err-parentFirst","Required.");markInvalid("parentFirst");if(!firstBad)firstBad="parentFirst";ok=false;}
+    if(!parentLast){showErr("err-parentLast","Required.");markInvalid("parentLast");if(!firstBad)firstBad="parentLast";ok=false;}
+    if(!email||email.indexOf("@")===-1){showErr("err-email","Please enter a valid email.");markInvalid("email");if(!firstBad)firstBad="email";ok=false;}
+    if(password.length<8||!checkPw(password).upper||!checkPw(password).lower||!checkPw(password).num){showErr("err-password","Password doesn't meet requirements.");markInvalid("password");if(!firstBad)firstBad="password";ok=false;}
+    if(password!==confirm){showErr("err-confirm","Passwords don't match.");markInvalid("confirm");if(!firstBad)firstBad="confirm";ok=false;}
+    if(!childFirst){showErr("err-childFirst","Required.");markInvalid("childFirst");if(!firstBad)firstBad="childFirst";ok=false;}
+    if(!city){showErr("err-city","Required for matching.");markInvalid("city");if(!firstBad)firstBad="city";ok=false;}
+
+    if(!ok){
+      showErr("err-general","Please fill in the required fields highlighted in red.");
+      if(firstBad){
+        var f=document.querySelector('[name="'+firstBad+'"]');
+        if(f){
+          f.scrollIntoView({behavior:"smooth",block:"center"});
+          try{ f.focus({preventScroll:true}); }catch(e){ f.focus(); }
+        }
+      }
+      return;
+    }
 
     // Turnstile token (the widget must have loaded + verified)
     var token = (window.turnstile ? window.turnstile.getResponse() : "") || "";
-    if(!token){ showErr("err-general","Please complete the verification below and try again."); return; }
+    if(!token){
+      showErr("err-general","Please complete the verification below and try again.");
+      var tw=document.querySelector(".cf-turnstile");
+      if(tw) tw.scrollIntoView({behavior:"smooth",block:"center"});
+      return;
+    }
 
     var btn=document.getElementById("signup-btn");
     btn.disabled=true; btn.textContent="Creating account...";
