@@ -12,14 +12,14 @@ const t = {
   en: {
     heading: "Your child deserves support.",
     headingAccent: "We help you find it.",
-    body: "UniqueApex helps families of neurodivergent children coordinate therapy access — from first concern to ongoing care. No more waiting alone.",
+    body: "UniqueApex is your family's home base — we coordinate therapy access, keep your child's whole story in one portable profile, and guide you through funding, school, and every transition. No more starting over. No more waiting alone.",
     cta1: "Join the Waitlist",
     cta2: "How It Works",
   },
   fr: {
     heading: "Votre enfant mérite du soutien.",
     headingAccent: "On vous aide à le trouver.",
-    body: "UniqueApex aide les familles d'enfants neurodivergents à coordonner l'accès aux thérapies — de la première préoccupation au suivi continu. Fini l'attente en solitaire.",
+    body: "UniqueApex est le port d'attache de votre famille — coordination de l'accès aux thérapies, toute l'histoire de votre enfant dans un profil portable, et un guide pour le financement, l'école et chaque transition. Fini de tout recommencer. Fini l'attente en solitaire.",
     cta1: "Rejoindre la liste d'attente",
     cta2: "Comment ça marche",
   },
@@ -28,14 +28,14 @@ const t = {
 
 <main
   class="grid lg:grid-cols-2 place-items-center items-center pt-16 pb-16 md:pt-12 md:pb-32">
-  <div class="md:order-1 hidden md:flex md:items-center md:justify-end pl-12">
+  <div class="hero-fade hero-fade-img md:order-1 hidden md:flex md:items-center md:justify-end pl-12">
     <img
       src="/hero-family.png"
       alt={lang === "fr" ? "Famille avec enfants neurodivergents" : "Family with neurodivergent children"}
       class="w-full max-w-lg"
     />
   </div>
-  <div>
+  <div class="hero-fade">
     <h1
       class="text-5xl lg:text-6xl xl:text-7xl font-bold lg:tracking-tight xl:tracking-tighter">
       {t.heading} <span class="text-violet-600">{t.headingAccent}</span>
@@ -57,3 +57,15 @@ const t = {
     </div>
   </div>
 </main>
+
+<style>
+  .hero-fade { animation: heroUp 0.7s ease both; }
+  .hero-fade-img { animation-delay: 0.15s; }
+  @keyframes heroUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-fade, .hero-fade-img { animation: none; }
+  }
+</style>

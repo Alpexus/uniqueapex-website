@@ -2,12 +2,200 @@
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
-<AppFormLayout title="My Child" activeNav="child">
+<AppFormLayout title="Assessments" activeNav="child">
   <SectionTabs section="child" active="assessments" />
+
   <h1 class="page-title">Assessments</h1>
-  <p class="page-sub">Part of My Child. This page is scaffolded — content is coming.</p>
-  <div class="ua-stub">
-    <b>Assessments</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+  <p class="page-sub">One library for every evaluation — the reports, their key findings, and all the recommendations in one place.</p>
+
+  <div id="as-gate"></div>
+
+  <div id="as-main" style="display:none">
+    <div class="as-sec">
+      <p class="as-h">Reports <a class="as-link" href="/documents">Upload a report →</a></p>
+      <div id="as-docs"></div>
+    </div>
+
+    <div class="as-sec">
+      <p class="as-h">Assessment records <button class="as-addbtn" id="as-addbtn"><span style="font-size:1.1em;line-height:1">+</span> Add assessment</button></p>
+      <div class="as-form" id="as-form">
+        <div class="as-form-grid">
+          <select id="as-type" class="as-field">
+            <option>Speech / language</option><option>Occupational therapy</option><option>Psychoeducational</option>
+            <option>Behavioural / ABA</option><option>Developmental pediatric</option><option>Physiotherapy</option><option>Other</option>
+          </select>
+          <input type="text" id="as-provider" class="as-field" placeholder="Provider or clinic" />
+          <input type="date" id="as-date" class="as-field" />
+        </div>
+        <textarea id="as-findings" class="as-field as-area" placeholder="Key findings (paste or summarize from the report)…"></textarea>
+        <textarea id="as-recs" class="as-field as-area" placeholder="Recommendations — one per line…"></textarea>
+        <div class="as-form-actions">
+          <span id="as-err" class="as-err"></span>
+          <button class="as-ghost" id="as-cancel">Cancel</button>
+          <button class="as-savebtn" id="as-save">Save assessment</button>
+        </div>
+      </div>
+      <div id="as-records"></div>
+    </div>
+
+    <div class="as-sec" style="margin-bottom:0">
+      <p class="as-h">All recommendations</p>
+      <div class="as-card" id="as-hub"></div>
+    </div>
   </div>
 </AppFormLayout>
+
+<style is:global>
+  #as-main, #as-gate{max-width:860px}
+  .as-sec{margin-bottom:24px}
+  .as-h{font-size:.84rem;color:#64748b;margin:0 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:600}
+  .as-link{font-size:.8rem;font-weight:600;color:#6d28d9;text-decoration:none}
+  .as-link:hover{text-decoration:underline}
+  .as-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 18px}
+  .as-doc{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:11px 14px;margin-bottom:8px}
+  .as-doc .ic{width:32px;height:32px;border-radius:9px;background:#F5F3FF;color:#6d28d9;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .as-doc .nm{font-size:.86rem;font-weight:600;color:#1e293b}
+  .as-doc .mt{font-size:.74rem;color:#94a3b8}
+  .as-pill{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:9999px;background:#f1f5f9;color:#64748b;margin-left:auto;white-space:nowrap}
+  .as-addbtn{font-size:.82rem;font-weight:600;padding:7px 14px;border-radius:9999px;border:1px solid #6d28d9;background:#fff;color:#6d28d9;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .as-addbtn:hover{background:#F5F3FF}
+  .as-form{display:none;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin-bottom:14px}
+  .as-form.show{display:block}
+  .as-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:10px}
+  .as-field{width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:10px;font-size:.88rem;color:#1e293b;background:#fff;outline:none;font-family:inherit}
+  .as-field:focus{border-color:#a78bfa;box-shadow:0 0 0 2px #ede9fe}
+  .as-area{min-height:64px;margin-bottom:10px;resize:vertical;line-height:1.5}
+  .as-form-actions{display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+  .as-err{font-size:.8rem;color:#dc2626;margin-right:auto}
+  .as-ghost{font-size:.82rem;font-weight:600;padding:8px 14px;border-radius:9999px;border:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer}
+  .as-savebtn{font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;border:none;background:#6d28d9;color:#fff;cursor:pointer}
+  .as-savebtn:hover{background:#5b21b6}
+  .as-rec-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px 16px;margin-bottom:10px;position:relative}
+  .as-rec-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+  .as-rec-type{font-size:.92rem;font-weight:700;color:#1e293b}
+  .as-rec-meta{font-size:.76rem;color:#94a3b8}
+  .as-rec-lab{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#94a3b8;margin:10px 0 5px}
+  .as-rec-text{font-size:.86rem;color:#334155;line-height:1.5;white-space:pre-line}
+  .as-rec-list{margin:0;padding-left:18px}
+  .as-rec-list li{font-size:.86rem;color:#334155;line-height:1.5;margin-bottom:3px}
+  .as-del{position:absolute;top:10px;right:12px;border:none;background:none;color:#cbd5e1;font-size:1.1rem;line-height:1;cursor:pointer;padding:2px}
+  .as-del:hover{color:#dc2626}
+  .as-hub-item{display:flex;gap:9px;align-items:flex-start;margin-bottom:9px}
+  .as-hub-item .ic{color:#6d28d9;flex-shrink:0;margin-top:2px}
+  .as-hub-item .tx{font-size:.86rem;color:#334155;line-height:1.45}
+  .as-hub-item .src{font-size:.72rem;color:#94a3b8}
+  .as-empty{font-size:.86rem;color:#94a3b8;margin:0}
+  .as-empty a{color:#6d28d9;font-weight:600;text-decoration:none}
+  .as-gate-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px 22px;text-align:center}
+  .as-gate-card p{color:#64748b;font-size:.9rem;margin:0 0 14px}
+  .as-gate-card a{display:inline-block;background:#6d28d9;color:#fff;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>
+
+<script>
+  import * as UA from "../../lib/ua-data.js";
+
+  const UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+  const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const textToList = (s) => String(s || "").split(/[\n;•]+/).map((x) => x.replace(/^[-*]\s*/, "").trim()).filter(Boolean);
+
+  function getSession() { try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch { return null; } }
+  function isValid(s) { return s && s.access_token && Math.floor(Date.now() / 1000) < (s.expires_at || 0) - 60; }
+  function authHeaders(t) { return { apikey: ANON, Authorization: "Bearer " + t, "Content-Type": "application/json" }; }
+  async function getValidSession() {
+    let s = getSession();
+    if (isValid(s)) return s;
+    if (s && s.refresh_token) {
+      const r = await fetch(UA_URL + "/auth/v1/token?grant_type=refresh_token", { method: "POST", headers: { apikey: ANON, "Content-Type": "application/json" }, body: JSON.stringify({ refresh_token: s.refresh_token }) });
+      if (r.ok) { const d = await r.json(); d.expires_at = Math.floor(Date.now() / 1000) + (d.expires_in || 3600); localStorage.setItem("ua_session", JSON.stringify(d)); return d; }
+    }
+    return s && s.access_token ? s : null;
+  }
+  async function restGet(path) { const s = await getValidSession(); if (!s) return []; const r = await fetch(UA_URL + "/rest/v1/" + path, { headers: authHeaders(s.access_token) }); return r.ok ? r.json() : []; }
+
+  const fileSvg = '<svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg>';
+  const dotSvg = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3"/></svg>';
+  const fmtDate = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" }); };
+
+  let records = [], activeP = null;
+
+  function renderRecords() {
+    if (!records.length) { $("as-records").innerHTML = `<p class="as-empty">No assessment records yet. Add one above to capture its findings and recommendations.</p>`; return; }
+    $("as-records").innerHTML = records.map((r) => {
+      const recs = textToList(r.recommendations);
+      return `<div class="as-rec-card"><button class="as-del" data-id="${r.id}" aria-label="Delete record">×</button>`
+        + `<div class="as-rec-head"><span class="as-rec-type">${esc(r.assessment_type || "Assessment")}</span><span class="as-rec-meta">${[esc(r.provider || ""), r.assessment_date ? esc(fmtDate(r.assessment_date)) : ""].filter(Boolean).join(" · ")}</span></div>`
+        + (r.findings ? `<p class="as-rec-lab">Key findings</p><div class="as-rec-text">${esc(r.findings)}</div>` : "")
+        + (recs.length ? `<p class="as-rec-lab">Recommendations</p><ul class="as-rec-list">${recs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : "")
+        + `</div>`;
+    }).join("");
+    $("as-records").querySelectorAll(".as-del").forEach((b) => b.addEventListener("click", () => delRecord(b.dataset.id)));
+  }
+
+  function renderHub() {
+    const all = [];
+    records.forEach((r) => textToList(r.recommendations).forEach((x) => all.push({ tx: x, src: r.assessment_type || "Assessment" })));
+    $("as-hub").innerHTML = all.length
+      ? all.map((a) => `<div class="as-hub-item"><span class="ic">${dotSvg}</span><span><span class="tx" style="display:block">${esc(a.tx)}</span><span class="src">From ${esc(a.src)}</span></span></div>`).join("")
+      : `<p class="as-empty">Recommendations from your assessment records will gather here.</p>`;
+  }
+
+  async function delRecord(id) {
+    if (!confirm("Delete this assessment record?")) return;
+    const s = await getValidSession(); if (!s) return;
+    const r = await fetch(UA_URL + "/rest/v1/assessments?id=eq." + id, { method: "DELETE", headers: authHeaders(s.access_token) });
+    if (r.ok) { records = records.filter((x) => x.id !== id); renderRecords(); renderHub(); }
+  }
+
+  async function saveRecord() {
+    const type = $("as-type").value, provider = $("as-provider").value.trim(), date = $("as-date").value, findings = $("as-findings").value.trim(), recs = $("as-recs").value.trim();
+    if (!findings && !recs) { $("as-err").textContent = "Add at least some findings or recommendations."; return; }
+    $("as-err").textContent = ""; const btn = $("as-save"); btn.disabled = true; btn.textContent = "Saving…";
+    const s = await getValidSession(); if (!s) { location.href = "/login"; return; }
+    const body = { user_id: s.user.id, passport_id: activeP.id, assessment_type: type, provider, assessment_date: date || null, findings, recommendations: recs };
+    try {
+      const r = await fetch(UA_URL + "/rest/v1/assessments", { method: "POST", headers: Object.assign({}, authHeaders(s.access_token), { Prefer: "return=representation" }), body: JSON.stringify(body) });
+      if (r.ok) {
+        const rows = await r.json(), row = rows && rows[0];
+        records.unshift(row || body);
+        $("as-provider").value = ""; $("as-date").value = ""; $("as-findings").value = ""; $("as-recs").value = "";
+        $("as-form").classList.remove("show"); renderRecords(); renderHub();
+      } else { $("as-err").textContent = "Couldn't save. Is the assessments table set up?"; }
+    } catch (e) { $("as-err").textContent = "Couldn't save. Check your connection."; }
+    btn.disabled = false; btn.textContent = "Save assessment";
+  }
+
+  (async () => {
+    const passports = await UA.getPassports().catch(() => []);
+    const p = UA.pickActivePassport(passports);
+    if (!p) {
+      $("as-gate").innerHTML = `<div class="as-gate-card"><p>Create your child's passport to start their assessment library.</p><a href="/passport">Start the passport →</a></div>`;
+      return;
+    }
+    activeP = p;
+    $("as-main").style.display = "block";
+
+    const docs = await restGet("documents?select=id,file_name,file_type,created_at&passport_id=eq." + p.id + "&order=created_at.desc&limit=30").catch(() => []);
+    $("as-docs").innerHTML = (docs && docs.length)
+      ? docs.map((doc) => `<div class="as-doc"><span class="ic">${fileSvg}</span><span><span class="nm" style="display:block">${esc(doc.file_name || "Document")}</span><span class="mt">Uploaded ${esc(fmtDate(doc.created_at))}</span></span><span class="as-pill">${esc((doc.file_type || "file").toUpperCase())}</span></div>`).join("")
+      : `<p class="as-empty">No reports uploaded yet. <a href="/documents">Upload your child's first report →</a></p>`;
+
+    const recs = await restGet("assessments?select=id,assessment_type,provider,assessment_date,findings,recommendations&passport_id=eq." + p.id + "&order=assessment_date.desc.nullslast").catch(() => []);
+    records = recs || [];
+    renderRecords();
+    renderHub();
+
+    $("as-addbtn").addEventListener("click", () => { const f = $("as-form"); f.classList.toggle("show"); if (f.classList.contains("show")) $("as-provider").focus(); });
+    $("as-cancel").addEventListener("click", () => { $("as-form").classList.remove("show"); $("as-err").textContent = ""; });
+    $("as-save").addEventListener("click", saveRecord);
+  })().catch((e) => console.error("[assessments] hydrate failed", e));
+</script>

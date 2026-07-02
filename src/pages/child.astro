@@ -1,54 +1,256 @@
 ---
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
-import AiPanel from "@/components/AiPanel.astro";
-import "@/styles/mock.css";
 ---
 <AppFormLayout title="My Child" activeNav="child">
   <SectionTabs section="child" active="overview" />
 
   <h1 class="page-title" data-rec-name>Your child</h1>
-  <p class="page-sub">The full record — everything you've captured, in one place. Day-to-day next steps live on the Dashboard.</p>
+  <p class="page-sub">A warm, at-a-glance picture of your child — built automatically from your Family Passport.</p>
 
-  <div class="mk-grid" style="margin-bottom:4px">
-    <div class="mk-card"><h3>Profile</h3><p data-f-profile>Name, date of birth and location.</p></div>
-    <div class="mk-card"><h3>Diagnosis</h3><p data-f-dx>Not recorded yet.</p></div>
-    <div class="mk-card"><h3>Support Wheel</h3><p>Sensory, communication, social and daily living.</p><div class="mk-meta"><a class="mk-tag" href="/child/support-wheel">Open wheel →</a></div></div>
+  <div class="ov-wrap">
+
+    <div class="ov-card ov-hero">
+      <div class="ov-hero-top">
+        <div class="ov-avatar" id="ov-avatar">·</div>
+        <div class="ov-hero-id">
+          <p class="ov-name" id="ov-name">Loading…</p>
+          <div class="ov-chips" id="ov-chips"></div>
+        </div>
+        <div class="ov-ring">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="#e2e8f0" stroke-width="6"></circle>
+            <circle id="ov-ring-c" cx="32" cy="32" r="26" fill="none" stroke="#7c3aed" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 163.4" transform="rotate(-90 32 32)"></circle>
+            <text id="ov-ring-t" x="32" y="33" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="700" fill="#1e293b">—</text>
+          </svg>
+          <span class="ov-ring-lab">Profile complete</span>
+        </div>
+      </div>
+      <div class="ov-actions">
+        <a class="ov-btn" id="ov-edit" href="/passport">Edit profile</a>
+        <a class="ov-btn ov-btn-v" id="ov-export" href="/passport?export=1">Export PDF</a>
+      </div>
+    </div>
+
+    <div class="ov-metrics" id="ov-metrics"></div>
+
+    <div class="ov-card">
+      <p class="ov-label" id="ov-about-title">About</p>
+      <p class="ov-about" id="ov-about">Loading…</p>
+    </div>
+
+    <div class="ov-card">
+      <p class="ov-label">Strength highlights</p>
+      <div class="ov-strengths" id="ov-strengths"></div>
+    </div>
+
+    <div class="ov-two">
+      <div class="ov-card">
+        <p class="ov-label">Current priorities</p>
+        <div class="ov-pri" id="ov-pri"></div>
+      </div>
+      <div class="ov-card">
+        <p class="ov-label">Support team</p>
+        <div id="ov-team"></div>
+      </div>
+    </div>
+
+    <div class="ov-card">
+      <div class="ov-snap-head">
+        <p class="ov-label" style="margin:0">Support snapshot</p>
+        <a class="ov-link" id="ov-wheel-link" href="/child/support-wheel">Open full wheel →</a>
+      </div>
+      <div id="ov-snap"></div>
+    </div>
+
+    <div class="ov-card ov-insights">
+      <p class="ov-ins-title">Family insights</p>
+      <div id="ov-insights"></div>
+      <p class="ov-note">Observations drawn from your passport — supportive guidance, not medical advice.</p>
+    </div>
+
   </div>
-
-  <h2 class="mk-sec-title">Jump to</h2>
-  <div class="col-grid">
-    <a class="col-card" style="--c1:#EEF2FF" href="/child/development"><span class="emoji">🧩</span><h3>Development Profile</h3><p>Milestones and areas of growth.</p></a>
-    <a class="col-card" style="--c1:#F0FDFA" href="/child/progress"><span class="emoji">📈</span><h3>Progress</h3><p>Track change over time.</p></a>
-    <a class="col-card" style="--c1:#FFF7ED" href="/child/timeline"><span class="emoji">🗓️</span><h3>Timeline</h3><p>Key events and appointments.</p></a>
-    <a class="col-card" style="--c1:#FDF2F8" href="/child/assessments"><span class="emoji">📋</span><h3>Assessments</h3><p>Reports and evaluations.</p></a>
-  </div>
-
-  <h2 class="mk-sec-title">Suggested for this section</h2>
-  <AiPanel section="child" />
 </AppFormLayout>
+
+<style is:global>
+  .ov-wrap{display:flex;flex-direction:column;gap:14px;max-width:980px}
+  .ov-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px 22px}
+  .ov-hero{border-radius:20px}
+  .ov-hero-top{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  .ov-avatar{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.55rem;font-weight:700;flex-shrink:0}
+  .ov-hero-id{flex:1;min-width:170px}
+  .ov-name{font-size:1.35rem;font-weight:800;color:#1e293b;margin:0 0 8px}
+  .ov-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .ov-chip{font-size:.75rem;font-weight:600;padding:4px 10px;border-radius:9999px;background:#f1f5f9;color:#475569}
+  .ov-chip-v{background:#F5F3FF;color:#6d28d9}
+  .ov-ring{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .ov-ring-lab{font-size:.68rem;color:#94a3b8}
+  .ov-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .ov-btn{font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;text-decoration:none;border:1px solid #e2e8f0;color:#64748b;background:#fff}
+  .ov-btn:hover{background:#f8fafc}
+  .ov-btn-v{background:#6d28d9;color:#fff;border-color:#6d28d9}
+  .ov-btn-v:hover{background:#5b21b6}
+  .ov-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+  .ov-metric{background:#f8fafc;border-radius:12px;padding:14px 16px}
+  .ov-metric .ml{font-size:.78rem;color:#64748b;margin:0 0 4px;display:flex;align-items:center;gap:5px}
+  .ov-metric .mn{font-size:1.5rem;font-weight:800;color:#1e293b;margin:0}
+  .ov-label{font-size:.78rem;color:#64748b;margin:0 0 10px;font-weight:600}
+  .ov-about{font-size:.95rem;line-height:1.6;color:#334155;margin:0}
+  .ov-strengths{display:flex;flex-wrap:wrap;gap:8px}
+  .ov-str{display:inline-flex;align-items:center;gap:6px;font-size:.84rem;font-weight:600;padding:6px 12px;border-radius:10px;background:#ECFDF5;color:#15803d}
+  .ov-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .ov-pri{display:flex;flex-wrap:wrap;gap:8px}
+  .ov-pri-tag{font-size:.84rem;font-weight:600;padding:6px 12px;border-radius:10px;background:#F5F3FF;color:#6d28d9}
+  .ov-team-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .ov-team-row:last-child{margin-bottom:0}
+  .ov-team-ic{width:34px;height:34px;border-radius:50%;background:#F5F3FF;color:#6d28d9;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0}
+  .ov-snap-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .ov-link{font-size:.8rem;font-weight:600;color:#6d28d9;text-decoration:none}
+  .ov-link:hover{text-decoration:underline}
+  .ov-snap-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .ov-snap-row:last-child{margin-bottom:0}
+  .ov-snap-name{font-size:.82rem;width:108px;flex-shrink:0;color:#64748b}
+  .ov-bar{flex:1;height:8px;border-radius:4px;background:#eef2f7;position:relative;overflow:hidden}
+  .ov-bar-fill{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+  .ov-insights{background:#F5F3FF;border-color:#EDE9FE}
+  .ov-ins-title{font-size:.8rem;font-weight:700;color:#6d28d9;margin:0 0 10px}
+  .ov-ins-li{display:flex;gap:9px;align-items:flex-start;font-size:.9rem;line-height:1.5;color:#5b21b6;margin-bottom:8px}
+  .ov-ins-li .dot{width:6px;height:6px;border-radius:50%;background:#7c3aed;margin-top:7px;flex-shrink:0}
+  .ov-note{font-size:.72rem;color:#9d8bc4;margin:4px 0 0}
+  .ov-empty{font-size:.85rem;color:#94a3b8;margin:0}
+  .ov-empty a{color:#6d28d9;font-weight:600}
+</style>
 
 <script is:inline>
   (function () {
-    var SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
-    var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
     var raw = localStorage.getItem("ua_session"), s = null;
     try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
-    if (!s || !s.access_token) return;
-    fetch(SUPABASE_URL + "/rest/v1/passports?select=id,data", { headers: { apikey: ANON, Authorization: "Bearer " + s.access_token } })
-      .then(function (r) { return r.ok ? r.json() : []; })
-      .then(function (rows) {
-        if (!rows || !rows.length) return;
-        var active = localStorage.getItem("ua_active_child") || rows[0].id;
-        var row = rows.find(function (x) { return x.id === active; }) || rows[0];
-        var d = row.data || {}, cp = d.childProfile || {};
-        var name = [cp.firstName, cp.lastName].filter(Boolean).join(" ");
-        if (name) { var h = document.querySelector("[data-rec-name]"); if (h) h.textContent = name; }
-        var bits = [cp.dob ? ("Born " + cp.dob) : null, cp.city || cp.location || null].filter(Boolean);
-        var pf = document.querySelector("[data-f-profile]"); if (pf && bits.length) pf.textContent = bits.join(" · ");
-        var dx = (d.diagnosis && (d.diagnosis.summary || d.diagnosis.primary || d.diagnosis.label)) || null;
-        var dxe = document.querySelector("[data-f-dx]"); if (dxe && dx) dxe.textContent = dx;
-      })
-      .catch(function () {});
+    if (!s || !s.access_token) location.href = "/login";
   })();
+</script>
+
+<script>
+  import * as UA from "../lib/ua-data.js";
+  import { scoreWheel, DOMAINS } from "../lib/wheelScore.js";
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const lc = (s) => String(s || "").toLowerCase();
+  const cap = (s) => { s = String(s || ""); return s.charAt(0).toUpperCase() + s.slice(1); };
+  const textToList = (s) => String(s || "").split(/[,\n;•]+/).map((x) => x.trim()).filter(Boolean);
+  const listPhrase = (arr) => {
+    arr = arr.filter(Boolean);
+    if (!arr.length) return "";
+    if (arr.length === 1) return arr[0];
+    if (arr.length === 2) return arr[0] + " and " + arr[1];
+    return arr.slice(0, -1).join(", ") + ", and " + arr[arr.length - 1];
+  };
+  const SHORT = { "Communication": "Communication", "Social Connection": "Social", "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility", "Emotional Regulation": "Emotional", "Executive Function": "Executive", "Daily Living Skills": "Daily living", "Learning & Play": "Learning & play" };
+  const barColor = (sc) => sc == null ? "#cbd5e1" : sc <= 33 ? "#16a34a" : sc <= 66 ? "#d97706" : "#7c3aed";
+
+  (async () => {
+    const passports = await UA.getPassports().catch(() => []);
+    const p = UA.pickActivePassport(passports);
+    const data = (p && p.data) || {};
+    const id = UA.childIdentity(data);
+    const cp = data.childProfile || {};
+    const scored = scoreWheel(data);
+    const firstName = id.first || "Your child";
+
+    if (p) {
+      $("ov-edit").href = `/passport?id=${p.id}`;
+      $("ov-export").href = `/passport?id=${p.id}&export=1`;
+    }
+
+    if (id.name) { const h = document.querySelector("[data-rec-name]"); if (h) h.textContent = id.name; }
+    $("ov-avatar").textContent = (firstName || "·")[0].toUpperCase();
+    $("ov-name").textContent = id.name;
+    $("ov-about-title").textContent = "About " + firstName;
+
+    const chips = [];
+    const dxList = (data.diagnosis && data.diagnosis.diagnoses) || [];
+    if (Array.isArray(dxList)) dxList.forEach((d) => chips.push(`<span class="ov-chip ov-chip-v">${esc(d)}</span>`));
+    if (id.age != null) chips.push(`<span class="ov-chip">${id.age} year${id.age === 1 ? "" : "s"}</span>`);
+    const loc = id.city || cp.location || "";
+    if (loc) chips.push(`<span class="ov-chip">${esc(loc)}</span>`);
+    if (id.languages) chips.push(`<span class="ov-chip">${esc(id.languages)}</span>`);
+    const school = (data.education && (data.education.schoolName || data.education.schoolType)) || "";
+    if (school) chips.push(`<span class="ov-chip">${esc(school)}</span>`);
+    $("ov-chips").innerHTML = chips.join("");
+
+    const comp = UA.completion(data);
+    const C = 2 * Math.PI * 26;
+    $("ov-ring-c").setAttribute("stroke-dasharray", `${((comp.pct / 100) * C).toFixed(1)} ${C.toFixed(1)}`);
+    $("ov-ring-t").textContent = comp.pct + "%";
+
+    const interests = textToList(data.strengths && data.strengths.interests);
+    const strengthsText = textToList(data.strengths && data.strengths.strengths);
+    const pri = (data.goals && data.goals.priorities) || [];
+    const team = (data.therapy || []).filter((t) => t && t.type);
+    const docs = p ? await UA.getRecentDocuments(p.id).catch(() => []) : [];
+
+    const strengths = [];
+    strengthsText.forEach((x) => strengths.push(cap(x)));
+    interests.forEach((x) => { if (strengths.length < 6) strengths.push("Loves " + lc(x)); });
+    if (strengths.length < 3) {
+      DOMAINS.filter((n) => scored[n].ability != null && scored[n].ability >= 0.6)
+        .sort((a, b) => scored[b].ability - scored[a].ability)
+        .forEach((n) => { if (strengths.length < 6) strengths.push("Strong " + lc(n)); });
+    }
+
+    const icT = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 1.5l2 4.2 4.5.5-3.3 3.1.9 4.5L8 11.7 3.9 13.8l.9-4.5L1.5 6.2 6 5.7z"/></svg>`;
+    const icU = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="5" r="2.2"/><path d="M2 13c.4-2.2 2-3.2 4-3.2s3.6 1 4 3.2"/><circle cx="11.5" cy="5.5" r="1.8"/></svg>`;
+    const icF = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg>`;
+    const icS = `<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg>`;
+    const metrics = [
+      ["Focus areas", Array.isArray(pri) ? pri.length : 0, icT],
+      ["Providers", team.length, icU],
+      ["Documents", docs.length, icF],
+      ["Strengths", strengths.length, icS],
+    ];
+    $("ov-metrics").innerHTML = metrics.map((m) =>
+      `<div class="ov-metric"><p class="ml">${m[2]}${m[0]}</p><p class="mn">${m[1]}</p></div>`).join("");
+
+    const aboutParts = [];
+    let s1 = firstName;
+    if (id.age != null) s1 += " is " + id.age + " year" + (id.age === 1 ? "" : "s") + " old";
+    if (interests.length) s1 += (id.age != null ? " and" : "") + " enjoys " + listPhrase(interests.slice(0, 3).map(lc));
+    else if (strengthsText.length) s1 += (id.age != null ? ", with" : " has") + " strengths in " + listPhrase(strengthsText.slice(0, 3).map(lc));
+    s1 += ".";
+    aboutParts.push(s1);
+    const needs = DOMAINS.filter((n) => scored[n].score != null).sort((a, b) => scored[b].score - scored[a].score);
+    if (needs.length) aboutParts.push(firstName + " does best with clear, predictable routines and benefits from extra support with " + listPhrase(needs.slice(0, 2).map((n) => lc(SHORT[n] || n))) + ".");
+    $("ov-about").textContent = (interests.length || strengthsText.length || needs.length) ? aboutParts.join(" ") : `Add ${firstName}'s interests and strengths to the passport to see a summary here.`;
+
+    $("ov-strengths").innerHTML = strengths.length
+      ? strengths.slice(0, 6).map((s) => `<span class="ov-str">${icS}${esc(s)}</span>`).join("")
+      : `<p class="ov-empty">No strengths recorded yet. <a href="/passport${p ? "?id=" + p.id : ""}">Add some →</a></p>`;
+
+    $("ov-pri").innerHTML = (Array.isArray(pri) && pri.length)
+      ? pri.map((x) => `<span class="ov-pri-tag">${esc(x)}</span>`).join("")
+      : `<p class="ov-empty">No priorities chosen yet. <a href="/passport${p ? "?id=" + p.id : ""}">Choose focus areas →</a></p>`;
+
+    $("ov-team").innerHTML = team.length
+      ? team.map((t) => {
+          const ini = String(t.type).split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+          return `<div class="ov-team-row"><span class="ov-team-ic">${esc(ini)}</span><span style="font-size:.9rem;color:#334155">${esc(t.type)}</span></div>`;
+        }).join("")
+      : `<p class="ov-empty">No providers added yet. <a href="/passport${p ? "?id=" + p.id : ""}">Add your child's team →</a></p>`;
+
+    $("ov-snap").innerHTML = DOMAINS.map((n) => {
+      const sc = scored[n].score;
+      const w = sc == null ? 0 : sc;
+      return `<div class="ov-snap-row"><span class="ov-snap-name">${esc(SHORT[n] || n)}</span><span class="ov-bar"><span class="ov-bar-fill" style="width:${w}%;background:${barColor(sc)}"></span></span></div>`;
+    }).join("");
+
+    const ins = [];
+    if (needs.length) ins.push(cap(firstName) + " currently appears to need the most support with " + listPhrase(needs.slice(0, 2).map((n) => lc(SHORT[n] || n))) + ".");
+    if (needs.length >= 3) ins.push("Current strengths show up most clearly in " + listPhrase(needs.slice().reverse().slice(0, 2).map((n) => lc(SHORT[n] || n))) + ".");
+    const sen = data.sensory || {};
+    if (["auditory", "visual", "tactile", "oral", "smell", "movement", "body"].some((k) => sen[k] && sen[k].signs && sen[k].signs.length))
+      ins.push("Visual supports, predictable routines, and small sensory-friendly adjustments may be particularly helpful.");
+    $("ov-insights").innerHTML = ins.length
+      ? ins.map((t) => `<div class="ov-ins-li"><span class="dot"></span><span>${esc(t)}</span></div>`).join("")
+      : `<p class="ov-empty">Complete more of the passport to see insights for ${esc(firstName)}.</p>`;
+  })().catch((e) => console.error("[child overview] hydrate failed", e));
 </script>

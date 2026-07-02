@@ -2,12 +2,153 @@
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
-<AppFormLayout title="My Child" activeNav="child">
+<AppFormLayout title="Strengths & Challenges" activeNav="child">
   <SectionTabs section="child" active="strengths" />
-  <h1 class="page-title">Strengths &amp; Challenges</h1>
-  <p class="page-sub">Part of My Child. This page is scaffolded — content is coming.</p>
-  <div class="ua-stub">
-    <b>Strengths &amp; Challenges</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+
+  <h1 class="page-title">Strengths & Challenges</h1>
+  <p class="page-sub">What makes your child shine — and the areas they're growing in, framed as opportunities.</p>
+
+  <div id="sc-gate"></div>
+
+  <div id="sc-main" style="display:none">
+    <div class="sc-sec">
+      <p class="sc-h"><span class="sc-hdot" style="background:#16a34a"></span>Strengths</p>
+      <div class="sc-strs" id="sc-strs"></div>
+    </div>
+
+    <div class="sc-sec">
+      <p class="sc-h"><span class="sc-hdot" style="background:#7c3aed"></span>Growth opportunities</p>
+      <div class="sc-opps" id="sc-opps"></div>
+    </div>
+
+    <div class="sc-sec" style="margin-bottom:0">
+      <div class="sc-card sc-insights">
+        <p class="sc-ins-title">Pattern insights</p>
+        <div id="sc-ins"></div>
+        <p class="sc-note">Warm observations from the passport — not medical advice.</p>
+      </div>
+    </div>
   </div>
 </AppFormLayout>
+
+<style is:global>
+  #sc-main, #sc-gate{max-width:880px}
+  .sc-sec{margin-bottom:24px}
+  .sc-h{font-size:.95rem;font-weight:700;color:#1e293b;margin:0 0 12px;display:flex;align-items:center;gap:9px}
+  .sc-hdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  .sc-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:18px 20px}
+  .sc-strs{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+  .sc-str{display:flex;gap:11px;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:13px 15px}
+  .sc-str .ic{width:32px;height:32px;border-radius:9px;background:#ECFDF5;color:#15803d;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sc-str .t{font-size:.88rem;font-weight:600;color:#1e293b}
+  .sc-opps{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+  .sc-opp{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px 16px}
+  .sc-opp .ic{width:32px;height:32px;border-radius:9px;background:#F5F3FF;color:#6d28d9;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sc-opp .t{font-size:.9rem;font-weight:600;color:#1e293b}
+  .sc-opp .s{font-size:.82rem;color:#64748b;margin-top:3px;line-height:1.45}
+  .sc-insights{background:#F5F3FF;border-color:#EDE9FE}
+  .sc-ins-title{font-size:.8rem;font-weight:700;color:#6d28d9;margin:0 0 10px}
+  .sc-ins-li{display:flex;gap:9px;align-items:flex-start;font-size:.9rem;line-height:1.5;color:#5b21b6;margin-bottom:8px}
+  .sc-ins-li .dot{width:6px;height:6px;border-radius:50%;background:#7c3aed;margin-top:7px;flex-shrink:0}
+  .sc-note{font-size:.72rem;color:#9d8bc4;margin:4px 0 0}
+  .sc-empty{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;font-size:.86rem;color:#94a3b8}
+  .sc-empty a{color:#6d28d9;font-weight:600;text-decoration:none}
+  .sc-good{background:#ECFDF5;border-color:#bbf7d0;border:1px solid #bbf7d0;border-radius:14px;padding:16px 18px;font-size:.88rem;color:#15803d}
+  .sc-gate-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px 22px;text-align:center}
+  .sc-gate-card p{color:#64748b;font-size:.9rem;margin:0 0 14px}
+  .sc-gate-card a{display:inline-block;background:#6d28d9;color:#fff;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>
+
+<script>
+  import * as UA from "../../lib/ua-data.js";
+  import { scoreWheel, DOMAINS } from "../../lib/wheelScore.js";
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const lc = (s) => String(s || "").toLowerCase();
+  const cap = (s) => { s = String(s || ""); return s.charAt(0).toUpperCase() + s.slice(1); };
+  const uniq = (a) => [...new Set(a)];
+  const textToList = (s) => String(s || "").split(/[,\n;•]+/).map((x) => x.trim()).filter(Boolean);
+  const listPhrase = (arr) => { arr = arr.filter(Boolean); if (!arr.length) return ""; if (arr.length === 1) return arr[0]; if (arr.length === 2) return arr[0] + " and " + arr[1]; return arr.slice(0, -1).join(", ") + ", and " + arr[arr.length - 1]; };
+  const SHORT = { "Communication": "communication", "Social Connection": "social connection", "Sensory Processing": "sensory processing", "Flexibility & Transitions": "flexibility", "Emotional Regulation": "emotional regulation", "Executive Function": "focus and planning", "Daily Living Skills": "daily living", "Learning & Play": "learning and play" };
+
+  const starSvg = '<svg width="17" height="17" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg>';
+  const upSvg = '<svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11L11 4M11 4H6M11 4v5"/></svg>';
+
+  (async () => {
+    const passports = await UA.getPassports().catch(() => []);
+    const p = UA.pickActivePassport(passports);
+    if (!p) {
+      $("sc-gate").innerHTML = `<div class="sc-gate-card"><p>Create your child's passport to see their strengths and growth areas.</p><a href="/passport">Start the passport →</a></div>`;
+      return;
+    }
+    $("sc-main").style.display = "block";
+    const d = p.data || {};
+    const scored = scoreWheel(d);
+    const id = UA.childIdentity(d);
+    const first = id.first || "Your child";
+    const passportLink = "/passport?id=" + p.id;
+
+    // ---- strengths ----
+    const str = [];
+    textToList(d.strengths && d.strengths.strengths).forEach((x) => str.push(cap(x)));
+    textToList(d.strengths && d.strengths.interests).forEach((x) => { if (str.length < 12) str.push("Loves " + lc(x)); });
+    const c = d.communication || {};
+    if (c.style === "Fluent Verbal" || c.style === "Verbal") str.push("Communicates verbally");
+    if (c.canExpressNeeds === "Consistently") str.push("Expresses needs clearly");
+    const dl = d.dailyLiving || {};
+    if (dl.eating === "Independent") str.push("Independent with eating");
+    if (dl.dressing === "Independent") str.push("Independent with dressing");
+    if (dl.toileting === "Fully trained") str.push("Toilet trained");
+    if ((d.behaviour || {}).peersInterest === "Yes") str.push("Interested in other children");
+    DOMAINS.filter((n) => scored[n].ability != null && scored[n].ability >= 0.62).sort((a, b) => scored[b].ability - scored[a].ability).forEach((n) => { if (str.length < 12) str.push("Strong " + SHORT[n]); });
+    const strengths = uniq(str).slice(0, 10);
+    $("sc-strs").innerHTML = strengths.length
+      ? strengths.map((s) => `<div class="sc-str"><span class="ic">${starSvg}</span><span class="t">${esc(s)}</span></div>`).join("")
+      : `<div class="sc-empty">No strengths recorded yet. <a href="${passportLink}">Add ${esc(first)}'s strengths and interests →</a></div>`;
+
+    // ---- growth opportunities ----
+    const DOMOPP = {
+      "Communication": ["Strengthening communication", "Building more ways to share thoughts and needs"],
+      "Social Connection": ["Growing friendships", "Building back-and-forth play and connection"],
+      "Sensory Processing": ["Finding sensory strategies", "Discovering what helps him feel regulated"],
+      "Flexibility & Transitions": ["Growing with change", "Building comfort with transitions and new routines"],
+      "Emotional Regulation": ["Managing big feelings", "Developing tools to calm and recover"],
+      "Executive Function": ["Building focus and planning", "Growing attention, organization and follow-through"],
+      "Daily Living Skills": ["Building daily independence", "Growing confidence with everyday routines"],
+      "Learning & Play": ["Expanding learning and play", "Building on natural curiosity and interests"],
+    };
+    const opps = [];
+    DOMAINS.filter((n) => scored[n].score != null && scored[n].score >= 50).sort((a, b) => scored[b].score - scored[a].score).slice(0, 4).forEach((n) => { const o = DOMOPP[n]; if (o) opps.push({ t: o[0], s: o[1] }); });
+    const cm = { "Requesting": ["Asking for help", "Building confidence to ask for what he needs"], "Conversation": ["Back-and-forth conversation", "Growing turn-taking and connection in chat"] };
+    ((c.challenges) || []).forEach((x) => { if (cm[x] && opps.length < 6) opps.push({ t: cm[x][0], s: cm[x][1] }); });
+    $("sc-opps").innerHTML = opps.length
+      ? opps.slice(0, 6).map((o) => `<div class="sc-opp"><span class="ic">${upSvg}</span><span><span class="t" style="display:block">${esc(o.t)}</span><span class="s">${esc(o.s)}</span></span></div>`).join("")
+      : `<div class="sc-good">No specific support areas are flagged right now — a lovely place to be. Keep celebrating the wins.</div>`;
+
+    // ---- pattern insights ----
+    const needs = DOMAINS.filter((n) => scored[n].score != null).sort((a, b) => scored[b].score - scored[a].score);
+    const ins = [];
+    if (needs.length >= 3) {
+      const shine = needs.slice().reverse().slice(0, 2).map((n) => SHORT[n]);
+      const grow = needs.slice(0, 2).map((n) => SHORT[n]);
+      ins.push(cap(first) + " shines in " + listPhrase(shine) + ", and is growing in " + listPhrase(grow) + ".");
+    }
+    const interests = textToList(d.strengths && d.strengths.interests);
+    if (interests.length) ins.push(cap(first) + " engages most when learning is built around " + listPhrase(interests.slice(0, 3).map(lc)) + ".");
+    const sen = d.sensory || {};
+    if (["auditory", "visual", "tactile", "oral", "smell", "movement", "body"].some((k) => sen[k] && sen[k].signs && sen[k].signs.length))
+      ins.push("Visual supports and predictable routines tend to help most, alongside small sensory-friendly adjustments.");
+    $("sc-ins").innerHTML = ins.length
+      ? ins.map((t) => `<div class="sc-ins-li"><span class="dot"></span><span>${esc(t)}</span></div>`).join("")
+      : `<p class="sc-empty" style="border:none;padding:0">Complete more of the passport to see patterns for ${esc(first)}.</p>`;
+  })().catch((e) => console.error("[strengths] hydrate failed", e));
+</script>

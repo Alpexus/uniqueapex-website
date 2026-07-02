@@ -2,12 +2,290 @@
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
-<AppFormLayout title="My Child" activeNav="child">
+<AppFormLayout title="Support Wheel" activeNav="child">
   <SectionTabs section="child" active="support-wheel" />
+
   <h1 class="page-title">Support Wheel</h1>
-  <p class="page-sub">Part of My Child. This page is scaffolded — content is coming.</p>
-  <div class="ua-stub">
-    <b>Support Wheel</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+  <p class="page-sub">A closer look at the same wheel from your dashboard. Tap any petal to see that area's strengths, what you're supporting, and strategies that help.</p>
+
+  <div class="sw-wrap">
+    <div id="sw-warning"></div>
+
+    <div class="sw-card">
+      <div id="sw-toggle" class="sw-toggle"></div>
+      <p id="sw-caption" class="sw-caption"></p>
+      <div class="sw-row">
+        <div class="sw-wheelcol">
+          <div class="sw-wheelwrap">
+            <div id="sw-wheel"></div>
+            <svg id="sw-overlay" class="sw-overlay" viewBox="0 0 480 420" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+          </div>
+        </div>
+        <div id="sw-detail" class="sw-detail"></div>
+      </div>
+    </div>
+
+    <div class="sw-card sw-disc">
+      <p><strong>Preliminary profile — not a diagnosis.</strong> Generated from your passport answers. Confidence reflects how many related questions you've completed. For any concerns, speak with a qualified professional.</p>
+    </div>
   </div>
 </AppFormLayout>
+
+<style is:global>
+  .sw-wrap{display:flex;flex-direction:column;gap:16px;max-width:880px}
+  .sw-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px 22px}
+  .sw-toggle{display:flex;gap:8px;justify-content:center;margin-bottom:8px}
+  .sw-tg{border:1px solid #e2e8f0;background:#fff;color:#64748b;border-radius:9999px;padding:6px 16px;font-size:.82rem;font-weight:600;cursor:pointer}
+  .sw-tg.on{background:#6d28d9;color:#fff;border-color:#6d28d9}
+  .sw-caption{text-align:center;font-size:.82rem;color:#64748b;margin:0 0 12px}
+  .sw-row{display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start}
+  .sw-wheelcol{flex:1 1 300px;min-width:260px}
+  .sw-wheelwrap{position:relative;width:100%;max-width:420px;margin:0 auto}
+  .sw-overlay{position:absolute;inset:0;width:100%;height:100%}
+  .sw-wedge{cursor:pointer;fill:transparent;transition:fill .15s}
+  .sw-wedge:hover{fill:rgba(109,40,217,0.06)}
+  .sw-detail{flex:1 1 300px;min-width:280px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:18px 20px;min-height:260px}
+  .swd-head{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+  .swd-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0}
+  .swd-name{font-size:1.05rem;font-weight:700;color:#1e293b;flex:1}
+  .swd-pill{font-size:.72rem;font-weight:700;padding:3px 11px;border-radius:9999px}
+  .swd-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .swd-meta .l{font-size:.74rem;color:#64748b;min-width:78px}
+  .swd-segs{display:flex;gap:4px;flex:1}
+  .swd-seg{height:8px;border-radius:3px;flex:1}
+  .swd-dots{display:flex;gap:5px}
+  .swd-d3{width:8px;height:8px;border-radius:50%}
+  .swd-lab{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#94a3b8;margin:15px 0 8px}
+  .swd-chips{display:flex;flex-wrap:wrap;gap:7px}
+  .swd-chip{display:inline-flex;align-items:center;gap:6px;font-size:.83rem;font-weight:600;padding:6px 11px;border-radius:10px;line-height:1.25}
+  .swd-chip.str{background:#ECFDF5;color:#15803d}
+  .swd-chip.sup{background:#FFFBEB;color:#b45309}
+  .swd-chip.tip{background:#F5F3FF;color:#6d28d9}
+  .swd-none{font-size:.83rem;color:#94a3b8}
+  .swd-ctx{font-size:.82rem;color:#64748b;font-style:italic;margin:0 0 12px}
+  .sw-disc{background:#fffbeb;border-color:#f3e2c0}
+  .sw-disc p{color:#b45309;font-size:.74rem;line-height:1.5;margin:0}
+  .sw-prompt{text-align:center;padding:28px 16px}
+  .sw-prompt p{color:#64748b;font-size:.9rem;margin:0 0 14px}
+  .sw-prompt a{display:inline-block;background:#6d28d9;color:#fff;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none}
+  .sw-warn{background:#fffbeb;border:1px solid #f3e2c0;border-radius:12px;padding:12px 16px}
+  .sw-warn p{color:#b45309;font-size:.8rem;line-height:1.5;margin:0}
+  .sw-warn a{color:#b45309;font-weight:600;text-decoration:underline}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>
+
+<script>
+  import * as UA from "../../lib/ua-data.js";
+  import { scoreWheel, DOMAINS, wheelCompleteness } from "../../lib/wheelScore.js";
+  import { generateWheelSVG } from "../../lib/wheelSvg.js";
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const SENSE_LABELS = { auditory: "Sound", visual: "Sight", tactile: "Touch", oral: "Taste & mouth", smell: "Smell", movement: "Movement & balance", body: "Body awareness" };
+  const isHigh = (v) => v === "Often" || v === "Daily";
+  const present = (v) => v != null && v !== "";
+  const uniq = (a) => [...new Set(a)];
+
+  const icCheck = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+  const icBang = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M8 3.2v6M8 12.3v.2"/></svg>';
+  const icStar = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg>';
+
+  function domainDetail(name, d) {
+    const strengths = [], support = [], strategies = [];
+    let context = "";
+    const comm = d.communication || {}, beh = d.behaviour || {}, bch = beh.challenges || {},
+          sen = d.sensory || {}, dl = d.dailyLiving || {}, motor = d.motor || {}, str = d.strengths || {};
+    switch (name) {
+      case "Communication": {
+        if (comm.style === "Fluent Verbal" || comm.style === "Verbal") strengths.push("Communicates verbally");
+        (comm.means || []).forEach((m) => {
+          if (m === "Words") strengths.push("Uses words");
+          else if (m === "Sentences") strengths.push("Uses sentences");
+          else if (m === "Sign language") strengths.push("Uses sign language");
+          else if (m === "Device / AAC app") strengths.push("Uses an AAC device");
+          else if (m === "Pictures (PECS)") strengths.push("Uses picture communication");
+        });
+        if (comm.canExpressNeeds === "Consistently") strengths.push("Expresses needs reliably");
+        if (comm.style === "Non-Speaking" || comm.style === "Limited Verbal") support.push("Building spoken communication");
+        const cmap = { "Requesting": "Requesting things", "Conversation": "Back-and-forth conversation", "Question Answering": "Answering questions", "Emotional Expression": "Putting feelings into words", "Social Communication": "Social communication" };
+        (comm.challenges || []).forEach((c) => { if (cmap[c]) support.push(cmap[c]); });
+        if (comm.canExpressNeeds === "Rarely") support.push("Expressing needs");
+        strategies.push("Visual supports and picture cards", "Offer simple choices", "Model short, clear phrases", "Give a little extra time to respond");
+        break;
+      }
+      case "Social Connection": {
+        if (beh.peersInterest === "Yes") strengths.push("Shows interest in other children");
+        if (beh.peersInteract === "Yes") strengths.push("Plays with peers");
+        else if (beh.peersInteract === "Sometimes") strengths.push("Plays alongside peers");
+        if (beh.peersInterest === "No") support.push("Connecting with other children");
+        if (beh.peersInteract === "No" || beh.peersInteract === "Sometimes") support.push("Back-and-forth play");
+        strategies.push("Structured, shared activities", "Turn-taking games", "Short play dates with clear roles", "Social stories before new situations");
+        break;
+      }
+      case "Sensory Processing": {
+        Object.keys(SENSE_LABELS).forEach((k) => {
+          const o = sen[k];
+          if (!o || typeof o !== "object") return;
+          if (o.typical) strengths.push("Comfortable with " + SENSE_LABELS[k].toLowerCase());
+          else if (o.signs && o.signs.length) {
+            const sig = o.signs.slice(0, 2).join(", ").toLowerCase();
+            support.push(SENSE_LABELS[k] + ": " + sig + (o.severity ? " (" + o.severity.toLowerCase() + ")" : ""));
+          }
+        });
+        if (present(sen.notes)) context = "Your note: " + sen.notes;
+        strategies.push("Sensory breaks through the day", "Noise-reducing headphones in loud places", "Deep-pressure input (tight hugs, weighted items)", "Prepare for known triggers in advance");
+        break;
+      }
+      case "Flexibility & Transitions": {
+        if (!isHigh(bch.rigidity) && bch.rigidity !== "Sometimes") strengths.push("Handles changes fairly well");
+        if (isHigh(bch.rigidity)) support.push("Changes in routine");
+        else if (bch.rigidity === "Sometimes") support.push("Some difficulty with transitions");
+        strategies.push("Visual schedules", "Countdown warnings before transitions", "First then language", "Keep routines predictable where you can");
+        break;
+      }
+      case "Emotional Regulation": {
+        if (!isHigh(bch.meltdowns) && !isHigh(bch.emotional) && !isHigh(bch.anxiety)) strengths.push("Generally calm and settled");
+        if (isHigh(bch.meltdowns)) support.push("Big emotional reactions / meltdowns");
+        if (isHigh(bch.emotional)) support.push("Regulating emotions in the moment");
+        if (isHigh(bch.anxiety)) support.push("Anxiety");
+        if (present(beh.triggers)) context = "Known triggers: " + beh.triggers;
+        if (present(beh.strategies)) strategies.push(beh.strategies);
+        strategies.push("A calm-down space", "Naming feelings together", "Simple breathing or counting", "Stay calm and steady during big feelings");
+        break;
+      }
+      case "Executive Function": {
+        if (dl.multiStep === "Yes") strengths.push("Follows multi-step instructions");
+        if (dl.safety === "Strong") strengths.push("Good safety awareness");
+        if (dl.multiStep === "No" || dl.multiStep === "Sometimes") support.push("Following multi-step instructions");
+        if (isHigh(bch.hyperactivity)) support.push("Staying focused / sitting still");
+        if (isHigh(bch.defiance)) support.push("Following directions");
+        strategies.push("Break tasks into small steps", "Visual checklists", "Use timers for activities", "One instruction at a time");
+        break;
+      }
+      case "Daily Living Skills": {
+        if (dl.eating === "Independent") strengths.push("Eats independently");
+        if (dl.dressing === "Independent") strengths.push("Dresses independently");
+        if (dl.toileting === "Fully trained") strengths.push("Toilet trained");
+        if (dl.sleep === "Good") strengths.push("Sleeps well");
+        if (dl.eating === "With support" || dl.eating === "Not yet") support.push("Eating skills");
+        if (dl.dressing === "With support" || dl.dressing === "Not yet") support.push("Dressing skills");
+        if (dl.toileting === "In progress" || dl.toileting === "Not started") support.push("Toilet training");
+        if (dl.feeding === "Mild" || dl.feeding === "Significant") support.push("Feeding");
+        if ((motor.fine || []).length) support.push("Fine motor skills");
+        if ((motor.gross || []).length) support.push("Gross motor skills");
+        strategies.push("Visual step-by-step routines", "Adaptive tools (easy-grip, velcro)", "Practice one skill at a time", "Celebrate small wins");
+        break;
+      }
+      case "Learning & Play": {
+        const interests = String(str.interests || "").split(/[,\n;•]+/).map((x) => x.trim()).filter(Boolean);
+        if (interests.length) strengths.push("Engages deeply with " + interests.slice(0, 3).join(", ").toLowerCase());
+        strategies.push("Build learning around their interests", "Play-based teaching", "Short, frequent sessions", "Visual and hands-on materials");
+        break;
+      }
+    }
+    return { strengths: uniq(strengths), support: uniq(support), strategies: uniq(strategies), context };
+  }
+
+  function levelInfo(score) {
+    if (score == null) return { label: "Not enough data", bg: "#f1f5f9", fg: "#64748b", seg: "#cbd5e1" };
+    const l = UA.levelFor(score);
+    if (l.cls === "low") return { label: "Low support", bg: "#ECFDF5", fg: "#15803d", seg: "#16a34a" };
+    if (l.cls === "high") return { label: "High support", bg: "#F5F3FF", fg: "#6d28d9", seg: "#7c3aed" };
+    return { label: "Moderate", bg: "#FFFBEB", fg: "#b45309", seg: "#d97706" };
+  }
+
+  (async () => {
+    const passports = await UA.getPassports().catch(() => []);
+    const p = UA.pickActivePassport(passports);
+    const data = (p && p.data) || {};
+    const id = UA.childIdentity(data);
+    const first = id.first || "your child";
+    const scored = scoreWheel(data);
+    const n = DOMAINS.length;
+    const scoredCount = DOMAINS.filter((nm) => scored[nm].score != null).length;
+    const passportLink = "/passport" + (p ? "?id=" + p.id : "");
+
+    if (scoredCount < 3) {
+      $("sw-toggle").innerHTML = "";
+      $("sw-caption").textContent = "";
+      $("sw-wheel").innerHTML = `<div class="sw-prompt"><p>Fill in more of the passport (communication, sensory, behaviour, daily living) to generate ${esc(first)}'s support wheel.</p><a href="${passportLink}">Continue passport →</a></div>`;
+      $("sw-detail").style.display = "none";
+      return;
+    }
+
+    const wc = wheelCompleteness(data);
+    const lowConf = DOMAINS.filter((nm) => scored[nm].confidence === "low");
+    $("sw-warning").innerHTML = (wc.pct < 70)
+      ? `<div class="sw-warn"><p><strong>Wheel is ${wc.pct}% complete</strong> — ${wc.answered} of ${wc.total} contributing questions answered.${lowConf.length ? " Lower confidence in: " + esc(lowConf.join(", ")) + "." : ""} <a href="${passportLink}">Complete more →</a></p></div>`
+      : "";
+
+    let sel = 0;
+    for (let i = 0; i < n; i++) { if (scored[DOMAINS[i]].score != null) { sel = i; break; } }
+    let mode = "needs";
+
+    function renderToggle() {
+      $("sw-toggle").innerHTML = ["needs", "strengths"].map((m) =>
+        `<button class="sw-tg ${m === mode ? "on" : ""}" data-mode="${m}">${m === "needs" ? "Support needs" : "Strengths"}</button>`).join("");
+      $("sw-toggle").querySelectorAll("button").forEach((b) =>
+        b.addEventListener("click", () => { mode = b.dataset.mode; renderToggle(); renderWheel(); }));
+      $("sw-caption").innerHTML = mode === "strengths"
+        ? "Fuller petals mean <strong>stronger</strong> areas."
+        : "Fuller petals mean <strong>more support</strong> is helpful.";
+    }
+    function renderWheel() { $("sw-wheel").innerHTML = generateWheelSVG(scored, mode); }
+
+    const cx = 240, cy = 210, ir = 24, or_ = 138, seg = (2 * Math.PI) / n;
+    const pt = (r, a) => [(cx + r * Math.cos(a)).toFixed(2), (cy + r * Math.sin(a)).toFixed(2)];
+    function sector(a0, a1) {
+      const p0 = pt(ir, a0), p1 = pt(or_, a0), p2 = pt(or_, a1), p3 = pt(ir, a1);
+      return "M" + p0[0] + "," + p0[1] + " L" + p1[0] + "," + p1[1] + " A" + or_ + "," + or_ + " 0 0 1 " + p2[0] + "," + p2[1] + " L" + p3[0] + "," + p3[1] + " A" + ir + "," + ir + " 0 0 0 " + p0[0] + "," + p0[1] + " Z";
+    }
+    function buildOverlay() {
+      let s = "";
+      for (let i = 0; i < n; i++) {
+        const a0 = -Math.PI / 2 + i * seg, a1 = a0 + seg, hue = Math.round((i / n) * 360), on = i === sel;
+        const attrs = on ? `fill="hsla(${hue},65%,52%,0.12)" stroke="hsl(${hue},65%,45%)" stroke-width="2.5"` : `stroke="none" stroke-width="0"`;
+        s += '<path class="sw-wedge" data-i="' + i + '" d="' + sector(a0, a1) + '" ' + attrs + '></path>';
+      }
+      $("sw-overlay").innerHTML = s;
+      $("sw-overlay").querySelectorAll(".sw-wedge").forEach((el) =>
+        el.addEventListener("click", () => { sel = +el.getAttribute("data-i"); renderDetail(); buildOverlay(); }));
+    }
+
+    function block(title, items, cls) {
+      const icon = cls === "str" ? icCheck : cls === "sup" ? icBang : icStar;
+      const inner = items.length
+        ? items.map((t) => `<span class="swd-chip ${cls}">${icon}${esc(t)}</span>`).join("")
+        : `<span class="swd-none">${cls === "sup" ? "Nothing flagged right now" : "Add details in the passport to see this"}</span>`;
+      return `<p class="swd-lab">${title}</p><div class="swd-chips">${inner}</div>`;
+    }
+    function renderDetail() {
+      const name = DOMAINS[sel], dm = scored[name], hue = Math.round((sel / n) * 360);
+      const L = levelInfo(dm.score), det = domainDetail(name, data);
+      const confN = dm.confidence === "high" ? 3 : dm.confidence === "medium" ? 2 : dm.confidence === "low" ? 1 : 0;
+      const segCount = dm.score == null ? 0 : Math.max(1, Math.min(5, Math.round(dm.score / 20)));
+      let segs = ""; for (let k = 1; k <= 5; k++) segs += `<span class="swd-seg" style="background:${k <= segCount ? L.seg : "#e2e8f0"}"></span>`;
+      let dots = ""; for (let k = 1; k <= 3; k++) dots += `<span class="swd-d3" style="background:${k <= confN ? "#64748b" : "#e2e8f0"}"></span>`;
+      $("sw-detail").innerHTML =
+        `<div class="swd-head"><span class="swd-dot" style="background:hsl(${hue},65%,52%)"></span><span class="swd-name">${esc(name)}</span><span class="swd-pill" style="background:${L.bg};color:${L.fg}">${L.label}</span></div>`
+        + (dm.score == null ? `<p class="swd-none">Add more in the passport to build this part of the profile.</p>` :
+            `<div class="swd-meta"><span class="l">Support level</span><span class="swd-segs">${segs}</span></div><div class="swd-meta"><span class="l">Confidence</span><span class="swd-dots">${dots}</span></div>`)
+        + (det.context ? `<p class="swd-ctx" style="margin-top:12px">${esc(det.context)}</p>` : "")
+        + block("Strengths", det.strengths, "str")
+        + block("Areas we're supporting", det.support, "sup")
+        + block("Strategies that help", det.strategies, "tip");
+    }
+
+    renderToggle();
+    renderWheel();
+    buildOverlay();
+    renderDetail();
+  })().catch((e) => console.error("[support wheel] hydrate failed", e));
+</script>

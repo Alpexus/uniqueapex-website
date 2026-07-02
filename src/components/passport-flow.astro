@@ -1,0 +1,164 @@
+---
+// =============================================================================
+// UniqueApex · Passport Flow — "tell it once, it travels with them"
+// Save as: src/components/passport-flow.astro
+// Use in a page:  <PassportFlow lang="en" />   (or lang="fr")
+// Lines are drawn in JS from the real card positions (no distortion).
+// =============================================================================
+const { lang = "en" } = Astro.props;
+
+const t = {
+  en: {
+    label: "The Family Passport",
+    heading: "Tell your child's story once.",
+    headingAccent: "It travels with them.",
+    body: "Behind everything you've just seen is one living profile that follows your child everywhere — so you never start from zero again.",
+    passport: "Family Passport",
+    child: "Maya · Age 7",
+    rows: ["Full history", "Strengths & needs", "Reports & documents"],
+    spokes: [
+      { title: "Therapists & clinics", text: "The full picture, ready before the first session" },
+      { title: "School & daycare", text: "Strengths and strategies from day one" },
+      { title: "Funding programs", text: "The details every application asks for" },
+      { title: "Every new provider", text: "No re-explaining. Ever." },
+    ],
+  },
+  fr: {
+    label: "Le Passeport familial",
+    heading: "Racontez l'histoire de votre enfant une seule fois.",
+    headingAccent: "Elle le suit partout.",
+    body: "Derrière tout ce que vous venez de voir : un profil vivant qui suit votre enfant partout — pour ne plus jamais repartir de zéro.",
+    passport: "Passeport familial",
+    child: "Maya · 7 ans",
+    rows: ["Historique complet", "Forces et besoins", "Rapports et documents"],
+    spokes: [
+      { title: "Thérapeutes et cliniques", text: "Le portrait complet, prêt avant la première séance" },
+      { title: "École et garderie", text: "Forces et stratégies dès le premier jour" },
+      { title: "Programmes de financement", text: "Les détails que chaque demande exige" },
+      { title: "Chaque nouvel intervenant", text: "Plus jamais besoin de tout réexpliquer." },
+    ],
+  },
+}[lang] || {};
+---
+
+<section class="py-16 my-4" id="ua-passport">
+  <div class="text-center max-w-3xl mx-auto mb-14">
+    <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{t.label}</p>
+    <h2 class="text-3xl md:text-4xl font-bold mt-3 text-slate-800 leading-tight">
+      {t.heading} <span class="text-violet-700">{t.headingAccent}</span>
+    </h2>
+    <p class="text-slate-500 mt-6 text-lg">{t.body}</p>
+  </div>
+
+  <div class="relative max-w-4xl mx-auto" id="pp-stage">
+    <svg id="pp-svg" class="hidden md:block absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
+      <line class="pp-line" stroke="#C4B5FD" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round" />
+      <line class="pp-line" stroke="#C4B5FD" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round" />
+      <line class="pp-line" stroke="#C4B5FD" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round" />
+      <line class="pp-line" stroke="#C4B5FD" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round" />
+    </svg>
+
+    <div class="relative grid gap-4 md:grid-cols-[1fr_auto_1fr] md:grid-rows-2 md:gap-x-12 md:gap-y-14 items-center">
+      <!-- center passport card -->
+      <div id="pp-center" class="pp-center order-first md:order-none md:col-start-2 md:row-start-1 md:row-span-2 justify-self-center bg-white border-2 border-violet-200 rounded-2xl shadow-xl shadow-violet-200/60 px-5 py-4 w-56 z-10">
+        <p class="text-[10px] font-bold text-violet-600 uppercase tracking-wider m-0 mb-2.5 flex items-center gap-1.5">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="2.6"/><path d="M8 17c.7-1.8 2.2-2.8 4-2.8s3.3 1 4 2.8"/></svg>
+          {t.passport}
+        </p>
+        <div class="flex items-center gap-2.5 mb-3">
+          <span class="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 text-white flex items-center justify-center text-sm font-bold shrink-0">M</span>
+          <span class="text-sm font-bold text-slate-800">{t.child}</span>
+        </div>
+        <ul class="m-0 p-0 list-none space-y-1.5">
+          {t.rows.map((row) => (
+            <li class="flex items-center gap-2 text-[12px] text-slate-600">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M5 13l4 4L19 7"/></svg>
+              {row}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- spokes -->
+      {t.spokes.map((s, i) => (
+        <div class={`pp-spoke bg-white border border-slate-200 rounded-2xl px-4 py-3.5 flex items-start gap-3 z-10 ${i === 0 ? "md:col-start-1 md:row-start-1 md:justify-self-end" : ""} ${i === 1 ? "md:col-start-3 md:row-start-1 md:justify-self-start" : ""} ${i === 2 ? "md:col-start-1 md:row-start-2 md:justify-self-end" : ""} ${i === 3 ? "md:col-start-3 md:row-start-2 md:justify-self-start" : ""} md:max-w-[240px]`}>
+          <span class="w-9 h-9 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              {i === 0 && <><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M2 21c.8-3.8 3.7-6 7-6s6.2 2.2 7 6"/><path d="M19 8v6M16 11h6"/></>}
+              {i === 1 && <><path d="M12 3L2 8l10 5 10-5-10-5z"/><path d="M6 10.5V16c1.8 1.6 3.8 2.4 6 2.4s4.2-.8 6-2.4v-5.5"/></>}
+              {i === 2 && <><path d="M3 21h18M4 18h16M5 10h14M12 3L4 8h16L12 3z"/><path d="M7 10v8M12 10v8M17 10v8"/></>}
+              {i === 3 && <><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></>}
+            </svg>
+          </span>
+          <span>
+            <span class="block text-[13.5px] font-bold text-slate-800 leading-snug">{s.title}</span>
+            <span class="block text-[12.5px] text-slate-500 leading-snug mt-0.5">{s.text}</span>
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  #ua-passport .pp-center{opacity:0;transform:scale(.94);transition:opacity .5s ease,transform .5s ease}
+  #ua-passport.ua-in .pp-center{opacity:1;transform:none}
+  #ua-passport .pp-line{opacity:0;transition:opacity .6s ease}
+  #ua-passport.ua-in .pp-line{opacity:1}
+  #ua-passport.ua-in .pp-line:nth-of-type(1){transition-delay:.4s}
+  #ua-passport.ua-in .pp-line:nth-of-type(2){transition-delay:.55s}
+  #ua-passport.ua-in .pp-line:nth-of-type(3){transition-delay:.7s}
+  #ua-passport.ua-in .pp-line:nth-of-type(4){transition-delay:.85s}
+  #ua-passport .pp-spoke{opacity:0;transform:translateY(10px) scale(.96);transition:opacity .5s ease,transform .5s ease}
+  #ua-passport.ua-in .pp-spoke{opacity:1;transform:none}
+  #ua-passport.ua-in .pp-spoke:nth-of-type(1){transition-delay:.55s}
+  #ua-passport.ua-in .pp-spoke:nth-of-type(2){transition-delay:.7s}
+  #ua-passport.ua-in .pp-spoke:nth-of-type(3){transition-delay:.85s}
+  #ua-passport.ua-in .pp-spoke:nth-of-type(4){transition-delay:1s}
+  @media (prefers-reduced-motion: reduce){
+    #ua-passport .pp-center,#ua-passport .pp-spoke{opacity:1;transform:none;transition:none}
+    #ua-passport .pp-line{opacity:1;transition:none}
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var root = document.getElementById("ua-passport");
+    if (!root) return;
+
+    function drawLines() {
+      var stage = document.getElementById("pp-stage");
+      var svg = document.getElementById("pp-svg");
+      var center = document.getElementById("pp-center");
+      if (!stage || !svg || !center) return;
+      if (window.innerWidth < 768) return;
+      var sr = stage.getBoundingClientRect();
+      svg.setAttribute("viewBox", "0 0 " + sr.width + " " + sr.height);
+      var cr = center.getBoundingClientRect();
+      var cx = cr.left - sr.left + cr.width / 2;
+      var cy = cr.top - sr.top + cr.height / 2;
+      var spokes = stage.querySelectorAll(".pp-spoke");
+      var lines = svg.querySelectorAll(".pp-line");
+      spokes.forEach(function (sp, i) {
+        var r = sp.getBoundingClientRect();
+        var line = lines[i];
+        if (!line) return;
+        line.setAttribute("x1", cx);
+        line.setAttribute("y1", cy);
+        line.setAttribute("x2", r.left - sr.left + r.width / 2);
+        line.setAttribute("y2", r.top - sr.top + r.height / 2);
+      });
+    }
+
+    requestAnimationFrame(drawLines);
+    window.addEventListener("load", drawLines);
+    var rt;
+    window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(drawLines, 120); });
+
+    if (!("IntersectionObserver" in window)) { root.classList.add("ua-in"); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { root.classList.add("ua-in"); drawLines(); io.disconnect(); } });
+    }, { threshold: 0.25 });
+    io.observe(root);
+  })();
+</script>

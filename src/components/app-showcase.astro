@@ -1,0 +1,225 @@
+---
+// =============================================================================
+// UniqueApex · App Showcase — "a look inside the platform"
+// Save as: src/components/app-showcase.astro
+// Fictional child ("Maya") — no real user data. Mirrors the real dashboard.
+// =============================================================================
+const { lang = "en" } = Astro.props;
+
+const t = {
+  en: {
+    badge: "A look inside",
+    title1: "Everything about your child,",
+    title2: "finally in one place.",
+    sub: "One living profile that grows with your child — coordination, documents, progress and support needs, ready to share with every provider, school, and program.",
+    note: "Shown with a sample profile — this is the real product our pilot families use.",
+    search: "Search documents, providers, programs…",
+    nav: ["Dashboard", "My Child", "Documents", "Funding", "Providers", "Resources"],
+    child: "Maya",
+    chips: ["Age 7", "Autism", "English"],
+    updated: "Profile updated 2 days ago",
+    exportBtn: "Export PDF",
+    stats: [
+      { v: "6", l: "Applications submitted" },
+      { v: "3", l: "Providers contacted" },
+      { v: "2", l: "Waitlists joined" },
+      { v: "12", l: "Documents" },
+    ],
+    wheel: "Support wheel",
+    insights: "Insights for Maya",
+    aiBadge: "AI · BETA",
+    strengthLab: "Key strengths",
+    strength: "Strong memory · Patterns · Music",
+    watchLab: "Watch areas",
+    watch: "Transitions · Social connection",
+    action: "Upload Maya's latest report",
+  },
+  fr: {
+    badge: "Un aperçu",
+    title1: "Tout sur votre enfant,",
+    title2: "enfin au même endroit.",
+    sub: "Un profil vivant qui grandit avec votre enfant — coordination, documents, progrès et besoins de soutien, prêt à partager avec chaque intervenant, école et programme.",
+    note: "Présenté avec un profil fictif — c'est le vrai produit utilisé par nos familles pilotes.",
+    search: "Rechercher documents, intervenants, programmes…",
+    nav: ["Tableau de bord", "Mon enfant", "Documents", "Financement", "Intervenants", "Ressources"],
+    child: "Maya",
+    chips: ["7 ans", "Autisme", "Français"],
+    updated: "Profil mis à jour il y a 2 jours",
+    exportBtn: "Exporter PDF",
+    stats: [
+      { v: "6", l: "Demandes envoyées" },
+      { v: "3", l: "Intervenants contactés" },
+      { v: "2", l: "Listes d'attente" },
+      { v: "12", l: "Documents" },
+    ],
+    wheel: "Roue de soutien",
+    insights: "Aperçus pour Maya",
+    aiBadge: "IA · BÊTA",
+    strengthLab: "Forces clés",
+    strength: "Mémoire forte · Régularités · Musique",
+    watchLab: "À surveiller",
+    watch: "Transitions · Lien social",
+    action: "Téléverser le dernier rapport de Maya",
+  },
+}[lang] || {};
+
+---
+
+<section class="ua-showcase my-16 md:my-24" id="app-showcase">
+  <div class="ua-sc-card rounded-3xl bg-violet-50 border border-violet-100 px-6 py-10 md:px-12 md:py-14 grid gap-10 lg:grid-cols-2 items-center overflow-hidden">
+    <!-- Left: message -->
+    <div>
+      <span class="inline-flex items-center gap-2 bg-white text-violet-800 text-xs font-semibold rounded-full px-3.5 py-1.5 shadow-sm">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6l2.1 2.1m0-12.8l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
+        {t.badge}
+      </span>
+      <h2 class="mt-5 text-3xl md:text-4xl font-bold tracking-tight text-slate-900 leading-tight">
+        {t.title1} <span class="text-violet-700">{t.title2}</span>
+      </h2>
+      <p class="mt-4 text-slate-600 leading-relaxed">{t.sub}</p>
+      <p class="mt-6 text-[13px] text-slate-400 italic">{t.note}</p>
+    </div>
+
+    <!-- Right: fictional app preview (mirrors the real dashboard) -->
+    <div class="ua-sc-app bg-white rounded-2xl border border-violet-100 shadow-xl shadow-violet-200/50 overflow-hidden select-none" aria-hidden="true">
+      <!-- top bar -->
+      <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
+        <span class="inline-flex items-center gap-1.5 border border-slate-200 rounded-full pl-1 pr-2 py-0.5">
+          <span class="w-4.5 h-4.5 w-[18px] h-[18px] rounded-full bg-gradient-to-br from-violet-500 to-violet-700 text-white flex items-center justify-center text-[9px] font-bold">M</span>
+          <span class="text-[10px] font-semibold text-slate-700">{t.child}</span>
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+        </span>
+        <span class="flex-1 flex items-center gap-1.5 bg-slate-50 border border-slate-100 rounded-full px-2.5 py-1">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <span class="text-[9.5px] text-slate-400 truncate">{t.search}</span>
+        </span>
+        <span class="w-5 h-5 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-[9px] font-bold">P</span>
+      </div>
+      <div class="flex">
+        <!-- sidebar -->
+        <div class="hidden sm:flex flex-col gap-0.5 w-[104px] border-r border-slate-100 p-2 shrink-0">
+          {t.nav.map((label, i) => (
+            <span class={`text-[10px] flex items-center gap-1.5 px-2 py-1.5 rounded-md ${i === 1 ? "text-violet-700 font-semibold bg-violet-50" : "text-slate-500"}`}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                {i === 0 && <><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></>}
+                {i === 1 && <path d="M12 20s-7-4.3-9.3-8.5C1 8 2.6 4.5 6 4.5c2 0 3.4 1.1 4 2.3.6-1.2 2-2.3 4-2.3 3.4 0 5 3.5 3.3 7C19 15.7 12 20 12 20z"/>}
+                {i === 2 && <><path d="M6 2.5h8L19 8v13.5H6z"/><path d="M13.5 2.5V8H19"/></>}
+                {i === 3 && <><circle cx="12" cy="12" r="9"/><path d="M12 7.5v9M9.5 9.8c0-1 1-1.8 2.5-1.8s2.5.8 2.5 1.8c0 2.4-5 1.6-5 4.2 0 1 1 1.8 2.5 1.8s2.5-.8 2.5-1.8"/></>}
+                {i === 4 && <><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/></>}
+                {i === 5 && <><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></>}
+              </svg>
+              {label}
+            </span>
+          ))}
+        </div>
+        <!-- main -->
+        <div class="flex-1 p-3 min-w-0">
+          <!-- profile card -->
+          <div class="flex items-center gap-2.5 bg-violet-50/60 border border-violet-100 rounded-xl px-3 py-2.5 mb-2.5">
+            <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-violet-700 text-white flex items-center justify-center text-sm font-bold shrink-0">M</span>
+            <span class="min-w-0">
+              <span class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-[13px] font-bold text-slate-800">{t.child}</span>
+                {t.chips.map((c, i) => (
+                  <span class={`text-[8.5px] font-semibold px-1.5 py-0.5 rounded-full ${i === 1 ? "bg-violet-100 text-violet-700" : "bg-white border border-slate-200 text-slate-500"}`}>{c}</span>
+                ))}
+              </span>
+              <span class="block text-[9.5px] text-slate-400 mt-0.5">{t.updated}</span>
+            </span>
+            <span class="ml-auto flex items-center gap-2 shrink-0">
+              <span class="relative w-8 h-8 hidden xs:block sm:block">
+                <svg viewBox="0 0 36 36" class="w-8 h-8 -rotate-90">
+                  <circle cx="18" cy="18" r="15" fill="none" stroke="#EDE9FE" stroke-width="4"/>
+                  <circle cx="18" cy="18" r="15" fill="none" stroke="#6D28D9" stroke-width="4" stroke-linecap="round" stroke-dasharray="75.4 94.2"/>
+                </svg>
+                <span class="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-violet-700">80%</span>
+              </span>
+              <span class="text-[9.5px] font-semibold text-white bg-violet-700 rounded-full px-2.5 py-1">{t.exportBtn}</span>
+            </span>
+          </div>
+          <!-- stat tiles -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-1.5 mb-2.5">
+            {t.stats.map((s) => (
+              <span class="bg-white border border-slate-100 rounded-lg px-2 py-1.5">
+                <span class="block text-[13px] font-bold text-slate-800 leading-tight">{s.v}</span>
+                <span class="block text-[8.5px] text-slate-400 leading-tight mt-0.5">{s.l}</span>
+              </span>
+            ))}
+          </div>
+          <!-- wheel + insights -->
+          <div class="grid grid-cols-[104px_1fr] gap-2.5 items-center">
+            <span class="block">
+              <span class="block text-[9px] font-semibold text-slate-500 mb-1 text-center">{t.wheel}</span>
+              <svg viewBox="0 0 120 120" class="ua-wheel w-full h-auto">
+                <circle cx="60" cy="60" r="22" fill="none" stroke="#EEF0F4" stroke-width="1"/>
+                <circle cx="60" cy="60" r="32" fill="none" stroke="#EEF0F4" stroke-width="1"/>
+                <circle cx="60" cy="60" r="42" fill="none" stroke="#EEF0F4" stroke-width="1"/>
+                <circle cx="60" cy="60" r="52" fill="none" stroke="#EEF0F4" stroke-width="1"/>
+                <path d="M60.6 48.0L62.7 8.1A52 52 0 0 1 94.8 21.4L68.0 51.1A12 12 0 0 0 60.6 48.0Z" fill="hsl(270,62%,55%)" opacity=".88"/>
+                <path d="M68.9 52.0L88.2 34.6A38 38 0 0 1 97.9 58.0L72.0 59.4A12 12 0 0 0 68.9 52.0Z" fill="hsl(225,62%,55%)" opacity=".88"/>
+                <path d="M72.0 60.6L105.9 62.4A46 46 0 0 1 94.2 90.8L68.9 68.0A12 12 0 0 0 72.0 60.6Z" fill="hsl(185,62%,55%)" opacity=".88"/>
+                <path d="M68.0 68.9L80.1 82.3A30 30 0 0 1 61.6 90.0L60.6 72.0A12 12 0 0 0 68.0 68.9Z" fill="hsl(145,62%,55%)" opacity=".88"/>
+                <path d="M59.4 72.0L57.8 101.9A42 42 0 0 1 31.9 91.2L52.0 68.9A12 12 0 0 0 59.4 72.0Z" fill="hsl(95,62%,55%)" opacity=".88"/>
+                <path d="M51.1 68.0L21.4 94.8A52 52 0 0 1 8.1 62.7L48.0 60.6A12 12 0 0 0 51.1 68.0Z" fill="hsl(45,62%,55%)" opacity=".88"/>
+                <path d="M48.0 59.4L26.0 58.2A34 34 0 0 1 34.7 37.2L51.1 52.0A12 12 0 0 0 48.0 59.4Z" fill="hsl(15,62%,55%)" opacity=".88"/>
+                <path d="M52.0 51.1L27.9 24.3A48 48 0 0 1 57.5 12.1L59.4 48.0A12 12 0 0 0 52.0 51.1Z" fill="hsl(330,62%,55%)" opacity=".88"/>
+                <circle cx="60" cy="60" r="12" fill="#fff" stroke="#EEF0F4"/>
+              </svg>
+            </span>
+            <span class="block bg-white border border-slate-100 rounded-xl p-2.5 min-w-0">
+              <span class="flex items-center justify-between gap-2 mb-1.5">
+                <span class="text-[10px] font-bold text-slate-700 truncate">{t.insights}</span>
+                <span class="text-[8px] font-bold text-violet-700 bg-violet-50 border border-violet-100 rounded-full px-1.5 py-0.5 whitespace-nowrap">✦ {t.aiBadge}</span>
+              </span>
+              <span class="block text-[8.5px] font-bold text-slate-400 uppercase tracking-wide">{t.strengthLab}</span>
+              <span class="flex items-center gap-1 text-[9.5px] text-slate-600 mb-1">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M5 13l4 4L19 7"/></svg>
+                {t.strength}
+              </span>
+              <span class="block text-[8.5px] font-bold text-slate-400 uppercase tracking-wide">{t.watchLab}</span>
+              <span class="flex items-center gap-1 text-[9.5px] text-slate-600 mb-1.5">
+                <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
+                {t.watch}
+              </span>
+              <span class="flex items-center gap-1.5 bg-violet-50 rounded-lg px-2 py-1.5 text-[9px] font-semibold text-violet-800">
+                <span class="w-3.5 h-3.5 rounded-full bg-violet-200 text-violet-800 flex items-center justify-center text-[8px] font-bold shrink-0">1</span>
+                <span class="truncate">{t.action}</span>
+                <span class="ml-auto">→</span>
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .ua-showcase .ua-sc-card{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+  .ua-showcase.ua-in .ua-sc-card{opacity:1;transform:none}
+  .ua-showcase .ua-wheel path{transform-origin:60px 60px;transform:scale(0);transition:transform .5s cubic-bezier(.34,1.4,.64,1)}
+  .ua-showcase.ua-in .ua-wheel path{transform:scale(1)}
+  .ua-showcase.ua-in .ua-wheel path:nth-of-type(1){transition-delay:.35s}
+  .ua-showcase.ua-in .ua-wheel path:nth-of-type(2){transition-delay:.42s}
+  .ua-showcase.ua-in .ua-wheel path:nth-of-type(3){transition-delay:.49s}
+  .ua-showcase.ua-in .ua-wheel path:nth-of-type(4){transition-delay:.56s}
+  .ua-showcase.ua-in .ua-wheel path:nth-of-type(5){transition-delay:.63s}
+  .ua-showcase.ua-in .ua-wheel path:nth-of-type(6){transition-delay:.7s}
+  .ua-showcase.ua-in .ua-wheel path:nth-of-type(7){transition-delay:.77s}
+  .ua-showcase.ua-in .ua-wheel path:nth-of-type(8){transition-delay:.84s}
+  @media (prefers-reduced-motion: reduce){
+    .ua-showcase .ua-sc-card{opacity:1;transform:none;transition:none}
+    .ua-showcase .ua-wheel path{transform:none;transition:none}
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var el = document.getElementById("app-showcase");
+    if (!el || !("IntersectionObserver" in window)) { if (el) el.classList.add("ua-in"); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { el.classList.add("ua-in"); io.disconnect(); } });
+    }, { threshold: 0.25 });
+    io.observe(el);
+  })();
+</script>

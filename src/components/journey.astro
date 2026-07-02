@@ -1,79 +1,142 @@
 ---
 // @ts-ignore
 import { Icon } from "astro-icon/components";
-import Link from "@/components/ui/link.astro";
 
 interface Props {
   lang?: "en" | "fr";
 }
 
 const { lang = "en" } = Astro.props;
-const prefix = lang === "fr" ? "/fr" : "";
 
 const content = {
   en: {
     label: "Your journey",
-    heading: "UniqueApex stays with your family through every stage —",
-    headingAccent: "not just the first search.",
+    heading: "We're with you from the very first concern —",
+    headingAccent: "even before a diagnosis.",
     body: "Start building your child's profile today. The earlier you begin, the more it grows with them.",
     startHere: "Start here",
-    cta: "Begin your child's profile",
+    tapHint: "Tap any stage to see how we help",
+    stageWord: "Stage",
+    ofWord: "of",
+    prev: "Previous stage",
+    next: "Next stage",
+    handlesLab: "What UniqueApex handles here",
     stages: [
-      { label: "First Concern", icon: "bx:bxs-heart" },
-      { label: "Assessment", icon: "bx:bxs-report" },
-      { label: "First Provider", icon: "bx:bxs-user-voice" },
-      { label: "Ongoing Therapy", icon: "bx:bxs-conversation" },
-      { label: "School Entry", icon: "bx:bxs-graduation" },
-      { label: "IEP & Transitions", icon: "bx:bxs-file" },
-      { label: "Adolescence", icon: "bx:bxs-user" },
-      { label: "Adult Services", icon: "bx:bxs-briefcase" },
+      { label: "First Concern", icon: "bx:bxs-heart", help: "Not sure where to start? Tell us what you're noticing and we'll point you to the right first steps — no diagnosis needed to begin. A few gentle questions build your child's starting picture, so you know what to watch for and who to talk to first, this month — not someday.", pts: ["A gentle starting questionnaire", "Clear next steps for this month", "No diagnosis required to begin"] },
+      { label: "Assessment", icon: "bx:bxs-report", help: "We help you find assessment options, prepare the paperwork, and understand the results in plain language. We track referral requirements for you and help gather observations from school or daycare, so you walk in prepared — and walk out knowing what the results actually mean for daily life.", pts: ["Assessment options near you", "Referral paperwork, prepared", "Results explained in plain language"] },
+      { label: "First Provider", icon: "bx:bxs-user-voice", help: "One profile, one outreach — we contact matched providers on your behalf and bring back real availability, fees, and fit notes. Your child's profile travels with every request, so the first session starts with understanding instead of paperwork. No calling twenty clinics and repeating your story each time.", pts: ["Matched shortlist with real availability", "Fees and fit notes upfront", "Outreach sent on your behalf"] },
+      { label: "Ongoing Therapy", icon: "bx:bxs-conversation", help: "Keep goals, progress, and reports from every provider in one place — so nothing gets lost between appointments. Goals from your SLP, OT, and school stay visible side by side, and every update keeps the whole team pulling in the same direction.", pts: ["All goals visible side by side", "Progress and reports in one place", "Every provider stays in sync"] },
+      { label: "School Entry", icon: "bx:bxs-graduation", help: "Your child's Passport hands the school everything they need on day one — strengths, needs, and the strategies that work. Teachers see communication preferences and sensory needs before challenges come up. Fewer surprises in September, and faster trust between home and school.", pts: ["Passport shared with the school", "Strategies teachers can use on day one", "Sensory and communication needs, upfront"] },
+      { label: "IEP & Transitions", icon: "bx:bxs-file", help: "Upload IEPs and reports; the platform summarizes them in plain language and alerts you before key transitions. You get a clear picture of what was decided and what to ask for next, plus reminders 60–90 days before a contract ends or a program changes — so there's always a plan in motion.", pts: ["Plain-language IEP summaries", "Reminders 60–90 days ahead", "Know exactly what to ask for next"] },
+      { label: "Adolescence", icon: "bx:bxs-user", help: "Support needs change — the profile grows with your child and brings every new provider up to speed instantly. As independence, school demands, and social life shift, the profile shifts with them: new strengths, new supports, without losing the history that got you here.", pts: ["The profile evolves with new needs", "New providers up to speed instantly", "Your history is never lost"] },
+      { label: "Adult Services", icon: "bx:bxs-briefcase", help: "We help you map adult programs and funding before school-based support ends — so nothing falls away at 18. We chart what exists in your region — day programs, employment support, funding — and help you apply early, because adult waitlists are the longest ones of all.", pts: ["Adult programs mapped early", "Funding options identified", "Applications in before waitlists bite"] },
     ],
   },
   fr: {
     label: "Votre parcours",
-    heading: "UniqueApex accompagne votre famille à chaque étape —",
-    headingAccent: "pas seulement à la première recherche.",
+    heading: "On est là dès les premières inquiétudes —",
+    headingAccent: "même avant le diagnostic.",
     body: "Commencez à bâtir le profil de votre enfant dès aujourd'hui. Plus tôt vous commencez, plus il grandit avec lui.",
     startHere: "Commencez ici",
-    cta: "Commencer le profil de votre enfant",
+    tapHint: "Touchez une étape pour voir comment on vous aide",
+    stageWord: "Étape",
+    ofWord: "de",
+    prev: "Étape précédente",
+    next: "Étape suivante",
+    handlesLab: "Ce que UniqueApex prend en charge ici",
     stages: [
-      { label: "Premières préoccupations", icon: "bx:bxs-heart" },
-      { label: "Évaluation", icon: "bx:bxs-report" },
-      { label: "Premier professionnel", icon: "bx:bxs-user-voice" },
-      { label: "Thérapie continue", icon: "bx:bxs-conversation" },
-      { label: "Entrée à l'école", icon: "bx:bxs-graduation" },
-      { label: "Plan d'intervention", icon: "bx:bxs-file" },
-      { label: "Adolescence", icon: "bx:bxs-user" },
-      { label: "Services aux adultes", icon: "bx:bxs-briefcase" },
+      { label: "Premières préoccupations", icon: "bx:bxs-heart", help: "Vous ne savez pas par où commencer? Dites-nous ce que vous observez et on vous oriente vers les bons premiers pas — aucun diagnostic requis. Quelques questions simples dressent un premier portrait de votre enfant : vous savez quoi surveiller et à qui parler en premier, dès ce mois-ci.", pts: ["Un questionnaire de départ tout en douceur", "Des prochaines étapes claires, dès ce mois-ci", "Aucun diagnostic requis pour commencer"] },
+      { label: "Évaluation", icon: "bx:bxs-report", help: "On vous aide à trouver des options d'évaluation, à préparer les documents et à comprendre les résultats en langage clair. On suit les exigences de référence pour vous et on rassemble les observations de l'école ou de la garderie — vous arrivez préparé, et vous repartez en sachant ce que les résultats signifient au quotidien.", pts: ["Options d'évaluation près de chez vous", "Documents de référence préparés", "Résultats expliqués en langage clair"] },
+      { label: "Premier professionnel", icon: "bx:bxs-user-voice", help: "Un profil, une démarche — on contacte les professionnels compatibles en votre nom et on vous rapporte les vraies disponibilités, tarifs et notes de compatibilité. Le profil de votre enfant accompagne chaque demande : la première séance commence par de la compréhension, pas de la paperasse. Fini d'appeler vingt cliniques en répétant votre histoire.", pts: ["Liste ciblée avec vraies disponibilités", "Tarifs et compatibilité dès le départ", "Démarches envoyées en votre nom"] },
+      { label: "Thérapie continue", icon: "bx:bxs-conversation", help: "Objectifs, progrès et rapports de chaque intervenant, réunis au même endroit — rien ne se perd entre les rendez-vous. Les objectifs de l'orthophoniste, de l'ergothérapeute et de l'école restent visibles côte à côte, et chaque mise à jour garde toute l'équipe dans la même direction.", pts: ["Tous les objectifs côte à côte", "Progrès et rapports au même endroit", "Chaque intervenant reste synchronisé"] },
+      { label: "Entrée à l'école", icon: "bx:bxs-graduation", help: "Le Passeport de votre enfant donne à l'école tout ce qu'il faut dès le premier jour — forces, besoins et stratégies qui fonctionnent. Les enseignants connaissent les préférences de communication et les besoins sensoriels avant que les défis surviennent. Moins de surprises en septembre, une confiance plus rapide entre la maison et l'école.", pts: ["Passeport partagé avec l'école", "Stratégies utilisables dès le premier jour", "Besoins sensoriels et de communication, d'avance"] },
+      { label: "Plan d'intervention", icon: "bx:bxs-file", help: "Téléversez les plans d'intervention et rapports; la plateforme les résume en langage clair et vous alerte avant les transitions importantes. Vous voyez clairement ce qui a été décidé et quoi demander ensuite, avec des rappels 60 à 90 jours avant la fin d'un contrat ou d'un programme — il y a toujours un plan en marche.", pts: ["Résumés clairs des plans d'intervention", "Rappels 60 à 90 jours à l'avance", "Savoir exactement quoi demander ensuite"] },
+      { label: "Adolescence", icon: "bx:bxs-user", help: "Les besoins évoluent — le profil grandit avec votre enfant et met chaque nouvel intervenant à jour instantanément. À mesure que l'autonomie, l'école et la vie sociale changent, le profil suit : nouvelles forces, nouveaux soutiens, sans perdre l'historique qui vous a menés jusqu'ici.", pts: ["Le profil évolue avec les nouveaux besoins", "Nouveaux intervenants à jour instantanément", "L'historique jamais perdu"] },
+      { label: "Services aux adultes", icon: "bx:bxs-briefcase", help: "On vous aide à planifier les programmes et le financement pour adultes avant la fin du soutien scolaire — pour que rien ne s'arrête à 18 ans. On cartographie ce qui existe dans votre région — programmes de jour, soutien à l'emploi, financement — et on vous aide à faire les demandes tôt, parce que les listes d'attente adultes sont les plus longues de toutes.", pts: ["Programmes pour adultes repérés tôt", "Options de financement identifiées", "Demandes déposées avant que les listes s'allongent"] },
     ],
   },
 }[lang];
 ---
 
-<section class="py-16 my-8">
-  <div class="text-center max-w-3xl mx-auto mb-16">
+<section class="pt-6 pb-16 my-4" id="ua-journey" data-sw={content.stageWord} data-ow={content.ofWord}>
+  <div class="text-center max-w-3xl mx-auto mb-12">
     <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{content.label}</p>
     <h2 class="text-3xl md:text-4xl font-bold mt-3 text-slate-800 leading-tight">
       {content.heading} <span class="text-violet-700">{content.headingAccent}</span>
     </h2>
     <p class="text-slate-500 mt-6 text-lg">{content.body}</p>
+    <p class="text-violet-600 mt-3 text-sm font-medium md:hidden">{content.tapHint} ↓</p>
   </div>
 
-  <!-- Desktop: horizontal timeline -->
-  <div class="hidden md:block relative">
-    <div class="absolute top-7 left-[6%] right-[6%] h-0.5 bg-gradient-to-r from-violet-200 via-violet-500 to-violet-200"></div>
-    <div class="relative flex justify-between">
+  <!-- Desktop: stage rail + spotlight card -->
+  <div class="hidden md:grid md:grid-cols-[290px_1fr] gap-8 max-w-5xl mx-auto items-stretch">
+    <!-- rail -->
+    <div id="jn-rail" class="relative">
+      <div id="jn-track" class="absolute w-0.5 bg-violet-100 rounded-full" style="left:25px;top:0;bottom:0"></div>
+      <div id="jn-fill" class="absolute w-0.5 rounded-full bg-gradient-to-b from-violet-400 to-violet-700" style="left:25px;top:0;height:0"></div>
+      <div class="relative flex flex-col gap-1">
+        {content.stages.map((stage, i) => (
+          <button type="button" class={`jn-row group flex items-center gap-3.5 w-full text-left rounded-xl px-2 py-2 cursor-pointer bg-transparent border-0 transition-colors ${i === 0 ? "jn-active" : ""}`} data-i={i} aria-expanded={i === 0 ? "true" : "false"}>
+            <span class={`jn-dot w-[38px] h-[38px] rounded-full flex items-center justify-center shrink-0 relative z-10 ${i === 0 ? "jn-done" : ""}`}>
+              <Icon class="w-[17px] h-[17px]" name={stage.icon} />
+            </span>
+            <span class="flex-1 min-w-0">
+              <span class="block text-[14.5px] font-semibold text-slate-700 leading-tight jn-row-label">{stage.label}</span>
+              {i === 0 && <span class="block text-[10px] font-bold text-violet-700 uppercase tracking-wide mt-0.5">{content.startHere}</span>}
+            </span>
+            <svg class="jn-row-chev opacity-0 group-hover:opacity-100 text-violet-400 shrink-0 transition-opacity" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <!-- spotlight card -->
+    <div class="relative bg-white border border-violet-100 rounded-3xl p-8 lg:p-10 overflow-hidden flex flex-col shadow-xl shadow-violet-100/50">
+      <div class="relative grid flex-1">
       {content.stages.map((stage, i) => (
-        <div class="flex flex-col items-center" style="width: 12.5%;">
-          <div class={`w-14 h-14 rounded-full flex items-center justify-center z-10 ${i === 0 ? "bg-violet-700 border-2 border-violet-700" : "bg-white border-2 border-violet-300"}`}>
-            <Icon class={i === 0 ? "text-white w-6 h-6" : "text-violet-600 w-6 h-6"} name={stage.icon} />
+        <div class={`jn-slide relative flex flex-col ${i === 0 ? "" : "jn-hide"}`} style="grid-area:1/1" data-i={i}>
+          <span class="absolute -top-8 -right-2 text-[120px] font-extrabold leading-none text-violet-50 select-none pointer-events-none" aria-hidden="true">{(i + 1).toString().padStart(2, "0")}</span>
+          <div class="relative flex items-center gap-4 mb-5">
+            <span class="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-violet-700 text-white flex items-center justify-center shadow-md shadow-violet-200 shrink-0">
+              <Icon class="w-7 h-7" name={stage.icon} />
+            </span>
+            <span>
+              <span class="block text-[11px] font-bold text-violet-600 uppercase tracking-wider">{content.stageWord} {i + 1} {content.ofWord} {content.stages.length}</span>
+              <span class="block text-2xl font-bold text-slate-800 leading-tight mt-0.5">{stage.label}</span>
+            </span>
           </div>
-          {i === 0 && (
-            <span class="mt-2 text-[11px] font-bold text-violet-700 uppercase tracking-wide">{content.startHere}</span>
-          )}
-          <p class={`text-sm font-medium text-center text-slate-700 px-1 ${i === 0 ? "mt-1" : "mt-3"}`}>{stage.label}</p>
+          <p class="relative text-slate-600 text-[15.5px] leading-relaxed m-0 mb-6">{stage.help}</p>
+          <div class="relative bg-violet-50/70 border border-violet-100 rounded-2xl p-5">
+            <p class="text-[11px] font-bold text-violet-600 uppercase tracking-wider m-0 mb-3">{content.handlesLab}</p>
+            <ul class="m-0 p-0 list-none space-y-2.5">
+              {stage.pts.map((pt) => (
+                <li class="flex items-start gap-2.5 text-[14.5px] text-slate-700 leading-snug">
+                  <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-[1px]">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                  </span>
+                  {pt}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       ))}
+      </div>
+      <div class="relative flex items-center justify-between mt-auto pt-6 border-t border-violet-50" style="margin-top:auto">
+        <div class="flex items-center gap-1.5">
+          {content.stages.map((_, i) => (
+            <span class={`jn-dot-mini w-2 h-2 rounded-full transition-colors ${i === 0 ? "bg-violet-600" : "bg-violet-100"}`} data-i={i}></span>
+          ))}
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="jn-prev" class="w-10 h-10 rounded-full border border-violet-200 text-violet-600 flex items-center justify-center cursor-pointer bg-white hover:bg-violet-50 transition-colors disabled:opacity-35 disabled:cursor-default" aria-label={content.prev}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button type="button" id="jn-next" class="w-10 h-10 rounded-full border border-violet-200 text-violet-600 flex items-center justify-center cursor-pointer bg-white hover:bg-violet-50 transition-colors disabled:opacity-35 disabled:cursor-default" aria-label={content.next}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -82,22 +145,132 @@ const content = {
     <div class="absolute top-5 bottom-5 left-[26px] w-0.5 bg-gradient-to-b from-violet-200 via-violet-500 to-violet-200"></div>
     <div class="space-y-5">
       {content.stages.map((stage, i) => (
-        <div class="flex items-center gap-4">
-          <div class={`w-12 h-12 rounded-full flex items-center justify-center z-10 shrink-0 ${i === 0 ? "bg-violet-700 border-2 border-violet-700" : "bg-white border-2 border-violet-300"}`}>
-            <Icon class={i === 0 ? "text-white w-5 h-5" : "text-violet-600 w-5 h-5"} name={stage.icon} />
-          </div>
-          <div>
-            <p class="font-medium text-slate-700">{stage.label}</p>
-            {i === 0 && (
-              <span class="text-[11px] font-bold text-violet-700 uppercase tracking-wide">{content.startHere}</span>
-            )}
+        <div>
+          <button type="button" class="jn-mrow flex items-center gap-4 w-full text-left cursor-pointer bg-transparent border-0 p-0" data-i={i} aria-expanded="false">
+            <div class={`w-12 h-12 rounded-full flex items-center justify-center z-10 shrink-0 ${i === 0 ? "bg-violet-700 border-2 border-violet-700" : "bg-white border-2 border-violet-300"}`}>
+              <Icon class={i === 0 ? "text-white w-5 h-5" : "text-violet-600 w-5 h-5"} name={stage.icon} />
+            </div>
+            <div class="flex-1">
+              <p class="font-medium text-slate-700 m-0">{stage.label}</p>
+              {i === 0 && (
+                <span class="text-[11px] font-bold text-violet-700 uppercase tracking-wide">{content.startHere}</span>
+              )}
+            </div>
+            <svg class="jn-chev text-violet-400 shrink-0 transition-transform duration-200" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="jn-mhelp hidden ml-16 mt-2 bg-violet-50 border border-violet-100 rounded-xl px-4 py-3" data-i={i}>
+            <p class="text-slate-600 text-[15px] leading-relaxed m-0">{stage.help}</p>
           </div>
         </div>
       ))}
     </div>
   </div>
-
-  <div class="text-center mt-16">
-    <Link href={prefix + "/waitlist"} size="lg">{content.cta}</Link>
-  </div>
 </section>
+
+<style is:global>
+  #ua-journey .jn-row:hover{background:#faf8ff}
+  #ua-journey .jn-row.jn-active{background:#f5f3ff}
+  #ua-journey .jn-row.jn-active .jn-row-label{color:#5b21b6}
+  #ua-journey .jn-dot{background:#fff;border:2px solid #ddd6fe;color:#8b5cf6;transition:background-color .25s ease,border-color .25s ease,color .25s ease,box-shadow .2s ease}
+  #ua-journey .jn-dot.jn-done{background:#6d28d9;border-color:#6d28d9;color:#fff}
+  #ua-journey .jn-row.jn-active .jn-dot{box-shadow:0 0 0 4px #ede9fe}
+  #ua-journey #jn-fill{transition:height .45s ease}
+  #ua-journey .jn-slide{transition:opacity .28s ease,transform .28s ease}
+  #ua-journey .jn-slide.jn-hide{opacity:0;visibility:hidden;transform:translateY(6px);pointer-events:none}
+  #ua-journey .jn-row{opacity:0;transform:translateX(-10px);transition:opacity .45s ease,transform .45s ease,background-color .2s ease}
+  #ua-journey.ua-in .jn-row{opacity:1;transform:none}
+  #ua-journey.ua-in .jn-row:nth-of-type(1){transition-delay:.05s}
+  #ua-journey.ua-in .jn-row:nth-of-type(2){transition-delay:.11s}
+  #ua-journey.ua-in .jn-row:nth-of-type(3){transition-delay:.17s}
+  #ua-journey.ua-in .jn-row:nth-of-type(4){transition-delay:.23s}
+  #ua-journey.ua-in .jn-row:nth-of-type(5){transition-delay:.29s}
+  #ua-journey.ua-in .jn-row:nth-of-type(6){transition-delay:.35s}
+  #ua-journey.ua-in .jn-row:nth-of-type(7){transition-delay:.41s}
+  #ua-journey.ua-in .jn-row:nth-of-type(8){transition-delay:.47s}
+  @media (prefers-reduced-motion: reduce){
+    #ua-journey .jn-row{opacity:1;transform:none;transition:background-color .2s ease}
+    #ua-journey .jn-slide{transition:none}
+    #ua-journey #jn-fill{transition:none}
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var root = document.getElementById("ua-journey");
+    if (!root) return;
+
+    var rows = root.querySelectorAll(".jn-row");
+    var slides = root.querySelectorAll(".jn-slide");
+    var minis = root.querySelectorAll(".jn-dot-mini");
+    var prevBtn = document.getElementById("jn-prev");
+    var nextBtn = document.getElementById("jn-next");
+    var fill = document.getElementById("jn-fill");
+    var track = document.getElementById("jn-track");
+    var rail = document.getElementById("jn-rail");
+    var cur = 0, n = rows.length;
+
+    function layoutRail() {
+      if (!rail || !rows.length || !track || !fill) return;
+      var rr = rail.getBoundingClientRect();
+      if (!rr.height) return;
+      var first = rows[0].querySelector(".jn-dot").getBoundingClientRect();
+      var last = rows[n - 1].querySelector(".jn-dot").getBoundingClientRect();
+      var top = first.top - rr.top + first.height / 2;
+      var bottom = last.top - rr.top + last.height / 2;
+      track.style.top = top + "px";
+      track.style.bottom = (rr.height - bottom) + "px";
+      fill.style.top = top + "px";
+      var curC = rows[cur].querySelector(".jn-dot").getBoundingClientRect();
+      fill.style.height = (curC.top - rr.top + curC.height / 2 - top) + "px";
+    }
+
+    function select(i) {
+      cur = Math.max(0, Math.min(n - 1, i));
+      rows.forEach(function (b, idx) {
+        b.classList.toggle("jn-active", idx === cur);
+        b.setAttribute("aria-expanded", idx === cur ? "true" : "false");
+        var d = b.querySelector(".jn-dot");
+        if (d) d.classList.toggle("jn-done", idx <= cur);
+      });
+      slides.forEach(function (s) { s.classList.toggle("jn-hide", s.getAttribute("data-i") !== String(cur)); });
+      minis.forEach(function (m, idx) {
+        m.classList.toggle("bg-violet-600", idx === cur);
+        m.classList.toggle("bg-violet-100", idx !== cur);
+      });
+      if (prevBtn) prevBtn.disabled = cur === 0;
+      if (nextBtn) nextBtn.disabled = cur === n - 1;
+      layoutRail();
+    }
+
+    rows.forEach(function (btn) {
+      btn.addEventListener("click", function () { select(parseInt(btn.getAttribute("data-i"), 10) || 0); });
+    });
+    if (prevBtn) prevBtn.addEventListener("click", function () { select(cur - 1); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { select(cur + 1); });
+
+    requestAnimationFrame(function () { select(0); });
+    window.addEventListener("load", function () { setTimeout(layoutRail, 60); });
+    var rt;
+    window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(layoutRail, 120); });
+
+    var mrows = root.querySelectorAll(".jn-mrow");
+    mrows.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var i = btn.getAttribute("data-i");
+        var help = root.querySelector('.jn-mhelp[data-i="' + i + '"]');
+        if (!help) return;
+        var open = !help.classList.contains("hidden");
+        help.classList.toggle("hidden", open);
+        btn.setAttribute("aria-expanded", open ? "false" : "true");
+        var chev = btn.querySelector(".jn-chev");
+        if (chev) chev.style.transform = open ? "" : "rotate(180deg)";
+      });
+    });
+
+    if (!("IntersectionObserver" in window)) { root.classList.add("ua-in"); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { root.classList.add("ua-in"); setTimeout(layoutRail, 80); io.disconnect(); } });
+    }, { threshold: 0.15 });
+    io.observe(root);
+  })();
+</script>

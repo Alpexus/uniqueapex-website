@@ -9,46 +9,70 @@ const prefix = lang === "fr" ? "/fr" : "";
 const allFaqs = {
   en: [
     {
-      question: "How does UniqueApex work?",
-      answer: "You create one child profile with your child's needs and location. UniqueApex automatically matches and reaches out to verified therapy providers on your behalf — no more cold-calling or repeated form-filling.",
+      question: "What exactly is UniqueApex?",
+      answer: "Your family's home base for the whole journey. We coordinate therapy access, keep your child's full story in one portable Family Passport, organize documents and progress, and guide you through funding, school, and every transition — from the very first concern all the way to adult services.",
     },
     {
-      question: "What types of therapy does UniqueApex support?",
-      answer: "We currently support speech-language therapy and occupational therapy, with behavioural therapy coming soon. More service types will be added as we expand.",
+      question: "Do I need a diagnosis to start?",
+      answer: "No. UniqueApex is built to help from the very first concern — long before a diagnosis. Your child's profile helps you prepare for assessments, and then keeps growing with them afterwards.",
+    },
+    {
+      question: "How does provider matching work?",
+      answer: "You fill in one child profile. We identify matched speech-language and occupational therapy providers (behavioural therapy coming soon) and contact them on your behalf. You get back a curated shortlist with real availability, fees, and fit notes — no cold-calling, no repeated forms.",
+    },
+    {
+      question: "What is the Family Passport?",
+      answer: "A living profile that captures your child's history, strengths, needs, winning strategies, and reports. It travels with them to every provider, school, and transition — shareable in one click, exportable as a PDF, and you always control what's visible.",
     },
     {
       question: "Is UniqueApex free to use?",
-      answer: "Yes — the core platform is free. Families can submit one child profile and receive one outreach batch per service type at no cost. Our Concierge service is available as a paid upgrade.",
+      answer: "The core platform is free: one child profile and one outreach batch per service type, at no cost. Our Concierge service — a real person handling follow-ups and waitlists for you — is a paid upgrade, and a membership with expert workshops and a parent community is coming.",
+    },
+    {
+      question: "What's coming after launch?",
+      answer: "The Government Funding Navigator (every grant and tax credit you qualify for, explained in plain language), AI Document Intelligence that reads reports and updates the Passport for you, transition alerts, and expert workshops with a parent community. Waitlist families get first access as each one ships.",
     },
     {
       question: "Is my child's information kept private?",
-      answer: "Absolutely. Your child's profile is only shared with providers you are matched with. We follow strict data privacy standards and never sell your information.",
+      answer: "Absolutely. Your child's profile is only shared with the providers you choose. Data is hosted in Canada, we follow strict privacy standards, and we never sell your information.",
     },
     {
-      question: "When is UniqueApex launching?",
-      answer: "We are launching our pilot in Montréal, serving both English and French-speaking families. Join the waitlist to be among the first families to get access.",
+      question: "When and where is UniqueApex launching?",
+      answer: "Our pilot starts in Montréal, in English and French, beginning with speech-language and occupational therapy. Join the waitlist to be among the first families in — and to help shape what we build next.",
     },
   ],
   fr: [
     {
-      question: "Comment fonctionne UniqueApex?",
-      answer: "Vous créez un profil avec les besoins et la localisation de votre enfant. UniqueApex jumelle automatiquement et contacte les professionnels vérifiés en votre nom — plus besoin de faire des appels ou de remplir les mêmes formulaires à répétition.",
+      question: "Qu'est-ce que UniqueApex, exactement?",
+      answer: "Le port d'attache de votre famille pour tout le parcours. Nous coordonnons l'accès aux thérapies, gardons toute l'histoire de votre enfant dans un Passeport familial portable, organisons documents et progrès, et vous guidons à travers le financement, l'école et chaque transition — des premières inquiétudes jusqu'aux services aux adultes.",
     },
     {
-      question: "Quels types de thérapie UniqueApex soutient-il?",
-      answer: "Nous offrons actuellement l'orthophonie et l'ergothérapie, avec la thérapie comportementale à venir bientôt. D'autres types de services seront ajoutés au fur et à mesure de notre croissance.",
+      question: "Faut-il un diagnostic pour commencer?",
+      answer: "Non. UniqueApex est conçu pour aider dès les premières inquiétudes — bien avant un diagnostic. Le profil de votre enfant vous aide à préparer les évaluations, puis continue de grandir avec lui par la suite.",
+    },
+    {
+      question: "Comment fonctionne le jumelage avec les professionnels?",
+      answer: "Vous remplissez un seul profil. Nous identifions les orthophonistes et ergothérapeutes compatibles (thérapie comportementale à venir) et les contactons en votre nom. Vous recevez une liste ciblée avec les vraies disponibilités, les tarifs et des notes de compatibilité — sans appels à froid ni formulaires répétés.",
+    },
+    {
+      question: "Qu'est-ce que le Passeport familial?",
+      answer: "Un profil vivant qui rassemble l'historique, les forces, les besoins, les stratégies gagnantes et les rapports de votre enfant. Il le suit chez chaque professionnel, à l'école et dans chaque transition — partageable en un clic, exportable en PDF, et c'est toujours vous qui contrôlez ce qui est visible.",
     },
     {
       question: "Est-ce que UniqueApex est gratuit?",
-      answer: "Oui — le cœur de la plateforme est gratuit. Les familles peuvent soumettre un profil enfant et recevoir une demande de contact par type de service sans frais. Notre service de conciergerie est offert comme option payante.",
+      answer: "Le cœur de la plateforme est gratuit : un profil enfant et une démarche de contact par type de service, sans frais. Notre service de conciergerie — une vraie personne qui gère les suivis et les listes d'attente pour vous — est offert en option payante, et un abonnement avec ateliers d'experts et communauté de parents s'en vient.",
+    },
+    {
+      question: "Qu'est-ce qui s'en vient après le lancement?",
+      answer: "Le Navigateur de financement gouvernemental (chaque subvention et crédit d'impôt auxquels vous avez droit, expliqués simplement), l'intelligence documentaire par IA qui lit les rapports et met à jour le Passeport pour vous, les alertes de transition, et des ateliers d'experts avec une communauté de parents. Les familles de la liste d'attente y auront accès en premier.",
     },
     {
       question: "Les informations de mon enfant sont-elles protégées?",
-      answer: "Absolument. Le profil de votre enfant est partagé uniquement avec les professionnels jumelés. Nous respectons des normes strictes de confidentialité et ne vendons jamais vos informations.",
+      answer: "Absolument. Le profil de votre enfant n'est partagé qu'avec les professionnels que vous choisissez. Les données sont hébergées au Canada, nous suivons des normes strictes de confidentialité et nous ne vendons jamais vos informations.",
     },
     {
-      question: "Quand est-ce que UniqueApex sera lancé?",
-      answer: "Nous lançons notre projet pilote à Montréal, pour les familles francophones et anglophones. Inscrivez-vous à la liste d'attente pour être parmi les premières familles à y avoir accès.",
+      question: "Quand et où est-ce que UniqueApex sera lancé?",
+      answer: "Notre projet pilote démarre à Montréal, en français et en anglais, en commençant par l'orthophonie et l'ergothérapie. Inscrivez-vous à la liste d'attente pour être parmi les premières familles — et pour aider à façonner la suite.",
     },
   ],
 };

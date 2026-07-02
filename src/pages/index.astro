@@ -1,24 +1,24 @@
 ---
 import Container from "@/components/container.astro";
 import Cta from "@/components/cta.astro";
+import AppShowcase from "@/components/app-showcase.astro";
+import PassportFlow from "@/components/passport-flow.astro";
 import PlatformFeatures from "@/components/platform-features.astro";
 import Journey from "@/components/journey.astro";
 import Faq from "@/components/faq.astro";
 import Hero from "@/components/hero.astro";
 import Logos from "@/components/logos.astro";
-import Howiteaser from "@/components/ui/howiteaser.astro";
 import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout title="">
   <Container>
     <Hero lang="en" />
-    <PlatformFeatures lang="en" />
     <Journey lang="en" />
-<div class="my-16">
-  <Howiteaser lang="en" />
-</div>
-<Logos />
+    <PassportFlow lang="en" />
+    <AppShowcase lang="en" />
+    <PlatformFeatures lang="en" />
+    <Logos />
     <Faq lang="en" />
     <Cta lang="en" />
   </Container>

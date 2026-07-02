@@ -2,12 +2,212 @@
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
-<AppFormLayout title="My Child" activeNav="child">
+<AppFormLayout title="Development Profile" activeNav="child">
   <SectionTabs section="child" active="development" />
+
   <h1 class="page-title">Development Profile</h1>
-  <p class="page-sub">Part of My Child. This page is scaffolded — content is coming.</p>
-  <div class="ua-stub">
-    <b>Development Profile</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+  <p class="page-sub">A friendly, organized picture of where your child is right now — built automatically from your Family Passport.</p>
+
+  <div class="da-top">
+    <span class="tinfo" id="da-meta"></span>
+    <a id="da-edit" href="/passport">Edit in passport →</a>
   </div>
+  <div id="da-acc"></div>
 </AppFormLayout>
+
+<style is:global>
+  .da-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;max-width:880px}
+  .da-top .tinfo{font-size:.82rem;color:#64748b;display:flex;align-items:center;gap:6px}
+  .da-top a{font-size:.82rem;color:#6d28d9;font-weight:600;text-decoration:none}
+  .da-top a:hover{text-decoration:underline}
+  #da-acc{max-width:880px}
+  .da-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;margin-bottom:10px;overflow:hidden}
+  .da-card.muted{background:#fcfcfd}
+  .da-head{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer}
+  .da-head:hover{background:#f8fafc}
+  .da-ic{width:34px;height:34px;border-radius:10px;background:#F5F3FF;color:#6d28d9;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .da-card.muted .da-ic{background:#f1f5f9;color:#94a3b8}
+  .da-name{font-size:.95rem;font-weight:700;color:#1e293b}
+  .da-sum{font-size:.82rem;color:#64748b}
+  .da-chev-svg{color:#94a3b8;transition:transform .2s;flex-shrink:0}
+  .da-card.open .da-chev-svg{transform:rotate(180deg)}
+  .da-card.collapsed .da-body{display:none}
+  .da-body{padding:2px 16px 18px}
+  .da-lab{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#94a3b8;margin:14px 0 8px}
+  .da-chip{display:inline-flex;align-items:center;gap:6px;font-size:.83rem;font-weight:600;padding:6px 11px;border-radius:10px;margin:0 6px 6px 0;line-height:1.25}
+  .da-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin-top:4px}
+  .da-tile{border:1px solid #e2e8f0;border-radius:12px;padding:11px 13px}
+  .da-tile-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .da-tile-name{font-size:.85rem;font-weight:600;color:#1e293b}
+  .da-badge{font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:9999px;white-space:nowrap}
+  .da-sub{font-size:.78rem;color:#64748b;margin:6px 0 0;line-height:1.4}
+  .da-note{font-size:.84rem;font-style:italic;color:#64748b;border-left:3px solid #EDE9FE;padding-left:11px;margin:14px 0 0;border-radius:0}
+  .da-empty{font-size:.85rem;color:#94a3b8;margin:6px 0 0}
+  .da-empty a{color:#6d28d9;font-weight:600;text-decoration:none}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>
+
+<script>
+  import * as UA from "../../lib/ua-data.js";
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const lc = (s) => String(s || "").toLowerCase();
+  const cap = (s) => { s = String(s || ""); return s.charAt(0).toUpperCase() + s.slice(1); };
+  const present = (v) => v != null && v !== "" && v !== "Select...";
+  const uniq = (a) => [...new Set(a)];
+  const textToList = (s) => String(s || "").split(/[,\n;•]+/).map((x) => x.trim()).filter(Boolean);
+  const isHigh = (v) => v === "Often" || v === "Daily";
+  const listShort = (arr, n) => arr.slice(0, n).join(" & ") + (arr.length > n ? "…" : "");
+
+  const TONE = {
+    good: { bg: "#ECFDF5", fg: "#15803d" },
+    work: { bg: "#FFFBEB", fg: "#b45309" },
+    info: { bg: "#F5F3FF", fg: "#6d28d9" },
+    warn: { bg: "#FEF2F2", fg: "#b91c1c" },
+    neutral: { bg: "#f1f5f9", fg: "#64748b" },
+  };
+  const TIC = {
+    good: '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M3 8.5l3.2 3L13 4.5"/></svg>',
+    work: '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M8 3.2v6M8 12.3v.2"/></svg>',
+    info: '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg>',
+    warn: '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M8 2v7M8 12v.2"/></svg>',
+    neutral: '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M3 8h10"/></svg>',
+  };
+  const IC = {
+    msg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 3z"/></svg>',
+    users: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3.3 2.7-5 6-5s6 1.7 6 5"/><circle cx="17" cy="8.5" r="2.2"/><path d="M16.5 14c2.6.2 4.5 1.7 4.5 5"/></svg>',
+    waves: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg>',
+    home: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-6 8 6"/><path d="M6 10v9h12v-9"/></svg>',
+    run: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="14" cy="5" r="2"/><path d="M6 21l3-5 3 2 1-5 3 3h2"/><path d="M9 12l3-3 2 2"/></svg>',
+    heart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.5-7-9.5A3.5 3.5 0 0 1 12 7a3.5 3.5 0 0 1 7 3.5C19 15.5 12 20 12 20z"/></svg>',
+    star: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2.5 6.5L21 10l-5 4.5L17.5 21 12 17l-5.5 4L8 14.5 3 10l6.5-.5z"/></svg>',
+    chev: '<svg class="da-chev-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>',
+  };
+
+  (async () => {
+    const passports = await UA.getPassports().catch(() => []);
+    const p = UA.pickActivePassport(passports);
+    const d = (p && p.data) || {};
+    const id = UA.childIdentity(d);
+    const firstName = id.first || "your child";
+    const passportLink = "/passport" + (p ? "?id=" + p.id : "");
+
+    $("da-edit").href = passportLink;
+    $("da-meta").innerHTML = `<span>Built from ${esc(firstName)}'s passport${p && p.updated_at ? " · updated " + esc(UA.relTime(p.updated_at)) : ""}</span>`;
+
+    function commCard() {
+      const c = d.communication || {}; const can = [], work = [];
+      if (c.style === "Fluent Verbal" || c.style === "Verbal") can.push("Communicates verbally");
+      const mm = { "Words": "Uses words", "Sentences": "Uses sentences", "Sounds": "Uses sounds", "Pictures (PECS)": "Uses picture cards", "Sign language": "Uses sign language", "Device / AAC app": "Uses an AAC device" };
+      (c.means || []).forEach((m) => { if (mm[m]) can.push(mm[m]); });
+      if (c.canExpressNeeds === "Consistently") can.push("Expresses needs reliably");
+      else if (c.canExpressNeeds === "Sometimes") can.push("Expresses needs sometimes");
+      if (c.style === "Non-Speaking" || c.style === "Limited Verbal") work.push("Building spoken communication");
+      const cm = { "Requesting": "Requesting things", "Conversation": "Back-and-forth conversation", "Question Answering": "Answering questions", "Emotional Expression": "Putting feelings into words", "Social Communication": "Social communication" };
+      (c.challenges || []).forEach((x) => { if (cm[x]) work.push(cm[x]); });
+      if (c.canExpressNeeds === "Rarely") work.push("Expressing needs");
+      const groups = []; if (can.length) groups.push({ label: "Can do", tone: "good", items: uniq(can) }); if (work.length) groups.push({ label: "Working on", tone: "work", items: uniq(work) });
+      const sum = [c.style, c.canExpressNeeds ? ("expresses needs " + lc(c.canExpressNeeds)) : ""].filter(present).join(" · ");
+      return { icon: "msg", name: "Communication", sum, mode: "chips", groups, note: "", empty: !groups.length };
+    }
+    function socialCard() {
+      const b = d.behaviour || {}; const can = [], work = [];
+      if (b.peersInterest === "Yes") can.push("Shows interest in other children");
+      if (b.peersInteract === "Yes") can.push("Plays with peers"); else if (b.peersInteract === "Sometimes") can.push("Plays alongside others");
+      if (b.followsInstructions === "Yes") can.push("Follows familiar instructions");
+      if (b.peersInterest === "No") work.push("Connecting with other children");
+      if (b.peersInteract === "No" || b.peersInteract === "Sometimes") work.push("Back-and-forth play");
+      if (b.followsInstructions === "No" || b.followsInstructions === "Sometimes") work.push("Following instructions");
+      const groups = []; if (can.length) groups.push({ label: "Can do", tone: "good", items: uniq(can) }); if (work.length) groups.push({ label: "Working on", tone: "work", items: uniq(work) });
+      const sum = [b.peersInterest === "Yes" ? "interested in peers" : "", b.peersInteract ? ("plays " + (b.peersInteract === "Yes" ? "with others" : b.peersInteract === "Sometimes" ? "alongside" : "independently")) : ""].filter(Boolean).join(" · ");
+      return { icon: "users", name: "Social interaction", sum: cap(sum), mode: "chips", groups, note: "", empty: !groups.length };
+    }
+    function sensoryCard() {
+      const s = d.sensory || {};
+      const SENSES = [["auditory", "Sound"], ["visual", "Sight"], ["tactile", "Touch"], ["oral", "Taste & mouth"], ["smell", "Smell"], ["movement", "Movement"], ["body", "Body awareness"]];
+      const seekRe = /seek|fascinat|spinning|crav|crash|rough play|chew|mouth|constantly moving|makes noise/i;
+      const avoidRe = /avoid|cover|bother|distress|dislike|fearful|overwhelm|misses|doesn't/i;
+      const items = [], sensitive = [], seeking = [];
+      SENSES.forEach(([k, label]) => {
+        const o = s[k]; if (!o || typeof o !== "object") return;
+        if (o.typical) { items.push({ name: label, badge: "Comfortable", tone: "good" }); return; }
+        if (o.signs && o.signs.length) {
+          const seek = o.signs.some((x) => seekRe.test(x)) && !o.signs.some((x) => avoidRe.test(x));
+          if (seek) seeking.push(label.toLowerCase()); else sensitive.push(label.toLowerCase());
+          items.push({ name: label, badge: seek ? "Seeking" : "Sensitive", tone: seek ? "info" : "work", sub: o.signs.slice(0, 2).join(", ") + (o.severity ? " (" + lc(o.severity) + ")" : "") });
+        }
+      });
+      const parts = []; if (sensitive.length) parts.push("sensitive to " + listShort(sensitive, 2)); if (seeking.length) parts.push("seeks " + listShort(seeking, 2));
+      const sum = cap(parts.join(" · ")) || (items.length ? "No concerns flagged" : "");
+      return { icon: "waves", name: "Sensory profile", sum, mode: "grid", items, note: present(s.notes) ? s.notes : "", empty: !items.length };
+    }
+    function dailyCard() {
+      const dl = d.dailyLiving || {};
+      const toneFor = (v) => (["Independent", "Fully trained", "Good", "Strong", "None"].indexOf(v) > -1) ? "good" : (["Variable", "Developing", "Mild", "Not applicable"].indexOf(v) > -1) ? "neutral" : "work";
+      const defs = [["eating", "Eating"], ["dressing", "Dressing"], ["toileting", "Toileting"], ["sleep", "Sleep"], ["safety", "Safety"]];
+      const items = []; defs.forEach(([k, label]) => { const v = dl[k]; if (present(v)) items.push({ name: label, badge: v, tone: toneFor(v) }); });
+      const indep = items.filter((i) => i.tone === "good"), sup = items.filter((i) => i.tone === "work");
+      const sum = [indep.length ? (cap(indep[0].name) + " independent") : "", sup.length ? (sup[0].name.toLowerCase() + " with support") : ""].filter(Boolean).join(" · ");
+      return { icon: "home", name: "Daily living", sum, mode: "grid", items, note: present(dl.dietaryRestrictions) ? ("Dietary needs: " + dl.dietaryRestrictions) : "", empty: !items.length };
+    }
+    function motorCard() {
+      const m = d.motor || {};
+      const clean = (x) => cap(String(x).replace(/^Difficulty (with |using )?/i, "").trim());
+      const work = []; (m.gross || []).forEach((x) => work.push(clean(x))); (m.fine || []).forEach((x) => work.push(clean(x)));
+      const hasData = (m.gross && m.gross.length) || (m.fine && m.fine.length) || present(m.notes);
+      const can = []; if (hasData) { if (!(m.gross && m.gross.length)) can.push("Gross motor on track"); if (!(m.fine && m.fine.length)) can.push("Fine motor on track"); }
+      const groups = []; if (can.length) groups.push({ label: "On track", tone: "good", items: can }); if (work.length) groups.push({ label: "Working on", tone: "work", items: uniq(work) });
+      const sum = hasData ? [(m.gross && m.gross.length) ? "gross motor support" : "strong gross motor", (m.fine && m.fine.length) ? "fine motor support" : "strong fine motor"].join(" · ") : "";
+      return { icon: "run", name: "Motor skills", sum: cap(sum), mode: "chips", groups, note: present(m.notes) ? m.notes : "", empty: !hasData };
+    }
+    function emotionalCard() {
+      const b = d.behaviour || {}, ch = b.challenges || {};
+      const settled = !isHigh(ch.meltdowns) && !isHigh(ch.emotional) && !isHigh(ch.anxiety);
+      const helps = textToList(b.strategies), trig = textToList(b.triggers);
+      const wmap = { meltdowns: "Big reactions / meltdowns", emotional: "Regulating emotions", anxiety: "Anxiety", rigidity: "Coping with change", aggression: "Aggression", selfInjury: "Self-injury", repetitive: "Repetitive behaviours", defiance: "Following directions", hyperactivity: "Focus and impulsivity", elopement: "Safety / flight risk" };
+      const work = Object.keys(wmap).filter((k) => isHigh(ch[k])).map((k) => wmap[k]);
+      const hasData = helps.length || trig.length || work.length || Object.keys(ch).some((k) => present(ch[k]));
+      const groups = [];
+      if (helps.length) groups.push({ label: "What helps", tone: "good", items: helps });
+      else if (settled && hasData) groups.push({ label: "Strengths", tone: "good", items: ["Generally calm and settled"] });
+      if (trig.length) groups.push({ label: "Triggers", tone: "work", items: trig });
+      if (work.length) groups.push({ label: "Working on", tone: "work", items: work });
+      const sum = !hasData ? "" : (settled ? "Generally settled" : "Working on big reactions");
+      return { icon: "heart", name: "Emotional regulation", sum, mode: "chips", groups, note: "", empty: !hasData || !groups.length };
+    }
+    function interestsCard() {
+      const s = d.strengths || {};
+      const loves = textToList(s.interests), avoid = textToList(s.dislikes);
+      const groups = []; if (loves.length) groups.push({ label: "Loves", tone: "good", items: loves.map(cap) }); if (avoid.length) groups.push({ label: "Things to avoid", tone: "warn", items: avoid.map(cap) });
+      const sum = loves.length ? loves.slice(0, 4).map(cap).join(", ") : "";
+      return { icon: "star", name: "Interests & motivators", sum, mode: "chips", groups, note: "", empty: !groups.length };
+    }
+
+    const cards = [commCard(), socialCard(), sensoryCard(), dailyCard(), motorCard(), emotionalCard(), interestsCard()];
+
+    const chipHtml = (items, tone) => { const t = TONE[tone]; return items.map((x) => `<span class="da-chip" style="background:${t.bg};color:${t.fg}">${TIC[tone]}${esc(x)}</span>`).join(""); };
+    const emptyBody = () => `<p class="da-empty">Not recorded yet. <a href="${passportLink}">Add in passport →</a></p>`;
+    const bodyChips = (c) => { if (c.empty) return emptyBody(); let h = ""; c.groups.forEach((g) => { h += `<p class="da-lab">${g.label}</p><div>${chipHtml(g.items, g.tone)}</div>`; }); if (c.note) h += `<p class="da-note">${esc(c.note)}</p>`; return h; };
+    const bodyGrid = (c) => { if (c.empty) return emptyBody(); let h = '<div class="da-grid">'; c.items.forEach((it) => { const t = TONE[it.tone]; h += `<div class="da-tile"><div class="da-tile-top"><span class="da-tile-name">${esc(it.name)}</span><span class="da-badge" style="background:${t.bg};color:${t.fg}">${esc(it.badge)}</span></div>${it.sub ? `<p class="da-sub">${esc(it.sub)}</p>` : ""}</div>`; }); h += "</div>"; if (c.note) h += `<p class="da-note">${esc(c.note)}</p>`; return h; };
+
+    let opened = false;
+    $("da-acc").innerHTML = cards.map((c) => {
+      const body = c.mode === "grid" ? bodyGrid(c) : bodyChips(c);
+      const isOpen = !c.empty && !opened; if (isOpen) opened = true;
+      const sum = c.empty ? "Not recorded yet" : (c.sum || "");
+      return `<div class="da-card ${isOpen ? "open" : "collapsed"} ${c.empty ? "muted" : ""}"><div class="da-head"><span class="da-ic">${IC[c.icon]}</span><span style="flex:1;min-width:0"><span class="da-name" style="display:block">${esc(c.name)}</span><span class="da-sum" style="display:block">${esc(sum)}</span></span>${IC.chev}</div><div class="da-body">${body}</div></div>`;
+    }).join("");
+
+    $("da-acc").querySelectorAll(".da-head").forEach((h) => h.addEventListener("click", () => {
+      const card = h.parentElement; card.classList.toggle("open"); card.classList.toggle("collapsed");
+    }));
+  })().catch((e) => console.error("[development] hydrate failed", e));
+</script>
