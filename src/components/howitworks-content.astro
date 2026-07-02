@@ -1,0 +1,211 @@
+---
+// =============================================================================
+// UniqueApex · How It Works — illustrated steps, each with one "moment" card
+// Save as: src/components/howitworks-content.astro
+// =============================================================================
+// @ts-ignore
+import { Icon } from "astro-icon/components";
+
+const { lang = "en" } = Astro.props;
+
+const t = {
+  en: {
+    label: "How UniqueApex works",
+    title1: "Your path to support,",
+    title2: "in five steps",
+    intro: "Most families spend months making calls, filling out the same forms, and waiting with no update. UniqueApex replaces that burden with one profile, structured outreach, and a single place where everything lands — so you can focus on your child.",
+    stepWord: "Step",
+    passportLab: "Family Passport",
+    passportChild: "Maya · Age 7",
+    passportRows: ["Full history", "Strengths & needs", "Reports & documents"],
+    sharesTo: "Shares to",
+    shareChips: ["School", "New provider", "Funding application"],
+    steps: [
+      {
+        title: "Tell your child's story — once",
+        body: "Age, strengths, needs, diagnosis or areas of concern, and the support you're looking for. This becomes your child's Family Passport — the living profile that powers everything else. You'll never re-enter it again.",
+        card: { icon: "bx:bxs-id-card", title: "Family Passport created", sub: "Maya · Age 7 · looking for speech-language support", time: "Day 1" },
+        img: "/step1-profile.png",
+        alt: "Create profile illustration",
+      },
+      {
+        title: "We match and reach out for you",
+        body: "UniqueApex matches your child's profile to verified speech-language and occupational therapy providers in your area (behavioural therapy coming soon) — and contacts them on your behalf. You get back a curated shortlist with availability, fees, and fit notes.",
+        card: { icon: "bx:bxs-paper-plane", title: "Outreach sent", sub: "6 speech-language clinics contacted on your behalf", time: "Day 2" },
+        img: "/step2-providers.png",
+        alt: "Provider matching illustration",
+      },
+      {
+        title: "Watch everything land in one place",
+        body: "Responses, waitlist positions, documents, and progress live together on one dashboard. You always know where things stand — without chasing anyone.",
+        card: { icon: "bx:bxs-bell", title: "Clinique Papillon replied", sub: "Intake possible in March — 2 spots open", time: "Day 6" },
+        img: "/step3-waitlist.png",
+        alt: "Tracking dashboard illustration",
+      },
+      {
+        title: "Share the Passport wherever it's needed",
+        body: "The same profile travels with your child — to the school, to every new provider, into funding applications. One click to share, a PDF export for any meeting, and you always control what's visible.",
+        card: { icon: "bx:bxs-graduation", title: "Shared with the school", sub: "Teachers see strengths and strategies before day one", time: "Week 3" },
+        img: null,
+        alt: "",
+      },
+      {
+        title: "Get hands-on help when you need it",
+        body: "When it gets heavy, our Concierge service assigns you a dedicated human coordinator — follow-ups, documentation, cross-service orchestration — one-time fee, no subscription.",
+        card: { icon: "bx:bxs-user-voice", title: "Concierge assigned", sub: "A real coordinator is handling your follow-ups", time: "When you choose" },
+        img: "/step4-concierge.png",
+        alt: "Concierge support illustration",
+      },
+    ],
+  },
+  fr: {
+    label: "Comment fonctionne UniqueApex",
+    title1: "Votre chemin vers du soutien,",
+    title2: "en cinq étapes",
+    intro: "La plupart des familles passent des mois à faire des appels, remplir les mêmes formulaires et attendre sans nouvelles. UniqueApex remplace ce fardeau par un seul profil, des démarches structurées et un seul endroit où tout arrive — pour que vous puissiez vous concentrer sur votre enfant.",
+    stepWord: "Étape",
+    passportLab: "Passeport familial",
+    passportChild: "Maya · 7 ans",
+    passportRows: ["Historique complet", "Forces et besoins", "Rapports et documents"],
+    sharesTo: "Se partage à",
+    shareChips: ["L'école", "Nouvel intervenant", "Demande de financement"],
+    steps: [
+      {
+        title: "Racontez l'histoire de votre enfant — une seule fois",
+        body: "Âge, forces, besoins, diagnostic ou préoccupations, et le soutien recherché. Tout cela devient le Passeport familial de votre enfant — le profil vivant qui alimente tout le reste. Vous n'aurez plus jamais à le ressaisir.",
+        card: { icon: "bx:bxs-id-card", title: "Passeport familial créé", sub: "Maya · 7 ans · à la recherche d'orthophonie", time: "Jour 1" },
+        img: "/step1-profile.png",
+        alt: "Illustration de création de profil",
+      },
+      {
+        title: "On jumelle et on contacte pour vous",
+        body: "UniqueApex jumelle le profil de votre enfant à des orthophonistes et ergothérapeutes vérifiés de votre région (thérapie comportementale à venir) — et les contacte en votre nom. Vous recevez une liste ciblée avec disponibilités, tarifs et notes de compatibilité.",
+        card: { icon: "bx:bxs-paper-plane", title: "Démarches envoyées", sub: "6 cliniques d'orthophonie contactées en votre nom", time: "Jour 2" },
+        img: "/step2-providers.png",
+        alt: "Illustration de jumelage",
+      },
+      {
+        title: "Tout arrive au même endroit",
+        body: "Réponses, positions sur les listes d'attente, documents et progrès vivent ensemble sur un seul tableau de bord. Vous savez toujours où ça en est — sans courir après personne.",
+        card: { icon: "bx:bxs-bell", title: "Clinique Papillon a répondu", sub: "Accueil possible en mars — 2 places ouvertes", time: "Jour 6" },
+        img: "/step3-waitlist.png",
+        alt: "Illustration du tableau de suivi",
+      },
+      {
+        title: "Partagez le Passeport partout où il le faut",
+        body: "Le même profil suit votre enfant — à l'école, chez chaque nouvel intervenant, dans les demandes de financement. Un clic pour partager, un PDF pour n'importe quelle rencontre, et c'est toujours vous qui contrôlez ce qui est visible.",
+        card: { icon: "bx:bxs-graduation", title: "Partagé avec l'école", sub: "Les enseignants voient forces et stratégies avant le premier jour", time: "Semaine 3" },
+        img: null,
+        alt: "",
+      },
+      {
+        title: "De l'aide humaine quand vous en avez besoin",
+        body: "Quand c'est trop lourd, notre service de conciergerie vous assigne une vraie personne dédiée — suivis, documentation, coordination entre services — frais uniques, sans abonnement.",
+        card: { icon: "bx:bxs-user-voice", title: "Conciergerie assignée", sub: "Une vraie personne s'occupe de vos suivis", time: "Quand vous voulez" },
+        img: "/step4-concierge.png",
+        alt: "Illustration du service de conciergerie",
+      },
+    ],
+  },
+}[lang];
+---
+
+<div id="hiw">
+  <!-- Hero -->
+  <div class="grid md:grid-cols-2 gap-16 items-center mt-16 mb-20">
+    <div class="space-y-6">
+      <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{t.label}</p>
+      <h1 class="text-5xl font-bold text-slate-800 leading-tight">
+        {t.title1} <span class="text-violet-700">{t.title2}</span>
+      </h1>
+      <p class="text-slate-600 leading-relaxed text-lg">{t.intro}</p>
+    </div>
+    <div class="flex items-center justify-center">
+      <img src="/mom-overwhelmed.png" alt={lang === "fr" ? "Illustration d'un parent débordé" : "Overwhelmed parent illustration"} class="w-full max-w-[520px]" />
+    </div>
+  </div>
+
+  <!-- Steps -->
+  <div class="mb-24 space-y-28">
+    {t.steps.map((step, i) => (
+      <div class="hiw-step grid md:grid-cols-2 gap-12 items-center" data-i={i}>
+        <div class={i % 2 === 1 ? "md:order-2" : ""}>
+          <p class="text-xs font-bold text-violet-600 uppercase tracking-wider m-0">{t.stepWord} {i + 1}</p>
+          <h2 class="text-3xl font-bold text-slate-800 mt-3">{step.title}</h2>
+          <p class="text-slate-500 mt-4 leading-relaxed text-lg">{step.body}</p>
+          <div class="hiw-card mt-6 inline-flex items-center gap-3.5 bg-white border border-violet-100 rounded-2xl px-4 py-3.5 shadow-lg shadow-violet-100/60 max-w-md">
+            <span class="w-10 h-10 rounded-xl bg-violet-50 text-violet-700 flex items-center justify-center shrink-0">
+              <Icon class="w-5 h-5" name={step.card.icon} />
+            </span>
+            <span class="flex-1 min-w-0">
+              <span class="block text-[14.5px] font-bold text-slate-800 leading-snug">{step.card.title}</span>
+              <span class="block text-[13px] text-slate-500 leading-snug mt-0.5">{step.card.sub}</span>
+            </span>
+            <span class="text-[11px] font-semibold text-violet-400 whitespace-nowrap shrink-0">{step.card.time}</span>
+          </div>
+        </div>
+        <div class={`flex items-center justify-center ${i % 2 === 1 ? "md:order-1" : ""}`}>
+          {step.img ? (
+            <img src={step.img} alt={step.alt} class="w-full max-w-[460px]" />
+          ) : (
+            <div class="w-full max-w-[300px]">
+              <div class="bg-white border-2 border-violet-200 rounded-2xl shadow-xl shadow-violet-200/60 p-5">
+                <p class="text-[10px] font-bold text-violet-600 uppercase tracking-wider m-0 mb-2.5 flex items-center gap-1.5">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="2.6"/><path d="M8 17c.7-1.8 2.2-2.8 4-2.8s3.3 1 4 2.8"/></svg>
+                  {t.passportLab}
+                </p>
+                <div class="flex items-center gap-2.5 mb-3">
+                  <span class="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 text-white flex items-center justify-center text-sm font-bold shrink-0">M</span>
+                  <span class="text-sm font-bold text-slate-800">{t.passportChild}</span>
+                </div>
+                <ul class="m-0 p-0 list-none space-y-1.5">
+                  {t.passportRows.map((row) => (
+                    <li class="flex items-center gap-2 text-[12px] text-slate-600">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M5 13l4 4L19 7"/></svg>
+                      {row}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <p class="text-center text-[11px] uppercase tracking-wide text-violet-500 font-bold mt-4 mb-2">{t.sharesTo} ↓</p>
+              <div class="grid gap-2">
+                {t.shareChips.map((chip) => (
+                  <span class="flex items-center gap-2.5 bg-violet-50 border border-violet-100 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold text-violet-800">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style is:global>
+  #hiw .hiw-step{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+  #hiw .hiw-step.hiw-in{opacity:1;transform:none}
+  #hiw .hiw-card{opacity:0;transform:translateY(8px);transition:opacity .45s ease .35s,transform .45s ease .35s}
+  #hiw .hiw-step.hiw-in .hiw-card{opacity:1;transform:none}
+  @media (prefers-reduced-motion: reduce){
+    #hiw .hiw-step,#hiw .hiw-card{opacity:1;transform:none;transition:none}
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var root = document.getElementById("hiw");
+    if (!root) return;
+    var steps = root.querySelectorAll(".hiw-step");
+    if (!("IntersectionObserver" in window)) {
+      steps.forEach(function (s) { s.classList.add("hiw-in"); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("hiw-in"); io.unobserve(e.target); } });
+    }, { threshold: 0.15 });
+    steps.forEach(function (s) { io.observe(s); });
+  })();
+</script>

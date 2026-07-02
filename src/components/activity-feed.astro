@@ -1,0 +1,267 @@
+---
+// =============================================================================
+// UniqueApex · First Weeks — interactive activity-feed module (homepage)
+// Save as: src/components/activity-feed.astro
+// Use in a page:  <ActivityFeed lang="en" />   (or lang="fr")
+// =============================================================================
+// @ts-ignore
+import { Icon } from "astro-icon/components";
+
+const { lang = "en" } = Astro.props;
+
+const t = {
+  en: {
+    label: "Your first weeks",
+    title1: "Here's what your first weeks",
+    title2: "actually look like.",
+    intro: "You tell your child's story once — then watch the work happen. Choose a phase to see it play out.",
+    prev: "Previous phase",
+    next: "Next phase",
+    phases: [
+      {
+        icon: "bx:bxs-heart",
+        name: "You tell your story",
+        caption: "A few gentle questions become your child's Family Passport — the living profile that powers everything below. Under five minutes, in English or French.",
+        feed: [
+          { icon: "bx:bxs-id-card", title: "Family Passport created", sub: "Maya · Age 7 · looking for speech-language support", time: "Day 1" },
+          { icon: "bx:bxs-lock-alt", title: "Private by default", sub: "Only you can see it — you control every share", time: "Day 1" },
+        ],
+      },
+      {
+        icon: "bx:bxs-send",
+        name: "We reach out for you",
+        caption: "We match verified speech-language and occupational therapy providers nearby and contact them with Maya's context — no cold calls, nothing repeated twice.",
+        feed: [
+          { icon: "bx:bxs-paper-plane", title: "Outreach sent", sub: "6 speech-language clinics contacted on your behalf", time: "Day 2" },
+          { icon: "bx:bxs-star", title: "Curated shortlist ready", sub: "Availability, fees and fit notes included", time: "Day 4" },
+        ],
+      },
+      {
+        icon: "bx:bxs-inbox",
+        name: "Everything lands in one place",
+        caption: "Responses, waitlist positions and documents live together on one dashboard — you always know where things stand, without chasing anyone.",
+        feed: [
+          { icon: "bx:bxs-bell", title: "Clinique Papillon replied", sub: "Intake possible in March — 2 spots open", time: "Day 6" },
+          { icon: "bx:bxs-report", title: "Waitlist position updated", sub: "You're #4 at Centre Communik", time: "Week 2" },
+          { icon: "bx:bxs-file", title: "Report stored", sub: "Assessment saved right beside your waitlists", time: "Week 2" },
+        ],
+      },
+      {
+        icon: "bx:bxs-share-alt",
+        name: "The Passport travels",
+        caption: "Share it with the school, a new provider, or a funding application — one click, a meeting-ready PDF, and always your choice what's visible.",
+        feed: [
+          { icon: "bx:bxs-graduation", title: "Shared with the school", sub: "Teachers see strengths and strategies before day one", time: "Week 3" },
+          { icon: "bx:bxs-file-pdf", title: "PDF exported", sub: "A meeting-ready summary in one click", time: "Week 3" },
+        ],
+      },
+      {
+        icon: "bx:bxs-user-check",
+        name: "Help when it's heavy",
+        caption: "When you want a human to take over, our Concierge assigns a dedicated coordinator for follow-ups and paperwork — one-time fee, no subscription.",
+        feed: [
+          { icon: "bx:bxs-user-voice", title: "Concierge assigned", sub: "A real coordinator is handling your follow-ups", time: "When you choose" },
+          { icon: "bx:bxs-check-shield", title: "Paperwork off your plate", sub: "Documentation support included", time: "Ongoing" },
+        ],
+      },
+    ],
+  },
+  fr: {
+    label: "Vos premières semaines",
+    title1: "Voici à quoi ressemblent vraiment",
+    title2: "vos premières semaines.",
+    intro: "Vous racontez l'histoire de votre enfant une fois — puis vous regardez le travail se faire. Choisissez une phase pour la voir se dérouler.",
+    prev: "Phase précédente",
+    next: "Phase suivante",
+    phases: [
+      {
+        icon: "bx:bxs-heart",
+        name: "Vous racontez votre histoire",
+        caption: "Quelques questions simples deviennent le Passeport familial de votre enfant — le profil vivant qui alimente tout le reste. Moins de cinq minutes, en français ou en anglais.",
+        feed: [
+          { icon: "bx:bxs-id-card", title: "Passeport familial créé", sub: "Maya · 7 ans · à la recherche d'orthophonie", time: "Jour 1" },
+          { icon: "bx:bxs-lock-alt", title: "Privé par défaut", sub: "Vous seule pouvez le voir — chaque partage vous appartient", time: "Jour 1" },
+        ],
+      },
+      {
+        icon: "bx:bxs-send",
+        name: "On contacte pour vous",
+        caption: "On jumelle des orthophonistes et ergothérapeutes vérifiés près de chez vous et on les contacte avec le contexte de Maya — aucun appel à froid, rien à répéter.",
+        feed: [
+          { icon: "bx:bxs-paper-plane", title: "Démarches envoyées", sub: "6 cliniques d'orthophonie contactées en votre nom", time: "Jour 2" },
+          { icon: "bx:bxs-star", title: "Liste ciblée prête", sub: "Disponibilités, tarifs et compatibilité inclus", time: "Jour 4" },
+        ],
+      },
+      {
+        icon: "bx:bxs-inbox",
+        name: "Tout arrive au même endroit",
+        caption: "Réponses, positions sur les listes d'attente et documents vivent ensemble sur un seul tableau de bord — vous savez toujours où ça en est, sans courir après personne.",
+        feed: [
+          { icon: "bx:bxs-bell", title: "Clinique Papillon a répondu", sub: "Accueil possible en mars — 2 places ouvertes", time: "Jour 6" },
+          { icon: "bx:bxs-report", title: "Liste d'attente mise à jour", sub: "Vous êtes 4e au Centre Communik", time: "Semaine 2" },
+          { icon: "bx:bxs-file", title: "Rapport enregistré", sub: "Évaluation classée à côté de vos listes d'attente", time: "Semaine 2" },
+        ],
+      },
+      {
+        icon: "bx:bxs-share-alt",
+        name: "Le Passeport voyage",
+        caption: "Partagez-le avec l'école, un nouvel intervenant ou une demande de financement — un clic, un PDF prêt pour toute rencontre, et c'est toujours vous qui choisissez.",
+        feed: [
+          { icon: "bx:bxs-graduation", title: "Partagé avec l'école", sub: "Les enseignants voient forces et stratégies avant le premier jour", time: "Semaine 3" },
+          { icon: "bx:bxs-file-pdf", title: "PDF exporté", sub: "Un résumé prêt pour la rencontre, en un clic", time: "Semaine 3" },
+        ],
+      },
+      {
+        icon: "bx:bxs-user-check",
+        name: "De l'aide quand c'est lourd",
+        caption: "Quand vous voulez qu'un humain prenne le relais, notre conciergerie vous assigne une personne dédiée pour les suivis et la paperasse — frais uniques, sans abonnement.",
+        feed: [
+          { icon: "bx:bxs-user-voice", title: "Conciergerie assignée", sub: "Une vraie personne s'occupe de vos suivis", time: "Quand vous voulez" },
+          { icon: "bx:bxs-check-shield", title: "Paperasse déléguée", sub: "Soutien à la documentation inclus", time: "En continu" },
+        ],
+      },
+    ],
+  },
+}[lang];
+---
+
+<section id="ua-weeks" class="py-16 my-4">
+  <div class="text-center max-w-2xl mx-auto mb-12">
+    <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{t.label}</p>
+    <h2 class="text-3xl md:text-4xl font-bold text-slate-800 leading-tight mt-3">
+      {t.title1} <span class="text-violet-700">{t.title2}</span>
+    </h2>
+    <p class="text-slate-500 leading-relaxed text-lg mt-6">{t.intro}</p>
+  </div>
+
+  <div id="wk-mod" class="max-w-5xl mx-auto bg-white border border-violet-100 rounded-3xl shadow-xl shadow-violet-100/50 overflow-hidden md:grid md:grid-cols-[280px_1fr]">
+    <!-- phase selector -->
+    <div class="bg-violet-50/60 border-b md:border-b-0 md:border-r border-violet-100 p-3 md:p-4 flex md:flex-col gap-1.5 overflow-x-auto">
+      {t.phases.map((ph, i) => (
+        <button type="button" class={`wk-tab group flex items-center gap-3 text-left rounded-xl px-3.5 py-3 cursor-pointer border-0 transition-all shrink-0 md:shrink md:w-full ${i === 0 ? "wk-on" : ""}`} data-i={i} aria-expanded={i === 0 ? "true" : "false"}>
+          <span class="wk-tab-ic w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors">
+            <Icon class="w-[18px] h-[18px]" name={ph.icon} />
+          </span>
+          <span class="text-[14px] font-semibold leading-snug whitespace-nowrap md:whitespace-normal">{ph.name}</span>
+        </button>
+      ))}
+    </div>
+
+    <!-- feed panel -->
+    <div class="p-6 md:p-8 flex flex-col">
+      <div class="relative grid flex-1">
+        {t.phases.map((ph, i) => (
+          <div class={`wk-pane flex flex-col ${i === 0 ? "" : "wk-hide"}`} style="grid-area:1/1" data-i={i}>
+            <p class="text-slate-600 text-[16px] leading-relaxed m-0 mb-6">{ph.caption}</p>
+            <div class="flex flex-col gap-3">
+              {ph.feed.map((card) => (
+                <div class="wk-card flex items-center gap-3.5 bg-white border border-slate-200 rounded-2xl px-4 py-3.5 shadow-sm">
+                  <span class="w-10 h-10 rounded-xl bg-violet-50 text-violet-700 flex items-center justify-center shrink-0">
+                    <Icon class="w-5 h-5" name={card.icon} />
+                  </span>
+                  <span class="flex-1 min-w-0">
+                    <span class="block text-[14.5px] font-bold text-slate-800 leading-snug">{card.title}</span>
+                    <span class="block text-[13px] text-slate-500 leading-snug mt-0.5">{card.sub}</span>
+                  </span>
+                  <span class="text-[11px] font-semibold text-violet-400 whitespace-nowrap shrink-0">{card.time}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div class="flex items-center justify-between mt-8 pt-5 border-t border-violet-50">
+        <div class="flex items-center gap-1.5">
+          {t.phases.map((_, i) => (
+            <span class={`wk-mini w-2 h-2 rounded-full transition-colors ${i === 0 ? "bg-violet-600" : "bg-violet-100"}`} data-i={i}></span>
+          ))}
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="wk-prev" class="w-10 h-10 rounded-full border border-violet-200 text-violet-600 flex items-center justify-center cursor-pointer bg-white hover:bg-violet-50 transition-colors disabled:opacity-35 disabled:cursor-default" aria-label={t.prev}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button type="button" id="wk-next" class="w-10 h-10 rounded-full border border-violet-200 text-violet-600 flex items-center justify-center cursor-pointer bg-white hover:bg-violet-50 transition-colors disabled:opacity-35 disabled:cursor-default" aria-label={t.next}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  #ua-weeks .wk-tab{background:transparent;color:#475569}
+  #ua-weeks .wk-tab:hover{background:#fff}
+  #ua-weeks .wk-tab .wk-tab-ic{background:#ede9fe;color:#7c3aed}
+  #ua-weeks .wk-tab.wk-on{background:#fff;color:#5b21b6;box-shadow:0 4px 14px -6px rgba(124,58,237,.25)}
+  #ua-weeks .wk-tab.wk-on .wk-tab-ic{background:#6d28d9;color:#fff}
+  #ua-weeks .wk-pane{transition:opacity .25s ease,transform .25s ease}
+  #ua-weeks .wk-pane.wk-hide{opacity:0;visibility:hidden;transform:translateY(6px);pointer-events:none}
+  #ua-weeks .wk-card{opacity:0;transform:translateY(10px);transition:opacity .4s ease,transform .4s ease}
+  #ua-weeks .wk-pane:not(.wk-hide) .wk-card.wk-show{opacity:1;transform:none}
+  #wk-mod{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+  #wk-mod.wk-in{opacity:1;transform:none}
+  @media (prefers-reduced-motion: reduce){
+    #ua-weeks .wk-pane,#ua-weeks .wk-card,#wk-mod{transition:none}
+    #ua-weeks .wk-card{opacity:1;transform:none}
+    #wk-mod{opacity:1;transform:none}
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var root = document.getElementById("ua-weeks");
+    if (!root) return;
+    var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var tabs = root.querySelectorAll(".wk-tab");
+    var panes = root.querySelectorAll(".wk-pane");
+    var minis = root.querySelectorAll(".wk-mini");
+    var prevBtn = document.getElementById("wk-prev");
+    var nextBtn = document.getElementById("wk-next");
+    var mod = document.getElementById("wk-mod");
+    var cur = 0, n = tabs.length;
+
+    function playFeed(pane) {
+      var cards = pane.querySelectorAll(".wk-card");
+      cards.forEach(function (c) { c.classList.remove("wk-show"); });
+      if (reduced) { cards.forEach(function (c) { c.classList.add("wk-show"); }); return; }
+      cards.forEach(function (c, i) {
+        setTimeout(function () { c.classList.add("wk-show"); }, 120 + i * 220);
+      });
+    }
+
+    function select(i) {
+      cur = Math.max(0, Math.min(n - 1, i));
+      tabs.forEach(function (b, idx) {
+        b.classList.toggle("wk-on", idx === cur);
+        b.setAttribute("aria-expanded", idx === cur ? "true" : "false");
+      });
+      var active = null;
+      panes.forEach(function (p) {
+        var on = p.getAttribute("data-i") === String(cur);
+        p.classList.toggle("wk-hide", !on);
+        if (on) active = p;
+      });
+      minis.forEach(function (m, idx) {
+        m.classList.toggle("bg-violet-600", idx === cur);
+        m.classList.toggle("bg-violet-100", idx !== cur);
+      });
+      if (prevBtn) prevBtn.disabled = cur === 0;
+      if (nextBtn) nextBtn.disabled = cur === n - 1;
+      if (active) playFeed(active);
+    }
+
+    tabs.forEach(function (b) {
+      b.addEventListener("click", function () { select(parseInt(b.getAttribute("data-i"), 10) || 0); });
+    });
+    if (prevBtn) prevBtn.addEventListener("click", function () { select(cur - 1); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { select(cur + 1); });
+
+    function start() { mod.classList.add("wk-in"); select(0); }
+    if (!("IntersectionObserver" in window)) { start(); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { io.disconnect(); start(); } });
+    }, { threshold: 0.2 });
+    io.observe(mod);
+  })();
+</script>

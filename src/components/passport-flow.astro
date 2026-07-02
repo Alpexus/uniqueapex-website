@@ -81,7 +81,7 @@ const t = {
 
       <!-- spokes -->
       {t.spokes.map((s, i) => (
-        <div class={`pp-spoke bg-white border border-slate-200 rounded-2xl px-4 py-3.5 flex items-start gap-3 z-10 ${i === 0 ? "md:col-start-1 md:row-start-1 md:justify-self-end" : ""} ${i === 1 ? "md:col-start-3 md:row-start-1 md:justify-self-start" : ""} ${i === 2 ? "md:col-start-1 md:row-start-2 md:justify-self-end" : ""} ${i === 3 ? "md:col-start-3 md:row-start-2 md:justify-self-start" : ""} md:max-w-[240px]`}>
+        <div class={`pp-spoke bg-white border border-slate-200 rounded-2xl px-4 py-3.5 flex items-start gap-3 z-10 ${i === 0 ? "md:col-start-1 md:row-start-1 md:justify-self-end" : ""} ${i === 1 ? "md:col-start-3 md:row-start-1 md:justify-self-start" : ""} ${i === 2 ? "md:col-start-1 md:row-start-2 md:justify-self-end" : ""} ${i === 3 ? "md:col-start-3 md:row-start-2 md:justify-self-start" : ""} w-full md:w-[240px] md:min-h-[96px]`}>
           <span class="w-9 h-9 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               {i === 0 && <><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M2 21c.8-3.8 3.7-6 7-6s6.2 2.2 7 6"/><path d="M19 8v6M16 11h6"/></>}
@@ -111,10 +111,10 @@ const t = {
   #ua-passport.ua-in .pp-line:nth-of-type(4){transition-delay:.85s}
   #ua-passport .pp-spoke{opacity:0;transform:translateY(10px) scale(.96);transition:opacity .5s ease,transform .5s ease}
   #ua-passport.ua-in .pp-spoke{opacity:1;transform:none}
-  #ua-passport.ua-in .pp-spoke:nth-of-type(1){transition-delay:.55s}
-  #ua-passport.ua-in .pp-spoke:nth-of-type(2){transition-delay:.7s}
-  #ua-passport.ua-in .pp-spoke:nth-of-type(3){transition-delay:.85s}
-  #ua-passport.ua-in .pp-spoke:nth-of-type(4){transition-delay:1s}
+  #ua-passport.ua-in .pp-spoke:nth-of-type(2){transition-delay:.55s}
+  #ua-passport.ua-in .pp-spoke:nth-of-type(3){transition-delay:.7s}
+  #ua-passport.ua-in .pp-spoke:nth-of-type(4){transition-delay:.85s}
+  #ua-passport.ua-in .pp-spoke:nth-of-type(5){transition-delay:1s}
   @media (prefers-reduced-motion: reduce){
     #ua-passport .pp-center,#ua-passport .pp-spoke{opacity:1;transform:none;transition:none}
     #ua-passport .pp-line{opacity:1;transition:none}

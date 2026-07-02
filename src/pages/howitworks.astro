@@ -1,118 +1,15 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import Container from "@/components/container.astro";
-import Link from "@/components/ui/link.astro";
+import HowItWorksContent from "@/components/howitworks-content.astro";
+import AppShowcase from "@/components/app-showcase.astro";
+import Cta from "@/components/cta.astro";
 ---
 
 <Layout title="How It Works">
   <Container>
-
-    <!-- Hero -->
-    <div class="grid md:grid-cols-2 gap-16 items-center mt-16 mb-24">
-      <div class="space-y-6">
-        <p class="text-2xl font-semibold text-violet-700 uppercase tracking-wide">How UniqueApex works</p>
-        <h1 class="text-5xl font-bold text-slate-800 leading-tight">
-          Your path to support, <span class="text-violet-700">in four steps</span>
-        </h1>
-        <p class="text-slate-600 leading-relaxed text-lg">
-          Most families spend months making calls, filling out the same forms, and waiting with no update — becoming coordinators on top of being caregivers. UniqueApex replaces that burden with a structured, automated process so you can focus on what actually matters: your child.
-        </p>
-        
-      </div>
-      <div class="flex items-center justify-center">
-        <img src="/mom-overwhelmed.png" alt="Overwhelmed parent illustration" class="w-full max-w-[520px]" />
-      </div>
-    </div>
-
-    <!-- Steps -->
-    <div class="mb-32 space-y-24">
-
-      <!-- Step 1: image left, text right -->
-      <div class="grid md:grid-cols-2 gap-8 items-start">
-        <div class="flex items-start justify-center">
-          <img src="/step1-profile.png" alt="Create profile illustration" class="w-full max-w-[437px]" />
-        </div>
-        <div>
-          <span class="text-6xl font-bold text-violet-200">01</span>
-          <h2 class="text-3xl font-bold text-slate-800 mt-2">Create your child's profile</h2>
-          <p class="text-slate-500 mt-4 leading-relaxed text-lg">
-            Tell us about your child once — their age, diagnosis or area of concern, location, and the type of support you are looking for. No more re-entering the same information for every provider.
-          </p>
-          <ul class="mt-6 space-y-2">
-            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Takes less than 5 minutes</li>
-            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Available in English and French</li>
-            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Your data is private and secure</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Step 2: text left, image right -->
-      <div class="grid md:grid-cols-2 gap-8 items-start">
-        <div>
-          <span class="text-6xl font-bold text-violet-200">02</span>
-          <h2 class="text-3xl font-bold text-slate-800 mt-2">We match and reach out to providers</h2>
-          <p class="text-slate-500 mt-4 leading-relaxed text-lg">
-            UniqueApex automatically matches your child's profile to verified speech-language, occupational, and behavioural therapy providers in your area — and contacts them on your behalf.
-          </p>
-          <ul class="mt-6 space-y-2">
-            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> One outreach batch per service type</li>
-            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> 90-day provider protection rule</li>
-            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> No cold calling required</li>
-          </ul>
-        </div>
-        <div class="flex items-start justify-center">
-          <img src="/step2-providers.png" alt="Provider matching illustration" class="w-full max-w-[460px]" />
-        </div>
-      </div>
-
-      <!-- Step 3: image left, text right -->
-      <div class="grid md:grid-cols-2 gap-8 items-start">
-        <div class="flex items-start justify-center">
-          <img src="/step3-waitlist.png" alt="Waitlist tracking illustration" class="w-full max-w-[441px]" />
-        </div>
-        <div>
-          <span class="text-6xl font-bold text-violet-200">03</span>
-          <h2 class="text-3xl font-bold text-slate-800 mt-2">Track your waitlist status</h2>
-          <p class="text-slate-500 mt-4 leading-relaxed text-lg">
-            No more wondering where things stand. UniqueApex tracks responses and waitlist positions across all your matched providers — so you always know what is happening without having to chase anyone.
-          </p>
-          <ul class="mt-6 space-y-2">
-            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Real-time status updates</li>
-            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> All providers in one place</li>
-            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Alerts when a spot opens up</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Step 4: text left, image right -->
-      <div class="grid md:grid-cols-2 gap-8 items-start">
-        <div>
-          <span class="text-6xl font-bold text-violet-200">04</span>
-          <h2 class="text-3xl font-bold text-slate-800 mt-2">Get hands-on help when you need it</h2>
-          <p class="text-slate-500 mt-4 leading-relaxed text-lg">
-            When you need more support, our Concierge service assigns you a dedicated human coordinator who handles follow-ups, documentation, and cross-service orchestration — so you can focus on your child.
-          </p>
-          <ul class="mt-6 space-y-2">
-            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Dedicated human coordinator</li>
-            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> Documentation support included</li>
-            <li class="flex items-center gap-3 text-slate-600"><span class="text-violet-700">✓</span> One-time fee, no subscription</li>
-          </ul>
-        </div>
-        <div class="flex items-start justify-center">
-          <img src="/step4-concierge.png" alt="Concierge support illustration" class="w-full max-w-[450px]" />
-        </div>
-      </div>
-
-    </div>
-
-    <!-- CTA -->
-    <div class="text-center mb-24">
-      <h2 class="text-3xl font-bold text-slate-800">Ready to get started?</h2>
-      <p class="text-slate-500 mt-4 text-lg">Join the waitlist and be among the first families to access UniqueApex in Montréal.</p>
-      <div class="mt-8 flex justify-center">
-        <Link href="/waitlist" size="lg">Join the Waitlist</Link>
-      </div>
-    </div>
-
+    <HowItWorksContent lang="en" />
+    <AppShowcase lang="en" />
+    <Cta lang="en" />
   </Container>
 </Layout>
