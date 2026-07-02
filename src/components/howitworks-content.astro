@@ -15,11 +15,6 @@ const t = {
     title2: "in five steps",
     intro: "Most families spend months making calls, filling out the same forms, and waiting with no update. UniqueApex replaces that burden with one profile, structured outreach, and a single place where everything lands — so you can focus on your child.",
     stepWord: "Step",
-    passportLab: "Family Passport",
-    passportChild: "Maya · Age 7",
-    passportRows: ["Full history", "Strengths & needs", "Reports & documents"],
-    sharesTo: "Shares to",
-    shareChips: ["School", "New provider", "Funding application"],
     steps: [
       {
         title: "Tell your child's story — once",
@@ -46,14 +41,14 @@ const t = {
         title: "Share the Passport wherever it's needed",
         body: "The same profile travels with your child — to the school, to every new provider, into funding applications. One click to share, a PDF export for any meeting, and you always control what's visible.",
         card: { icon: "bx:bxs-graduation", title: "Shared with the school", sub: "Teachers see strengths and strategies before day one", time: "Week 3" },
-        img: null,
-        alt: "",
+        img: "/step4-passport.png",
+        alt: "Family Passport sharing illustration",
       },
       {
         title: "Get hands-on help when you need it",
         body: "When it gets heavy, our Concierge service assigns you a dedicated human coordinator — follow-ups, documentation, cross-service orchestration — one-time fee, no subscription.",
         card: { icon: "bx:bxs-user-voice", title: "Concierge assigned", sub: "A real coordinator is handling your follow-ups", time: "When you choose" },
-        img: "/step4-concierge.png",
+        img: "/step5-concierge.png",
         alt: "Concierge support illustration",
       },
     ],
@@ -64,11 +59,6 @@ const t = {
     title2: "en cinq étapes",
     intro: "La plupart des familles passent des mois à faire des appels, remplir les mêmes formulaires et attendre sans nouvelles. UniqueApex remplace ce fardeau par un seul profil, des démarches structurées et un seul endroit où tout arrive — pour que vous puissiez vous concentrer sur votre enfant.",
     stepWord: "Étape",
-    passportLab: "Passeport familial",
-    passportChild: "Maya · 7 ans",
-    passportRows: ["Historique complet", "Forces et besoins", "Rapports et documents"],
-    sharesTo: "Se partage à",
-    shareChips: ["L'école", "Nouvel intervenant", "Demande de financement"],
     steps: [
       {
         title: "Racontez l'histoire de votre enfant — une seule fois",
@@ -95,14 +85,14 @@ const t = {
         title: "Partagez le Passeport partout où il le faut",
         body: "Le même profil suit votre enfant — à l'école, chez chaque nouvel intervenant, dans les demandes de financement. Un clic pour partager, un PDF pour n'importe quelle rencontre, et c'est toujours vous qui contrôlez ce qui est visible.",
         card: { icon: "bx:bxs-graduation", title: "Partagé avec l'école", sub: "Les enseignants voient forces et stratégies avant le premier jour", time: "Semaine 3" },
-        img: null,
-        alt: "",
+        img: "/step4-passport.png",
+        alt: "Illustration du partage du Passeport familial",
       },
       {
         title: "De l'aide humaine quand vous en avez besoin",
         body: "Quand c'est trop lourd, notre service de conciergerie vous assigne une vraie personne dédiée — suivis, documentation, coordination entre services — frais uniques, sans abonnement.",
         card: { icon: "bx:bxs-user-voice", title: "Conciergerie assignée", sub: "Une vraie personne s'occupe de vos suivis", time: "Quand vous voulez" },
-        img: "/step4-concierge.png",
+        img: "/step5-concierge.png",
         alt: "Illustration du service de conciergerie",
       },
     ],
@@ -129,9 +119,9 @@ const t = {
   <div class="mb-24 space-y-28">
     {t.steps.map((step, i) => (
       <div class="hiw-step grid md:grid-cols-2 gap-12 items-center" data-i={i}>
-        <div class={i % 2 === 1 ? "md:order-2" : ""}>
-          <p class="text-xs font-bold text-violet-600 uppercase tracking-wider m-0">{t.stepWord} {i + 1}</p>
-          <h2 class="text-3xl font-bold text-slate-800 mt-3">{step.title}</h2>
+        <div class={i % 2 === 0 ? "md:order-2" : ""}>
+          <p class="text-sm font-bold text-violet-600 uppercase tracking-wider m-0">{t.stepWord} {i + 1}</p>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mt-3">{step.title}</h2>
           <p class="text-slate-500 mt-4 leading-relaxed text-lg">{step.body}</p>
           <div class="hiw-card mt-6 inline-flex items-center gap-3.5 bg-white border border-violet-100 rounded-2xl px-4 py-3.5 shadow-lg shadow-violet-100/60 max-w-md">
             <span class="w-10 h-10 rounded-xl bg-violet-50 text-violet-700 flex items-center justify-center shrink-0">
@@ -144,40 +134,8 @@ const t = {
             <span class="text-[11px] font-semibold text-violet-400 whitespace-nowrap shrink-0">{step.card.time}</span>
           </div>
         </div>
-        <div class={`flex items-center justify-center ${i % 2 === 1 ? "md:order-1" : ""}`}>
-          {step.img ? (
-            <img src={step.img} alt={step.alt} class="w-full max-w-[460px]" />
-          ) : (
-            <div class="w-full max-w-[300px]">
-              <div class="bg-white border-2 border-violet-200 rounded-2xl shadow-xl shadow-violet-200/60 p-5">
-                <p class="text-[10px] font-bold text-violet-600 uppercase tracking-wider m-0 mb-2.5 flex items-center gap-1.5">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="2.6"/><path d="M8 17c.7-1.8 2.2-2.8 4-2.8s3.3 1 4 2.8"/></svg>
-                  {t.passportLab}
-                </p>
-                <div class="flex items-center gap-2.5 mb-3">
-                  <span class="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 text-white flex items-center justify-center text-sm font-bold shrink-0">M</span>
-                  <span class="text-sm font-bold text-slate-800">{t.passportChild}</span>
-                </div>
-                <ul class="m-0 p-0 list-none space-y-1.5">
-                  {t.passportRows.map((row) => (
-                    <li class="flex items-center gap-2 text-[12px] text-slate-600">
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M5 13l4 4L19 7"/></svg>
-                      {row}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <p class="text-center text-[11px] uppercase tracking-wide text-violet-500 font-bold mt-4 mb-2">{t.sharesTo} ↓</p>
-              <div class="grid gap-2">
-                {t.shareChips.map((chip) => (
-                  <span class="flex items-center gap-2.5 bg-violet-50 border border-violet-100 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold text-violet-800">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                    {chip}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+        <div class={`flex items-center justify-center ${i % 2 === 0 ? "md:order-1" : ""}`}>
+          <img src={step.img} alt={step.alt} class="w-full max-w-[460px]" />
         </div>
       </div>
     ))}
