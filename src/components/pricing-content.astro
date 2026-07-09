@@ -1,0 +1,528 @@
+---
+// =============================================================================
+// UniqueApex · Pricing — PRICING-V4 (financial model v2)
+// Save as: src/components/pricing-content.astro   (replaces PRICING-V3)
+// Changes from V3:
+//  · "Family Plan" renamed to "Member" everywhere (FR: "Membre")
+//  · NEW plan: Family+ — $39/mo, "Best Value" outline ribbon, between Member
+//    and Concierge (4 cards: Free → Member → Family+ → Concierge)
+//  · Add-ons strip: AI Report Reader $17/report · Report Translation $99/report
+//  · Compare table: 4 plan columns + 3 new rows (priority matching, AI report
+//    summaries, Concierge credit)
+//  · FAQ: +"Member vs Family+" and +"introductory pricing" (6 questions total)
+//  · Helper panel: 4th persona card highlighting Family+
+// Family+ illustration: /public/pricing-familyplus.png (soft fallback until added)
+// =============================================================================
+const { lang = "en" } = Astro.props;
+const prefix = lang === "fr" ? "/fr" : "";
+
+const t = {
+  en: {
+    label: "Pricing",
+    title1: "Support that fits",
+    title2: "where you are",
+    sub: "Every family is at a different stage. UniqueApex meets you there — whether you are just getting started or need someone to take over completely.",
+    helperQ1: "Which sounds like",
+    helperQ2: "you?",
+    helper: ["We're just getting started", "I'm juggling several providers and services", "I want things handled before I have to chase them", "I want someone to take this over"],
+    forYou: "For you",
+    popular: "Most Popular",
+    best: "Best Value",
+    plans: [
+      {
+        badge: "Free Forever",
+        name: "Free",
+        bestFor: "For families taking their first steps",
+        price: "$0",
+        suffix: "",
+        blurb: "You should not have to pay just to get matched. Submit one profile and we reach out to verified providers on your behalf.",
+        lead: "",
+        feats: ["One child profile", "One outreach batch per service type", "Automatic provider matching", "English & French support", "Community access"],
+        cta: "Start for Free",
+        href: "/signup",
+        filled: false,
+        pop: false,
+        best: false,
+        img: "/pricing-free.png",
+        imgAlt: "Getting started illustration",
+      },
+      {
+        badge: "Most Popular",
+        name: "Member",
+        bestFor: "For families coordinating multiple services",
+        price: "$19",
+        suffix: "/mo",
+        blurb: "When you are juggling providers, services, and waitlists, this keeps you on top of everything.",
+        lead: "Everything in Free, plus:",
+        feats: ["Unlimited child profiles & outreach", "Expert workshops access", "Documentation tools", "Priority support"],
+        cta: "Start Member",
+        href: "/signup",
+        filled: true,
+        pop: true,
+        best: false,
+        img: "/pricing-monthly.png",
+        imgAlt: "Coordinating care illustration",
+      },
+      {
+        badge: "Best Value",
+        name: "Family+",
+        bestFor: "For families who want it handled proactively",
+        price: "$39",
+        suffix: "/mo",
+        blurb: "When you're coordinating several services at once, Family+ keeps you at the front of every line — with the heavy reading done for you.",
+        lead: "Everything in Member, plus:",
+        feats: ["Priority matching — your outreach goes to the front of the queue", "AI Report Reader included — plain-language summaries of assessments & IEPs", "1 Concierge engagement credit per year", "Priority support"],
+        cta: "Start Family+",
+        href: "/signup",
+        filled: true,
+        pop: false,
+        best: true,
+        img: "/pricing-familyplus.png",
+        imgAlt: "Proactive support illustration",
+      },
+      {
+        badge: "One-Time",
+        name: "Concierge",
+        bestFor: "For when you need it off your plate",
+        price: "$99",
+        suffix: "one-time",
+        blurb: "A dedicated human coordinator handles everything — follow-ups, documentation, cross-service orchestration.",
+        lead: "",
+        feats: ["Dedicated human coordinator", "Provider follow-ups handled for you", "Cross-service orchestration", "Documentation support", "One full engagement included"],
+        cta: "Start with Concierge",
+        href: "/contact",
+        filled: false,
+        pop: false,
+        best: false,
+        img: "/pricing-concierge.png",
+        imgAlt: "Concierge support illustration",
+      },
+    ],
+    addonsLabel: "Add-ons",
+    addons: [
+      { name: "AI Report Reader", price: "$17", per: "per report", desc: "Upload an assessment or IEP — get a clear, plain-language summary in minutes. Included free with Family+." },
+      { name: "Report Translation EN↔FR", price: "$99", per: "per report", desc: "Assessment reports translated between English and French, AI-drafted and reviewed by a bilingual human." },
+    ],
+    trust: ["All prices in Canadian dollars", "No hidden fees", "Cancel anytime"],
+    compareLabel: "Compare plans",
+    compareTitle: "See what's included",
+    colNames: ["Free", "Member", "Family+", "Concierge"],
+    colPrices: ["$0", "$19/mo", "$39/mo", "$99 one-time"],
+    rows: [
+      { f: "Child profiles", v: ["1", "Unlimited", "Unlimited", "Unlimited"] },
+      { f: "Outreach batches", v: ["1 per service", "Unlimited", "Unlimited", "Unlimited"] },
+      { f: "Automatic provider matching", v: [true, true, true, true] },
+      { f: "Priority matching", v: [false, false, true, true] },
+      { f: "Waitlist status tracking", v: [false, true, true, true] },
+      { f: "English & French support", v: [true, true, true, true] },
+      { f: "Community access", v: [true, true, true, true] },
+      { f: "Expert workshops", v: [false, true, true, true] },
+      { f: "Documentation tools", v: [false, true, true, true] },
+      { f: "AI report summaries", v: ["Pay per report", "Pay per report", true, true] },
+      { f: "Priority support", v: [false, true, true, true] },
+      { f: "Concierge engagement credit", v: [false, false, "1 per year", false] },
+      { f: "Dedicated human coordinator", v: [false, false, false, true] },
+      { f: "Provider follow-ups handled", v: [false, false, false, true] },
+      { f: "Cross-service orchestration", v: [false, false, false, true] },
+      { f: "Documentation support", v: [false, false, false, true] },
+    ],
+    faqLabel: "Pricing questions",
+    faqTitle: "Questions families ask us",
+    faqs: [
+      { q: "What is an outreach batch?", a: "One coordinated round of contact: we reach out to the matched providers for one service type (for example, speech-language therapy) on your behalf, with your child's profile attached. On the Free plan you get one batch per service type; on the Member plan, as many as you need." },
+      { q: "What's the difference between Member and Family+?", a: "Member gives you the full platform. Family+ moves you to the front of every outreach queue, includes unlimited AI report summaries, and adds one Concierge engagement each year — for families coordinating several services at once." },
+      { q: "Can I cancel my monthly plan anytime?", a: "Yes — cancel in one click, no questions asked. You keep access until the end of your billing period, and your child's profile and documents stay yours." },
+      { q: "Is the Concierge fee per child or per engagement?", a: "Per engagement — one full coordination cycle handled by a dedicated human coordinator, from outreach through follow-ups and documentation. Families with more than one child or a new round of needs can book another engagement whenever they want." },
+      { q: "What does introductory pricing mean?", a: "These are our launch rates for founding families. Rates may increase as the platform grows — you'll always be notified before anything changes on your plan." },
+      { q: "Do I need a diagnosis or a paid plan to start?", a: "Neither. The Free plan is genuinely free, and you can start from the very first concern — no diagnosis required." },
+    ],
+  },
+  fr: {
+    label: "Tarifs",
+    title1: "Un soutien qui s'adapte à",
+    title2: "où vous en êtes",
+    sub: "Chaque famille est à une étape différente. UniqueApex vous rejoint là où vous êtes — que vous commenciez à peine ou que vous ayez besoin que quelqu'un prenne le relais complètement.",
+    helperQ1: "Qu'est-ce qui",
+    helperQ2: "vous ressemble?",
+    helper: ["On commence tout juste", "Je jongle avec plusieurs intervenants et services", "Je veux que les choses avancent sans que je doive courir après", "Je veux que quelqu'un prenne le relais"],
+    forYou: "Pour vous",
+    popular: "Le plus populaire",
+    best: "Meilleure valeur",
+    plans: [
+      {
+        badge: "Gratuit pour toujours",
+        name: "Gratuit",
+        bestFor: "Pour les familles qui font leurs premiers pas",
+        price: "0 $",
+        suffix: "",
+        blurb: "Vous ne devriez pas avoir à payer juste pour être jumelé. Soumettez un profil et nous contactons des professionnels vérifiés en votre nom.",
+        lead: "",
+        feats: ["Un profil enfant", "Une démarche de contact par type de service", "Jumelage automatique", "Soutien en français et en anglais", "Accès à la communauté"],
+        cta: "Commencer gratuitement",
+        href: "/signup",
+        filled: false,
+        pop: false,
+        best: false,
+        img: "/pricing-free.png",
+        imgAlt: "Illustration des premiers pas",
+      },
+      {
+        badge: "Le plus populaire",
+        name: "Membre",
+        bestFor: "Pour les familles qui coordonnent plusieurs services",
+        price: "19 $",
+        suffix: "/mois",
+        blurb: "Quand vous jonglez avec les intervenants, les services et les listes d'attente, ce plan vous garde au-dessus de tout.",
+        lead: "Tout le plan Gratuit, plus :",
+        feats: ["Profils et démarches illimités", "Accès aux ateliers d'experts", "Outils de documentation", "Soutien prioritaire"],
+        cta: "Choisir Membre",
+        href: "/signup",
+        filled: true,
+        pop: true,
+        best: false,
+        img: "/pricing-monthly.png",
+        imgAlt: "Illustration de la coordination",
+      },
+      {
+        badge: "Meilleure valeur",
+        name: "Famille+",
+        bestFor: "Pour les familles qui veulent que tout avance de façon proactive",
+        price: "39 $",
+        suffix: "/mois",
+        blurb: "Quand vous coordonnez plusieurs services à la fois, Famille+ vous place en tête de chaque file — et la lecture lourde est faite pour vous.",
+        lead: "Tout le plan Membre, plus :",
+        feats: ["Jumelage prioritaire — vos démarches passent en tête de file", "Lecteur de rapports IA inclus — résumés en langage clair des évaluations et plans d'intervention", "1 crédit de prise en charge Conciergerie par année", "Soutien prioritaire"],
+        cta: "Choisir Famille+",
+        href: "/signup",
+        filled: true,
+        pop: false,
+        best: true,
+        img: "/pricing-familyplus.png",
+        imgAlt: "Illustration du soutien proactif",
+      },
+      {
+        badge: "Paiement unique",
+        name: "Conciergerie",
+        bestFor: "Pour quand vous voulez déléguer",
+        price: "99 $",
+        suffix: "paiement unique",
+        blurb: "Une personne dédiée s'occupe de tout — suivis, documentation, coordination entre les services.",
+        lead: "",
+        feats: ["Une coordonnatrice ou un coordonnateur dédié", "Suivis auprès des professionnels pris en charge", "Coordination entre les services", "Soutien à la documentation", "Une prise en charge complète incluse"],
+        cta: "Choisir la conciergerie",
+        href: "/contact",
+        filled: false,
+        pop: false,
+        best: false,
+        img: "/pricing-concierge.png",
+        imgAlt: "Illustration du service de conciergerie",
+      },
+    ],
+    addonsLabel: "Options à la carte",
+    addons: [
+      { name: "Lecteur de rapports IA", price: "17 $", per: "par rapport", desc: "Téléversez une évaluation ou un plan d'intervention — recevez un résumé clair, en langage simple, en quelques minutes. Inclus gratuitement avec Famille+." },
+      { name: "Traduction de rapports AN↔FR", price: "99 $", per: "par rapport", desc: "Rapports d'évaluation traduits entre le français et l'anglais — rédigés par IA et révisés par une personne bilingue." },
+    ],
+    trust: ["Tous les prix en dollars canadiens", "Aucuns frais cachés", "Annulable en tout temps"],
+    compareLabel: "Comparer les plans",
+    compareTitle: "Ce qui est inclus",
+    colNames: ["Gratuit", "Membre", "Famille+", "Conciergerie"],
+    colPrices: ["0 $", "19 $/mois", "39 $/mois", "99 $ unique"],
+    rows: [
+      { f: "Profils enfant", v: ["1", "Illimités", "Illimités", "Illimités"] },
+      { f: "Démarches de contact", v: ["1 par service", "Illimitées", "Illimitées", "Illimitées"] },
+      { f: "Jumelage automatique", v: [true, true, true, true] },
+      { f: "Jumelage prioritaire", v: [false, false, true, true] },
+      { f: "Suivi des listes d'attente", v: [false, true, true, true] },
+      { f: "Soutien en français et en anglais", v: [true, true, true, true] },
+      { f: "Accès à la communauté", v: [true, true, true, true] },
+      { f: "Ateliers d'experts", v: [false, true, true, true] },
+      { f: "Outils de documentation", v: [false, true, true, true] },
+      { f: "Résumés de rapports par IA", v: ["À la carte", "À la carte", true, true] },
+      { f: "Soutien prioritaire", v: [false, true, true, true] },
+      { f: "Crédit de conciergerie", v: [false, false, "1 par année", false] },
+      { f: "Coordonnatrice ou coordonnateur dédié", v: [false, false, false, true] },
+      { f: "Suivis auprès des professionnels", v: [false, false, false, true] },
+      { f: "Coordination entre les services", v: [false, false, false, true] },
+      { f: "Soutien à la documentation", v: [false, false, false, true] },
+    ],
+    faqLabel: "Questions sur les tarifs",
+    faqTitle: "Les questions que les familles nous posent",
+    faqs: [
+      { q: "Qu'est-ce qu'une démarche de contact?", a: "Une ronde coordonnée : nous contactons en votre nom les professionnels jumelés pour un type de service (par exemple, l'orthophonie), avec le profil de votre enfant. Le plan Gratuit inclut une démarche par type de service; le plan Membre, autant que nécessaire." },
+      { q: "Quelle est la différence entre Membre et Famille+?", a: "Membre vous donne la plateforme complète. Famille+ vous place en tête de chaque file de démarches, inclut les résumés de rapports par IA en illimité, et ajoute une prise en charge Conciergerie par année — pour les familles qui coordonnent plusieurs services à la fois." },
+      { q: "Puis-je annuler mon plan mensuel en tout temps?", a: "Oui — un clic suffit, sans questions. Vous gardez l'accès jusqu'à la fin de votre période de facturation, et le profil et les documents de votre enfant restent à vous." },
+      { q: "Les frais de conciergerie sont-ils par enfant ou par prise en charge?", a: "Par prise en charge — un cycle complet de coordination mené par une personne dédiée, des démarches aux suivis et à la documentation. Les familles avec plus d'un enfant ou de nouveaux besoins peuvent réserver une nouvelle prise en charge quand elles le veulent." },
+      { q: "Que signifie « tarif de lancement »?", a: "Ce sont nos tarifs de lancement pour les familles fondatrices. Les tarifs pourraient augmenter à mesure que la plateforme grandit — vous serez toujours prévenus avant tout changement à votre plan." },
+      { q: "Faut-il un diagnostic ou un plan payant pour commencer?", a: "Ni l'un ni l'autre. Le plan Gratuit est réellement gratuit, et vous pouvez commencer dès les premières inquiétudes — aucun diagnostic requis." },
+    ],
+  },
+}[lang];
+---
+
+<div id="ua-pricing">
+  <!-- Hero -->
+  <div class="text-center max-w-2xl mx-auto mt-16 mb-10 pr-hero">
+    <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{t.label}</p>
+    <h1 class="text-4xl md:text-5xl font-bold text-slate-800 leading-tight mt-3">
+      {t.title1} <span class="text-violet-700">{t.title2}</span>
+    </h1>
+    <p class="text-slate-500 leading-relaxed text-lg mt-6">{t.sub}</p>
+  </div>
+
+  <!-- Helper -->
+  <div class="pr-rev mb-14">
+    <div class="relative max-w-5xl mx-auto bg-violet-50/60 border border-violet-100 rounded-3xl px-6 py-10 md:px-10 overflow-hidden">
+      <svg class="absolute top-6 left-8 w-5 h-5" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.2 6.6L21 12l-6.8 3.4L12 22l-2.2-6.6L3 12l6.8-3.4z" fill="#ddd6fe"/></svg>
+      <svg class="absolute bottom-8 right-10 w-4 h-4" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.2 6.6L21 12l-6.8 3.4L12 22l-2.2-6.6L3 12l6.8-3.4z" fill="#c4b5fd"/></svg>
+      <svg class="absolute top-10 right-16 w-3 h-3" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.2 6.6L21 12l-6.8 3.4L12 22l-2.2-6.6L3 12l6.8-3.4z" fill="#ede9fe"/></svg>
+      <h2 class="relative text-2xl md:text-3xl font-bold text-slate-800 text-center m-0 mb-8">
+        {t.helperQ1} <span class="text-violet-700">{t.helperQ2}</span>
+      </h2>
+      <div class="relative grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {t.helper.map((h, i) => (
+          <button type="button" class="pr-chip flex items-center gap-3.5 text-left rounded-2xl border border-violet-100 bg-white px-5 py-4 cursor-pointer" data-i={i}>
+            <span class="pr-chip-ic w-11 h-11 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                {i === 0 && <><path d="M12 21v-7"/><path d="M12 14c0-3.6-2.6-6.2-6.2-6.2 0 3.6 2.6 6.2 6.2 6.2z"/><path d="M12 11.8c0-3.6 2.6-6.2 6.2-6.2 0 3.6-2.6 6.2-6.2 6.2z"/></>}
+                {i === 1 && <><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13.5l9 5 9-5"/></>}
+                {i === 2 && <path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/>}
+                {i === 3 && <><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.7-2.9 2.9-4.5 5.5-4.5s4.8 1.6 5.5 4.5"/><path d="M15.5 10.5l2 2 4-4"/></>}
+              </svg>
+            </span>
+            <span class="text-[15px] font-semibold text-slate-700 leading-snug">{h}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan cards -->
+  <div class="pr-rev pr-cards grid md:grid-cols-2 xl:grid-cols-4 xl:grid-rows-[auto_1fr_auto] xl:gap-y-0 gap-6 items-stretch max-w-6xl mx-auto mb-8 pt-4">
+    {t.plans.map((p, i) => (
+      <div class={`pr-card relative flex flex-col xl:grid xl:grid-rows-subgrid xl:row-span-3 rounded-3xl bg-white ${p.pop ? "border-2 border-violet-600 shadow-xl shadow-violet-200/60" : "border border-violet-100 shadow-sm"}`} data-i={i}>
+        {p.pop && (
+          <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 bg-violet-700 text-white text-xs font-bold uppercase tracking-wide rounded-full px-4 py-1.5 whitespace-nowrap shadow-md">{t.popular}</span>
+        )}
+        {p.best && (
+          <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 bg-white border-2 border-violet-600 text-violet-700 text-xs font-bold uppercase tracking-wide rounded-full px-4 py-1 whitespace-nowrap shadow-md">{t.best}</span>
+        )}
+        <span class="pr-foryou absolute -top-3.5 right-4 z-10 bg-emerald-500 text-white text-xs font-bold uppercase tracking-wide rounded-full px-3 py-1.5 whitespace-nowrap shadow-md" style="opacity:0;transform:scale(.8);transition:opacity .25s ease,transform .25s ease">{t.forYou} ✓</span>
+        <div class="flex flex-col">
+          <div class="pr-illo relative flex items-center justify-center h-56 p-5 pt-8 bg-violet-50/70 rounded-t-3xl overflow-hidden">
+            <svg class="absolute top-5 left-5 w-4 h-4" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.2 6.6L21 12l-6.8 3.4L12 22l-2.2-6.6L3 12l6.8-3.4z" fill="#ddd6fe"/></svg>
+            <svg class="absolute bottom-4 right-6 w-3 h-3" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.2 6.6L21 12l-6.8 3.4L12 22l-2.2-6.6L3 12l6.8-3.4z" fill="#c4b5fd"/></svg>
+            <img src={p.img} alt={p.imgAlt} class="pr-img w-full h-full object-contain" onerror="this.style.display='none'" />
+          </div>
+          <div class="px-8 pt-6">
+            <span class={`inline-block text-xs font-semibold px-3 py-1 rounded-full ${p.pop || p.best ? "bg-violet-100 text-violet-700" : "bg-slate-100 text-slate-500"}`}>{p.badge}</span>
+            <h2 class="text-2xl font-bold text-slate-800 mt-4">{p.name}</h2>
+            <p class="text-sm text-slate-400 mt-1 m-0">{p.bestFor}</p>
+            <p class="mt-5 mb-0">
+              <span class="text-5xl font-extrabold text-slate-900 tracking-tight">{p.price}</span>
+              {p.suffix && <span class="text-slate-400 font-semibold ml-1.5">{p.suffix}</span>}
+            </p>
+            <p class="text-slate-500 leading-relaxed mt-4 mb-0">{p.blurb}</p>
+          </div>
+        </div>
+        <ul class="m-0 list-none space-y-2.5 mt-5 mb-8 px-8">
+          {p.lead && <li class="text-sm font-bold text-violet-700">{p.lead}</li>}
+          {p.feats.map((f) => (
+            <li class="flex items-start gap-2.5 text-[15px] text-slate-600">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+              </span>
+              {f}
+            </li>
+          ))}
+        </ul>
+        <a href={prefix + p.href} class={`mt-auto xl:mt-0 xl:self-end xl:w-[calc(100%-4rem)] mx-8 mb-8 text-center rounded-full px-6 py-3 text-sm font-bold transition-colors ${p.filled ? "bg-violet-700 text-white hover:bg-violet-800" : "border-2 border-violet-600 text-violet-700 hover:bg-violet-50"}`}>{p.cta}</a>
+      </div>
+    ))}
+  </div>
+
+  <!-- Add-ons -->
+  <div class="pr-rev max-w-3xl mx-auto mb-8">
+    <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide text-center mb-5">{t.addonsLabel}</p>
+    <div class="grid md:grid-cols-2 gap-5">
+      {t.addons.map((a, i) => (
+        <div class="pr-addon bg-white border border-violet-100 rounded-3xl shadow-sm p-6 flex items-start gap-4">
+          <span class="w-12 h-12 rounded-2xl bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              {i === 0 && <><path d="M6 2.5h8L19 8v13.5H6z"/><path d="M13.5 2.5V8H19"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.2 2.2"/></>}
+              {i === 1 && <><path d="M4 5h7M7.5 3v2M10.5 13c-2.6-1.1-4.3-3.2-4.9-5.5M4 13c1.6 0 4.4-1.2 6-6M13 21l4-9 4 9M14.6 17.5h4.8"/></>}
+            </svg>
+          </span>
+          <span class="min-w-0">
+            <span class="flex items-baseline flex-wrap gap-x-2">
+              <span class="text-[16px] font-bold text-slate-800">{a.name}</span>
+              <span class="text-[15px] font-extrabold text-violet-700">{a.price}</span>
+              <span class="text-xs text-slate-400 font-medium">{a.per}</span>
+            </span>
+            <span class="block text-[13.5px] text-slate-500 leading-relaxed mt-1.5">{a.desc}</span>
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Trust chips -->
+  <div class="pr-rev flex flex-wrap justify-center gap-2.5 mb-24">
+    {t.trust.map((item) => (
+      <span class="inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-3.5 py-1.5">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+        {item}
+      </span>
+    ))}
+  </div>
+
+  <!-- Compare table -->
+  <div class="pr-rev max-w-5xl mx-auto mb-24">
+    <div class="text-center mb-10">
+      <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{t.compareLabel}</p>
+      <h2 class="text-3xl md:text-4xl font-bold mt-3 text-slate-800">{t.compareTitle}</h2>
+    </div>
+    <div class="rounded-3xl border border-slate-200 overflow-hidden bg-white">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr>
+              <th class="p-4 md:p-5 w-1/3"></th>
+              {t.colNames.map((n, i) => (
+                <th class={`p-4 md:p-5 text-center ${i === 1 || i === 2 ? "bg-violet-50" : ""}`}>
+                  <span class={`block text-base font-bold ${i === 1 || i === 2 ? "text-violet-700" : "text-slate-800"}`}>{n}</span>
+                  <span class="block text-xs text-slate-400 font-medium mt-0.5">{t.colPrices[i]}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {t.rows.map((row) => (
+              <tr class="pr-row border-t border-slate-100">
+                <td class="p-4 md:p-5 text-[15px] text-slate-600">{row.f}</td>
+                {row.v.map((val, i) => (
+                  <td class={`p-4 md:p-5 text-center ${i === 1 || i === 2 ? "bg-violet-50/70" : ""}`}>
+                    {val === true && (
+                      <span class="inline-flex w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 items-center justify-center">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                      </span>
+                    )}
+                    {val === false && <span class="text-slate-300 font-bold">—</span>}
+                    {val !== true && val !== false && <span class="text-sm font-semibold text-violet-700">{val}</span>}
+                  </td>
+                ))}
+              </tr>
+            ))}
+            <tr class="border-t border-slate-100">
+              <td class="p-4 md:p-5"></td>
+              {t.plans.map((p, i) => (
+                <td class={`p-4 md:p-5 text-center ${i === 1 || i === 2 ? "bg-violet-50" : ""}`}>
+                  <a href={prefix + p.href} class={`inline-block rounded-full px-5 py-2 text-xs font-bold transition-colors ${p.filled ? "bg-violet-700 text-white hover:bg-violet-800" : "border-2 border-violet-600 text-violet-700 hover:bg-violet-50"}`}>{p.cta}</a>
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing FAQ: conversation -->
+  <div class="pr-rev pr-qas max-w-4xl mx-auto mb-24">
+    <div class="text-center mb-10">
+      <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{t.faqLabel}</p>
+      <h2 class="text-3xl md:text-4xl font-bold mt-3 text-slate-800">{t.faqTitle}</h2>
+    </div>
+    <div class="grid md:grid-cols-2 gap-5">
+      {t.faqs.map((faq) => (
+        <div class="pr-qa bg-white border border-violet-100 rounded-3xl p-6 shadow-sm">
+          <div class="flex items-start gap-3">
+            <span class="w-9 h-9 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </span>
+            <p class="bg-violet-50 rounded-2xl rounded-tl-md px-4 py-3 text-slate-800 font-semibold text-[15px] leading-snug m-0">{faq.q}</p>
+          </div>
+          <div class="flex items-start gap-3 mt-4">
+            <span class="w-9 h-9 rounded-full bg-white border border-violet-100 shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
+              <img src="/Logo.png" alt="" class="w-6 h-6 object-contain" />
+            </span>
+            <p class="bg-white border border-violet-100 rounded-2xl rounded-tl-md px-4 py-3 text-slate-500 text-[15px] leading-relaxed m-0">{faq.a}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  #ua-pricing .pr-hero{animation:prUp .7s ease both}
+  @keyframes prUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  #ua-pricing .pr-rev{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+  #ua-pricing .pr-rev.pr-in{opacity:1;transform:none}
+  #ua-pricing .pr-card{transition:transform .25s ease,box-shadow .25s ease,border-color .2s ease}
+  #ua-pricing .pr-card:hover{transform:translateY(-6px);box-shadow:0 18px 36px -16px rgba(124,58,237,.3)}
+  #ua-pricing .pr-card.pr-reco{border-color:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.18),0 18px 36px -16px rgba(16,185,129,.25)}
+  #ua-pricing .pr-illo{transition:background-color .3s ease}
+  #ua-pricing .pr-card:hover .pr-illo{background:#ede9fe}
+  #ua-pricing .pr-img{transition:transform .4s cubic-bezier(.34,1.5,.64,1)}
+  #ua-pricing .pr-card:hover .pr-img{transform:translateY(-8px) scale(1.04)}
+  #ua-pricing .pr-addon{transition:transform .25s ease,box-shadow .25s ease,border-color .2s ease}
+  #ua-pricing .pr-addon:hover{transform:translateY(-4px);border-color:#c4b5fd;box-shadow:0 14px 28px -14px rgba(124,58,237,.25)}
+  #ua-pricing .pr-chip{transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+  #ua-pricing .pr-chip:hover{transform:translateY(-3px);border-color:#c4b5fd;box-shadow:0 12px 24px -14px rgba(124,58,237,.35)}
+  #ua-pricing .pr-chip .pr-chip-ic{transition:background-color .2s ease,color .2s ease}
+  #ua-pricing .pr-chip.pr-on{border-color:#6d28d9;border-width:2px;box-shadow:0 12px 24px -12px rgba(124,58,237,.4)}
+  #ua-pricing .pr-chip.pr-on .pr-chip-ic{background:#6d28d9;color:#fff}
+  #ua-pricing .pr-row{transition:background-color .15s ease}
+  #ua-pricing .pr-row:hover{background:#faf8ff}
+  #ua-pricing .pr-qa{opacity:0;transition:transform .25s ease,box-shadow .25s ease,border-color .2s ease}
+  #ua-pricing .pr-qas.pr-in .pr-qa{animation:prQaIn .5s ease both}
+  #ua-pricing .pr-qas.pr-in .pr-qa:nth-child(1){animation-delay:.05s}
+  #ua-pricing .pr-qas.pr-in .pr-qa:nth-child(2){animation-delay:.15s}
+  #ua-pricing .pr-qas.pr-in .pr-qa:nth-child(3){animation-delay:.25s}
+  #ua-pricing .pr-qas.pr-in .pr-qa:nth-child(4){animation-delay:.35s}
+  #ua-pricing .pr-qas.pr-in .pr-qa:nth-child(5){animation-delay:.45s}
+  #ua-pricing .pr-qas.pr-in .pr-qa:nth-child(6){animation-delay:.55s}
+  @keyframes prQaIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+  #ua-pricing .pr-qa:hover{transform:translateY(-4px);border-color:#c4b5fd;box-shadow:0 14px 28px -14px rgba(124,58,237,.25)}
+  @media (prefers-reduced-motion: reduce){
+    #ua-pricing .pr-hero{animation:none}
+    #ua-pricing .pr-rev{opacity:1;transform:none;transition:none}
+    #ua-pricing .pr-card:hover,#ua-pricing .pr-card:hover .pr-img,#ua-pricing .pr-chip:hover,#ua-pricing .pr-addon:hover{transform:none}
+    #ua-pricing .pr-qa{opacity:1;animation:none;transition:none}
+    #ua-pricing .pr-qa:hover{transform:none}
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var root = document.getElementById("ua-pricing");
+    if (!root) return;
+
+    var chips = root.querySelectorAll(".pr-chip");
+    var cards = root.querySelectorAll(".pr-card");
+    chips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        var i = chip.getAttribute("data-i");
+        chips.forEach(function (c) { c.classList.toggle("pr-on", c === chip); });
+        cards.forEach(function (card) {
+          var on = card.getAttribute("data-i") === i;
+          card.classList.toggle("pr-reco", on);
+          var tag = card.querySelector(".pr-foryou");
+          if (tag) { tag.style.opacity = on ? "1" : "0"; tag.style.transform = on ? "scale(1)" : "scale(.8)"; }
+          if (on) card.scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+      });
+    });
+
+    var els = root.querySelectorAll(".pr-rev");
+    if (!("IntersectionObserver" in window)) {
+      els.forEach(function (e) { e.classList.add("pr-in"); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("pr-in"); io.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    els.forEach(function (e) { io.observe(e); });
+  })();
+</script>

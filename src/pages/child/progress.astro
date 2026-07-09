@@ -38,6 +38,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
   .pg-h{font-size:.84rem;color:#64748b;margin:0 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:600}
   .pg-ms{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
   .pg-mcard{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center}
+  a.pg-miss{border-style:dashed;background:#fbfcfe;text-decoration:none}
+  a.pg-miss:hover{background:#f5f3ff;border-color:#c4b5fd}
   .pg-mic{width:34px;height:34px;border-radius:9px;background:#ECFDF5;color:#15803d;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .pg-mname{font-size:.84rem;font-weight:600;color:#1e293b}
   .pg-mwhen{font-size:.78rem;color:#64748b}
@@ -76,7 +78,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
 <script>
   import * as UA from "../../lib/ua-data.js";
-  import { scoreWheel, DOMAINS } from "../../lib/wheelScore.js";
+  import { scoreWheel, DOMAINS, scoreToBand } from "../../lib/wheelScore.js";
 
   const UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
   const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
@@ -84,7 +86,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const present = (v) => v != null && v !== "";
   const SHORT = { "Communication": "Communication", "Social Connection": "Social", "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility", "Emotional Regulation": "Emotional", "Executive Function": "Executive", "Daily Living Skills": "Daily living", "Learning & Play": "Learning & play" };
-  const barColor = (sc) => sc == null ? "#cbd5e1" : sc <= 33 ? "#16a34a" : sc <= 66 ? "#d97706" : "#7c3aed";
+  const barColor = (sc) => { if (sc == null) return "#cbd5e1"; const k = scoreToBand(sc).key; return (k === "minimal" || k === "low") ? "#16a34a" : k === "moderate" ? "#d97706" : "#7c3aed"; };
 
   function getSession() { try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch { return null; } }
   function isValid(s) { return s && s.access_token && Math.floor(Date.now() / 1000) < (s.expires_at || 0) - 60; }
@@ -155,9 +157,14 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
     const ms = (data.birth && data.birth.milestones) || {};
     const MLAB = { sit: "Sat unsupported", crawl: "Crawled", walk: "Walked", firstWord: "First words", phrases: "First phrases", sentences: "First sentences", toiletDay: "Toilet trained (day)", toiletNight: "Toilet trained (night)" };
-    const mItems = Object.keys(MLAB).filter((k) => present(ms[k])).map((k) => ({ name: MLAB[k], when: "around " + ms[k], ic: MIC[k] || MIC.firstWord }));
-    $("pg-ms").innerHTML = mItems.length
-      ? mItems.map((m) => `<div class="pg-mcard"><span class="pg-mic"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${m.ic}</svg></span><span><span class="pg-mname" style="display:block">${esc(m.name)}</span><span class="pg-mwhen">${esc(m.when)}</span></span></div>`).join("")
+    const naLike = (v) => /^(n\/?a|na|-+|none|\?+)$/i.test(String(v).trim());
+    const recKeys = Object.keys(MLAB).filter((k) => present(ms[k]) && !naLike(ms[k]));
+    const missing = Object.keys(MLAB).length - recKeys.length;
+    const mItems = recKeys.map((k) => ({ name: MLAB[k], when: "around " + ms[k], ic: MIC[k] || MIC.firstWord }));
+    let msHtml = mItems.map((m) => `<div class="pg-mcard"><span class="pg-mic"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${m.ic}</svg></span><span><span class="pg-mname" style="display:block">${esc(m.name)}</span><span class="pg-mwhen">${esc(m.when)}</span></span></div>`).join("");
+    if (missing > 0) msHtml += `<a class="pg-mcard pg-miss" href="/passport?id=${p.id}"><span class="pg-mic" style="background:#f1f5f9;color:#94a3b8"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 4v8M4 8h8"/></svg></span><span><span class="pg-mname" style="display:block;color:#64748b">${missing} more to record</span><span class="pg-mwhen">Add ages in the passport →</span></span></a>`;
+    $("pg-ms").innerHTML = (mItems.length || missing)
+      ? msHtml
       : `<p class="pg-empty">No milestones recorded yet. <a href="/passport?id=${p.id}">Add them in the passport →</a></p>`;
 
     const w = await restGet("wins?select=id,text,created_at&passport_id=eq." + p.id + "&order=created_at.desc").catch(() => []);

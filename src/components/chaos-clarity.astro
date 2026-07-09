@@ -1,0 +1,512 @@
+---
+// =============================================================================
+// UniqueApex · From Chaos to Clarity — v5
+// Save as: src/components/chaos-clarity.astro  (replaces v4)
+// Changes from v4:
+//  · shorter overall: left scatter compressed into 5 compact rows, right-side
+//    gaps tightened — the right panel now sets the height (no dead space)
+//  · left rebalanced: every row ends with an item on the right edge
+//  · "Another intake form…" scribble is now a yellow post-it: "Fill SLP
+//    intake form" / "Remplir le formulaire d'ortho"
+//  · dotted seam swirls removed (arrow badge stays)
+// v5 · 2026-07-05
+// =============================================================================
+const { lang = "en" } = Astro.props;
+
+const t = {
+  en: {
+    label: "Why UniqueApex",
+    heading: "From chaos",
+    headingAccent: "to clarity.",
+    body: "Right now, assessments, reports, funding, appointments, and services live in a dozen different places. UniqueApex brings them together around your child — so you always know where you are, and what comes next.",
+    before: "Today",
+    beforeSub: "Too many places. Too hard to keep track.",
+    after: "With UniqueApex",
+    afterSub: "Everything connected. One place for everything.",
+    sticky1: "Did I miss something?",
+    sticky2: "Call OT back",
+    sticky3: "Fill SLP intake form",
+    scribble1: "??",
+    scribble2: "Where did I save that?",
+    reminder: { title: "Reminder", sub: "Intake form due" },
+    chaos: {
+      assessment: { title: "Assessment Report", sub: "speech_assessment.pdf" },
+      funding: { title: "Funding Application", sub: "Due in 5 days" },
+      school: { title: "School Meeting", sub: "Tomorrow 9:00 AM" },
+      notes: { title: "Therapy Notes" },
+      waitlist: { title: "Waitlist Update", sub: "12–18 months" },
+      unread: "Unread emails",
+      medical: { title: "Medical Report", sub: "final_v2 (2).pdf" },
+    },
+    tabs: ["Funding website", "Service directory", "School portal"],
+    dash: {
+      greet: "Good morning 👋",
+      greetSub: "Here's what's happening today.",
+      next: "Next up",
+      items: [
+        { title: "Speech therapy", sub: "Today at 3:00 PM", warn: false },
+        { title: "Funding application", sub: "Due in 5 days", warn: true },
+      ],
+      recent: "Recent activity",
+      acts: [
+        { title: "OT assessment uploaded", sub: "2h ago" },
+        { title: "New resource recommended", sub: "5h ago" },
+      ],
+    },
+    features: [
+      { title: "Family Passport", desc: "Your child's story, told once." },
+      { title: "Child Profile", desc: "All about your child, always up to date." },
+      { title: "Support Wheel", desc: "See strengths, needs, and growth." },
+      { title: "Timeline", desc: "Your journey, in one place." },
+      { title: "Appointments", desc: "Stay on top of every appointment." },
+      { title: "Assessments", desc: "Reports organized and easy to find." },
+      { title: "Progress", desc: "Track milestones and celebrate wins." },
+      { title: "Funding", desc: "Find programs. Track applications." },
+      { title: "Recommendations", desc: "Personalized next steps for your family." },
+    ],
+  },
+  fr: {
+    label: "Pourquoi UniqueApex",
+    heading: "Du chaos",
+    headingAccent: "à la clarté.",
+    body: "En ce moment, évaluations, rapports, financement, rendez-vous et services vivent à dix endroits différents. UniqueApex les réunit autour de votre enfant — pour toujours savoir où vous en êtes, et ce qui vient ensuite.",
+    before: "Aujourd'hui",
+    beforeSub: "Trop d'endroits. Trop difficile à suivre.",
+    after: "Avec UniqueApex",
+    afterSub: "Tout est connecté. Un seul endroit pour tout.",
+    sticky1: "Ai-je oublié quelque chose?",
+    sticky2: "Rappeler l'ergo",
+    sticky3: "Remplir le formulaire d'ortho",
+    scribble1: "??",
+    scribble2: "Où ai-je mis ce rapport?",
+    reminder: { title: "Rappel", sub: "Formulaire à remettre" },
+    chaos: {
+      assessment: { title: "Rapport d'évaluation", sub: "evaluation_ortho.pdf" },
+      funding: { title: "Demande de financement", sub: "Échéance dans 5 jours" },
+      school: { title: "Rencontre à l'école", sub: "Demain 9 h" },
+      notes: { title: "Notes de thérapie" },
+      waitlist: { title: "Liste d'attente", sub: "12–18 mois" },
+      unread: "Courriels non lus",
+      medical: { title: "Rapport médical", sub: "finale_v2 (2).pdf" },
+    },
+    tabs: ["Site de financement", "Répertoire de services", "Portail de l'école"],
+    dash: {
+      greet: "Bonjour 👋",
+      greetSub: "Voici ce qui se passe aujourd'hui.",
+      next: "À venir",
+      items: [
+        { title: "Orthophonie", sub: "Aujourd'hui à 15 h", warn: false },
+        { title: "Demande de financement", sub: "Échéance dans 5 jours", warn: true },
+      ],
+      recent: "Activité récente",
+      acts: [
+        { title: "Évaluation en ergo téléversée", sub: "il y a 2 h" },
+        { title: "Nouvelle ressource recommandée", sub: "il y a 5 h" },
+      ],
+    },
+    features: [
+      { title: "Passeport familial", desc: "L'histoire de votre enfant, racontée une seule fois." },
+      { title: "Profil de l'enfant", desc: "Tout sur votre enfant, toujours à jour." },
+      { title: "Roue de soutien", desc: "Forces, besoins et progrès, en un coup d'œil." },
+      { title: "Ligne du temps", desc: "Votre parcours, au même endroit." },
+      { title: "Rendez-vous", desc: "Aucun rendez-vous ne vous échappe." },
+      { title: "Évaluations", desc: "Des rapports organisés, faciles à retrouver." },
+      { title: "Progrès", desc: "Suivez les étapes, célébrez les victoires." },
+      { title: "Financement", desc: "Trouvez les programmes. Suivez vos demandes." },
+      { title: "Recommandations", desc: "Les prochaines étapes, personnalisées pour vous." },
+    ],
+  },
+}[lang] || {};
+
+// Icon tile + inline SVG paths per feature (index-matched to t.features)
+const featureMeta = [
+  { tile: "bg-violet-100 text-violet-700", paths: '<rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="2.6"/><path d="M8 17c.7-1.8 2.2-2.8 4-2.8s3.3 1 4 2.8"/>' },
+  { tile: "bg-indigo-100 text-indigo-600", paths: '<circle cx="12" cy="8" r="4"/><path d="M4 21c.9-4 4.2-6 8-6s7.1 2 8 6"/>' },
+  { tile: "bg-blue-100 text-blue-600", paths: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/>' },
+  { tile: "bg-sky-100 text-sky-600", paths: '<circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2.5"/>' },
+  { tile: "bg-rose-100 text-rose-500", paths: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M9.5 15.5l2 2 3.5-4"/>' },
+  { tile: "bg-amber-100 text-amber-600", paths: '<path d="M6 2.5h8L19 8v13.5H6z"/><path d="M13.5 2.5V8H19M9 13h6M9 17h6"/>' },
+  { tile: "bg-green-100 text-green-600", paths: '<path d="M4 20v-6M10 20V9M16 20v-9M21 20H3M16 6l3-3 2 2"/>' },
+  { tile: "bg-emerald-100 text-emerald-600", paths: '<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.3c0-1 1.1-1.8 2.5-1.8s2.5.8 2.5 1.8c0 2.3-5 1.5-5 4 0 1 1.1 1.8 2.5 1.8s2.5-.8 2.5-1.8"/>' },
+  { tile: "bg-yellow-100 text-yellow-500", paths: '<path d="M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.2l5.9-.8z"/>' },
+];
+
+const leftIdx = [1, 3, 5];
+const rightIdx = [2, 4, 6];
+const bottomIdx = [7, 8];
+---
+
+<section class="py-16 my-4" id="ua-chaos">
+  <div class="text-center max-w-3xl mx-auto mb-12">
+    <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{t.label}</p>
+    <h2 class="relative inline-block text-3xl md:text-4xl font-bold mt-3 text-slate-800 leading-tight">
+      <svg class="hidden sm:block absolute -left-11 -top-4 w-9 h-9 text-violet-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 3l1.8 4.9L20 9.7l-4.7 1.8L13.5 16l-1.8-4.5L7 9.7l4.7-1.8z"/><path d="M5.5 14l1 2.6 2.5.9-2.5 1L5.5 21l-1-2.5L2 17.5l2.5-.9z" opacity=".7"/></svg>
+      {t.heading}
+      <span class="relative text-violet-700 whitespace-nowrap">
+        {t.headingAccent}
+        <svg class="absolute left-0 -bottom-2 w-full h-3 text-violet-300" viewBox="0 0 220 14" preserveAspectRatio="none" fill="none" aria-hidden="true"><path d="M4 10 Q 55 3 110 8 T 216 7" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>
+      </span>
+    </h2>
+    <p class="text-slate-500 mt-6 text-lg">{t.body}</p>
+  </div>
+
+  <div class="relative grid gap-8 lg:gap-6 lg:grid-cols-[2fr_3fr] lg:items-stretch">
+    <!-- ================= LEFT · today: dense, chaotic, never overlapping ================= -->
+    <div class="relative rounded-3xl border border-orange-100 bg-orange-50 overflow-hidden flex flex-col p-5">
+      <div class="text-center relative z-20">
+        <span class="inline-block rounded-full bg-orange-100 text-orange-600 text-xs font-bold uppercase tracking-wide px-3.5 py-1.5">{t.before}</span>
+        <p class="text-slate-800 font-bold text-lg mt-3 m-0">{t.beforeSub}</p>
+      </div>
+
+      <div class="relative flex-1 flex flex-col justify-around mt-3 min-h-[420px]">
+        <!-- row 1 -->
+        <div class="flex flex-wrap items-start justify-between gap-x-2 gap-y-3 pr-2">
+          <div class="cc-item -rotate-6" style="--dur:7s;--del:0s;transition-delay:.05s">
+            <p class="cc-drift cc-hand bg-yellow-100 border border-yellow-200/70 rounded-lg shadow-md shadow-orange-200/40 px-3.5 py-2.5 text-xl leading-tight text-slate-700 m-0 w-[126px]">{t.sticky1}</p>
+          </div>
+          <div class="cc-item rotate-2 mt-5" style="--dur:6.4s;--del:.5s;transition-delay:.1s">
+            <div class="cc-drift bg-white rounded-xl shadow-md shadow-orange-200/50 px-3 py-2.5 flex items-center gap-2.5">
+              <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-500 flex items-center justify-center shrink-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8L19 8v13.5H6z"/><path d="M13.5 2.5V8H19"/></svg>
+              </span>
+              <span>
+                <span class="block text-[12.5px] font-bold text-slate-700 leading-tight">{t.chaos.assessment.title}</span>
+                <span class="block text-[11px] text-slate-400 leading-tight mt-0.5">{t.chaos.assessment.sub}</span>
+              </span>
+            </div>
+          </div>
+          <div class="cc-item rotate-12" style="--dur:5.8s;--del:.9s;transition-delay:.15s">
+            <p class="cc-drift cc-hand text-3xl text-slate-400 m-0">{t.scribble1}</p>
+          </div>
+        </div>
+
+        <!-- row 2 -->
+        <div class="flex flex-wrap items-start justify-between gap-x-2 gap-y-3 pl-4 pr-1">
+          <div class="cc-item -rotate-3" style="--dur:6.2s;--del:.7s;transition-delay:.2s">
+            <div class="cc-drift bg-sky-50 border border-sky-100 rounded-xl shadow-md shadow-orange-200/50 px-3 py-2.5 flex items-center gap-2.5">
+              <span class="w-8 h-8 rounded-lg bg-white text-sky-500 flex items-center justify-center shrink-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+              </span>
+              <span>
+                <span class="block text-[12.5px] font-bold text-slate-700 leading-tight">{t.chaos.school.title}</span>
+                <span class="block text-[11px] text-slate-400 leading-tight mt-0.5">{t.chaos.school.sub}</span>
+              </span>
+            </div>
+          </div>
+          <div class="cc-item rotate-3 mt-4" style="--dur:7.4s;--del:.2s;transition-delay:.25s">
+            <div class="cc-drift bg-rose-50 border border-rose-100 rounded-xl shadow-md shadow-orange-200/50 px-3 py-2.5 flex items-center gap-2.5">
+              <span class="w-8 h-8 rounded-lg bg-white text-rose-500 flex items-center justify-center shrink-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8L19 8v13.5H6z"/><path d="M13.5 2.5V8H19M9 13h6M9 17h4"/></svg>
+              </span>
+              <span>
+                <span class="block text-[12.5px] font-bold text-slate-700 leading-tight">{t.chaos.funding.title}</span>
+                <span class="block text-[11px] font-semibold text-rose-500 leading-tight mt-0.5">{t.chaos.funding.sub}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- row 3 -->
+        <div class="flex flex-wrap items-start justify-between gap-x-2 gap-y-3 pl-1 pr-1">
+          <div class="cc-item -rotate-1 mt-2" style="--dur:6.8s;--del:1.1s;transition-delay:.3s">
+            <div class="cc-drift bg-white rounded-xl shadow-md shadow-orange-200/50 px-3 py-2.5 w-[112px]">
+              <span class="block text-[12.5px] font-bold text-slate-700 leading-tight">{t.chaos.notes.title}</span>
+              <span class="block h-1.5 rounded bg-slate-200 mt-2 w-[85%]"></span>
+              <span class="block h-1.5 rounded bg-slate-200 mt-1.5 w-[65%]"></span>
+              <span class="block h-1.5 rounded bg-slate-100 mt-1.5 w-[75%]"></span>
+            </div>
+          </div>
+          <div class="cc-item rotate-3" style="--dur:6.3s;--del:.6s;transition-delay:.35s">
+            <p class="cc-drift cc-hand bg-yellow-100 border border-yellow-200/70 rounded-lg shadow-md shadow-orange-200/40 px-3 py-2.5 text-lg leading-tight text-slate-700 m-0 w-[122px]">{t.sticky3}</p>
+          </div>
+          <div class="cc-item rotate-2 mt-5" style="--dur:7.6s;--del:.4s;transition-delay:.4s">
+            <div class="cc-drift bg-violet-50 border border-violet-100 rounded-xl shadow-md shadow-orange-200/50 px-3 py-2.5 flex items-center gap-2.5">
+              <span class="w-8 h-8 rounded-lg bg-white text-violet-600 flex items-center justify-center shrink-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>
+              </span>
+              <span>
+                <span class="block text-[12.5px] font-bold text-slate-700 leading-tight">{t.chaos.waitlist.title}</span>
+                <span class="block text-[11px] text-slate-400 leading-tight mt-0.5">{t.chaos.waitlist.sub}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- row 4 -->
+        <div class="flex flex-wrap items-start justify-between gap-x-2 gap-y-3 pr-1">
+          <div class="cc-item -rotate-6 mt-2" style="--dur:6.6s;--del:.3s;transition-delay:.45s">
+            <p class="cc-drift cc-hand bg-yellow-100 border border-yellow-200/70 rounded-lg shadow-md shadow-orange-200/40 px-3.5 py-2.5 text-xl leading-tight text-slate-700 m-0 w-[104px]">{t.sticky2}</p>
+          </div>
+          <div class="cc-item rotate-1 mt-5" style="--dur:5.6s;--del:1.3s;transition-delay:.5s">
+            <div class="cc-drift relative bg-white rounded-xl shadow-md shadow-orange-200/50 px-3 py-2.5 flex items-center gap-2.5">
+              <span class="relative w-8 h-8 rounded-lg bg-slate-100 text-slate-400 flex items-center justify-center shrink-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+                <span class="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] px-0.5 rounded-full bg-rose-500 text-white text-[8.5px] font-bold flex items-center justify-center">12</span>
+              </span>
+              <span class="text-[12.5px] font-bold text-slate-700">{t.chaos.unread}</span>
+            </div>
+          </div>
+          <div class="cc-item -rotate-3" style="--dur:7.2s;--del:.8s;transition-delay:.55s">
+            <div class="cc-drift bg-emerald-50 border border-emerald-100 rounded-xl shadow-md shadow-orange-200/50 px-3 py-2.5 flex items-center gap-2.5">
+              <span class="w-8 h-8 rounded-lg bg-white text-emerald-500 flex items-center justify-center shrink-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8L19 8v13.5H6z"/><path d="M13.5 2.5V8H19M12 12v5M9.5 14.5h5"/></svg>
+              </span>
+              <span>
+                <span class="block text-[12.5px] font-bold text-slate-700 leading-tight">{t.chaos.medical.title}</span>
+                <span class="block text-[11px] text-slate-400 leading-tight mt-0.5">{t.chaos.medical.sub}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- row 5 -->
+        <div class="flex flex-wrap items-end justify-between gap-x-2 gap-y-3 pl-2 pr-2">
+          <div class="cc-item -rotate-1" style="--dur:7.8s;--del:.6s;transition-delay:.6s">
+            <div class="cc-drift">
+              {t.tabs.map((tab, i) => (
+                <div class={`flex items-center gap-2 bg-white rounded-lg shadow-md shadow-orange-200/50 border border-slate-100 pl-3 pr-2 py-1.5 w-36 ${i === 0 ? "" : "-mt-1.5"}`} style={`transform:translateX(${i * 8}px) rotate(${(i - 1) * 1.2}deg)`}>
+                  <span class="w-2 h-2 rounded-full bg-slate-200 shrink-0"></span>
+                  <span class="text-[10.5px] text-slate-500 truncate flex-1">{tab}</span>
+                  <span class="text-slate-300 text-[11px] leading-none">✕</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div class="cc-item rotate-2 mb-4" style="--dur:6.1s;--del:1.2s;transition-delay:.62s">
+            <div class="cc-drift bg-white rounded-xl shadow-md shadow-orange-200/50 px-3 py-2 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-md bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/></svg>
+              </span>
+              <span>
+                <span class="block text-[11px] font-bold text-slate-700 leading-tight">{t.reminder.title}</span>
+                <span class="block text-[9.5px] text-slate-400 leading-tight">{t.reminder.sub}</span>
+              </span>
+            </div>
+          </div>
+          <div class="cc-item -rotate-3 mb-1" style="--dur:6s;--del:1s;transition-delay:.65s">
+            <p class="cc-drift cc-hand text-xl text-slate-500 m-0 max-w-[130px] leading-tight">{t.scribble2}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- seam badge: desktop (at the 40/60 boundary) -->
+    <div class="hidden lg:flex absolute left-[calc((100%-1.5rem)*0.4+0.75rem)] top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 w-14 h-14 rounded-full bg-white shadow-xl shadow-violet-200/60 items-center justify-center text-violet-700" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </div>
+    <!-- seam badge: mobile -->
+    <div class="lg:hidden flex justify-center -my-2 relative z-20" aria-hidden="true">
+      <span class="w-11 h-11 rounded-full bg-white shadow-xl shadow-violet-200/60 flex items-center justify-center text-violet-700">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+      </span>
+    </div>
+
+    <!-- ================= RIGHT · with UniqueApex: cards around the dashboard ================= -->
+    <div class="relative rounded-3xl border border-violet-100 bg-violet-50 overflow-hidden p-5" id="cc-stage">
+      <div class="text-center relative z-20">
+        <span class="inline-block rounded-full bg-white text-violet-700 text-xs font-bold uppercase tracking-wide px-3.5 py-1.5 shadow-sm">{t.after}</span>
+        <p class="text-slate-800 font-bold text-lg mt-3 m-0">{t.afterSub}</p>
+      </div>
+
+      <svg id="cc-svg" class="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
+        {t.features.map((_, i) => (
+          <path class="cc-line" fill="none" stroke="#C4B5FD" stroke-width="2" stroke-linecap="round" style={`transition-delay:${(0.45 + i * 0.06).toFixed(2)}s`} />
+        ))}
+      </svg>
+
+      <div class="relative mt-4 grid gap-4 xl:grid-cols-[1fr_auto_1fr] xl:items-center xl:gap-x-4">
+        <!-- center: Family Passport + dashboard (first on small screens) -->
+        <div class="order-first xl:order-none xl:col-start-2 xl:row-start-1 flex flex-col items-center gap-3">
+          <div class="cc-rcard cc-feature relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/50 px-4 py-3 flex items-center gap-3 w-full max-w-[260px]" style="transition-delay:.4s">
+            <span class={`w-9 h-9 rounded-xl ${featureMeta[0].tile} flex items-center justify-center shrink-0`}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={featureMeta[0].paths} />
+            </span>
+            <span>
+              <span class="block text-[13.5px] font-bold text-slate-800 leading-tight">{t.features[0].title}</span>
+              <span class="block text-[11.5px] text-slate-500 leading-snug mt-0.5">{t.features[0].desc}</span>
+            </span>
+          </div>
+
+          <!-- mini dashboard -->
+          <div id="cc-dash" class="cc-center relative z-10 bg-white rounded-2xl border border-violet-100 shadow-xl shadow-violet-200/60 overflow-hidden w-full max-w-[280px] flex">
+            <div class="flex flex-col items-center gap-2 border-r border-slate-100 py-3 px-2 shrink-0">
+              <span class="w-6 h-6 rounded-md bg-violet-600 text-white flex items-center justify-center">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+              </span>
+              <span class="w-6 h-6 rounded-md bg-slate-100"></span>
+              <span class="w-6 h-6 rounded-md bg-slate-100"></span>
+              <span class="w-6 h-6 rounded-md bg-slate-100"></span>
+              <span class="w-6 h-6 rounded-md bg-slate-100"></span>
+            </div>
+            <div class="flex-1 p-3 min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <span class="min-w-0">
+                  <span class="block text-[12px] font-bold text-slate-800 leading-tight truncate">{t.dash.greet}</span>
+                  <span class="block text-[9.5px] text-slate-400 leading-tight mt-0.5">{t.dash.greetSub}</span>
+                </span>
+                <span class="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 text-white flex items-center justify-center text-[10px] font-bold shrink-0">M</span>
+              </div>
+              <span class="block text-[8.5px] font-bold text-slate-400 uppercase tracking-wide mt-2.5">{t.dash.next}</span>
+              {t.dash.items.map((it) => (
+                <span class="flex items-center gap-2 bg-slate-50 rounded-lg px-2 py-1.5 mt-1">
+                  <span class={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${it.warn ? "bg-rose-100 text-rose-500" : "bg-violet-100 text-violet-600"}`}>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                  </span>
+                  <span class="min-w-0">
+                    <span class="block text-[10px] font-semibold text-slate-700 leading-tight truncate">{it.title}</span>
+                    <span class={`block text-[8.5px] leading-tight ${it.warn ? "text-rose-500 font-semibold" : "text-slate-400"}`}>{it.sub}</span>
+                  </span>
+                </span>
+              ))}
+              <span class="block text-[8.5px] font-bold text-slate-400 uppercase tracking-wide mt-2.5">{t.dash.recent}</span>
+              {t.dash.acts.map((a, i) => (
+                <span class="flex items-center gap-2 rounded-lg px-2 py-1 mt-0.5">
+                  <span class={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${i === 0 ? "bg-emerald-100 text-emerald-600" : "bg-violet-100 text-violet-600"}`}>
+                    {i === 0
+                      ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                      : <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l1.8 3.9L18 9.2l-3.1 2.9.8 4.2-3.7-2-3.7 2 .8-4.2L6 9.2l4.2-1.3z"/></svg>}
+                  </span>
+                  <span class="min-w-0">
+                    <span class="block text-[10px] font-semibold text-slate-700 leading-tight truncate">{a.title}</span>
+                    <span class="block text-[8.5px] text-slate-400 leading-tight">{a.sub}</span>
+                  </span>
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <!-- left orbit column -->
+        <div class="grid grid-cols-2 gap-3 xl:col-start-1 xl:row-start-1 xl:flex xl:flex-col xl:gap-4 xl:items-end xl:justify-center">
+          {leftIdx.map((f, i) => (
+            <div class="cc-rcard cc-feature relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/50 px-3.5 py-3 flex items-start gap-2.5 w-full xl:max-w-[230px]" style={`transition-delay:${(0.55 + i * 0.1).toFixed(2)}s`}>
+              <span class={`w-9 h-9 rounded-xl ${featureMeta[f].tile} flex items-center justify-center shrink-0`}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={featureMeta[f].paths} />
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[13px] font-bold text-slate-800 leading-tight">{t.features[f].title}</span>
+                <span class="block text-[10.5px] sm:text-[11.5px] text-slate-500 leading-snug mt-0.5">{t.features[f].desc}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <!-- right orbit column -->
+        <div class="grid grid-cols-2 gap-3 xl:col-start-3 xl:row-start-1 xl:flex xl:flex-col xl:gap-4 xl:items-start xl:justify-center">
+          {rightIdx.map((f, i) => (
+            <div class="cc-rcard cc-feature relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/50 px-3.5 py-3 flex items-start gap-2.5 w-full xl:max-w-[230px]" style={`transition-delay:${(0.6 + i * 0.1).toFixed(2)}s`}>
+              <span class={`w-9 h-9 rounded-xl ${featureMeta[f].tile} flex items-center justify-center shrink-0`}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={featureMeta[f].paths} />
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[13px] font-bold text-slate-800 leading-tight">{t.features[f].title}</span>
+                <span class="block text-[10.5px] sm:text-[11.5px] text-slate-500 leading-snug mt-0.5">{t.features[f].desc}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <!-- bottom pair -->
+        <div class="grid grid-cols-2 gap-3 xl:col-span-3 xl:row-start-2 xl:flex xl:justify-center xl:gap-4 xl:mt-3">
+          {bottomIdx.map((f, i) => (
+            <div class="cc-rcard cc-feature relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/50 px-3.5 py-3 flex items-start gap-2.5 w-full xl:w-auto xl:max-w-[230px]" style={`transition-delay:${(0.8 + i * 0.1).toFixed(2)}s`}>
+              <span class={`w-9 h-9 rounded-xl ${featureMeta[f].tile} flex items-center justify-center shrink-0`}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={featureMeta[f].paths} />
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[13px] font-bold text-slate-800 leading-tight">{t.features[f].title}</span>
+                <span class="block text-[10.5px] sm:text-[11.5px] text-slate-500 leading-snug mt-0.5">{t.features[f].desc}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap');
+  #ua-chaos .cc-hand{font-family:'Caveat','Segoe Script',cursive}
+  #ua-chaos .cc-item{opacity:0;transition:opacity .6s ease}
+  #ua-chaos.ua-in .cc-item{opacity:1}
+  #ua-chaos .cc-drift{animation:none}
+  #ua-chaos.ua-in .cc-drift{animation:ccDrift var(--dur,6s) ease-in-out var(--del,0s) infinite alternate}
+  @keyframes ccDrift{from{transform:translateY(-3px)}to{transform:translateY(4px)}}
+  #ua-chaos .cc-line{opacity:0;transition:opacity .6s ease}
+  #ua-chaos.ua-in .cc-line{opacity:1}
+  #ua-chaos .cc-rcard{opacity:0;transform:translateY(10px) scale(.97);transition:opacity .5s ease,transform .5s ease}
+  #ua-chaos.ua-in .cc-rcard{opacity:1;transform:none}
+  #ua-chaos .cc-center{opacity:0;transform:scale(.94);transition:opacity .55s ease,transform .55s ease;transition-delay:.2s}
+  #ua-chaos.ua-in .cc-center{opacity:1;transform:none}
+  @media (prefers-reduced-motion: reduce){
+    #ua-chaos .cc-item,#ua-chaos .cc-rcard,#ua-chaos .cc-center{opacity:1;transform:none;transition:none}
+    #ua-chaos .cc-line{opacity:1;transition:none}
+    #ua-chaos.ua-in .cc-drift{animation:none}
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var root = document.getElementById("ua-chaos");
+    if (!root) return;
+
+    function drawLines() {
+      var stage = document.getElementById("cc-stage");
+      var svg = document.getElementById("cc-svg");
+      var dash = document.getElementById("cc-dash");
+      if (!stage || !svg || !dash) return;
+      var sr = stage.getBoundingClientRect();
+      if (!sr.width) return;
+      svg.setAttribute("viewBox", "0 0 " + sr.width + " " + sr.height);
+      var dr = dash.getBoundingClientRect();
+      var cx = dr.left - sr.left + dr.width / 2;
+      var cy = dr.top - sr.top + dr.height / 2;
+      var dTop = dr.top - sr.top;
+      var dBottom = dr.top - sr.top + dr.height;
+      var orbit = window.matchMedia("(min-width: 1280px)").matches;
+      var cards = stage.querySelectorAll(".cc-feature");
+      var lines = svg.querySelectorAll(".cc-line");
+      cards.forEach(function (card, i) {
+        var r = card.getBoundingClientRect();
+        var line = lines[i];
+        if (!line) return;
+        var x2 = r.left - sr.left + r.width / 2;
+        var y2 = r.top - sr.top + r.height / 2;
+        var d;
+        if (orbit) {
+          // curved line from dashboard center to card center (ends hidden under cards)
+          var mx = (cx + x2) / 2, my = (cy + y2) / 2;
+          var dx = x2 - cx, dy = y2 - cy;
+          var len = Math.sqrt(dx * dx + dy * dy) || 1;
+          var bend = 14 * (i % 2 === 0 ? 1 : -1);
+          var qx = mx + (-dy / len) * bend;
+          var qy = my + (dx / len) * bend;
+          d = "M" + cx + " " + cy + " Q " + qx + " " + qy + ", " + x2 + " " + y2;
+        } else if (i === 0) {
+          // spine fallback: Family Passport down into the dashboard
+          var fy = r.top - sr.top + r.height;
+          var m = (fy + dTop) / 2;
+          d = "M" + x2 + " " + fy + " C " + x2 + " " + m + ", " + cx + " " + m + ", " + cx + " " + dTop;
+        } else {
+          // spine fallback: elbow from dashboard bottom out to each card
+          var inner = x2 < cx ? r.right - sr.left : r.left - sr.left;
+          var ey = y2;
+          d = "M" + cx + " " + dBottom + " Q " + cx + " " + ey + ", " + inner + " " + ey;
+        }
+        line.setAttribute("d", d);
+      });
+    }
+
+    requestAnimationFrame(drawLines);
+    window.addEventListener("load", drawLines);
+    var rt;
+    window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(drawLines, 120); });
+
+    if (!("IntersectionObserver" in window)) { root.classList.add("ua-in"); drawLines(); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { root.classList.add("ua-in"); drawLines(); io.disconnect(); } });
+    }, { threshold: 0.15 });
+    io.observe(root);
+  })();
+</script>

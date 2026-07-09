@@ -15,6 +15,13 @@ const t = {
     title2: "in five steps",
     intro: "Most families spend months making calls, filling out the same forms, and waiting with no update. UniqueApex replaces that burden with one profile, structured outreach, and a single place where everything lands — so you can focus on your child.",
     stepWord: "Step",
+    gtkTitle: "Good to know",
+    gtk: [
+      { icon: "bx:bxs-heart", title: "No diagnosis needed", sub: "Start from the very first concern" },
+      { icon: "bx:bxs-star", title: "Free to start", sub: "One profile, one outreach batch — Concierge is optional" },
+      { icon: "bx:bxs-conversation", title: "English & French", sub: "Built bilingual for Montréal families" },
+      { icon: "bx:bxs-check-shield", title: "Private by default", sub: "Hosted in Canada — you control every share" },
+    ],
     steps: [
       {
         title: "Tell your child's story — once",
@@ -59,6 +66,13 @@ const t = {
     title2: "en cinq étapes",
     intro: "La plupart des familles passent des mois à faire des appels, remplir les mêmes formulaires et attendre sans nouvelles. UniqueApex remplace ce fardeau par un seul profil, des démarches structurées et un seul endroit où tout arrive — pour que vous puissiez vous concentrer sur votre enfant.",
     stepWord: "Étape",
+    gtkTitle: "Bon à savoir",
+    gtk: [
+      { icon: "bx:bxs-heart", title: "Aucun diagnostic requis", sub: "Commencez dès les premières inquiétudes" },
+      { icon: "bx:bxs-star", title: "Gratuit pour commencer", sub: "Un profil, une démarche — la conciergerie est optionnelle" },
+      { icon: "bx:bxs-conversation", title: "Français et anglais", sub: "Pensé bilingue pour les familles de Montréal" },
+      { icon: "bx:bxs-check-shield", title: "Privé par défaut", sub: "Hébergé au Canada — chaque partage vous appartient" },
+    ],
     steps: [
       {
         title: "Racontez l'histoire de votre enfant — une seule fois",
@@ -135,10 +149,35 @@ const t = {
           </div>
         </div>
         <div class={`flex items-center justify-center ${i % 2 === 0 ? "md:order-1" : ""}`}>
-          <img src={step.img} alt={step.alt} class="w-full max-w-[460px]" />
+          <img src={step.img} alt={step.alt} class={`w-full ${i === 3 ? "max-w-[368px]" : "max-w-[460px]"}`} />
         </div>
       </div>
     ))}
+  </div>
+
+  <!-- Good to know -->
+  <div class="hiw-step mb-24">
+    <h2 class="text-2xl md:text-3xl font-bold text-slate-800 text-center m-0 mb-10">{t.gtkTitle}</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
+      {t.gtk.map((item, gi) => (
+        <div class="gtk-card relative bg-white border border-violet-100 rounded-3xl px-5 py-7 text-center shadow-sm">
+          <div class="relative w-24 h-24 mx-auto mb-5">
+            <div class="gtk-blob absolute inset-1.5" style={["border-radius:46% 54% 58% 42% / 52% 44% 56% 48%","border-radius:58% 42% 46% 54% / 44% 56% 48% 52%","border-radius:52% 48% 42% 58% / 56% 46% 54% 44%","border-radius:44% 56% 54% 46% / 48% 58% 42% 56%"][gi]}></div>
+            {gi === 0 ? (
+              <svg class="gtk-acc absolute -top-1 right-0 w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"><path d="M16 6l3-3M18 11h4M12 5V1"/></svg>
+            ) : (
+              <svg class="gtk-acc gtk-spark absolute -top-1 -right-1 w-4 h-4" viewBox="0 0 24 24"><path d="M12 2l2.2 6.6L21 12l-6.8 3.4L12 22l-2.2-6.6L3 12l6.8-3.4z" fill="#c4b5fd"/></svg>
+            )}
+            <svg class="gtk-acc gtk-spark gtk-spark2 absolute bottom-0 -left-1 w-3 h-3" viewBox="0 0 24 24"><path d="M12 2l2.2 6.6L21 12l-6.8 3.4L12 22l-2.2-6.6L3 12l6.8-3.4z" fill="#ddd6fe"/></svg>
+            <span class="gtk-ic absolute inset-0 flex items-center justify-center text-violet-600">
+              <Icon class="w-10 h-10" name={item.icon} />
+            </span>
+          </div>
+          <span class="block text-[15.5px] font-bold text-slate-800 leading-snug">{item.title}</span>
+          <span class="block text-[13.5px] text-slate-500 leading-snug mt-1.5">{item.sub}</span>
+        </div>
+      ))}
+    </div>
   </div>
 </div>
 
@@ -147,8 +186,29 @@ const t = {
   #hiw .hiw-step.hiw-in{opacity:1;transform:none}
   #hiw .hiw-card{opacity:0;transform:translateY(8px);transition:opacity .45s ease .35s,transform .45s ease .35s}
   #hiw .hiw-step.hiw-in .hiw-card{opacity:1;transform:none}
+  #hiw .gtk-card{opacity:0;transition:transform .25s ease,box-shadow .25s ease,border-color .2s ease}
+  #hiw .hiw-step.hiw-in .gtk-card{animation:gtkIn .5s ease both}
+  #hiw .hiw-step.hiw-in .gtk-card:nth-child(1){animation-delay:.05s}
+  #hiw .hiw-step.hiw-in .gtk-card:nth-child(2){animation-delay:.15s}
+  #hiw .hiw-step.hiw-in .gtk-card:nth-child(3){animation-delay:.25s}
+  #hiw .hiw-step.hiw-in .gtk-card:nth-child(4){animation-delay:.35s}
+  @keyframes gtkIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+  #hiw .gtk-card:hover{transform:translateY(-6px);border-color:#c4b5fd;box-shadow:0 16px 32px -14px rgba(124,58,237,.28)}
+  #hiw .gtk-card:active{transform:translateY(-2px) scale(.99)}
+  #hiw .gtk-blob{background:#EDE9FE;transition:transform .5s cubic-bezier(.34,1.5,.64,1)}
+  #hiw .gtk-card:hover .gtk-blob{transform:scale(1.12) rotate(9deg)}
+  #hiw .gtk-ic{transition:transform .35s cubic-bezier(.34,1.6,.64,1)}
+  #hiw .gtk-card:hover .gtk-ic{transform:scale(1.14) rotate(-5deg)}
+  #hiw .gtk-acc{opacity:.85}
+  #hiw .gtk-card:hover .gtk-spark{animation:gtkTwinkle 1s ease infinite}
+  #hiw .gtk-card:hover .gtk-spark2{animation-delay:.3s}
+  @keyframes gtkTwinkle{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.35);opacity:1}}
   @media (prefers-reduced-motion: reduce){
     #hiw .hiw-step,#hiw .hiw-card{opacity:1;transform:none;transition:none}
+    #hiw .gtk-card{opacity:1;animation:none;transition:none}
+    #hiw .gtk-card:hover{transform:none}
+    #hiw .gtk-card:hover .gtk-ic,#hiw .gtk-card:hover .gtk-blob{transform:none}
+    #hiw .gtk-spark,#hiw .gtk-card:hover .gtk-spark,#hiw .gtk-card:hover .gtk-spark2{animation:none}
   }
 </style>
 

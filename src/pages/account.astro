@@ -179,8 +179,12 @@ import AppLayout from "../layouts/AppLayout.astro";
         // legend
         $("wheel-legend").innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">` + DOMAINS.map((nm) => {
           const dm = scored[nm];
-          const shown = dm.score == null ? "—" : (mode === "strengths" ? 100 - dm.score : dm.score);
-          return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;padding:4px 8px;background:#fff;border:1px solid var(--line);border-radius:8px"><span style="color:var(--ink-2)">${esc(nm)}</span><span style="display:flex;align-items:center;gap:6px"><span style="font-weight:700;color:var(--ink)">${shown}</span>${confidenceBadge(dm.confidence)}</span></div>`;
+          const raw = mode === "strengths" ? dm.strength : dm.score;
+          const shown = raw == null ? "—" : raw;
+          const conf = mode === "strengths" ? dm.strengthConfidence : dm.confidence;
+          const ansN = mode === "strengths" ? dm.strengthAnswered : dm.answered;
+          const totN = mode === "strengths" ? dm.strengthTotal : dm.total;
+          return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;padding:4px 8px;background:#fff;border:1px solid var(--line);border-radius:8px"><span style="color:var(--ink-2)">${esc(nm)}</span><span style="display:flex;align-items:center;gap:6px"><span style="font-weight:700;color:var(--ink)">${shown}</span>${confidenceBadge(conf, ansN, totN)}</span></div>`;
         }).join("") + `</div>`;
       }
       // completeness warning

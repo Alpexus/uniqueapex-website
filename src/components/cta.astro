@@ -1,4 +1,5 @@
 ---
+// v2 · 2026-07-04 — messaging pass: sub-line closes on a feeling, not a feature list
 import Link from "./ui/link.astro";
 
 interface Props {
@@ -11,12 +12,12 @@ const prefix = lang === "fr" ? "/fr" : "";
 const t = {
   en: {
     heading: "Every child deserves support.",
-    body: "UniqueApex helps families of neurodivergent children find, coordinate, and manage therapy access — all in one place.",
+    body: "And no parent should have to find it alone. Tell your child's story once — we'll help carry it from there.",
     cta: "Join the Waitlist",
   },
   fr: {
     heading: "Chaque enfant mérite du soutien.",
-    body: "UniqueApex aide les familles d'enfants neurodivergents à trouver, coordonner et gérer l'accès aux thérapies — au même endroit.",
+    body: "Et aucun parent ne devrait avoir à le trouver seul. Racontez l'histoire de votre enfant une seule fois — ensuite, nous la portons avec vous.",
     cta: "Rejoindre la liste d'attente",
   },
 }[lang];

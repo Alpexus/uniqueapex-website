@@ -1,4 +1,5 @@
 ---
+// v2 · 2026-07-04 — messaging pass: added "Can I add more than one child?" (Q5, EN + FR)
 interface Props {
   lang?: "en" | "fr";
 }
@@ -13,28 +14,32 @@ const allFaqs = {
       answer: "Your family's home base for the whole journey. We coordinate therapy access, keep your child's full story in one portable Family Passport, organize documents and progress, and guide you through funding, school, and every transition — from the very first concern all the way to adult services.",
     },
     {
-      question: "Do I need a diagnosis to start?",
-      answer: "No. UniqueApex is built to help from the very first concern — long before a diagnosis. Your child's profile helps you prepare for assessments, and then keeps growing with them afterwards.",
-    },
-    {
-      question: "How does provider matching work?",
-      answer: "You fill in one child profile. We identify matched speech-language and occupational therapy providers (behavioural therapy coming soon) and contact them on your behalf. You get back a curated shortlist with real availability, fees, and fit notes — no cold-calling, no repeated forms.",
-    },
-    {
-      question: "What is the Family Passport?",
-      answer: "A living profile that captures your child's history, strengths, needs, winning strategies, and reports. It travels with them to every provider, school, and transition — shareable in one click, exportable as a PDF, and you always control what's visible.",
+      question: "Is my child's information kept private?",
+      answer: "Absolutely. Your child's profile is only shared with the providers you choose. Data is hosted in Canada, we follow strict privacy standards, and we never sell your information.",
     },
     {
       question: "Is UniqueApex free to use?",
       answer: "The core platform is free: one child profile and one outreach batch per service type, at no cost. Our Concierge service — a real person handling follow-ups and waitlists for you — is a paid upgrade, and a membership with expert workshops and a parent community is coming.",
     },
     {
-      question: "What's coming after launch?",
-      answer: "The Government Funding Navigator (every grant and tax credit you qualify for, explained in plain language), AI Document Intelligence that reads reports and updates the Passport for you, transition alerts, and expert workshops with a parent community. Waitlist families get first access as each one ships.",
+      question: "Do I need a diagnosis to start?",
+      answer: "No. UniqueApex is built to help from the very first concern — long before a diagnosis. Your child's profile helps you prepare for assessments, and then keeps growing with them afterwards.",
     },
     {
-      question: "Is my child's information kept private?",
-      answer: "Absolutely. Your child's profile is only shared with the providers you choose. Data is hosted in Canada, we follow strict privacy standards, and we never sell your information.",
+      question: "Can I add more than one child?",
+      answer: "Yes. Each child gets their own Family Passport, profile, Support Wheel, and timeline — all under one family account, and you can switch between them anytime. Siblings rarely need the same support, and UniqueApex is built with that in mind.",
+    },
+    {
+      question: "What is the Family Passport?",
+      answer: "A living profile that captures your child's history, strengths, needs, winning strategies, and reports. It travels with them to every provider, school, and transition — shareable in one click, exportable as a PDF, and you always control what's visible.",
+    },
+    {
+      question: "How does provider matching work?",
+      answer: "You fill in one child profile. We identify matched speech-language and occupational therapy providers (behavioural therapy coming soon) and contact them on your behalf. You get back a curated shortlist with real availability, fees, and fit notes — no cold-calling, no repeated forms.",
+    },
+    {
+      question: "What's coming after launch?",
+      answer: "The Government Funding Navigator (every grant and tax credit you qualify for, explained in plain language), AI Document Intelligence that reads reports and updates the Passport for you, transition alerts, and expert workshops with a parent community. Waitlist families get first access as each one ships.",
     },
     {
       question: "When and where is UniqueApex launching?",
@@ -47,28 +52,32 @@ const allFaqs = {
       answer: "Le port d'attache de votre famille pour tout le parcours. Nous coordonnons l'accès aux thérapies, gardons toute l'histoire de votre enfant dans un Passeport familial portable, organisons documents et progrès, et vous guidons à travers le financement, l'école et chaque transition — des premières inquiétudes jusqu'aux services aux adultes.",
     },
     {
-      question: "Faut-il un diagnostic pour commencer?",
-      answer: "Non. UniqueApex est conçu pour aider dès les premières inquiétudes — bien avant un diagnostic. Le profil de votre enfant vous aide à préparer les évaluations, puis continue de grandir avec lui par la suite.",
-    },
-    {
-      question: "Comment fonctionne le jumelage avec les professionnels?",
-      answer: "Vous remplissez un seul profil. Nous identifions les orthophonistes et ergothérapeutes compatibles (thérapie comportementale à venir) et les contactons en votre nom. Vous recevez une liste ciblée avec les vraies disponibilités, les tarifs et des notes de compatibilité — sans appels à froid ni formulaires répétés.",
-    },
-    {
-      question: "Qu'est-ce que le Passeport familial?",
-      answer: "Un profil vivant qui rassemble l'historique, les forces, les besoins, les stratégies gagnantes et les rapports de votre enfant. Il le suit chez chaque professionnel, à l'école et dans chaque transition — partageable en un clic, exportable en PDF, et c'est toujours vous qui contrôlez ce qui est visible.",
+      question: "Les informations de mon enfant sont-elles protégées?",
+      answer: "Absolument. Le profil de votre enfant n'est partagé qu'avec les professionnels que vous choisissez. Les données sont hébergées au Canada, nous suivons des normes strictes de confidentialité et nous ne vendons jamais vos informations.",
     },
     {
       question: "Est-ce que UniqueApex est gratuit?",
       answer: "Le cœur de la plateforme est gratuit : un profil enfant et une démarche de contact par type de service, sans frais. Notre service de conciergerie — une vraie personne qui gère les suivis et les listes d'attente pour vous — est offert en option payante, et un abonnement avec ateliers d'experts et communauté de parents s'en vient.",
     },
     {
-      question: "Qu'est-ce qui s'en vient après le lancement?",
-      answer: "Le Navigateur de financement gouvernemental (chaque subvention et crédit d'impôt auxquels vous avez droit, expliqués simplement), l'intelligence documentaire par IA qui lit les rapports et met à jour le Passeport pour vous, les alertes de transition, et des ateliers d'experts avec une communauté de parents. Les familles de la liste d'attente y auront accès en premier.",
+      question: "Faut-il un diagnostic pour commencer?",
+      answer: "Non. UniqueApex est conçu pour aider dès les premières inquiétudes — bien avant un diagnostic. Le profil de votre enfant vous aide à préparer les évaluations, puis continue de grandir avec lui par la suite.",
     },
     {
-      question: "Les informations de mon enfant sont-elles protégées?",
-      answer: "Absolument. Le profil de votre enfant n'est partagé qu'avec les professionnels que vous choisissez. Les données sont hébergées au Canada, nous suivons des normes strictes de confidentialité et nous ne vendons jamais vos informations.",
+      question: "Puis-je ajouter plus d'un enfant?",
+      answer: "Oui. Chaque enfant a son propre Passeport familial, son profil, sa Roue de soutien et sa ligne du temps — le tout dans un seul compte familial, et vous pouvez passer de l'un à l'autre en tout temps. Les frères et sœurs ont rarement les mêmes besoins, et UniqueApex est conçu en ce sens.",
+    },
+    {
+      question: "Qu'est-ce que le Passeport familial?",
+      answer: "Un profil vivant qui rassemble l'historique, les forces, les besoins, les stratégies gagnantes et les rapports de votre enfant. Il le suit chez chaque professionnel, à l'école et dans chaque transition — partageable en un clic, exportable en PDF, et c'est toujours vous qui contrôlez ce qui est visible.",
+    },
+    {
+      question: "Comment fonctionne le jumelage avec les professionnels?",
+      answer: "Vous remplissez un seul profil. Nous identifions les orthophonistes et ergothérapeutes compatibles (thérapie comportementale à venir) et les contactons en votre nom. Vous recevez une liste ciblée avec les vraies disponibilités, les tarifs et des notes de compatibilité — sans appels à froid ni formulaires répétés.",
+    },
+    {
+      question: "Qu'est-ce qui s'en vient après le lancement?",
+      answer: "Le Navigateur de financement gouvernemental (chaque subvention et crédit d'impôt auxquels vous avez droit, expliqués simplement), l'intelligence documentaire par IA qui lit les rapports et met à jour le Passeport pour vous, les alertes de transition, et des ateliers d'experts avec une communauté de parents. Les familles de la liste d'attente y auront accès en premier.",
     },
     {
       question: "Quand et où est-ce que UniqueApex sera lancé?",

@@ -12,7 +12,7 @@
      import * as UA from "../lib/ua-data.js";
    ============================================================ */
 
-import { scoreWheel, domainArray } from "./wheelScore.js";
+import { scoreWheel, domainArray, scoreToBand } from "./wheelScore.js";
 
 const SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
 const ANON =
@@ -181,9 +181,10 @@ export function domainSnapshot(data) {
 
 export function levelFor(support) {
   if (support == null) return { cls: "mod", label: "Not enough data" };
-  if (support <= 33) return { cls: "low", label: "Low support" };
-  if (support <= 66) return { cls: "mod", label: "Moderate" };
-  return { cls: "high", label: "High support" };
+  const b = scoreToBand(support); // shared band table — same as wheel, badges, bars
+  if (b.key === "minimal" || b.key === "low") return { cls: "low", label: b.label };
+  if (b.key === "high" || b.key === "intensive") return { cls: "high", label: b.label };
+  return { cls: "mod", label: b.label };
 }
 
 // ---- derived: rule-based insights (v1) -------------------------

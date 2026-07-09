@@ -124,7 +124,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     if (present(dg.date) || (dg.diagnoses && dg.diagnoses.length)) {
       const dt = present(dg.date) ? parseLoose(dg.date) : null;
       const y = dt ? dt.getFullYear() : (present(dg.date) ? extractYear(dg.date) : null);
-      out.push({ cat: "Diagnosis", title: "Diagnosed", note: [(dg.diagnoses && dg.diagnoses.length ? dg.diagnoses.join(", ") : ""), dg.diagnosedBy].filter(Boolean).join(" · "), ts: dt ? dt.getTime() : (y ? new Date(y, 0, 1).getTime() : Date.now()), display: dt ? fmtMY(dt) : (present(dg.date) ? dg.date : "Date not set"), y: dt ? dt.getFullYear() : (y || "Recent"), auto: true });
+      out.push({ cat: "Diagnosis", title: "Diagnosed", note: [(dg.diagnoses && dg.diagnoses.length ? dg.diagnoses.join(", ") : ""), dg.diagnosedBy, (!dt && !y) ? "Add the date in the passport" : ""].filter(Boolean).join(" · "), ts: dt ? dt.getTime() : (y ? new Date(y, 0, 1).getTime() : -8640000000000000), display: dt ? fmtMY(dt) : (present(dg.date) ? dg.date : "Date not set"), y: dt ? dt.getFullYear() : (y || "Undated"), auto: true });
     }
     (d.therapy || []).forEach((t) => { if (present(t.startDate)) { const dt = parseLoose(t.startDate); if (dt) out.push({ cat: "Therapy", title: "Started " + String(t.type).toLowerCase(), note: [t.provider, t.frequency].filter(Boolean).join(" · "), ts: dt.getTime(), display: fmtMY(dt), y: dt.getFullYear(), auto: true }); } });
     const dob = d.childProfile && d.childProfile.dob, ms = (d.birth && d.birth.milestones) || {};

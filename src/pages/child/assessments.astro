@@ -13,11 +13,13 @@ import SectionTabs from "@/components/SectionTabs.astro";
   <div id="as-main" style="display:none">
     <div class="as-sec">
       <p class="as-h">Reports <a class="as-link" href="/documents">Upload a report →</a></p>
+      <p class="as-sub2">The files themselves — PDFs, scans, and originals live here.</p>
       <div id="as-docs"></div>
     </div>
 
     <div class="as-sec">
       <p class="as-h">Assessment records <button class="as-addbtn" id="as-addbtn"><span style="font-size:1.1em;line-height:1">+</span> Add assessment</button></p>
+      <p class="as-sub2">The key findings and recommendations, captured so nothing gets lost.</p>
       <div class="as-form" id="as-form">
         <div class="as-form-grid">
           <select id="as-type" class="as-field">
@@ -49,6 +51,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
   #as-main, #as-gate{max-width:860px}
   .as-sec{margin-bottom:24px}
   .as-h{font-size:.84rem;color:#64748b;margin:0 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:600}
+  .as-sub2{font-size:.76rem;color:#94a3b8;margin:-8px 0 10px}
   .as-link{font-size:.8rem;font-weight:600;color:#6d28d9;text-decoration:none}
   .as-link:hover{text-decoration:underline}
   .as-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 18px}
@@ -146,7 +149,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     records.forEach((r) => textToList(r.recommendations).forEach((x) => all.push({ tx: x, src: r.assessment_type || "Assessment" })));
     $("as-hub").innerHTML = all.length
       ? all.map((a) => `<div class="as-hub-item"><span class="ic">${dotSvg}</span><span><span class="tx" style="display:block">${esc(a.tx)}</span><span class="src">From ${esc(a.src)}</span></span></div>`).join("")
-      : `<p class="as-empty">Recommendations from your assessment records will gather here.</p>`;
+      : `<p class="as-empty">Recommendations you add to records gather here automatically — one ready-made list for IEP meetings, funding applications, and new providers.</p>`;
   }
 
   async function delRecord(id) {
@@ -187,7 +190,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     const docs = await restGet("documents?select=id,file_name,file_type,created_at&passport_id=eq." + p.id + "&order=created_at.desc&limit=30").catch(() => []);
     $("as-docs").innerHTML = (docs && docs.length)
       ? docs.map((doc) => `<div class="as-doc"><span class="ic">${fileSvg}</span><span><span class="nm" style="display:block">${esc(doc.file_name || "Document")}</span><span class="mt">Uploaded ${esc(fmtDate(doc.created_at))}</span></span><span class="as-pill">${esc((doc.file_type || "file").toUpperCase())}</span></div>`).join("")
-      : `<p class="as-empty">No reports uploaded yet. <a href="/documents">Upload your child's first report →</a></p>`;
+      : `<p class="as-empty">No reports yet. <a href="/documents">Upload the first one →</a> — every evaluation lives in one place, and the <strong>AI Report Reader</strong> can turn any report into a plain-language summary in minutes.</p>`;
 
     const recs = await restGet("assessments?select=id,assessment_type,provider,assessment_date,findings,recommendations&passport_id=eq." + p.id + "&order=assessment_date.desc.nullslast").catch(() => []);
     records = recs || [];

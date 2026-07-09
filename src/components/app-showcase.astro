@@ -3,6 +3,8 @@
 // UniqueApex · App Showcase — "a look inside the platform"
 // Save as: src/components/app-showcase.astro
 // Fictional child ("Maya") — no real user data. Mirrors the real dashboard.
+// v2 · 2026-07-04 — messaging pass: dashboard framed as the result of
+//                   completing the Family Passport.
 // =============================================================================
 const { lang = "en" } = Astro.props;
 
@@ -11,8 +13,9 @@ const t = {
     badge: "A look inside",
     title1: "Everything about your child,",
     title2: "finally in one place.",
-    sub: "One living profile that grows with your child — coordination, documents, progress and support needs, ready to share with every provider, school, and program.",
-    note: "Shown with a sample profile — this is the real product our pilot families use.",
+    sub: "The moment your Family Passport is complete, this is what it becomes — your family's home base. It keeps everything organized without the effort, shows you what comes next, tracks progress as it builds, and gives your whole care team one place to work from.",
+    cta: "Join the Waitlist",
+    cta2: "See how it works",
     search: "Search documents, providers, programs…",
     nav: ["Dashboard", "My Child", "Documents", "Funding", "Providers", "Resources"],
     child: "Maya",
@@ -23,7 +26,7 @@ const t = {
       { v: "6", l: "Applications submitted" },
       { v: "3", l: "Providers contacted" },
       { v: "2", l: "Waitlists joined" },
-      { v: "12", l: "Documents" },
+      { v: "12", l: "Documents stored" },
     ],
     wheel: "Support wheel",
     insights: "Insights for Maya",
@@ -38,8 +41,9 @@ const t = {
     badge: "Un aperçu",
     title1: "Tout sur votre enfant,",
     title2: "enfin au même endroit.",
-    sub: "Un profil vivant qui grandit avec votre enfant — coordination, documents, progrès et besoins de soutien, prêt à partager avec chaque intervenant, école et programme.",
-    note: "Présenté avec un profil fictif — c'est le vrai produit utilisé par nos familles pilotes.",
+    sub: "Dès que votre Passeport familial est complété, voici ce qu'il devient — le port d'attache de votre famille. Il garde tout organisé sans effort, vous montre la prochaine étape, suit les progrès au fil du temps et donne à toute votre équipe un seul endroit où travailler.",
+    cta: "Rejoindre la liste d'attente",
+    cta2: "Comment ça marche",
     search: "Rechercher documents, intervenants, programmes…",
     nav: ["Tableau de bord", "Mon enfant", "Documents", "Financement", "Intervenants", "Ressources"],
     child: "Maya",
@@ -50,7 +54,7 @@ const t = {
       { v: "6", l: "Demandes envoyées" },
       { v: "3", l: "Intervenants contactés" },
       { v: "2", l: "Listes d'attente" },
-      { v: "12", l: "Documents" },
+      { v: "12", l: "Documents classés" },
     ],
     wheel: "Roue de soutien",
     insights: "Aperçus pour Maya",
@@ -63,6 +67,8 @@ const t = {
   },
 }[lang] || {};
 
+const waitlistHref = lang === "fr" ? "/fr/waitlist" : "/waitlist";
+const howHref = lang === "fr" ? "/fr/howitworks" : "/howitworks";
 ---
 
 <section class="ua-showcase my-16 md:my-24" id="app-showcase">
@@ -77,7 +83,10 @@ const t = {
         {t.title1} <span class="text-violet-700">{t.title2}</span>
       </h2>
       <p class="mt-4 text-slate-600 leading-relaxed">{t.sub}</p>
-      <p class="mt-6 text-[13px] text-slate-400 italic">{t.note}</p>
+      <div class="mt-7 flex flex-wrap gap-3">
+        <a href={waitlistHref} class="inline-block rounded-full bg-violet-700 hover:bg-violet-800 text-white text-sm font-semibold px-6 py-3 transition">{t.cta}</a>
+        <a href={howHref} class="inline-block rounded-full border border-violet-300 text-violet-700 hover:bg-white text-sm font-semibold px-6 py-3 transition">{t.cta2}</a>
+      </div>
     </div>
 
     <!-- Right: fictional app preview (mirrors the real dashboard) -->
@@ -97,15 +106,15 @@ const t = {
       </div>
       <div class="flex">
         <!-- sidebar -->
-        <div class="hidden sm:flex flex-col gap-0.5 w-[128px] border-r border-slate-100 p-2 shrink-0">
+        <div class="hidden sm:flex flex-col gap-0.5 w-[104px] border-r border-slate-100 p-2 shrink-0">
           {t.nav.map((label, i) => (
-            <span class={`text-[10px] whitespace-nowrap flex items-center gap-1.5 px-2 py-1.5 rounded-md ${i === 1 ? "text-violet-700 font-semibold bg-violet-50" : "text-slate-500"}`}>
-              <svg width="12" height="12" class="shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <span class={`text-[10px] flex items-center gap-1.5 px-2 py-1.5 rounded-md ${i === 1 ? "text-violet-700 font-semibold bg-violet-50" : "text-slate-500"}`}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 {i === 0 && <><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></>}
                 {i === 1 && <path d="M12 20s-7-4.3-9.3-8.5C1 8 2.6 4.5 6 4.5c2 0 3.4 1.1 4 2.3.6-1.2 2-2.3 4-2.3 3.4 0 5 3.5 3.3 7C19 15.7 12 20 12 20z"/>}
                 {i === 2 && <><path d="M6 2.5h8L19 8v13.5H6z"/><path d="M13.5 2.5V8H19"/></>}
-                {i === 3 && <><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 12h.01M18 12h.01"/></>}
-                {i === 4 && <><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.7-2.9 2.9-4.5 5.5-4.5s4.8 1.6 5.5 4.5"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 14.8c2.2.3 3.9 1.7 4.6 3.9"/></>}
+                {i === 3 && <><circle cx="12" cy="12" r="9"/><path d="M12 7.5v9M9.5 9.8c0-1 1-1.8 2.5-1.8s2.5.8 2.5 1.8c0 2.4-5 1.6-5 4.2 0 1 1 1.8 2.5 1.8s2.5-.8 2.5-1.8"/></>}
+                {i === 4 && <><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/></>}
                 {i === 5 && <><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></>}
               </svg>
               {label}

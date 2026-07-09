@@ -3,6 +3,7 @@
 // UniqueApex · Platform Features v2 — modern interactive cards
 // Replaces: src/components/platform-features.astro
 // Cards expand on click for one extra detail line; violet glow follows cursor.
+// v2.1 · 2026-07-04 — messaging pass: intro ends "for your family" (EN + FR)
 // =============================================================================
 // @ts-ignore
 import { Icon } from "astro-icon/components";
@@ -17,49 +18,49 @@ const content = {
   en: {
     heading: "Much more than a",
     headingAccent: "search tool",
-    body: "UniqueApex is a long-term support system that grows with your family — from first concern through every stage of your child's development. Here's everything we're building.",
+    body: "UniqueApex is a long-term support system that grows with your family — from first concern through every stage of your child's development. Here's everything we're building for your family.",
     more: "More",
     less: "Less",
     badges: { beta: "Available in Beta", soon: "Coming Soon" },
     features: [
       {
         title: "Provider Matching & Outreach",
-        description: "We identify matched providers and contact them on your behalf. You receive a curated shortlist with availability, fees, and fit notes.",
+        description: "Skip the twenty phone calls. You get a curated shortlist — availability, fees, and fit notes — while we contact matched providers for you.",
         detail: "Speech, OT, behavioural and more — matched on fit, not just postal code.",
         icon: "bx:bxs-network-chart",
         status: "beta",
       },
       {
         title: "Family Passport",
-        description: "One portable child profile that captures your child's full history — diagnosis, therapy records, communication profile, school contacts — and travels with them to every provider, school, and transition.",
+        description: "Never re-tell your child's story. One portable profile — history, therapy records, communication profile — travels with them to every provider, school, and transition.",
         detail: "You control what's shared, and everything exports to PDF for any meeting.",
         icon: "bx:bxs-id-card",
         status: "beta",
       },
       {
         title: "Government Funding Navigator",
-        description: "Every grant, subsidy, tax credit, and support programme your family qualifies for, across every jurisdiction — with plain-language explanations and direct application links.",
+        description: "Stop leaving money on the table. Every grant, subsidy, and tax credit your family qualifies for — explained in plain language, with direct application links.",
         detail: "Built first for Québec and federal programs, growing as we expand.",
         icon: "bx:bxs-bank",
         status: "beta",
       },
       {
         title: "Expert Workshops & Peer Community",
-        description: "Live sessions with psychologists, occupational therapists, and autism specialists, plus a peer community of families who understand what you are navigating.",
+        description: "You are not alone in this. Live sessions with psychologists and specialists, plus a community of parents who understand — no backstory needed.",
         detail: "Ask questions in a space where nobody needs the backstory explained.",
         icon: "bx:bxs-group",
         status: "beta",
       },
       {
         title: "AI Document Intelligence",
-        description: "Upload diagnosis reports, therapy notes, or IEP documents. The platform reads them, summarises key findings in plain language, and updates your child's Passport automatically.",
+        description: "Reports become answers. Upload any assessment or IEP and get the key findings in plain language — with your child's Passport updated for you.",
         detail: "Findings and recommendations in parent language — you review everything before it's saved.",
         icon: "bx:bxs-file-find",
         status: "soon",
       },
       {
         title: "Transition Alert System",
-        description: "Proactive alerts 60–90 days before a therapist contract ends, a programme closes, or a school year transitions — so you are never caught without a plan.",
+        description: "Never be caught without a plan. We alert you 60–90 days before a contract ends, a programme closes, or a school year turns over.",
         detail: "The platform watches the calendar so your family doesn't have to.",
         icon: "bx:bxs-bell",
         status: "soon",
@@ -69,49 +70,49 @@ const content = {
   fr: {
     heading: "Bien plus qu'un",
     headingAccent: "outil de recherche",
-    body: "UniqueApex est un système de soutien à long terme qui grandit avec votre famille — de la première préoccupation à chaque étape du développement de votre enfant. Voici tout ce que nous bâtissons.",
+    body: "UniqueApex est un système de soutien à long terme qui grandit avec votre famille — de la première préoccupation à chaque étape du développement de votre enfant. Voici tout ce que nous bâtissons pour votre famille.",
     more: "Plus",
     less: "Moins",
     badges: { beta: "Offert en version bêta", soon: "À venir" },
     features: [
       {
         title: "Jumelage et démarches auprès des professionnels",
-        description: "Nous identifions les professionnels qui correspondent et les contactons en votre nom. Vous recevez une liste ciblée avec les disponibilités, les tarifs et des notes sur la compatibilité.",
+        description: "Fini les vingt appels. Vous recevez une liste ciblée — disponibilités, tarifs et compatibilité — pendant que nous contactons les professionnels pour vous.",
         detail: "Orthophonie, ergothérapie, comportement et plus — un jumelage basé sur la compatibilité, pas seulement le code postal.",
         icon: "bx:bxs-network-chart",
         status: "beta",
       },
       {
         title: "Passeport familial",
-        description: "Un profil enfant portable qui rassemble tout l'historique de votre enfant — diagnostic, dossiers de thérapie, profil de communication, contacts scolaires — et le suit chez chaque professionnel, école et transition.",
+        description: "Ne racontez plus jamais l'histoire de votre enfant. Un profil portable — historique, dossiers, profil de communication — le suit chez chaque professionnel, école et transition.",
         detail: "Vous contrôlez ce qui est partagé, et tout s'exporte en PDF pour n'importe quelle rencontre.",
         icon: "bx:bxs-id-card",
         status: "beta",
       },
       {
         title: "Navigateur de financement gouvernemental",
-        description: "Chaque subvention, crédit d'impôt et programme de soutien auquel votre famille a droit, dans toutes les juridictions — avec des explications en langage clair et des liens directs vers les demandes.",
+        description: "Ne laissez plus d'argent sur la table. Chaque subvention et crédit d'impôt auxquels votre famille a droit — expliqués en langage clair, avec des liens directs vers les demandes.",
         detail: "Conçu d'abord pour les programmes du Québec et du fédéral, et grandit avec notre expansion.",
         icon: "bx:bxs-bank",
         status: "beta",
       },
       {
         title: "Ateliers d'experts et communauté de pairs",
-        description: "Des séances en direct avec des psychologues, ergothérapeutes et spécialistes de l'autisme, ainsi qu'une communauté de familles qui comprennent ce que vous vivez.",
+        description: "Vous n'êtes pas seule. Des séances en direct avec des spécialistes et une communauté de parents qui comprennent — sans devoir tout réexpliquer.",
         detail: "Posez vos questions dans un espace où personne n'a besoin qu'on lui explique le contexte.",
         icon: "bx:bxs-group",
         status: "beta",
       },
       {
         title: "Intelligence documentaire par IA",
-        description: "Téléversez des rapports de diagnostic, des notes de thérapie ou des plans d'intervention. La plateforme les lit, résume les points clés en langage clair et met à jour le Passeport de votre enfant automatiquement.",
+        description: "Les rapports deviennent des réponses. Téléversez une évaluation ou un plan d'intervention et recevez l'essentiel en langage clair — le Passeport de votre enfant mis à jour pour vous.",
         detail: "Constats et recommandations en langage parent — vous révisez tout avant l'enregistrement.",
         icon: "bx:bxs-file-find",
         status: "soon",
       },
       {
         title: "Système d'alertes de transition",
-        description: "Des alertes proactives de 60 à 90 jours avant la fin d'un contrat de thérapie, la fermeture d'un programme ou un changement d'année scolaire — pour ne jamais être pris au dépourvu.",
+        description: "Ne soyez plus jamais prise au dépourvu. On vous prévient 60 à 90 jours avant la fin d'un contrat, la fermeture d'un programme ou un changement d'année scolaire.",
         detail: "La plateforme surveille le calendrier pour que votre famille n'ait pas à le faire.",
         icon: "bx:bxs-bell",
         status: "soon",

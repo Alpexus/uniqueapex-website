@@ -43,6 +43,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
   .da-sub{font-size:.78rem;color:#64748b;margin:6px 0 0;line-height:1.4}
   .da-note{font-size:.84rem;font-style:italic;color:#64748b;border-left:3px solid #EDE9FE;padding-left:11px;margin:14px 0 0;border-radius:0}
   .da-empty{font-size:.85rem;color:#94a3b8;margin:6px 0 0}
+  .da-wheel{display:inline-block;margin-top:12px;font-size:.78rem;font-weight:600;color:#6d28d9;text-decoration:none}
+  .da-wheel:hover{text-decoration:underline}
   .da-empty a{color:#6d28d9;font-weight:600;text-decoration:none}
 </style>
 
@@ -192,6 +194,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     }
 
     const cards = [commCard(), socialCard(), sensoryCard(), dailyCard(), motorCard(), emotionalCard(), interestsCard()];
+    const WHEEL_OF = { "Communication": "Communication", "Social interaction": "Social Connection", "Sensory profile": "Sensory Processing", "Daily living": "Daily Living Skills", "Motor skills": "Daily Living Skills", "Emotional regulation": "Emotional Regulation", "Interests & motivators": "Learning & Play" };
 
     const chipHtml = (items, tone) => { const t = TONE[tone]; return items.map((x) => `<span class="da-chip" style="background:${t.bg};color:${t.fg}">${TIC[tone]}${esc(x)}</span>`).join(""); };
     const emptyBody = () => `<p class="da-empty">Not recorded yet. <a href="${passportLink}">Add in passport →</a></p>`;
@@ -203,7 +206,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       const body = c.mode === "grid" ? bodyGrid(c) : bodyChips(c);
       const isOpen = !c.empty && !opened; if (isOpen) opened = true;
       const sum = c.empty ? "Not recorded yet" : (c.sum || "");
-      return `<div class="da-card ${isOpen ? "open" : "collapsed"} ${c.empty ? "muted" : ""}"><div class="da-head"><span class="da-ic">${IC[c.icon]}</span><span style="flex:1;min-width:0"><span class="da-name" style="display:block">${esc(c.name)}</span><span class="da-sum" style="display:block">${esc(sum)}</span></span>${IC.chev}</div><div class="da-body">${body}</div></div>`;
+      return `<div class="da-card ${isOpen ? "open" : "collapsed"} ${c.empty ? "muted" : ""}"><div class="da-head"><span class="da-ic">${IC[c.icon]}</span><span style="flex:1;min-width:0"><span class="da-name" style="display:block">${esc(c.name)}</span><span class="da-sum" style="display:block">${esc(sum)}</span></span>${IC.chev}</div><div class="da-body">${body}${!c.empty && WHEEL_OF[c.name] ? `<a class="da-wheel" href="/child/support-wheel?domain=${encodeURIComponent(WHEEL_OF[c.name])}">See in Support Wheel →</a>` : ""}</div></div>`;
     }).join("");
 
     $("da-acc").querySelectorAll(".da-head").forEach((h) => h.addEventListener("click", () => {

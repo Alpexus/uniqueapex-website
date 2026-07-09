@@ -83,8 +83,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
 <script>
   import * as UA from "../../lib/ua-data.js";
-  import { scoreWheel, DOMAINS, wheelCompleteness } from "../../lib/wheelScore.js";
-  import { generateWheelSVG } from "../../lib/wheelSvg.js";
+  import { scoreWheel, DOMAINS, wheelCompleteness, scoreToBand, HUES } from "../../lib/wheelScore.js";
+  import { generateWheelSVG, domainColor } from "../../lib/wheelSvg.js";
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -195,10 +195,10 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
   function levelInfo(score) {
     if (score == null) return { label: "Not enough data", bg: "#f1f5f9", fg: "#64748b", seg: "#cbd5e1" };
-    const l = UA.levelFor(score);
-    if (l.cls === "low") return { label: "Low support", bg: "#ECFDF5", fg: "#15803d", seg: "#16a34a" };
-    if (l.cls === "high") return { label: "High support", bg: "#F5F3FF", fg: "#6d28d9", seg: "#7c3aed" };
-    return { label: "Moderate", bg: "#FFFBEB", fg: "#b45309", seg: "#d97706" };
+    const b = scoreToBand(score);
+    if (b.key === "minimal" || b.key === "low") return { label: b.label, bg: "#ECFDF5", fg: "#15803d", seg: "#16a34a" };
+    if (b.key === "high" || b.key === "intensive") return { label: b.label, bg: "#F5F3FF", fg: "#6d28d9", seg: "#7c3aed" };
+    return { label: b.label, bg: "#FFFBEB", fg: "#b45309", seg: "#d97706" };
   }
 
   (async () => {
@@ -228,6 +228,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
     let sel = 0;
     for (let i = 0; i < n; i++) { if (scored[DOMAINS[i]].score != null) { sel = i; break; } }
+    const qd = new URLSearchParams(location.search).get("domain");
+    if (qd) { const qi = DOMAINS.findIndex((nm) => nm.toLowerCase().startsWith(qd.toLowerCase())); if (qi > -1) sel = qi; }
     let mode = "needs";
 
     function renderToggle() {
@@ -250,7 +252,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     function buildOverlay() {
       let s = "";
       for (let i = 0; i < n; i++) {
-        const a0 = -Math.PI / 2 + i * seg, a1 = a0 + seg, hue = Math.round((i / n) * 360), on = i === sel;
+        const a0 = -Math.PI / 2 + i * seg, a1 = a0 + seg, hue = HUES[i], on = i === sel;
         const attrs = on ? `fill="hsla(${hue},65%,52%,0.12)" stroke="hsl(${hue},65%,45%)" stroke-width="2.5"` : `stroke="none" stroke-width="0"`;
         s += '<path class="sw-wedge" data-i="' + i + '" d="' + sector(a0, a1) + '" ' + attrs + '></path>';
       }
@@ -267,16 +269,19 @@ import SectionTabs from "@/components/SectionTabs.astro";
       return `<p class="swd-lab">${title}</p><div class="swd-chips">${inner}</div>`;
     }
     function renderDetail() {
-      const name = DOMAINS[sel], dm = scored[name], hue = Math.round((sel / n) * 360);
+      const name = DOMAINS[sel], dm = scored[name];
       const L = levelInfo(dm.score), det = domainDetail(name, data);
-      const confN = dm.confidence === "high" ? 3 : dm.confidence === "medium" ? 2 : dm.confidence === "low" ? 1 : 0;
-      const segCount = dm.score == null ? 0 : Math.max(1, Math.min(5, Math.round(dm.score / 20)));
+      const segCount = dm.score == null ? 0 : (dm.score === 0 ? 0 : scoreToBand(dm.score).rings);
+      const strCount = dm.strength == null ? 0 : (dm.strength === 0 ? 0 : scoreToBand(dm.strength, "strength").rings);
       let segs = ""; for (let k = 1; k <= 5; k++) segs += `<span class="swd-seg" style="background:${k <= segCount ? L.seg : "#e2e8f0"}"></span>`;
-      let dots = ""; for (let k = 1; k <= 3; k++) dots += `<span class="swd-d3" style="background:${k <= confN ? "#64748b" : "#e2e8f0"}"></span>`;
+      let ssegs = ""; for (let k = 1; k <= 5; k++) ssegs += `<span class="swd-seg" style="background:${k <= strCount ? "#16a34a" : "#e2e8f0"}"></span>`;
+      const confLbl = dm.confidence === "high" ? "High" : dm.confidence === "medium" ? "Medium" : dm.confidence === "low" ? "Low" : "No data";
       $("sw-detail").innerHTML =
-        `<div class="swd-head"><span class="swd-dot" style="background:hsl(${hue},65%,52%)"></span><span class="swd-name">${esc(name)}</span><span class="swd-pill" style="background:${L.bg};color:${L.fg}">${L.label}</span></div>`
+        `<div class="swd-head"><span class="swd-dot" style="background:${domainColor(name)}"></span><span class="swd-name">${esc(name)}</span><span class="swd-pill" style="background:${L.bg};color:${L.fg}">${L.label}</span></div>`
         + (dm.score == null ? `<p class="swd-none">Add more in the passport to build this part of the profile.</p>` :
-            `<div class="swd-meta"><span class="l">Support level</span><span class="swd-segs">${segs}</span></div><div class="swd-meta"><span class="l">Confidence</span><span class="swd-dots">${dots}</span></div>`)
+            `<div class="swd-meta"><span class="l">Support level</span><span class="swd-segs">${segs}</span></div>`
+            + (dm.strength != null ? `<div class="swd-meta"><span class="l">Strengths</span><span class="swd-segs">${ssegs}</span></div>` : "")
+            + `<div class="swd-meta"><span class="l">Confidence</span><span style="font-size:.78rem;color:#64748b">${confLbl} — based on ${dm.answered} of ${dm.total} related questions</span></div>`)
         + (det.context ? `<p class="swd-ctx" style="margin-top:12px">${esc(det.context)}</p>` : "")
         + block("Strengths", det.strengths, "str")
         + block("Areas we're supporting", det.support, "sup")
