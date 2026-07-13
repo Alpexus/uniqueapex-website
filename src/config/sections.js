@@ -7,19 +7,23 @@
 //
 // To add/rename/reorder a tab: edit ONLY this file.
 // To add a whole new section: don't — keep the sidebar at 7.
-// Put new capabilities inside an existing section as a tab,
-// or surface them inline within a workflow.
 // ============================================================
 
 export const SECTIONS = {
+  // CHILD-IA-V2: consolidated from 7 tabs to 5 with distinct jobs.
+  //  · Overview — who the child is + what needs attention now
+  //  · Journey  — the copilot roadmap (next steps with reasons) + story so far
+  //  · Support Wheel — the deep-dive instrument (scoring engine unchanged)
+  //  · Growth   — check-in history: then vs now, what changed, wins, milestones
+  //  · Records  — assessment records + recommendations hub
+  // Old routes (/child/development, /child/strengths, /child/progress,
+  // /child/timeline) now redirect into the new structure.
   child: [
-    { key: "overview",      label: "Overview",              href: "/child" },
-    { key: "development",   label: "Development Profile",   href: "/child/development" },
-    { key: "support-wheel", label: "Support Wheel",         href: "/child/support-wheel" },
-    { key: "progress",      label: "Progress",              href: "/child/progress" },
-    { key: "timeline",      label: "Timeline",              href: "/child/timeline" },
-    { key: "assessments",   label: "Assessments",           href: "/child/assessments" },
-    { key: "strengths",     label: "Strengths & Challenges",href: "/child/strengths" },
+    { key: "overview",      label: "Overview",      href: "/child" },
+    { key: "journey",       label: "Journey",       href: "/child/journey" },
+    { key: "support-wheel", label: "Support Wheel", href: "/child/support-wheel" },
+    { key: "growth",        label: "Growth",        href: "/child/growth" },
+    { key: "assessments",   label: "Records",       href: "/child/assessments" },
   ],
   documents: [
     { key: "vault",        label: "Vault",        href: "/documents" },
@@ -42,6 +46,7 @@ export const SECTIONS = {
     { key: "notes",        label: "Notes",       href: "/providers/notes" },
   ],
   resources: [
+    { key: "hub",       label: "Overview",            href: "/resources" },
     { key: "workshops", label: "Workshops",           href: "/resources/workshops" },
     { key: "guides",    label: "Guides",              href: "/resources/guides" },
     { key: "articles",  label: "Articles",            href: "/resources/articles" },
@@ -57,6 +62,5 @@ export const SECTIONS = {
 };
 
 // Optional third level — rendered INSIDE a tab's page body, never in the sidebar
-// or the tab bar. (Settings was flattened to 4 areas per spec; export/delete now
-// live as sections inside Privacy & Data, so there are no settings subsections.)
+// or the tab bar.
 export const SUBSECTIONS = {};

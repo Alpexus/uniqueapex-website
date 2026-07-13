@@ -1,13 +1,132 @@
 ---
+/* PROVIDERS-CONTACTS-V1 — from stub to a working contact book for the
+   care team: add / call / email / delete. Saved on this device for now
+   (localStorage per account); syncing arrives with the directory. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
 <AppFormLayout title="Providers" activeNav="providers">
   <SectionTabs section="providers" active="contacts" />
-  <h1 class="page-title">Contacts</h1>
-  <p class="page-sub">Part of Providers. This page is scaffolded — content is coming.</p>
-  <div class="ua-stub">
-    <b>Contacts</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+
+  <div class="pc-wrap">
+    <div class="c3-ribbon rib-rose cu-rev">
+      <span class="c3-spark" style="top:12px;right:120px">✦</span>
+      <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
+      <span class="c3-rib-av"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="5.2" r="2.6"/><path d="M2.8 13.5c.6-2.8 2.6-4.2 5.2-4.2s4.6 1.4 5.2 4.2"/></svg></span>
+      <div class="c3-rib-id">
+        <h1>The Care Team Book</h1>
+        <p>Every therapist, clinic and coordinator in one place — one tap to call or write.</p>
+      </div>
+      <div class="c3-rib-stats" id="rb-stats"></div>
+    </div>
+
+    <div class="pc-add cu-rev" style="--d:.05s">
+      <div class="pc-grid">
+        <input class="pc-f" id="c-name" placeholder="Name *" maxlength="80" />
+        <input class="pc-f" id="c-role" placeholder="Role (SLP, OT, pediatrician…)" maxlength="60" />
+        <input class="pc-f" id="c-org" placeholder="Clinic / organization" maxlength="80" />
+        <input class="pc-f" id="c-phone" placeholder="Phone" maxlength="30" />
+        <input class="pc-f" id="c-email" placeholder="Email" maxlength="80" />
+        <input class="pc-f" id="c-note" placeholder="Note (waitlist, hours…)" maxlength="120" />
+      </div>
+      <div class="pc-actions">
+        <span class="pc-hint">Saved on this device for now — syncing comes with the directory.</span>
+        <button class="btn btn-primary btn-sm" id="c-save" type="button">Add contact</button>
+      </div>
+    </div>
+
+    <div id="pc-list" class="pc-list"></div>
   </div>
 </AppFormLayout>
+
+<style is:global>
+  .pc-wrap{display:flex;flex-direction:column;gap:14px;max-width:880px}
+  .pc-add{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px 17px;box-shadow:var(--shadow)}
+  .pc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:9px}
+  .pc-f{width:100%;padding:9px 12px;border:1px solid var(--line-2);border-radius:10px;font-size:.86rem;color:var(--ink);background:var(--card);outline:none;font-family:inherit}
+  .pc-f:focus{border-color:#F9A8D4;box-shadow:0 0 0 3px rgba(177,74,102,.12)}
+  .pc-actions{display:flex;align-items:center;gap:10px;margin-top:11px;flex-wrap:wrap}
+  .pc-hint{flex:1;font-size:.7rem;color:var(--faint);min-width:200px}
+  .pc-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+  .pc-card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:flex-start;transition:transform .15s,border-color .15s}
+  .pc-card:hover{transform:translateY(-2px);border-color:#F3D8E1}
+  .pc-av{width:38px;height:38px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;background:linear-gradient(135deg,#F9A8D4,#B14A66);color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:.9rem;flex-shrink:0}
+  .pc-b{flex:1;min-width:0}
+  .pc-nm{font-size:.9rem;font-weight:700;color:var(--ink)}
+  .pc-rl{font-size:.72rem;color:var(--rose);font-weight:700}
+  .pc-org{font-size:.74rem;color:var(--muted)}
+  .pc-note2{font-size:.74rem;color:var(--muted);font-style:italic;margin-top:4px}
+  .pc-links{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+  .pc-lk{font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:9999px;background:#F9EDF1;color:var(--rose);text-decoration:none;transition:transform .15s}
+  .pc-lk:hover{transform:translateY(-1px)}
+  .pc-del{position:absolute;top:8px;right:10px;border:none;background:none;color:#E7D3DB;font-size:1.05rem;line-height:1;cursor:pointer;padding:2px}
+  .pc-del:hover{color:#B14A66}
+  .pc-empty{grid-column:1/-1;display:flex;gap:14px;align-items:center;border:1.5px dashed #F3D8E1;border-radius:16px;background:#FFFDFD;padding:18px}
+  .pc-empty p{font-size:.85rem;color:var(--ink-2);line-height:1.55;margin:0}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>
+
+<script>
+  import { getSession } from "../../lib/ua-data.js";
+  import { notify } from "../../lib/notify.js";
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const uid = (getSession() && getSession().user && getSession().user.id) || "anon";
+  const KEY = "ua_contacts_" + uid;
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; } };
+  const save = (list) => localStorage.setItem(KEY, JSON.stringify(list));
+  let contacts = load();
+
+  function stats() {
+    $("rb-stats").innerHTML = `<span class="c3-rstat"><b>${contacts.length}</b><span>contact${contacts.length === 1 ? "" : "s"}</span></span>`;
+  }
+  function render() {
+    stats();
+    if (!contacts.length) {
+      $("pc-list").innerHTML = `<div class="pc-empty cu-rev"><span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66;width:42px;height:42px"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="5.2" r="2.6"/><path d="M2.8 13.5c.6-2.8 2.6-4.2 5.2-4.2s4.6 1.4 5.2 4.2"/></svg></span><p><b>No contacts yet.</b> Add the pediatrician, the CLSC social worker, the clinic front desk — every number you've ever scribbled on a receipt, finally in one place.</p></div>`;
+      return;
+    }
+    $("pc-list").innerHTML = contacts.map((c, i) => `
+      <div class="pc-card cu-pop" style="--d:${(i * 0.04).toFixed(2)}s">
+        <span class="pc-av">${esc((c.name || "?")[0].toUpperCase())}</span>
+        <span class="pc-b">
+          <span class="pc-nm" style="display:block">${esc(c.name)}</span>
+          ${c.role ? `<span class="pc-rl" style="display:block">${esc(c.role)}</span>` : ""}
+          ${c.org ? `<span class="pc-org" style="display:block">${esc(c.org)}</span>` : ""}
+          ${c.note ? `<span class="pc-note2" style="display:block">${esc(c.note)}</span>` : ""}
+          <span class="pc-links">
+            ${c.phone ? `<a class="pc-lk" href="tel:${esc(c.phone)}">Call</a>` : ""}
+            ${c.email ? `<a class="pc-lk" href="mailto:${esc(c.email)}">Email</a>` : ""}
+          </span>
+        </span>
+        <button class="pc-del" data-i="${i}" aria-label="Delete contact">×</button>
+      </div>`).join("");
+    $("pc-list").querySelectorAll(".pc-del").forEach((b) => b.addEventListener("click", () => {
+      if (!confirm("Remove this contact?")) return;
+      contacts.splice(+b.dataset.i, 1);
+      save(contacts); render();
+    }));
+  }
+
+  $("c-save").addEventListener("click", () => {
+    const c = {
+      name: $("c-name").value.trim(), role: $("c-role").value.trim(), org: $("c-org").value.trim(),
+      phone: $("c-phone").value.trim(), email: $("c-email").value.trim(), note: $("c-note").value.trim(),
+    };
+    if (!c.name) { $("c-name").focus(); return; }
+    contacts.unshift(c);
+    save(contacts);
+    ["c-name", "c-role", "c-org", "c-phone", "c-email", "c-note"].forEach((k) => { $(k).value = ""; });
+    render();
+    notify("ok", c.name + " added to the care team ✓");
+  });
+  render();
+</script>

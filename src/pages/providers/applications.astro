@@ -1,13 +1,182 @@
 ---
+/* PROVIDERS-APPLICATIONS-V1 — from stub to the OUTREACH KIT: a ready-to-
+   send email personalized from the passport (child's name, age, top needs),
+   a phone script, and the attach-this checklist. Copy, paste, send. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
 <AppFormLayout title="Providers" activeNav="providers">
   <SectionTabs section="providers" active="applications" />
-  <h1 class="page-title">Applications</h1>
-  <p class="page-sub">Part of Providers. This page is scaffolded — content is coming.</p>
-  <div class="ua-stub">
-    <b>Applications</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+
+  <div class="pa-wrap">
+    <div class="c3-ribbon rib-rose cu-rev">
+      <span class="c3-spark" style="top:12px;right:120px">✦</span>
+      <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
+      <span class="c3-rib-av"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 4.5h12v8H2z"/><path d="M2 5l6 4.5L14 5"/></svg></span>
+      <div class="c3-rib-id">
+        <h1>The Outreach Kit</h1>
+        <p id="rb-sub">Reaching out is the hardest part — so we wrote it for you, from the passport.</p>
+      </div>
+      <div class="c3-rib-stats" id="rb-stats"></div>
+    </div>
+
+    <div class="pa-grid">
+      <div class="pa-card cu-rev" style="--d:.03s">
+        <div class="pa-head">
+          <span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9;width:36px;height:36px"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg></span>
+          <span class="pa-t"><b>Automated outreach</b><span>Batches we sent on your behalf — replies go straight to your inbox.</span></span>
+          <a class="btn btn-ghost btn-sm" href="/providers">Send a batch</a>
+        </div>
+        <div id="pa-history"><p style="font-size:.8rem;color:var(--faint);margin:0">Checking…</p></div>
+      </div>
+
+      <div class="pa-card cu-rev" style="--d:.05s">
+        <div class="pa-head">
+          <span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66;width:36px;height:36px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 4.5h12v8H2z"/><path d="M2 5l6 4.5L14 5"/></svg></span>
+          <span class="pa-t"><b>The first email</b><span>Personalized from the passport — edit anything before sending.</span></span>
+          <button class="btn btn-primary btn-sm" id="pa-copy-email" type="button">Copy email</button>
+        </div>
+        <pre class="pa-pre" id="pa-email">Building your email…</pre>
+      </div>
+
+      <div class="pa-card cu-rev" style="--d:.1s">
+        <div class="pa-head">
+          <span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9;width:36px;height:36px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3.5 2.5h3l1.5 3.5-2 1a8 8 0 004 4l1-2 3.5 1.5v3a1.5 1.5 0 01-1.5 1.5A12 12 0 012 4a1.5 1.5 0 011.5-1.5z"/></svg></span>
+          <span class="pa-t"><b>The phone script</b><span>For the clinics that only answer the phone.</span></span>
+          <button class="btn btn-ghost btn-sm" id="pa-copy-phone" type="button">Copy</button>
+        </div>
+        <pre class="pa-pre" id="pa-phone">…</pre>
+      </div>
+
+      <div class="pa-card cu-rev" style="--d:.15s">
+        <div class="pa-head">
+          <span class="cu-blob" style="--blob:#E6F4F2;color:#0E8C82;width:36px;height:36px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8.5l3.2 3L13 4.5"/></svg></span>
+          <span class="pa-t"><b>Attach these</b><span>What providers actually want on first contact.</span></span>
+        </div>
+        <ul class="pa-list">
+          <li><b>The Family Passport PDF</b> — export it from the Overview; it answers 90% of intake questions. <a href="/child">Export →</a></li>
+          <li><b>The latest evaluation report</b>, if you have one. <a href="/documents">Open the vault →</a></li>
+          <li><b>Your availability</b> — two or three time windows makes scheduling twice as fast.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pa-note cu-rev" style="--d:.2s">
+      <p><b>Application tracking is coming with the provider directory.</b> Until then, log every call and reply in <a href="/providers/notes">Notes</a> — future you will be grateful.</p>
+    </div>
   </div>
 </AppFormLayout>
+
+<style is:global>
+  .pa-wrap{display:flex;flex-direction:column;gap:14px;max-width:920px}
+  .pa-grid{display:grid;grid-template-columns:1fr;gap:12px}
+  .pa-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:var(--shadow)}
+  .pa-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  .pa-t{flex:1;min-width:160px}
+  .pa-t b{display:block;font-family:var(--display);font-size:.96rem;font-weight:700;color:var(--ink)}
+  .pa-t span{display:block;font-size:.74rem;color:var(--muted);margin-top:2px}
+  .pa-pre{white-space:pre-wrap;font-family:var(--body);font-size:.84rem;line-height:1.65;color:var(--ink-2);background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0}
+  .pa-list{margin:0;padding-left:18px}
+  .pa-list li{font-size:.84rem;color:var(--ink-2);line-height:1.6;margin-bottom:8px}
+  .pa-list b{color:var(--ink)}
+  .pa-list a{color:var(--violet-700);font-weight:700;text-decoration:none}
+  .pa-note{background:linear-gradient(135deg,#FFFDFD,#FBEFF3 60%,#F3F0FE);border:1px solid #F3D8E1;border-radius:16px;padding:13px 17px}
+  .pa-note p{font-size:.83rem;color:var(--ink-2);margin:0;line-height:1.55}
+  .pa-note b{color:var(--rose)}
+  .pa-note a{color:var(--violet-700);font-weight:700;text-decoration:none}
+  .pa-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:.83rem;flex-wrap:wrap}
+  .pa-row:first-child{border-top:none}
+  .pa-row .sv{font-weight:700;color:var(--ink)}
+  .pa-row .dt{font-size:.72rem;color:var(--faint)}
+  .pa-row .ct{margin-left:auto;font-size:.74rem;color:var(--muted)}
+  .pa-pill{font-size:.64rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:9999px;white-space:nowrap}
+  .pa-pill.sent{background:var(--green-bg);color:var(--green)}
+  .pa-pill.partial{background:var(--amber-bg);color:var(--amber)}
+  .pa-pill.failed{background:#F9EDF1;color:var(--rose)}
+  .pa-pill.queued{background:var(--violet-50);color:var(--violet-700)}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>
+
+<script>
+  import * as UA from "../../lib/ua-data.js";
+  import { scoreWheel, DOMAINS, scoreToBand } from "../../lib/wheelScore.js";
+  import { notify } from "../../lib/notify.js";
+
+  const $ = (id) => document.getElementById(id);
+
+  (async () => {
+    const passports = await UA.getPassports().catch(() => []);
+    const p = UA.pickActivePassport(passports);
+    const data = (p && p.data) || {};
+    const id = UA.childIdentity(data);
+    const first = id.first || "our child";
+    const scored = scoreWheel(data);
+    const g1 = String((data.household && data.household.g1name) || "").replace(/\s*\([^)]*\)\s*$/, "").trim();
+    const needs = DOMAINS.filter((n) => scored[n].score != null).sort((a, b) => scored[b].score - scored[a].score).slice(0, 2);
+    const NICE = { "Communication": "communication", "Social Connection": "social connection", "Sensory Processing": "sensory regulation", "Flexibility & Transitions": "transitions and flexibility", "Emotional Regulation": "emotional regulation", "Executive Function": "attention and organization", "Daily Living Skills": "daily-living independence", "Learning & Play": "learning and play" };
+    const needTxt = needs.length ? needs.map((n) => NICE[n]).join(" and ") : "development";
+    const ageTxt = id.age != null ? id.age + "-year-old " : "";
+    const dxTxt = id.dx ? " (" + id.dx + ")" : "";
+
+    const email = `Subject: New client inquiry — ${first}, ${ageTxt.trim() || "young child"}
+
+Hello,
+
+My name is ${g1 || "…"} and I'm reaching out about services for my ${ageTxt}child, ${first}${dxTxt}. We're based in Montréal and looking for support with ${needTxt}.
+
+Could you tell me:
+• whether you're currently accepting new clients (or the waitlist length),
+• your availability and rates,
+• and what you'd need from us for an intake.
+
+I can share a one-page family profile with ${first}'s strengths, needs and history right away — it answers most intake questions.
+
+Thank you so much,
+${g1 || "…"}`;
+
+    const phone = `Hi, my name is ${g1 || "…"} — I'm calling about services for my ${ageTxt}child, ${first}.
+
+1. "Are you accepting new clients, or is there a waitlist I can join today?"
+2. "What does intake look like, and what should I send ahead of time?"
+3. "Is there a cancellation list we could be on?"
+4. Before hanging up: get a NAME and a DATE ("Who should I follow up with, and when?").`;
+
+    $("pa-email").textContent = email;
+    $("pa-phone").textContent = phone;
+    if (id.first) $("rb-sub").textContent = "Reaching out is the hardest part — so we wrote it for you, from " + id.first + "'s passport.";
+    $("rb-stats").innerHTML = [
+      `<span class="c3-rstat"><b>2</b><span>templates ready</span></span>`,
+      needs[0] ? `<span class="c3-rstat"><b style="font-size:.82rem">${NICE[needs[0]].split(" ")[0]}</b><span>top need inside</span></span>` : "",
+    ].join("");
+
+    $("pa-copy-email").addEventListener("click", () => {
+      navigator.clipboard && navigator.clipboard.writeText(email).then(() => notify("ok", "Email copied — paste it anywhere ✓")).catch(() => {});
+    });
+    $("pa-copy-phone").addEventListener("click", () => {
+      navigator.clipboard && navigator.clipboard.writeText(phone).then(() => notify("ok", "Phone script copied ✓")).catch(() => {});
+    });
+
+    /* ---------- automated outreach history ---------- */
+    const SVCNICE = { slp: "Speech-language therapy", ot: "Occupational therapy", aba: "Behaviour support", psych: "Psychology", social: "Social skills groups" };
+    try {
+      const s0 = await UA.getValidSession();
+      let rows = [];
+      if (s0 && p) {
+        const rq = await fetch("https://eghqufgiudxjkbsddtnx.supabase.co/rest/v1/outreach_requests?select=service_type,status,sent_count,created_at&passport_id=eq." + p.id + "&order=created_at.desc&limit=12", { headers: UA.authHeaders(s0.access_token) });
+        if (rq.ok) rows = await rq.json();
+      }
+      $("pa-history").innerHTML = rows.length
+        ? rows.map((r) => `<div class="pa-row"><span class="sv">${SVCNICE[r.service_type] || r.service_type}</span><span class="dt">${new Date(r.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}</span><span class="ct">sent to ${r.sent_count} provider${r.sent_count === 1 ? "" : "s"}</span><span class="pa-pill ${r.status}">${r.status}</span></div>`).join("")
+        : `<p style="font-size:.82rem;color:var(--muted);margin:0;line-height:1.55">No automated batches yet. Go to <a href="/providers" style="color:var(--violet-700);font-weight:700;text-decoration:none">Matches</a>, pick a service, and we introduce ${first} to up to 5 matched providers in one tap — replies land straight in your inbox.</p>`;
+    } catch (e) {
+      $("pa-history").innerHTML = `<p style="font-size:.8rem;color:var(--faint);margin:0">Outreach history appears once the outreach setup is deployed.</p>`;
+    }
+  })().catch((e) => console.error("[applications] hydrate failed", e));
+</script>

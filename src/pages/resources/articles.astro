@@ -23,8 +23,19 @@ const ARTICLES = [
 <AppFormLayout title="Resources" activeNav="resources">
   <SectionTabs section="resources" active="articles" />
 
-  <h1 class="page-title">Articles</h1>
-  <p class="page-sub">Short, practical reads written for parents — no jargon, no overwhelm. New pieces monthly.</p>
+  <div class="c3-ribbon rib-amber cu-rev" style="max-width:920px">
+    <span class="c3-spark" style="top:12px;right:120px">✦</span>
+    <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
+    <span class="c3-rib-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2.5h8L19 7.5v14H6z"/><path d="M14 2.5v5h5M9.5 12h5M9.5 15.5h5"/></svg></span>
+    <div class="c3-rib-id">
+      <h1>Articles</h1>
+      <p>Short, practical reads written for parents — no jargon, no overwhelm. New pieces monthly.</p>
+    </div>
+    <div class="c3-rib-stats">
+      <span class="c3-rstat"><b>{ARTICLES.length}</b><span>reads</span></span>
+      <span class="c3-rstat"><b>{TOPICS.length - 1}</b><span>topics</span></span>
+    </div>
+  </div>
 
   <div class="ra-filters cu-rev" id="ra-filters">
     {TOPICS.map((t) => <button class={t === "All" ? "ra-f on" : "ra-f"} data-t={t}>{t}</button>)}

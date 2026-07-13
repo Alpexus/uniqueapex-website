@@ -1,20 +1,145 @@
 ---
+/* FUNDING-GUIDE-V2 — information, not entitlement. Reframed after review:
+   no in-app "applying", no status tracking, no secured-money bar. Instead:
+   · a clear disclaimer (eligibility varies; applications happen on the
+     official government sites — never here)
+   · the 7 programs as an informational path: what each is, who it's
+     typically for, hedged amounts ("if eligible, up to…"), a personalized
+     soft hint, and OFFICIAL SITE links + our plain-language guide
+   · amounts framed as "programs like these can add up to…" — no promises */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
-import AiPanel from "@/components/AiPanel.astro";
-import "@/styles/mock.css";
 ---
 <AppFormLayout title="Funding" activeNav="funding">
   <SectionTabs section="funding" active="opportunities" />
-  <h1 class="page-title">Funding Opportunities</h1>
-  <p class="page-sub">Programs, credits and benefits your family may be eligible for in Québec.</p>
 
-  <AiPanel section="funding" />
+  <div class="fd-wrap">
+    <div class="c3-ribbon rib-green cu-rev">
+      <span class="c3-spark" style="top:12px;right:120px">✦</span>
+      <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
+      <span class="c3-rib-av">$</span>
+      <div class="c3-rib-id">
+        <h1>Funding Guide</h1>
+        <p>The programs Québec families most often use — what they are, who they're for, and where to apply officially.</p>
+      </div>
+      <div class="c3-rib-stats">
+        <span class="c3-rstat"><b>7</b><span>programs explained</span></span>
+        <span class="c3-rstat"><b>2</b><span>levels (CA + QC)</span></span>
+      </div>
+    </div>
 
-  <div class="mk-grid">
-    <div class="mk-card"><h3>Disability Tax Credit</h3><p>Federal &amp; Québec credit for eligible families.</p><div class="mk-meta"><span class="mk-tag amt">up to $3,000/yr</span><span class="mk-tag warn">Not applied</span></div></div>
-    <div class="mk-card"><h3>Supplement for Handicapped Children</h3><p>Retraite Québec monthly supplement.</p><div class="mk-meta"><span class="mk-tag amt">$229/mo</span><span class="mk-tag">Likely eligible</span></div></div>
-    <div class="mk-card"><h3>Exceptional Care Supplement</h3><p>For children with exceptional needs.</p><div class="mk-meta"><span class="mk-tag amt">$1,158/mo</span><span class="mk-tag muted">Check eligibility</span></div></div>
-    <div class="mk-card"><h3>Respite &amp; Répit Funding</h3><p>Support for family caregivers.</p><div class="mk-meta"><span class="mk-tag">Regional</span></div></div>
+    <div class="fd-disc cu-rev" style="--d:.05s">
+      <p><strong>Information only — not financial advice, and not an application.</strong> Eligibility depends on your family's situation and is decided by the government programs themselves. Applications always happen on the official sites or with your CLSC — never through UniqueApex. Amounts shown are program maximums that may not apply to you.</p>
+    </div>
+
+    <div id="fd-hint"></div>
+    <div id="fd-path" class="fd-path"></div>
+
+    <div class="fd-foot cu-rev" style="--d:.5s">
+      <p><b>Want a walkthrough?</b> Our plain-language guide covers the usual order — and 811 / your CLSC can confirm what applies to your family.</p>
+      <a class="btn btn-primary btn-sm" href="/resources/guides">Read the funding guide</a>
+      <a class="btn btn-ghost btn-sm" href="/resources/community">Community help</a>
+    </div>
   </div>
 </AppFormLayout>
+
+<style is:global>
+  .fd-wrap{display:flex;flex-direction:column;gap:14px;max-width:880px}
+  .fd-disc{background:var(--amber-bg);border:1px solid #EBDCC3;border-radius:14px;padding:13px 17px}
+  .fd-disc p{font-size:.8rem;color:var(--amber);line-height:1.55;margin:0}
+  .fd-hintcard{display:flex;gap:12px;align-items:flex-start;background:var(--violet-50);border:1px solid var(--violet-100);border-radius:14px;padding:12px 16px}
+  .fd-hintcard p{font-size:.82rem;color:#5b21b6;line-height:1.55;margin:0}
+
+  .fd-path{display:flex;flex-direction:column}
+  .fd-node{display:flex;gap:14px;position:relative;padding-bottom:14px}
+  .fd-node::before{content:"";position:absolute;left:19px;top:44px;bottom:-2px;width:2.5px;border-radius:2px;background:linear-gradient(to bottom,#C8E9D6,#EAE7F3)}
+  .fd-node.last::before{display:none}
+  .fd-dot{width:40px;height:40px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;flex-shrink:0;display:grid;place-items:center;z-index:1;background:#ECF7EF;color:var(--green);border:1.5px solid #D5EDDD;font-family:var(--display);font-weight:700;font-size:.82rem;transition:transform .3s cubic-bezier(.34,1.5,.64,1)}
+  .fd-node:hover .fd-dot{transform:scale(1.08) rotate(6deg)}
+  .fd-card{flex:1;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 16px;box-shadow:var(--shadow);transition:border-color .18s,box-shadow .18s}
+  .fd-node:hover .fd-card{border-color:#BBE8D5;box-shadow:0 8px 22px rgba(14,143,102,.1)}
+  .fd-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .fd-name{font-family:var(--display);font-size:.94rem;font-weight:700;color:var(--ink)}
+  .fd-lvl{font-size:.62rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:9999px;background:var(--bg);color:var(--muted)}
+  .fd-money{margin-left:auto;font-size:.76rem;font-weight:700;color:var(--green);white-space:nowrap}
+  .fd-money small{font-weight:500;color:var(--muted)}
+  .fd-note2{font-size:.78rem;color:var(--muted);margin:5px 0 0;line-height:1.55}
+  .fd-elig{display:inline-flex;align-items:flex-start;gap:6px;font-size:.7rem;font-weight:600;background:var(--violet-50);border:1px solid var(--violet-100);color:#7c6bab;border-radius:10px;padding:5px 10px;margin-top:9px;line-height:1.4}
+  .fd-links{display:flex;gap:12px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  .fd-off{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;color:var(--teal);text-decoration:none}
+  .fd-off:hover{text-decoration:underline}
+  .fd-in{font-size:.74rem;font-weight:600;color:var(--muted);text-decoration:none}
+  .fd-in:hover{color:var(--violet-700)}
+  .fd-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:linear-gradient(120deg,#FCFEFC 0%,#ECF7EF 55%,#F3F0FE 100%);border:1px solid #D5EDDD;border-radius:16px;padding:14px 18px}
+  .fd-foot p{flex:1;font-size:.84rem;color:var(--ink-2);line-height:1.5;margin:0;min-width:220px}
+  .fd-foot b{color:var(--green)}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>
+
+<script>
+  import * as UA from "../lib/ua-data.js";
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const extIc = '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6.5 3H3v10h10V9.5M9.5 2.5H13.5V6.5M13 3L7.5 8.5"/></svg>';
+
+  /* what each program IS + where to read the official page.
+     Links point at long-standing government domains — verify before launch. */
+  const INFO = {
+    dtc: { what: "A federal tax credit that also acts as the gateway to other supports (the CDB and the RDSP). Applied for through the CRA with a form your doctor completes.", url: "https://www.canada.ca/en/revenue-agency/services/tax/individuals/segments/tax-credits-deductions-persons-disabilities/disability-tax-credit.html", site: "Canada.ca — Disability Tax Credit" },
+    cdb: { what: "A tax-free monthly amount for families who care for a child under 18 who is approved for the Disability Tax Credit. Usually flows automatically with your tax return once the DTC is in place.", url: "https://www.canada.ca/en/revenue-agency/services/child-family-benefits/child-disability-benefit.html", site: "Canada.ca — Child Disability Benefit" },
+    rdsp: { what: "A long-term savings plan where the government adds grants and bonds. Requires DTC approval; opened at a bank.", url: "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/registered-disability-savings-plan-rdsp.html", site: "Canada.ca — RDSP" },
+    qc_supplement: { what: "A Retraite Québec supplement for parents of a child with a significant disability. Application includes a report from a professional.", url: "https://www.retraitequebec.gouv.qc.ca", site: "Retraite Québec" },
+    qc_exceptional: { what: "A higher tier of the supplement for children whose care needs are exceptional. Assessed by Retraite Québec on top of the basic supplement.", url: "https://www.retraitequebec.gouv.qc.ca", site: "Retraite Québec" },
+    qc_family_alloc: { what: "Québec's family allowance — income-based and automatic with your taxes for most families. Worth confirming it's flowing correctly.", url: "https://www.retraitequebec.gouv.qc.ca", site: "Retraite Québec" },
+    qc_family_supp: { what: "Respite, babysitting and support measures coordinated locally. The front door is your CLSC social worker — 811 (option 2) can point you to yours.", url: "https://www.quebec.ca", site: "Québec.ca" },
+  };
+
+  (async () => {
+    const passports = await UA.getPassports().catch(() => []);
+    const p = UA.pickActivePassport(passports);
+    const data = (p && p.data) || {};
+    const hasDx = ((data.diagnosis || {}).diagnoses || []).length > 0;
+
+    $("fd-hint").innerHTML = hasDx
+      ? `<div class="fd-hintcard cu-rev" style="--d:.08s"><span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9;width:34px;height:34px;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg></span><p><b>A diagnosis is on file</b> — families in this situation usually start with the Disability Tax Credit, because two other programs depend on it. The guide below walks the order.</p></div>`
+      : `<div class="fd-hintcard cu-rev" style="--d:.08s"><span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9;width:34px;height:34px;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg></span><p><b>No diagnosis on file yet</b> — most of these programs ask for one. The smart move is reading up now so you can act the week it lands. The Journey has that step mapped.</p></div>`;
+
+    const HINT = {
+      dtc: hasDx ? "With a diagnosis on file, this is usually the first application — your doctor fills part of the form." : "Usually the first application once a diagnosis lands.",
+      cdb: "Depends on DTC approval — nothing extra to apply for in most cases.",
+      rdsp: "Depends on DTC approval — opened at a bank, grants stack yearly.",
+      qc_supplement: hasDx ? "Many families with a formal diagnosis apply here next — via Retraite Québec." : "Requires professional documentation of the disability.",
+      qc_exceptional: "Only after the basic supplement — for substantially higher care needs.",
+      qc_family_alloc: "Automatic with taxes for most families — just confirm it's flowing.",
+      qc_family_supp: "Ask your CLSC social worker — 811 option 2 finds yours.",
+    };
+
+    $("fd-path").innerHTML = UA.FUNDING_PROGRAMS.map((r, i) => {
+      const info = INFO[r.key] || {};
+      return `<div class="fd-node cu-rev${i === UA.FUNDING_PROGRAMS.length - 1 ? " last" : ""}" style="--d:${(0.1 + i * 0.05).toFixed(2)}s">
+        <span class="fd-dot">${i + 1}</span>
+        <div class="fd-card">
+          <div class="fd-top">
+            <span class="fd-name">${esc(r.name)}</span>
+            <span class="fd-lvl">${esc(r.level)}</span>
+            <span class="fd-money">${r.amount ? `<small>if eligible, </small>up to $${r.amount.toLocaleString("en-CA")}/yr` : esc(r.note)}</span>
+          </div>
+          <p class="fd-note2">${esc(info.what || r.note)}</p>
+          ${HINT[r.key] ? `<span class="fd-elig">✦ ${esc(HINT[r.key])}</span>` : ""}
+          <div class="fd-links">
+            ${info.url ? `<a class="fd-off" href="${info.url}" target="_blank" rel="noopener">${extIc}Official: ${esc(info.site)}</a>` : ""}
+            <a class="fd-in" href="/resources/guides">Our plain-language guide →</a>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  })().catch((e) => console.error("[funding] hydrate failed", e));
+</script>

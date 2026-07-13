@@ -1,34 +1,41 @@
-/* SectionTabs — minimal structural styles for in-page secondary nav.
-   Imported by SectionTabs.astro. Kept intentionally plain (this is an IA
-   change, not a visual one); restyle later if desired. */
+/* SectionTabs — V2: the floating pill bar, app-wide.
+   Every section (child, documents, funding, providers, resources,
+   settings) now shares the same navigation language. */
 
 .sectiontabs {
   display: flex;
-  gap: 2px;
+  gap: 5px;
   overflow-x: auto;
-  border-bottom: 1px solid var(--line, #EAE7F3);
-  margin: 0 0 22px;
+  padding: 4px;
+  margin: 0 0 16px;
+  background: var(--card, #fff);
+  border: 1px solid var(--line, #EAE7F3);
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(34, 27, 54, .04), 0 4px 16px rgba(34, 27, 54, .05);
+  width: max-content;
+  max-width: 100%;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.sectiontabs::-webkit-scrollbar { display: none; }
 .sectiontab {
   flex: 0 0 auto;
-  padding: 11px 14px;
-  font: 500 14px/1 var(--body, "Inter", sans-serif);
+  padding: 7px 14px;
+  border-radius: 9999px;
+  font: 600 13px/1 var(--body, "Inter", sans-serif);
   color: var(--muted, #7B7491);
   text-decoration: none;
   white-space: nowrap;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
+  transition: background .15s, color .15s;
 }
-.sectiontab:hover { color: var(--ink, #221B36); }
+.sectiontab:hover { background: var(--bg, #F7F6FB); color: var(--ink, #221B36); }
 .sectiontab.active {
-  color: var(--violet-700, #6D28D9);
-  border-bottom-color: var(--violet-700, #6D28D9);
-  font-weight: 600;
+  background: var(--violet-700, #6D28D9);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(109, 40, 217, .3);
 }
 
-/* Any page that renders the section tab bar gets the wide canvas
-   (fixes the narrow document vault and makes every section page wide). */
+/* Any page that renders the section tab bar gets the wide canvas. */
 main.content:has(.sectiontabs){max-width:1260px;}
 
 /* Generic placeholder block for scaffolded pages */

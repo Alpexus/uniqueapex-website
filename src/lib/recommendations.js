@@ -71,13 +71,13 @@ export function getRecommendations(data, ctx = {}) {
     add({ id: "communication", section: "child", severity: "todo",
       title: "Fill in the communication section",
       reason: "Therapists use it to tailor early goals.",
-      href: "/child/development", cta: "Continue profile" });
+      href: "/child/support-wheel", cta: "Continue profile" });
   }
   if (!filled(data.strengths)) {
     add({ id: "strengths", section: "child", severity: "info",
       title: `Capture ${name}'s strengths and interests`,
       reason: "Strength-based notes make plans easier to follow.",
-      href: "/child/strengths", cta: "Add strengths" });
+      href: "/child", cta: "Add strengths" });
   }
 
   /* ---------- Documents: recency ---------- */

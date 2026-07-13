@@ -19,8 +19,19 @@ const VIDEOS = [
 <AppFormLayout title="Resources" activeNav="resources">
   <SectionTabs section="resources" active="videos" />
 
-  <h1 class="page-title">Videos</h1>
-  <p class="page-sub">Workshop recordings and bite-size explainers — watch anytime, at your own pace.</p>
+  <div class="c3-ribbon rib-amber cu-rev" style="max-width:920px">
+    <span class="c3-spark" style="top:12px;right:120px">✦</span>
+    <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
+    <span class="c3-rib-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M10 9.5l5 2.5-5 2.5z"/></svg></span>
+    <div class="c3-rib-id">
+      <h1>Videos</h1>
+      <p>Workshop recordings and bite-size explainers — watch anytime, at your own pace.</p>
+    </div>
+    <div class="c3-rib-stats">
+      <span class="c3-rstat"><b>{VIDEOS.length}</b><span>videos</span></span>
+      <span class="c3-rstat"><b>{VIDEOS.filter((v) => v.kind === "Recording").length}</b><span>recordings</span></span>
+    </div>
+  </div>
 
   <div class="rv-note cu-rev">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M10 9.5l5 2.5-5 2.5z"/></svg>

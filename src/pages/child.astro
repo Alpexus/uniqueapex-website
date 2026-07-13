@@ -1,60 +1,82 @@
 ---
-/* OVERVIEW-V3 — structural redesign to match the approved mockup:
-   · ONE hero card = identity + about sentence + profile ring + stat strip
-   · Mini support wheel (rose petals, petal length = support level) is the
-     centerpiece, with "Most support now" / "Going strong" beside it
-   · Strengths render as ICON CARDS via a keyword→icon dictionary (EN+FR)
-     with a star fallback for anything unmatched
-   · Insights condensed into one warm guidance paragraph
-   Data logic and Supabase calls unchanged. */
+/* OVERVIEW-V5 — the front door of the living profile (CHILD-IA-V2, light):
+   · LIGHT hero (lavender-mist gradient, violet accents only — no dark
+     panels): morphing avatar, identity chips, about sentence, completion
+     ring, quick actions, linked stat chips
+   · CHECK-IN NUDGE when the passport is stale or thin — the profile asks
+     to stay alive
+   · WHAT'S NEXT: top 3 steps from the journey engine (personalized whys,
+     real destinations) + link to the full Journey
+   · Support wheel snapshot (SHARED band-ring engine, calculation untouched)
+     with most-support / going-strong chips
+   · "Shines at" star chips + working-on + team, personalized guidance
+   · Quietly records a passport check-in (history.js) so Growth can show
+     then-vs-now — the profile never forgets where you started. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
 <AppFormLayout title="My Child" activeNav="child">
-  <SectionTabs section="child" active="overview" />
-
-  <h1 class="page-title" data-rec-name>Your child</h1>
-  <p class="page-sub">A warm, at-a-glance picture of your child — built automatically from your Family Passport.</p>
+  <div class="c3-tabs"><SectionTabs section="child" active="overview" /></div>
 
   <div class="ov-wrap">
 
-    <!-- ================= HERO: identity + about + stats ================= -->
-    <div class="ov-card ov-hero cu-hero-grad cu-rev">
-      <div class="ov-hero-top">
-        <div class="ov-avatar" id="ov-avatar">·</div>
-        <div class="ov-hero-id">
-          <p class="ov-name" id="ov-name">Loading…</p>
-          <p class="ov-meta" id="ov-meta"></p>
-          <p class="ov-about" id="ov-about"></p>
+    <!-- ================= HERO (light) ================= -->
+    <section class="ov5-hero cu-rev">
+      <span class="c3-spark" style="top:16px;left:46%">✦</span>
+      <span class="c3-spark s2" style="top:42px;left:58%">✦</span>
+      <span class="c3-spark s3" style="bottom:50px;right:9%">✦</span>
+      <div class="ov5-top">
+        <div class="ov5-av" id="ov-avatar">·</div>
+        <div class="ov5-id">
+          <h1 id="ov-name">Loading…</h1>
+          <div class="ov5-chips" id="ov-meta"></div>
+          <p class="ov5-about" id="ov-about"></p>
         </div>
-        <div class="ov-ring">
-          <svg width="64" height="64" viewBox="0 0 64 64">
-            <circle cx="32" cy="32" r="26" fill="none" stroke="var(--line)" stroke-width="5.5"></circle>
-            <circle id="ov-ring-c" cx="32" cy="32" r="26" fill="none" stroke="#7C3AED" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="0 163.4" transform="rotate(-90 32 32)" style="transition:stroke-dasharray 1.1s cubic-bezier(.22,1,.36,1)"></circle>
-            <text id="ov-ring-t" x="32" y="33" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="700" fill="var(--ink)">—</text>
-          </svg>
-          <span class="ov-ring-lab">Profile complete</span>
+        <div class="ov5-side">
+          <div class="ov5-ringrow">
+            <span class="ov5-ring">
+              <svg width="56" height="56" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="26" fill="none" stroke="var(--line)" stroke-width="5.5"></circle>
+                <circle id="ov-ring-c" cx="32" cy="32" r="26" fill="none" stroke="var(--violet-600)" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="0 163.4" transform="rotate(-90 32 32)" style="transition:stroke-dasharray 1.1s cubic-bezier(.22,1,.36,1)"></circle>
+                <text id="ov-ring-t" x="32" y="33" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="700" fill="var(--ink)">—</text>
+              </svg>
+            </span>
+            <span class="ov5-ringlab"><b>Passport</b><span id="ov-ring-sub">—</span></span>
+          </div>
+          <div class="ov5-btns">
+            <a class="btn btn-primary btn-sm" id="ov-edit" href="/passport">Edit profile</a>
+            <a class="btn btn-ghost btn-sm" id="ov-export" href="/passport?export=1">Export PDF</a>
+          </div>
         </div>
       </div>
-      <div class="ov-statstrip">
-        <div class="ov-stats" id="ov-stats"></div>
-        <div class="ov-actions">
-          <a class="ov-btn" id="ov-edit" href="/passport">Edit profile</a>
-          <a class="ov-btn ov-btn-v" id="ov-export" href="/passport?export=1">Export PDF</a>
-        </div>
-      </div>
+      <div class="ov5-stats" id="ov-stats"></div>
+    </section>
+
+    <!-- ================= CHECK-IN NUDGE ================= -->
+    <div class="ov5-nudge cu-rev" id="ov-nudge" style="--d:.06s;display:none">
+      <span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9;width:36px;height:36px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 2.3"/></svg></span>
+      <p id="ov-nudge-text"></p>
+      <a class="btn btn-primary btn-sm" id="ov-nudge-cta" href="/passport">5-minute check-in</a>
     </div>
 
-    <!-- ================= MAIN GRID: wheel + strengths ================= -->
-    <div class="ov-grid cu-rev" style="--d:.1s">
+    <!-- ================= WHAT'S NEXT ================= -->
+    <div class="ov-card cu-rev" style="--d:.08s">
+      <div class="ov5-nexthead">
+        <p class="ov-label" style="margin:0" id="ov-next-title">What's next</p>
+        <a class="ov-link" href="/child/journey">Full journey <span class="ov-arr">→</span></a>
+      </div>
+      <div class="ov5-next" id="ov-next"></div>
+    </div>
 
-      <div class="ov-card ov-wheelcard">
-        <div class="ov-snap-head">
+    <!-- ================= MAIN GRID ================= -->
+    <div class="ov-grid cu-rev" style="--d:.14s">
+      <div class="ov-card">
+        <div class="ov5-nexthead">
           <p class="ov-label" style="margin:0">Support today</p>
           <a class="ov-link" href="/child/support-wheel">Open full wheel <span class="ov-arr">→</span></a>
         </div>
-        <div id="ov-rose" class="ov-rose"></div>
-        <p class="ov-rose-cap">Bigger petal = more support is helpful right now · tap a petal to explore</p>
+        <div id="ov-rose" class="ov-rose c3-stage c3-anim"></div>
+        <p class="ov-rose-cap">Fuller petals = more support is helpful right now · tap a petal to explore</p>
         <div class="ov-splits" id="ov-splits"></div>
       </div>
 
@@ -69,11 +91,12 @@ import SectionTabs from "@/components/SectionTabs.astro";
           <div class="ov-teamline" id="ov-team"></div>
         </div>
       </div>
-
     </div>
 
     <!-- ================= GUIDANCE ================= -->
-    <div class="ov-card ov-insights cu-rev" style="--d:.18s">
+    <div class="ov-card ov-insights cu-rev cu-sparkle-host" style="--d:.2s">
+      <span class="cu-spark" style="top:14px;right:26px">✦</span>
+      <span class="cu-spark s2" style="top:32px;right:48px">✦</span>
       <p class="ov-ins-title"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg> Family guidance</p>
       <p class="ov-ins-text" id="ov-insights">Loading…</p>
       <p class="ov-note">Observations drawn from your passport — supportive guidance, not medical advice.</p>
@@ -86,27 +109,40 @@ import SectionTabs from "@/components/SectionTabs.astro";
   .ov-wrap{display:flex;flex-direction:column;gap:14px;max-width:1040px}
   .ov-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow)}
 
-  /* ---- hero ---- */
-  .ov-hero{border-radius:22px}
-  .ov-hero-top{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;position:relative;z-index:1}
-  .ov-avatar{width:58px;height:58px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;flex-shrink:0;box-shadow:0 6px 18px rgba(109,40,217,.25)}
-  .ov-hero-id{flex:1;min-width:200px}
-  .ov-name{font-family:var(--display);font-size:1.4rem;font-weight:700;letter-spacing:-.015em;color:var(--ink);margin:0}
-  .ov-meta{font-size:.82rem;color:var(--muted);margin:3px 0 0}
-  .ov-about{font-size:.86rem;font-style:italic;line-height:1.55;color:var(--ink-2);margin:7px 0 0;max-width:560px}
-  .ov-ring{display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;z-index:1}
-  .ov-ring-lab{font-size:.66rem;color:var(--muted)}
-  .ov-statstrip{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:14px;padding-top:12px;position:relative;z-index:1}
-  .ov-stats{display:flex;gap:18px;flex-wrap:wrap;flex:1}
-  .ov-stat{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;color:var(--ink-2);text-decoration:none;font-weight:500;border-radius:8px;padding:2px 4px;transition:background .15s,color .15s}
-  .ov-stat:hover{background:var(--violet-50);color:var(--violet-700)}
-  .ov-stat svg{flex-shrink:0}
-  .ov-stat b{font-weight:700;color:var(--ink)}
-  .ov-actions{display:flex;gap:8px;flex-wrap:wrap}
-  .ov-btn{font-size:.8rem;font-weight:600;padding:7px 15px;border-radius:9999px;text-decoration:none;border:1px solid var(--line-2);color:var(--ink-2);background:var(--card);transition:border-color .15s,color .15s}
-  .ov-btn:hover{border-color:var(--violet-500);color:var(--violet-700)}
-  .ov-btn-v{background:var(--violet-700);color:#fff;border-color:var(--violet-700);transition:filter .15s}
-  .ov-btn-v:hover{filter:brightness(1.1);color:#fff;border-color:var(--violet-700)}
+  /* ---- light hero ---- */
+  .ov5-hero{position:relative;overflow:hidden;border-radius:22px;padding:22px 24px 16px;background:linear-gradient(120deg,#FDFCFF 0%,#F4EFFE 46%,#EFF9F6 100%);border:1px solid var(--violet-100);box-shadow:var(--shadow)}
+  .ov5-hero::before{content:"";position:absolute;top:-90px;right:-60px;width:320px;height:280px;background:radial-gradient(closest-side,rgba(139,92,246,.13),transparent 72%);border-radius:50%;pointer-events:none}
+  .ov5-hero::after{content:"";position:absolute;bottom:-110px;left:8%;width:300px;height:240px;background:radial-gradient(closest-side,rgba(94,234,212,.13),transparent 72%);border-radius:50%;pointer-events:none}
+  .ov5-top{position:relative;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;z-index:1}
+  .ov5-av{width:58px;height:58px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;background:linear-gradient(135deg,#A78BFA,#6D28D9);color:#fff;display:grid;place-items:center;font-family:var(--display);font-size:1.5rem;font-weight:700;flex-shrink:0;animation:c3Morph 9s ease-in-out infinite alternate;box-shadow:0 6px 18px rgba(109,40,217,.24)}
+  .ov5-id{flex:1;min-width:220px}
+  .ov5-id h1{font-family:var(--display);font-size:1.55rem;font-weight:700;letter-spacing:-.02em;color:var(--ink);margin:0;line-height:1.15}
+  .ov5-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .ov5-about{font-size:.86rem;font-style:italic;line-height:1.55;color:var(--ink-2);margin:9px 0 0;max-width:560px}
+  .ov5-side{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+  .ov5-ringrow{display:flex;align-items:center;gap:9px}
+  .ov5-ring{position:relative;flex-shrink:0}
+  .ov5-ringlab{font-size:.68rem;color:var(--muted);line-height:1.3}
+  .ov5-ringlab b{display:block;color:var(--ink);font-size:.76rem}
+  .ov5-btns{display:flex;gap:8px}
+  .ov5-stats{position:relative;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--violet-100);margin-top:15px;padding-top:12px;z-index:1}
+  .ov5-stat{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:9999px;padding:5px 13px;font-size:.76rem;font-weight:600;color:var(--ink-2);text-decoration:none;box-shadow:var(--shadow);transition:border-color .15s,transform .15s}
+  .ov5-stat:hover{border-color:#DDD6FE;transform:translateY(-1px);color:var(--violet-700)}
+  .ov5-stat b{font-weight:700;color:var(--ink)}
+  .ov5-stat svg{flex-shrink:0}
+
+  /* ---- nudge ---- */
+  .ov5-nudge{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--violet-50),#F9F7FE 60%,var(--violet-50));border:1px solid var(--violet-100);border-radius:16px;padding:12px 16px}
+  .ov5-nudge p{flex:1;font-size:.86rem;color:#5b21b6;line-height:1.5;margin:0;min-width:0}
+
+  /* ---- what's next ---- */
+  .ov5-nexthead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .ov5-next{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+  .ov5-step{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;padding:12px 14px;text-decoration:none;transition:border-color .15s,transform .15s,box-shadow .15s}
+  .ov5-step:hover{border-color:#DDD6FE;transform:translateY(-2px);box-shadow:0 8px 20px rgba(109,40,217,.1)}
+  .ov5-step .tt{font-size:.84rem;font-weight:700;color:var(--ink);line-height:1.3}
+  .ov5-step .why{font-size:.74rem;color:var(--muted);margin-top:3px;line-height:1.45}
+  .ov5-step .go{font-size:.74rem;font-weight:700;color:var(--violet-700);margin-top:6px;display:inline-block}
 
   /* ---- main grid ---- */
   .ov-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:stretch}
@@ -114,25 +150,21 @@ import SectionTabs from "@/components/SectionTabs.astro";
   @media (max-width:760px){.ov-grid{grid-template-columns:1fr}}
 
   /* ---- wheel card ---- */
-  .ov-snap-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
   .ov-label{font-size:.78rem;color:var(--muted);margin:0 0 10px;font-weight:600}
   .ov-link{font-size:.8rem;font-weight:600;color:var(--violet-700);text-decoration:none}
   .ov-link .ov-arr{display:inline-block;transition:transform .18s}
   .ov-link:hover .ov-arr{transform:translateX(3px)}
-  .ov-rose{display:flex;justify-content:center}
-  .ov-rose svg{max-width:100%}
-  .ov-rose [data-domain]{cursor:pointer}
-  .ov-rose [data-domain]:hover path{opacity:.75}
-  .ov-rose-anim{transform-origin:50% 50%;animation:ovRose .9s cubic-bezier(.22,1,.36,1) .15s both}
-  @keyframes ovRose{from{transform:scale(.55);opacity:0}to{transform:scale(1);opacity:1}}
-  .ov-rose-cap{font-size:.72rem;color:var(--faint);text-align:center;margin:4px 0 0}
+  .ov-rose{display:flex;justify-content:center;border-radius:14px}
+  .ov-rose svg{max-width:380px}
+  .ov-rose [data-domain]:hover path{opacity:.82}
+  .ov-rose-cap{font-size:.72rem;color:var(--faint);text-align:center;margin:6px 0 0}
   .ov-splits{display:grid;grid-template-columns:1fr 1fr;gap:12px;border-top:1px solid var(--line);margin-top:12px;padding-top:12px}
-  .ov-split-t{font-size:.74rem;font-weight:700;margin:0 0 7px}
+  .ov-split-t{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:0 0 7px}
   .ov-split-t.need{color:var(--amber)}
   .ov-split-t.strong{color:var(--green)}
-  .ov-split-li{display:flex;align-items:center;gap:7px;font-size:.86rem;color:var(--ink-2);margin-bottom:5px;text-decoration:none;border-radius:7px;padding:1px 3px;transition:background .15s}
-  a.ov-split-li:hover{background:var(--violet-50);color:var(--violet-700)}
-  .ov-split-li .dd{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .ov-split-li{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;font-weight:600;margin:0 5px 6px 0;text-decoration:none;border-radius:9999px;padding:4px 11px;transition:transform .15s}
+  a.ov-split-li:hover{transform:translateY(-1px)}
+  .ov-split-li .dd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
   .ov-split-empty{font-size:.8rem;color:var(--faint);margin:0}
 
   /* ---- shines grid ---- */
@@ -149,16 +181,21 @@ import SectionTabs from "@/components/SectionTabs.astro";
   .ov-teamline b{color:var(--ink-2);font-weight:600}
 
   /* ---- guidance ---- */
-  .ov-insights{background:linear-gradient(135deg,var(--violet-50),#F9F7FE 55%,var(--violet-50));border-color:var(--violet-100)}
+  .ov-insights{position:relative;background:linear-gradient(135deg,var(--violet-50),#F9F7FE 55%,var(--violet-50));border-color:var(--violet-100)}
+  .ov-insights .cu-spark{font-style:normal;font-size:13px;color:#8B5CF6}
+  .ov-insights .cu-spark.s2{font-size:10px;color:#5EEAD4}
   .ov-ins-title{display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:700;color:var(--violet-700);margin:0 0 8px}
   .ov-ins-text{font-size:.92rem;line-height:1.65;color:#5b21b6;margin:0}
   .ov-note{font-size:.72rem;color:var(--faint);margin:8px 0 0}
   .ov-empty{font-size:.85rem;color:var(--muted);margin:0}
   .ov-empty a{color:var(--violet-700);font-weight:600}
 
+  @media (max-width:760px){
+    .ov5-side{align-items:flex-start;width:100%}
+  }
   @media (prefers-reduced-motion:reduce){
     #ov-ring-c{transition:none!important}
-    .ov-rose-anim{animation:none}
+    .ov5-av{animation:none}
   }
 </style>
 
@@ -172,11 +209,12 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
 <script>
   import * as UA from "../lib/ua-data.js";
-  import { scoreWheel, DOMAINS, scoreToBand } from "../lib/wheelScore.js";
-  import { HUES } from "../config/wheelConfig.js";
-  import { domainColor } from "../lib/wheelSvg.js";
+  import { scoreWheel, DOMAINS, snapshotWheel, HUES } from "../lib/wheelScore.js";
+  import { generateWheelSVG, domainColor } from "../lib/wheelSvg.js";
   import { buildFamilyGuidance } from "../lib/domainInsights.js";
   import { iconFor } from "../lib/interestIcons.js";
+  import { buildJourney } from "../lib/journey.js";
+  import { ensureSnapshot } from "../lib/history.js";
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -192,10 +230,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     return arr.slice(0, -1).join(", ") + ", and " + arr[arr.length - 1];
   };
   const SHORT = { "Communication": "Communication", "Social Connection": "Social", "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility", "Emotional Regulation": "Emotional", "Executive Function": "Executive", "Daily Living Skills": "Daily living", "Learning & Play": "Learning & play" };
-
-  /* iconFor now lives in src/lib/interestIcons.js (shared with the
-     Strengths & Challenges tab) — imported above. */
-
+  const tintOf = (nm, a) => { const i = DOMAINS.indexOf(nm); return i === -1 ? "rgba(109,40,217," + a + ")" : "hsla(" + HUES[i] + ",70%,45%," + a + ")"; };
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   (async () => {
@@ -206,29 +241,29 @@ import SectionTabs from "@/components/SectionTabs.astro";
     const cp = data.childProfile || {};
     const scored = scoreWheel(data);
     const firstName = id.first || "Your child";
+    const pLink = "/passport" + (p ? "?id=" + p.id : "");
 
     if (p) {
       $("ov-edit").href = `/passport?id=${p.id}`;
       $("ov-export").href = `/passport?id=${p.id}&export=1`;
+      $("ov-nudge-cta").href = `/passport?id=${p.id}`;
     }
 
-    /* ---- hero: identity ---- */
-    if (id.name) { const h = document.querySelector("[data-rec-name]"); if (h) h.textContent = id.name; }
+    /* ---- hero identity ---- */
     $("ov-avatar").textContent = (firstName || "·")[0].toUpperCase();
     $("ov-name").textContent = id.name;
-
     const metaBits = [];
     const dxList = (data.diagnosis && data.diagnosis.diagnoses) || [];
-    if (Array.isArray(dxList)) dxList.forEach((d) => metaBits.push(esc(d)));
+    if (Array.isArray(dxList)) dxList.slice(0, 2).forEach((d) => metaBits.push(esc(d)));
     if (id.age != null) metaBits.push(id.age + " year" + (id.age === 1 ? "" : "s"));
     const loc = id.city || cp.location || "";
     if (loc) metaBits.push(esc(loc));
     if (id.languages) metaBits.push(esc(id.languages));
     const school = (data.education && (data.education.schoolName || data.education.schoolType)) || "";
     if (school) metaBits.push(esc(school));
-    $("ov-meta").innerHTML = metaBits.join(" · ");
+    $("ov-meta").innerHTML = metaBits.map((m) => `<span class="c3-glass">${m}</span>`).join("");
 
-    /* ---- hero: about sentence ---- */
+    /* ---- about sentence ---- */
     const interests = textToList(data.strengths && data.strengths.interests);
     const strengthsText = textToList(data.strengths && data.strengths.strengths);
     const needs = DOMAINS.filter((n) => scored[n].score != null).sort((a, b) => scored[b].score - scored[a].score);
@@ -238,7 +273,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     if (needs.length) aboutParts.push("Does best with clear, predictable routines and benefits from extra support with " + listPhrase(needs.slice(0, 2).map((n) => lc(SHORT[n] || n))) + ".");
     $("ov-about").textContent = aboutParts.join(" ");
 
-    /* ---- hero: profile ring ---- */
+    /* ---- completion ring ---- */
     const comp = UA.completion(data);
     const C = 2 * Math.PI * 26;
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -255,8 +290,10 @@ import SectionTabs from "@/components/SectionTabs.astro";
       };
       requestAnimationFrame(tick);
     }
+    const left = comp.total - comp.done;
+    $("ov-ring-sub").textContent = left === 0 ? "complete ✦" : left + " section" + (left === 1 ? "" : "s") + " left";
 
-    /* ---- hero: stat strip ---- */
+    /* ---- stat chips ---- */
     const pri = (data.goals && data.goals.priorities) || [];
     const team = (data.therapy || []).filter((t) => t && t.type);
     const docs = p ? await UA.getRecentDocuments(p.id).catch(() => []) : [];
@@ -268,70 +305,71 @@ import SectionTabs from "@/components/SectionTabs.astro";
         .sort((a, b) => scored[b].strength - scored[a].strength)
         .forEach((n) => { if (strengths.length < 6) strengths.push("Strong " + lc(SHORT[n] || n)); });
     }
-    const sIc = (d, c) => `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="${c}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-    const pLink = "/passport" + (p ? "?id=" + p.id : "");
+    const sIc = (d, c) => `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="${c}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
     const teamAbbr = team.map((t) => String(t.type).split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase()).join(" + ");
     const stats = [
       [`<b>${Array.isArray(pri) ? pri.length : 0}</b> focus areas`, sIc(`<path d="M8 1.5l2 4.2 4.5.5-3.3 3.1.9 4.5L8 11.7 3.9 13.8l.9-4.5L1.5 6.2 6 5.7z"/>`, "#6D28D9"), pLink],
       [`<b>${team.length}</b> providers${teamAbbr ? " · " + esc(teamAbbr) : ""}`, sIc(`<circle cx="6" cy="5" r="2.2"/><path d="M2 13c.4-2.2 2-3.2 4-3.2s3.6 1 4 3.2"/><circle cx="11.5" cy="5.5" r="1.8"/>`, "#0E8C82"), "/providers"],
       [`<b>${docs.length}</b> documents`, sIc(`<path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/>`, "#A8650A"), "/documents"],
-      [`<b>${strengths.length}</b> strengths`, sIc(`<path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/>`, "#0E8F66"), "/child/strengths"],
+      [`<b>${strengths.length}</b> strengths`, sIc(`<path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/>`, "#0E8F66"), "/child/growth"],
     ];
-    $("ov-stats").innerHTML = stats.map((s) => `<a class="ov-stat" href="${s[2]}">${s[1]}<span>${s[0]}</span></a>`).join("");
+    $("ov-stats").innerHTML = stats.map((s) => `<a class="ov5-stat" href="${s[2]}">${s[1]}<span>${s[0]}</span></a>`).join("");
 
-    /* ---- rose wheel (petal length = support level) ---- */
+    /* ---- check-in nudge (staleness or thin passport) ---- */
+    const daysSince = p && p.updated_at ? Math.floor((Date.now() - new Date(p.updated_at)) / 864e5) : null;
+    if (p && (daysSince == null || daysSince >= 60)) {
+      $("ov-nudge-text").innerHTML = `It's been <strong>${daysSince != null ? (daysSince >= 30 ? Math.round(daysSince / 30) + " months" : daysSince + " days") : "a while"}</strong> since ${esc(firstName)}'s passport was updated. Children change fast — a quick check-in keeps the wheel, the matches and the journey true. Growth will remember where you were.`;
+      $("ov-nudge").style.display = "flex";
+    } else if (p && comp.pct < 60) {
+      $("ov-nudge-text").innerHTML = `${esc(firstName)}'s passport is <strong>${comp.pct}% complete</strong> — the more it knows, the better it guides. ${comp.total - comp.done} sections to go.`;
+      $("ov-nudge").style.display = "flex";
+    }
+
+    /* ---- journey teaser: top 3 next steps ---- */
+    const wl = await UA.getWaitlist().catch(() => []);
+    const apps = p ? await UA.getFundingApplications(p.id).catch(() => []) : [];
+    const fo = UA.fundingOverview(apps);
+    const journey = buildJourney(data, scored, {
+      firstName, passportLink: pLink, completion: comp,
+      docsCount: docs.length, onWaitlists: wl.length > 0,
+      dtcStarted: fo.rows.some((r) => r.key === "dtc" && r.status !== "not_started"),
+      fundingStarted: fo.started, daysSinceUpdate: daysSince, lastWinDays: null,
+    });
+    $("ov-next-title").textContent = "What's next for " + (id.first ? id.first : "you");
+    const DOTS = {
+      now: `<span class="c3-dot now"><svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3.5"/></svg></span>`,
+      next: `<span class="c3-dot next"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>`,
+    };
+    $("ov-next").innerHTML = journey.nextUp.slice(0, 3).map((s) =>
+      `<a class="ov5-step" href="${s.href}">${DOTS[s.status] || DOTS.next}<span style="min-width:0"><span class="tt" style="display:block">${esc(s.title)}</span><span class="why" style="display:block">${esc(s.why)}</span><span class="go">${esc(s.cta)} →</span></span></a>`).join("")
+      || `<p class="ov-empty">All caught up — check the full journey for what's ahead.</p>`;
+
+    /* ---- support wheel — SHARED band-ring engine ---- */
     const anyScore = DOMAINS.some((n) => scored[n].score != null);
+    const rose = $("ov-rose");
     if (anyScore) {
-      const cx = 230, cy = 172, r0 = 20, R = 128, n8 = DOMAINS.length, seg = (2 * Math.PI) / n8;
-      const pt = (r, a) => [(cx + r * Math.cos(a)).toFixed(1), (cy + r * Math.sin(a)).toFixed(1)];
-      let svg = `<g class="${reduceMotion ? "" : "ov-rose-anim"}">`;
-      /* faint band rings behind the petals — keeps the wheel's structure */
-      for (let k = 1; k <= 5; k++) {
-        const rr = (r0 + (R - r0) * k / 5).toFixed(1);
-        svg += `<circle cx="${cx}" cy="${cy}" r="${rr}" fill="none" stroke="#ECE8F6" stroke-width="1"/>`;
-      }
-      DOMAINS.forEach((name, i) => {
-        const a0 = -Math.PI / 2 + i * seg + 0.025, a1 = a0 + seg - 0.05;
-        const sc = scored[name].score;
-        const frac = sc == null ? 0.1 : Math.max(0.12, sc / 100);
-        const r = r0 + (R - r0) * frac;
-        const fill = sc == null ? "#EAE7F3" : `hsl(${HUES[i]},62%,60%)`;
-        const p0 = pt(r0, a0), p1 = pt(r, a0), p2 = pt(r, a1), p3 = pt(r0, a1);
-        const band = sc == null ? null : scoreToBand(sc);
-        const tip = SHORT[name] + (band ? " — " + band.label : " — not enough answers yet");
-        svg += `<g data-domain="${esc(name)}" role="button" tabindex="0" aria-label="${esc(tip)}">
-          <title>${esc(tip)}</title>
-          <path d="M${p0} L${p1} A${r.toFixed(1)},${r.toFixed(1)} 0 0 1 ${p2} L${p3} A${r0},${r0} 0 0 0 ${p0} Z" fill="${fill}" stroke="#fff" stroke-width="1.5"/>
-        </g>`;
-        const mid = a0 + (seg - 0.05) / 2, lp = pt(R + 14, mid);
-        const anchor = Math.cos(mid) > 0.25 ? "start" : (Math.cos(mid) < -0.25 ? "end" : "middle");
-        svg += `<text x="${lp[0]}" y="${lp[1]}" font-size="10.5" fill="var(--muted)" text-anchor="${anchor}" dominant-baseline="middle">${SHORT[name]}</text>`;
-      });
-      /* white ring lines over the petals so every petal shows its bands */
-      for (let k = 1; k <= 4; k++) {
-        const rr = (r0 + (R - r0) * k / 5).toFixed(1);
-        svg += `<circle cx="${cx}" cy="${cy}" r="${rr}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.4" style="pointer-events:none"/>`;
-      }
-      svg += `<circle cx="${cx}" cy="${cy}" r="${r0}" fill="var(--card)" stroke="var(--line)"/></g>`;
-      $("ov-rose").innerHTML = `<svg viewBox="0 0 460 344" width="100%" style="max-width:430px" role="img"><title>Support wheel snapshot</title>${svg}</svg>`;
-      $("ov-rose").querySelectorAll("[data-domain]").forEach((g) => {
+      rose.innerHTML = generateWheelSVG(scored, "needs");
+      void rose.offsetWidth;
+      rose.classList.add("play");
+      rose.querySelectorAll("[data-domain]").forEach((g) => {
         const go = () => location.href = "/child/support-wheel?domain=" + encodeURIComponent(g.dataset.domain);
         g.addEventListener("click", go);
         g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
       });
     } else {
-      $("ov-rose").innerHTML = `<p class="ov-empty" style="padding:34px 10px;text-align:center">Answer a few passport questions to see ${esc(firstName)}'s support wheel here. <a href="${pLink}">Open the passport →</a></p>`;
+      rose.innerHTML = `<p class="ov-empty" style="padding:34px 10px;text-align:center">Answer a few passport questions to see ${esc(firstName)}'s support wheel here. <a href="${pLink}">Open the passport →</a></p>`;
       document.querySelector(".ov-rose-cap").style.display = "none";
     }
 
     /* ---- most support / going strong ---- */
     const shine = DOMAINS.filter((n) => scored[n].strength != null && scored[n].strength >= 45).sort((a, b) => scored[b].strength - scored[a].strength);
-    const li = (n) => `<a class="ov-split-li" href="/child/support-wheel?domain=${encodeURIComponent(n)}"><span class="dd" style="background:${domainColor(n)}"></span>${esc(SHORT[n] || n)}</a>`;
+    const needLi = (n) => `<a class="ov-split-li" style="background:${tintOf(n, 0.1)};color:${domainColor(n)}" href="/child/support-wheel?domain=${encodeURIComponent(n)}"><span class="dd" style="background:${domainColor(n)}"></span>${esc(SHORT[n] || n)}</a>`;
+    const strongLi = (n) => `<a class="ov-split-li" style="background:var(--green-bg);color:var(--green)" href="/child/support-wheel?domain=${encodeURIComponent(n)}"><span class="dd" style="background:var(--green)"></span>${esc(SHORT[n] || n)}</a>`;
     $("ov-splits").innerHTML = `
-      <div><p class="ov-split-t need">Most support now</p>${needs.length ? needs.slice(0, 3).map(li).join("") : `<p class="ov-split-empty">Not enough answers yet.</p>`}</div>
-      <div><p class="ov-split-t strong">Going strong</p>${shine.length ? shine.slice(0, 3).map(li).join("") : `<p class="ov-split-empty">Not enough answers yet.</p>`}</div>`;
+      <div><p class="ov-split-t need">Most support now</p>${needs.length ? needs.slice(0, 3).map(needLi).join("") : `<p class="ov-split-empty">Not enough answers yet.</p>`}</div>
+      <div><p class="ov-split-t strong">Going strong</p>${shine.length ? shine.slice(0, 3).map(strongLi).join("") : `<p class="ov-split-empty">Not enough answers yet.</p>`}</div>`;
 
-    /* ---- shines at (icon cards) ---- */
+    /* ---- shines at ---- */
     $("ov-shine-title").textContent = firstName + " shines at";
     $("ov-shine").innerHTML = strengths.length
       ? strengths.slice(0, 6).map((s, i) => `<div class="ov-shinecard cu-pop" style="--d:${(0.12 + i * 0.06).toFixed(2)}s">${iconFor(s)}<p>${esc(s)}</p></div>`).join("")
@@ -345,10 +383,13 @@ import SectionTabs from "@/components/SectionTabs.astro";
       ? `Support team: <b>${team.map((t) => esc(t.type)).join(" · ")}</b>`
       : `Support team: <a href="${pLink}" style="color:var(--violet-700);font-weight:600">add ${esc(firstName)}'s team →</a>`;
 
-    /* ---- guidance paragraph: fully personalized from THIS child's answers
-       (their top-need domains, their specific challenges, their strategies,
-       their strengths + interests, their sensory profile) ---- */
+    /* ---- guidance ---- */
     const g = buildFamilyGuidance(data, scored, firstName);
     $("ov-insights").textContent = g.length ? g.join(" ") : `Complete more of the passport to see guidance for ${firstName}.`;
+
+    /* ---- quietly record a check-in for Growth (never blocks the page) ---- */
+    if (p) ensureSnapshot(p, snapshotWheel(scored)).then((r) => {
+      if (r && r.created && r.rows && r.rows.length >= 2 && window.uaNotify) window.uaNotify("info", "Passport changes noticed — a check-in was saved to Growth ✦");
+    }).catch(() => {});
   })().catch((e) => console.error("[child overview] hydrate failed", e));
 </script>

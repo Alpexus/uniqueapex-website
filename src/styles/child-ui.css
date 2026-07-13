@@ -1,9 +1,10 @@
 /* ============================================================
-   child-ui.css — CHILD-UI-V1
+   child-ui.css — CHILD-UI-V2.1 (light)
    Shared design language for the /child tabs (and any app page).
-   Imported once by AppFormLayout.astro. Everything is class-
-   scoped ("cu-" prefix) — no element or global rules, so it can
-   never interfere with the passport form or Tailwind.
+   Imported by AppFormLayout + AppLayout. Everything is class-
+   scoped ("cu-" / "c3-") — no element or global rules.
+   V2.1: the dark-violet panels are gone — ribbons and stages are
+   now light lavender-mist gradients with violet ACCENTS only.
    ============================================================ */
 
 /* ---------- entrance reveal (stagger with style="--d:.08s") ---------- */
@@ -43,6 +44,87 @@ a:hover .cu-blob::before,button:hover .cu-blob::before,.cu-lift:hover .cu-blob::
 .cu-hero-grad::before{content:"";position:absolute;top:-70px;right:-40px;width:280px;height:240px;background:radial-gradient(closest-side,rgba(139,92,246,.16),transparent 72%);border-radius:50%;pointer-events:none}
 .cu-hero-grad::after{content:"";position:absolute;bottom:-90px;left:16%;width:250px;height:210px;background:radial-gradient(closest-side,rgba(94,234,212,.13),transparent 72%);border-radius:50%;pointer-events:none}
 
+/* ============================================================
+   CHILD-UI-V2.1 (c3-) — LIGHT premium layer for the child tabs:
+   lavender-mist ribbon, white stat chips, pill tab bar, sliding
+   toggle, 5-segment band bars, wheel draw-in, soft stage glow.
+   ============================================================ */
+
+/* ---------- pill tab bar (wrap <SectionTabs> in .c3-tabs) ---------- */
+.c3-tabs .sectiontabs{border-bottom:none;gap:5px;margin:0 0 16px;padding:4px;background:var(--card);border:1px solid var(--line);border-radius:9999px;box-shadow:var(--shadow);width:max-content;max-width:100%}
+.c3-tabs .sectiontab{padding:7px 14px;border-radius:9999px;border-bottom:none;margin-bottom:0;font-weight:600;font-size:.8rem}
+.c3-tabs .sectiontab:hover{background:var(--bg);color:var(--ink)}
+.c3-tabs .sectiontab.active{background:var(--violet-700);color:#fff;box-shadow:0 2px 8px rgba(109,40,217,.3)}
+
+/* ---------- light gradient ribbon header ---------- */
+.c3-ribbon{position:relative;overflow:hidden;border-radius:18px;padding:15px 20px;color:var(--ink);background:linear-gradient(120deg,#FDFCFF 0%,#F4EFFE 48%,#EFF9F6 100%);border:1px solid var(--violet-100);box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.c3-ribbon::before{content:"";position:absolute;top:-70px;right:-30px;width:250px;height:210px;background:radial-gradient(closest-side,rgba(139,92,246,.12),transparent 72%);border-radius:50%;pointer-events:none}
+.c3-ribbon::after{content:"";position:absolute;bottom:-90px;left:22%;width:220px;height:180px;background:radial-gradient(closest-side,rgba(94,234,212,.12),transparent 72%);border-radius:50%;pointer-events:none}
+.c3-rib-av{width:40px;height:40px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;background:linear-gradient(135deg,#A78BFA,#6D28D9);color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:1.05rem;flex-shrink:0;animation:c3Morph 9s ease-in-out infinite alternate;position:relative;z-index:1;box-shadow:0 5px 14px rgba(109,40,217,.24)}
+@keyframes c3Morph{0%{border-radius:46% 54% 58% 42%/52% 44% 56% 48%}100%{border-radius:56% 44% 44% 56%/46% 56% 44% 54%}}
+.c3-rib-id{min-width:0;position:relative;z-index:1}
+.c3-rib-id h1{font-family:var(--display);font-size:1.18rem;font-weight:700;letter-spacing:-.015em;margin:0;line-height:1.2;color:var(--ink)}
+.c3-rib-id p{font-size:.74rem;color:var(--muted);margin:3px 0 0;line-height:1.35}
+.c3-rib-stats{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+.c3-rstat{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 13px;min-width:72px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow);transition:border-color .15s,transform .15s}
+a.c3-rstat:hover{border-color:#DDD6FE;transform:translateY(-1px)}
+.c3-rstat b{font-family:var(--display);font-size:1.02rem;font-weight:700;line-height:1.15;color:var(--violet-700)}
+.c3-rstat span{font-size:.6rem;color:var(--muted);white-space:nowrap;margin-top:1px}
+.c3-spark{position:absolute;font-style:normal;font-size:11px;color:#A78BFA;pointer-events:none;animation:c3Twk 2.6s ease infinite;z-index:1}
+.c3-spark.s2{font-size:8px;color:#5EEAD4;animation-delay:.9s}
+.c3-spark.s3{font-size:9px;color:#F9A8D4;animation-delay:1.6s}
+@keyframes c3Twk{0%,100%{transform:scale(1);opacity:.45}50%{transform:scale(1.3);opacity:.95}}
+.c3-glass{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--violet-100);border-radius:9999px;padding:3px 11px;font-size:.72rem;font-weight:600;color:var(--ink-2)}
+
+/* ---------- per-section ribbon identities (make every section unique) ---------- */
+.c3-ribbon.rib-teal{background:linear-gradient(120deg,#FCFEFE 0%,#E9F7F5 48%,#F3F0FE 100%);border-color:#CFEAE6}
+.c3-ribbon.rib-teal .c3-rib-av{background:linear-gradient(135deg,#5EEAD4,#0E8C82);box-shadow:0 5px 14px rgba(14,140,130,.25)}
+.c3-ribbon.rib-teal .c3-rstat b{color:var(--teal)}
+.c3-ribbon.rib-rose{background:linear-gradient(120deg,#FFFDFD 0%,#FBEFF3 48%,#F3F0FE 100%);border-color:#F3D8E1}
+.c3-ribbon.rib-rose .c3-rib-av{background:linear-gradient(135deg,#F9A8D4,#B14A66);box-shadow:0 5px 14px rgba(177,74,102,.25)}
+.c3-ribbon.rib-rose .c3-rstat b{color:var(--rose)}
+.c3-ribbon.rib-green{background:linear-gradient(120deg,#FCFEFC 0%,#ECF7EF 48%,#F3F0FE 100%);border-color:#D5EDDD}
+.c3-ribbon.rib-green .c3-rib-av{background:linear-gradient(135deg,#6EE7B7,#0E8F66);box-shadow:0 5px 14px rgba(14,143,102,.25)}
+.c3-ribbon.rib-green .c3-rstat b{color:var(--green)}
+.c3-ribbon.rib-amber{background:linear-gradient(120deg,#FFFEFB 0%,#FBF4E4 48%,#F3F0FE 100%);border-color:#F0E4C4}
+.c3-ribbon.rib-amber .c3-rib-av{background:linear-gradient(135deg,#FCD34D,#A8650A);box-shadow:0 5px 14px rgba(168,101,10,.25)}
+.c3-ribbon.rib-amber .c3-rstat b{color:var(--amber)}
+
+/* ---------- sliding segmented toggle ---------- */
+.c3-seg{position:relative;display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:9999px;padding:3px}
+.c3-seg .thumb{position:absolute;top:3px;bottom:3px;border-radius:9999px;background:var(--violet-700);transition:left .22s cubic-bezier(.22,1,.36,1),width .22s cubic-bezier(.22,1,.36,1);box-shadow:0 2px 8px rgba(109,40,217,.3)}
+.c3-seg button{position:relative;z-index:1;border:none;background:none;color:var(--muted);border-radius:9999px;padding:7px 17px;font-size:.83rem;font-weight:600;cursor:pointer;transition:color .2s;font-family:inherit}
+.c3-seg button.on{color:#fff}
+
+/* ---------- 5-segment band bar (fill k of 5 <i>, tint via inline bg) ---------- */
+.c3-bar5{display:flex;gap:3px;flex:1;min-width:70px}
+.c3-bar5 i{height:7px;border-radius:4px;flex:1;background:var(--bg);font-style:normal;position:relative;overflow:hidden}
+.c3-bar5 i b{position:absolute;inset:0;border-radius:4px;transform:scaleX(0);transform-origin:left;animation:c3Seg .5s cubic-bezier(.22,1,.36,1) var(--d,0s) both}
+@keyframes c3Seg{to{transform:scaleX(1)}}
+
+/* ---------- wheel draw-in + soft stage glow ---------- */
+.c3-anim svg{transform-origin:50% 50%}
+.c3-anim.play svg{animation:c3Draw .8s cubic-bezier(.22,1,.36,1) both}
+@keyframes c3Draw{from{opacity:0;transform:scale(.6) rotate(-8deg)}to{opacity:1;transform:none}}
+.c3-stage{position:relative;background:radial-gradient(440px 300px at 50% 40%,rgba(139,92,246,.09),transparent 70%)}
+
+/* ---------- step status dots (journey / next steps) ---------- */
+.c3-dot{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;font-style:normal}
+.c3-dot svg{width:12px;height:12px}
+.c3-dot.done{background:var(--green-bg);color:var(--green)}
+.c3-dot.now{background:var(--violet-100);color:var(--violet-700);position:relative}
+.c3-dot.now::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid rgba(139,92,246,.35);animation:c3Pulse 2s ease infinite}
+@keyframes c3Pulse{0%,100%{transform:scale(.9);opacity:.4}50%{transform:scale(1.08);opacity:.9}}
+.c3-dot.next{background:var(--amber-bg);color:var(--amber)}
+.c3-dot.later{background:var(--bg);color:var(--faint)}
+
+/* ---------- upgrade lock card (plan gating) ---------- */
+.up-lock{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:linear-gradient(120deg,#FDFCFF 0%,#F4EFFE 55%,#EFF9F6 100%);border:1.5px dashed #C4B5FD;border-radius:16px;padding:14px 17px}
+.up-ic{width:36px;height:36px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;background:linear-gradient(135deg,#A78BFA,#6D28D9);color:#fff;display:grid;place-items:center;flex-shrink:0}
+.up-tx{flex:1;min-width:200px}
+.up-tx b{display:block;font-family:var(--display);font-size:.9rem;color:var(--ink)}
+.up-tx span{display:block;font-size:.78rem;color:var(--muted);margin-top:2px;line-height:1.5}
+
 /* ---------- reduced motion: everything lands instantly ---------- */
 @media (prefers-reduced-motion:reduce){
   .cu-rev,.cu-pop{animation:none;opacity:1}
@@ -50,4 +132,7 @@ a:hover .cu-blob::before,button:hover .cu-blob::before,.cu-lift:hover .cu-blob::
   .cu-lift,.cu-lift:hover{transform:none}
   .cu-wiggle:hover,.cu-lift:hover .cu-spark,.cu-sparkle-host:hover .cu-spark{animation:none}
   .cu-blob::before,.cu-lift{transition:none}
+  .c3-rib-av,.c3-spark,.c3-dot.now::after{animation:none}
+  .c3-anim.play svg{animation:none}
+  .c3-bar5 i b{animation:none;transform:none}
 }

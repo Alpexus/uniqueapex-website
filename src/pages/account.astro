@@ -1,90 +1,159 @@
 ---
-/* DASHBOARD-V2 — visual + interaction redesign of /account:
-   · time-of-day greeting with the parent's name
-   · gradient hero, morphing blob avatar, animated completion ring
-   · quick-action chips (add a win, add event, update passport, export)
-   · LIVE KPI tiles with blob icons + count-ups (replaces the two dead "—")
-   · personalized "this week" guidance band from domainInsights
-   · wheel card: sliding toggle, draw-in animation, colored legend dots,
-     deep link into the full wheel
-   All existing data hydration kept. */
+/* DASHBOARD-V3 — the "morning coffee" dashboard. Brand-new design:
+   · GRADIENT HERO BAND (deep violet, white text): greeting + day-aware
+     subline, child identity chip, animated completion ring, personalized
+     guidance line (buildFamilyGuidance) pinned at the bottom.
+   · "TODAY" STRIP — three live mini-cards:
+       1. Tip of the day  — deterministic daily pick from the closed
+          advice library (matchAdvice), with provenance + copy button.
+       2. Suggested next step — top item from recommendations.js with
+          its plain-language reason.
+       3. Log a win — save straight to the wins table from the dashboard,
+          with a sparkle-burst celebration.
+   · KPI ROW (5 live tiles, count-ups, every tile is a link).
+   · SUPPORT WHEEL — now the EXACT support-wheel-tab logic:
+     generateWheelSVG (shared band rings) + click-overlay wedges with
+     violet selection outline + compact domain detail panel (level
+     segments, chips from domainDetail) + needs/strengths sliding toggle
+     + draw-in animation + ring-scale legend.
+   · MOMENTUM card — wins this week, 7-day dot strip, weekly streak,
+     recent wins feed (live).
+   · NEXT STEPS card — personalized checklist (recommendations.js).
+   · Reports / Funding / Workshop / Explore keep their live hydration.
+   Removed from V2: separate AI-insights card (its actions moved to Next
+   steps; strengths/watch live on the child pages), separate guidance
+   band (now in the hero), quick-action chip row (replaced by Today strip). */
 import AppLayout from "../layouts/AppLayout.astro";
 ---
 <AppLayout title="Dashboard" activeNav="dashboard">
 
-  <!-- ===== GREETING ===== -->
-  <div class="dash-greet cu-rev">
-    <div>
-      <h1 id="g-hello">Welcome back</h1>
-      <p id="g-date"></p>
-    </div>
-    <div class="dash-quick" id="dash-quick">
-      <a class="dq" href="/child/progress"><span class="dq-ic" style="--blob:#E8F6F0;color:#0E8F66"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg></span>Add a win</a>
-      <a class="dq" href="/child/timeline"><span class="dq-ic" style="--blob:#FBF2E2;color:#A8650A"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg></span>Add event</a>
-      <a class="dq" id="q-passport" href="/passport"><span class="dq-ic" style="--blob:#EDE9FE;color:#6D28D9"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.8 2.6l2.6 2.6L6 12.6H3.4V10z"/></svg></span>Update passport</a>
-    </div>
-  </div>
-
-  <!-- ===== HERO ===== -->
-  <div class="card hero cu-hero-grad cu-rev" style="--d:.05s">
-    <div class="hero-photo dash-avatar" id="d-photo">·</div>
-    <div class="hero-id">
-      <h1 id="d-name">Loading…</h1>
-      <div class="hero-tags" id="d-tags"></div>
-      <div class="updated" id="d-updated"></div>
-    </div>
-    <div class="hero-meta">
-      <div class="ring-wrap">
-        <span class="ring">
-          <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-            <circle cx="26" cy="26" r="22" stroke="var(--line)" stroke-width="5"/>
-            <circle id="d-ring" cx="26" cy="26" r="22" stroke="var(--violet-600)" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 138.2" style="transition:stroke-dasharray 1s cubic-bezier(.22,1,.36,1)"/>
-          </svg>
-          <span class="pct" id="d-pct">—</span>
-        </span>
-        <span class="ring-label"><b>Profile complete</b><span id="d-remaining">—</span></span>
+  <!-- ================= HERO ================= -->
+  <section class="d3-hero cu-rev" id="d3-hero">
+    <span class="d3-spark" style="top:18px;left:46%">✦</span>
+    <span class="d3-spark s2" style="top:44px;left:56%">✦</span>
+    <span class="d3-spark s3" style="bottom:58px;right:12%">✦</span>
+    <div class="d3-hero-main">
+      <div class="d3-hello">
+        <h1 id="g-hello">Welcome back</h1>
+        <p class="d3-sub" id="g-sub"></p>
+        <p class="d3-date" id="g-date"></p>
       </div>
-      <div class="hero-actions">
-        <a class="btn btn-ghost btn-sm" id="d-edit" href="/passport">Edit profile</a>
-        <a class="btn btn-ghost btn-sm" href="/documents">Upload report</a>
-        <a class="btn btn-primary btn-sm" id="d-export" href="/passport?export=1">Export PDF</a>
+      <div class="d3-hero-side">
+        <a class="d3-chip" id="h-chip" href="/child" aria-label="Open the child profile">
+          <span class="d3-chip-av" id="h-avatar">·</span>
+          <span class="d3-chip-meta">
+            <b id="h-name">Loading…</b>
+            <span id="h-sub"></span>
+          </span>
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" style="opacity:.7;flex-shrink:0"><path d="M6 3.5L10.5 8 6 12.5"/></svg>
+        </a>
+        <div class="d3-ring-row">
+          <span class="d3-ring">
+            <svg width="50" height="50" viewBox="0 0 52 52" fill="none">
+              <circle cx="26" cy="26" r="22" stroke="var(--line)" stroke-width="5"/>
+              <circle id="d-ring" cx="26" cy="26" r="22" stroke="var(--violet-600)" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 138.2" style="transition:stroke-dasharray 1s cubic-bezier(.22,1,.36,1)"/>
+            </svg>
+            <span class="pctw" id="d-pct">—</span>
+          </span>
+          <span class="d3-ring-label"><b>Passport</b><span id="d-remaining">—</span></span>
+          <div class="d3-hero-btns">
+            <a class="d3-btn-solid" id="d-edit" href="/passport">Continue passport</a>
+            <a class="d3-btn-line" id="d-export" href="/passport?export=1">Export PDF</a>
+          </div>
+        </div>
       </div>
     </div>
+    <div class="d3-guide" id="g-guide" style="display:none">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="#5EEAD4" style="flex-shrink:0;margin-top:3px"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg>
+      <p id="g-guide-text"></p>
+      <a href="/child" class="d3-guide-link">More →</a>
+    </div>
+  </section>
+
+  <!-- ================= TODAY STRIP ================= -->
+  <div class="d3-today">
+
+    <!-- Tip of the day -->
+    <div class="card t3 cu-rev cu-lift" style="--d:.06s">
+      <div class="t3-head">
+        <span class="cu-blob t3-blob" style="--blob:#EDE9FE;color:#6D28D9"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg></span>
+        <span class="t3-title">Today's tip</span>
+        <span class="t3-pill" id="tip-tag" style="display:none"></span>
+      </div>
+      <p class="t3-body" id="tip-text">Loading…</p>
+      <p class="t3-src" id="tip-src"></p>
+      <div class="t3-foot">
+        <button class="t3-mini" id="tip-copy" type="button" style="display:none">Copy</button>
+        <button class="t3-mini" id="tip-next" type="button" style="display:none">Another tip</button>
+        <span class="t3-note" id="tip-note"></span>
+      </div>
+    </div>
+
+    <!-- Suggested next step -->
+    <div class="card t3 cu-rev cu-lift" style="--d:.1s">
+      <div class="t3-head">
+        <span class="cu-blob t3-blob" style="--blob:#E6F4F2;color:#0E8C82"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8h9M8 4.5L11.5 8 8 11.5"/></svg></span>
+        <span class="t3-title">Suggested next step</span>
+        <span class="t3-pill" id="step-pill" style="display:none"></span>
+      </div>
+      <p class="t3-body" id="step-title" style="font-weight:600">Loading…</p>
+      <p class="t3-src" id="step-why"></p>
+      <div class="t3-foot">
+        <a class="btn btn-primary btn-sm" id="step-cta" href="/child" style="display:none">Do it</a>
+        <span class="t3-note" id="step-more"></span>
+      </div>
+    </div>
+
+    <!-- Log a win -->
+    <div class="card t3 t3-win cu-rev cu-lift" style="--d:.14s">
+      <div class="t3-head">
+        <span class="cu-blob t3-blob" style="--blob:#E8F6F0;color:#0E8F66"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg></span>
+        <span class="t3-title">Log today's win</span>
+      </div>
+      <div class="t3-winrow">
+        <input id="win-input" type="text" maxlength="200" placeholder="Even tiny ones count…" autocomplete="off" />
+        <button id="win-save" type="button" class="d3-winbtn">
+          <span class="d3-burst" id="win-burst" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i></span>
+          Save
+        </button>
+      </div>
+      <p class="t3-src" id="win-msg">It lands in the Progress journal, dated today.</p>
+    </div>
   </div>
 
-  <!-- ===== GUIDANCE BAND (personalized) ===== -->
-  <div class="dash-guide cu-rev cu-sparkle-host" id="dash-guide" style="--d:.1s;display:none">
-    <span class="cu-spark" style="top:10px;right:60px">✦</span>
-    <span class="cu-spark s2" style="top:26px;right:40px">✦</span>
-    <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0;margin-top:2px"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg>
-    <p id="dash-guide-text"></p>
-    <a href="/child" class="dash-guide-link">More →</a>
-  </div>
-
-  <!-- ===== KPI STRIP (all live) ===== -->
-  <div class="kpis" id="d-kpis">
-    <div class="card kpi cu-rev cu-lift" style="--d:.12s"><div class="kpi-row"><span class="cu-blob kpi-blob" style="--blob:#EDE9FE;color:#6D28D9"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 1.5l2 4.2 4.5.5-3.3 3.1.9 4.5L8 11.7 3.9 13.8l.9-4.5L1.5 6.2 6 5.7z"/></svg></span><div><div class="kpi-num" id="kpi-focus">—</div><div class="kpi-label2">Focus areas</div></div></div></div>
-    <div class="card kpi cu-rev cu-lift" style="--d:.16s"><div class="kpi-row"><span class="cu-blob kpi-blob" style="--blob:#E6F4F2;color:#0E8C82"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg></span><div><div class="kpi-num" id="kpi-docs">—</div><div class="kpi-label2">Documents stored</div></div></div></div>
-    <div class="card kpi cu-rev cu-lift" style="--d:.2s"><div class="kpi-row"><span class="cu-blob kpi-blob" style="--blob:#FBF2E2;color:#A8650A"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 2.3"/></svg></span><div><div class="kpi-num" id="kpi-waitlist">—</div><div class="kpi-label2" id="kpi-waitlist-sub">Waitlists joined</div></div></div></div>
-    <div class="card kpi cu-rev cu-lift" style="--d:.24s"><div class="kpi-row"><span class="cu-blob kpi-blob" style="--blob:#E8F6F0;color:#0E8F66"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M6.5 6.7L8 5l1.5 1.7"/></svg></span><div><div class="kpi-num" id="kpi-funding-num">$0</div><div class="kpi-label2" id="kpi-funding-sub">Funding approved</div></div></div></div>
+  <!-- ================= KPI ROW ================= -->
+  <div class="d3-kpis">
+    <a class="card d3-kpi cu-rev cu-lift" href="/child" style="--d:.16s"><span class="cu-blob d3-kpi-blob" style="--blob:#EDE9FE;color:#6D28D9"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 1.5l2 4.2 4.5.5-3.3 3.1.9 4.5L8 11.7 3.9 13.8l.9-4.5L1.5 6.2 6 5.7z"/></svg></span><span><span class="d3-kpi-num" id="kpi-focus">—</span><span class="d3-kpi-lab">Focus areas</span></span></a>
+    <a class="card d3-kpi cu-rev cu-lift" href="/child/growth" style="--d:.19s"><span class="cu-blob d3-kpi-blob" style="--blob:#E8F6F0;color:#0E8F66"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg></span><span><span class="d3-kpi-num" id="kpi-wins">—</span><span class="d3-kpi-lab">Wins this month</span></span></a>
+    <a class="card d3-kpi cu-rev cu-lift" href="/documents" style="--d:.22s"><span class="cu-blob d3-kpi-blob" style="--blob:#E6F4F2;color:#0E8C82"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg></span><span><span class="d3-kpi-num" id="kpi-docs">—</span><span class="d3-kpi-lab">Documents</span></span></a>
+    <a class="card d3-kpi cu-rev cu-lift" href="/providers/waitlists" style="--d:.25s"><span class="cu-blob d3-kpi-blob" style="--blob:#FBF2E2;color:#A8650A"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 2.3"/></svg></span><span><span class="d3-kpi-num" id="kpi-waitlist">—</span><span class="d3-kpi-lab" id="kpi-waitlist-sub">Waitlists</span></span></a>
+    <a class="card d3-kpi cu-rev cu-lift" href="/funding" style="--d:.28s"><span class="cu-blob d3-kpi-blob" style="--blob:#F9EDF1;color:#B14A66"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M6.5 6.7L8 5l1.5 1.7"/></svg></span><span><span class="d3-kpi-num" id="kpi-funding-num">$0</span><span class="d3-kpi-lab" id="kpi-funding-sub">Funding approved</span></span></a>
   </div>
 
   <div class="grid">
     <!-- ===== LEFT ===== -->
     <div class="col">
 
-      <!-- Support wheel -->
-      <div class="card cu-rev" style="--d:.18s">
+      <!-- Support wheel — support-wheel-tab logic -->
+      <div class="card cu-rev" style="--d:.2s">
         <div class="card-head">
-          <span class="card-title">Support wheel</span>
-          <a class="card-link" href="/child/support-wheel">Explore full wheel →</a>
+          <span class="card-title" id="wheel-title">Support wheel</span>
+          <a class="card-link" href="/child/support-wheel">Full wheel →</a>
         </div>
-        <div id="wheel-warning" style="padding:0 20px"></div>
-        <div id="wheel-toggle" class="dash-seg-wrap"></div>
-        <p id="wheel-label" style="text-align:center;font-size:13px;color:var(--muted);margin:0 20px 4px"></p>
-        <div id="wheel-body" class="dash-wheel" style="padding:4px 16px 8px"></div>
-        <div id="wheel-legend" style="padding:0 20px 16px"></div>
-        <div style="padding:0 20px 18px">
+        <div id="wheel-warning" style="padding:10px 20px 0"></div>
+        <div class="d3-seg-wrap"><div id="wheel-toggle" class="d3-seg" role="tablist"></div></div>
+        <p class="d3-caption" id="wheel-caption"></p>
+        <div class="d3-wheelwrap">
+          <div id="wheel-host" class="d3-anim"></div>
+          <svg id="wheel-overlay" class="d3-overlay" viewBox="0 0 480 420" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+        </div>
+        <div class="d3-ringleg">
+          <span class="d3-ringleg-dots"><i style="width:5px;height:5px"></i><i style="width:7px;height:7px"></i><i style="width:9px;height:9px"></i><i style="width:11px;height:11px"></i><i style="width:13px;height:13px"></i></span>
+          <span id="wheel-leg-text">1 ring = minimal · 5 rings = intensive</span>
+        </div>
+        <div id="wheel-tops" class="d3-tops"></div>
+        <div id="wheel-detail" class="d3-detail" style="display:none"></div>
+        <div style="padding:4px 20px 18px">
           <div style="background:var(--amber-bg);border:1px solid #f3e2c0;border-radius:12px;padding:10px 12px">
             <p style="color:var(--amber);font-size:11px;line-height:1.45;margin:0"><strong>Preliminary profile — not a diagnosis.</strong> Generated from your passport answers. Confidence reflects how many related questions you've completed. For any concerns, speak with a qualified professional.</p>
           </div>
@@ -92,7 +161,7 @@ import AppLayout from "../layouts/AppLayout.astro";
       </div>
 
       <!-- Recent reports -->
-      <div class="card cu-rev" style="--d:.24s">
+      <div class="card cu-rev" style="--d:.26s">
         <div class="card-head"><span class="card-title">Recent reports</span><a class="card-link" href="/documents">View all →</a></div>
         <div id="d-docs"><div style="color:var(--muted);font-size:.82rem;padding:14px 20px">Loading…</div></div>
         <div class="card-foot">
@@ -102,7 +171,7 @@ import AppLayout from "../layouts/AppLayout.astro";
       </div>
 
       <!-- Activity -->
-      <div class="card cu-rev" style="--d:.3s">
+      <div class="card cu-rev" style="--d:.32s">
         <div class="card-head"><span class="card-title">Recent activity</span></div>
         <div class="timeline" id="d-activity"><div style="color:var(--muted);font-size:.82rem;padding:6px 0">Loading…</div></div>
       </div>
@@ -111,93 +180,232 @@ import AppLayout from "../layouts/AppLayout.astro";
     <!-- ===== RIGHT ===== -->
     <div class="col">
 
-      <!-- AI insights -->
-      <div class="card ai-card cu-rev" style="--d:.2s">
-        <div class="card-head"><span class="card-title" id="d-ai-title">Insights</span><span class="ai-badge"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--violet-700)"><path d="M8 1.5l1.5 4.2L14 7.2l-4.5 1.5L8 13l-1.5-4.3L2 7.2l4.5-1.5z"/></svg>AI · Beta</span></div>
-        <div class="ai-group"><h4>Key strengths</h4><div id="d-strengths"><div class="ai-li" style="color:var(--muted)">Loading…</div></div></div>
-        <div class="ai-group"><h4>Watch areas</h4><div id="d-watch"></div></div>
-        <div class="ai-group"><h4>Recommended next actions</h4><div id="d-actions"></div></div>
-        <div class="ai-foot"><span style="font-size:.68rem;color:var(--faint)">Generated from this profile and your uploaded reports. Always confirm with your care team.</span></div>
+      <!-- Momentum -->
+      <div class="card cu-rev" style="--d:.22s">
+        <div class="card-head"><span class="card-title">This week</span><a class="card-link" href="/child/growth">Open growth →</a></div>
+        <div class="d3-mo">
+          <div class="d3-mo-big">
+            <span class="cu-blob" style="--blob:#E8F6F0;color:#0E8F66;width:40px;height:40px"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg></span>
+            <div><div class="d3-mo-num" id="mo-count">—</div><div class="d3-mo-lab" id="mo-lab">wins this week</div></div>
+          </div>
+          <div class="d3-days" id="mo-days" aria-label="Wins over the last 7 days"></div>
+          <p class="d3-streak" id="mo-streak"></p>
+        </div>
+        <div id="d-wins" style="padding:0 20px 8px"><div style="color:var(--muted);font-size:.82rem;padding:8px 0">Loading…</div></div>
+        <div class="card-foot">
+          <a class="btn btn-ghost btn-sm" href="/child/growth">Add a moment</a>
+          <a class="btn btn-ghost btn-sm" href="/child/growth">All wins</a>
+        </div>
+      </div>
+
+      <!-- Next steps -->
+      <div class="card cu-rev" style="--d:.26s">
+        <div class="card-head"><span class="card-title">Next steps</span><span class="ai-badge"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--violet-700)"><path d="M8 1.5l1.5 4.2L14 7.2l-4.5 1.5L8 13l-1.5-4.3L2 7.2l4.5-1.5z"/></svg>Personalized</span></div>
+        <div id="d-steps" style="padding:6px 20px 8px"></div>
+        <div class="ai-foot"><span style="font-size:.68rem;color:var(--faint)" id="steps-note">Based on this profile — the list updates as you go.</span></div>
       </div>
 
       <!-- Funding overview -->
-      <div class="card cu-rev" style="--d:.26s">
+      <div class="card cu-rev" style="--d:.3s">
         <div class="card-head"><span class="card-title">Funding overview</span><a class="card-link" href="/funding">Open navigator →</a></div>
         <div class="fund-stats" id="d-fund-stats"></div>
         <div id="d-fund-rows"></div>
       </div>
 
-      <!-- Recent wins -->
-      <div class="card cu-rev" style="--d:.3s">
-        <div class="card-head"><span class="card-title">Recent wins</span><a class="card-link" href="/child/progress">All wins →</a></div>
-        <div id="d-wins" style="padding:6px 20px 16px"><div style="color:var(--muted);font-size:.82rem;padding:8px 0">Loading…</div></div>
-      </div>
-
       <!-- Next workshop -->
-      <div class="card cu-rev" style="--d:.32s">
+      <div class="card cu-rev" style="--d:.34s">
         <div class="card-head"><span class="card-title">Next workshop</span><a class="card-link" href="/resources/workshops">All workshops →</a></div>
         <div id="d-workshop"><div style="color:var(--muted);font-size:.82rem;padding:14px 20px">Loading…</div></div>
       </div>
 
       <!-- Explore the profile -->
-      <div class="card cu-rev" style="--d:.36s">
+      <div class="card cu-rev" style="--d:.38s">
         <div class="card-head"><span class="card-title" id="d-explore-title">Explore the profile</span></div>
-        <div class="dash-explore">
+        <div class="d3-explore">
           <a href="/child"><span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="5.2" r="2.6"/><path d="M2.8 13.5c.6-2.8 2.6-4.2 5.2-4.2s4.6 1.4 5.2 4.2"/></svg></span>Overview</a>
+          <a href="/child/journey"><span class="cu-blob" style="--blob:#FBF2E2;color:#A8650A;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 13.5c3.5 0 3.5-4 7-4s3.5-4 3-7"/><circle cx="3" cy="13.5" r="1.3" fill="currentColor" stroke="none"/><path d="M10.6 2.5H13v2.4"/></svg></span>Journey</a>
           <a href="/child/support-wheel"><span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.6"/><path d="M8 2.4v11.2M2.4 8h11.2M4.2 4.2l7.6 7.6M11.8 4.2l-7.6 7.6"/></svg></span>Wheel</a>
-          <a href="/child/progress"><span class="cu-blob" style="--blob:#E8F6F0;color:#0E8F66;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 13V3M2.5 13h11M5.5 10l2-2.6 2 1.4 2.7-4"/></svg></span>Progress</a>
-          <a href="/child/timeline"><span class="cu-blob" style="--blob:#FBF2E2;color:#A8650A;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2.5v11M8 5h4.5M8 9H4"/><circle cx="8" cy="2.8" r="1.2" fill="currentColor" stroke="none"/></svg></span>Timeline</a>
-          <a href="/child/assessments"><span class="cu-blob" style="--blob:#E6F4F2;color:#0E8C82;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg></span>Assessments</a>
-          <a href="/child/strengths"><span class="cu-blob" style="--blob:#EAF3DE;color:#4C9A2A;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg></span>Strengths</a>
+          <a href="/child/growth"><span class="cu-blob" style="--blob:#E8F6F0;color:#0E8F66;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 13V3M2.5 13h11M5.5 10l2-2.6 2 1.4 2.7-4"/></svg></span>Growth</a>
+          <a href="/child/assessments"><span class="cu-blob" style="--blob:#E6F4F2;color:#0E8C82;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg></span>Records</a>
         </div>
       </div>
     </div>
   </div>
 
   <style is:global>
-    .dash-greet{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
-    .dash-greet h1{font-family:var(--display);font-size:1.45rem;font-weight:700;letter-spacing:-.015em;color:var(--ink);margin:0}
-    .dash-greet p{font-size:.82rem;color:var(--muted);margin:3px 0 0}
-    .dash-quick{display:flex;gap:8px;flex-wrap:wrap}
-    .dq{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;font-weight:600;color:var(--ink-2);background:var(--card);border:1px solid var(--line);border-radius:9999px;padding:7px 15px 7px 8px;text-decoration:none;box-shadow:var(--shadow);transition:transform .16s,border-color .16s,box-shadow .16s}
-    .dq:hover{transform:translateY(-2px);border-color:#DDD6FE;box-shadow:0 8px 20px rgba(109,40,217,.12);color:var(--ink)}
-    .dq-ic{position:relative;width:26px;height:26px;display:grid;place-items:center;font-size:.85rem;font-weight:700;flex-shrink:0}
-    .dq-ic::before{content:"";position:absolute;inset:0;background:var(--blob,#EDE9FE);border-radius:46% 54% 58% 42%/52% 44% 56% 48%;transition:transform .4s cubic-bezier(.34,1.5,.64,1)}
-    .dq:hover .dq-ic::before{transform:scale(1.12) rotate(9deg)}
-    .dq-ic > *{position:relative}
-    .dash-avatar{border-radius:46% 54% 58% 42%/52% 44% 56% 48% !important;animation:dashMorph 9s ease-in-out infinite alternate;box-shadow:0 6px 18px rgba(109,40,217,.25)}
-    @keyframes dashMorph{0%{border-radius:46% 54% 58% 42%/52% 44% 56% 48%}50%{border-radius:58% 42% 46% 54%/44% 56% 48% 52%}100%{border-radius:52% 48% 42% 58%/56% 46% 54% 44%}}
-    .dash-guide{position:relative;display:flex;align-items:flex-start;gap:10px;background:linear-gradient(135deg,var(--violet-50),#F9F7FE 55%,var(--violet-50));border:1px solid var(--violet-100);border-radius:14px;padding:12px 16px;margin:14px 0 0;color:var(--violet-700)}
-    .dash-guide p{flex:1;font-size:.86rem;color:#5b21b6;line-height:1.55;margin:0;min-width:0}
-    .dash-guide-link{font-size:.8rem;font-weight:700;color:var(--violet-700);text-decoration:none;white-space:nowrap;align-self:center}
-    .dash-guide .cu-spark{font-style:normal;font-size:12px;color:#8B5CF6}
-    .dash-guide .cu-spark.s2{font-size:9px;color:#5EEAD4}
-    .kpi-row{display:flex;align-items:center;gap:12px}
-    .kpi-blob{width:38px;height:38px}
-    .kpi-label2{font-size:.74rem;color:var(--muted);margin-top:1px}
-    .dash-seg-wrap{display:flex;justify-content:center;margin:12px 0 4px}
-    .dash-seg{position:relative;display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:9999px;padding:3px}
-    .dash-seg .thumb{position:absolute;top:3px;bottom:3px;border-radius:9999px;background:var(--violet-700);transition:left .22s cubic-bezier(.22,1,.36,1),width .22s cubic-bezier(.22,1,.36,1);box-shadow:0 2px 8px rgba(109,40,217,.3)}
-    .dash-seg button{position:relative;z-index:1;border:none;background:none;color:var(--muted);border-radius:9999px;padding:6px 15px;font-size:13px;font-weight:600;cursor:pointer;transition:color .2s;font-family:inherit}
-    .dash-seg button.on{color:#fff}
-    .dash-wheel svg{transform-origin:50% 50%}
-    .dash-wheel.play svg{animation:dashDraw .8s cubic-bezier(.22,1,.36,1) both}
-    @keyframes dashDraw{from{opacity:0;transform:scale(.6) rotate(-8deg)}to{opacity:1;transform:none}}
-    .dash-wheel [data-domain]:hover path:first-of-type{opacity:.75}
-    .dash-wheel [data-domain]:focus{outline:none}
-    .dash-wheel [data-domain]:focus-visible path:last-of-type{fill:rgba(109,40,217,.08)}
-    .doc-row{transition:background .15s}
-    .doc-row:hover{background:var(--bg)}
-    .dash-explore{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:6px 20px 18px}
-    .dash-explore a{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.72rem;font-weight:600;color:var(--ink-2);text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:11px 6px;transition:transform .15s,border-color .15s,background .15s}
-    .dash-explore a:hover{transform:translateY(-2px);border-color:#DDD6FE;background:var(--violet-50);color:var(--violet-700)}
+    /* ============ HERO ============ */
+    .d3-hero{position:relative;overflow:hidden;border-radius:22px;padding:24px 26px 20px;color:var(--ink);background:linear-gradient(120deg,#FDFCFF 0%,#F4EFFE 46%,#EFF9F6 100%);border:1px solid var(--violet-100);box-shadow:var(--shadow)}
+    .d3-hero::before{content:"";position:absolute;top:-90px;right:-60px;width:340px;height:300px;background:radial-gradient(closest-side,rgba(139,92,246,.13),transparent 72%);border-radius:50%;pointer-events:none}
+    .d3-hero::after{content:"";position:absolute;bottom:-120px;left:6%;width:320px;height:260px;background:radial-gradient(closest-side,rgba(94,234,212,.13),transparent 72%);border-radius:50%;pointer-events:none}
+    .d3-spark{position:absolute;font-style:normal;font-size:12px;color:#A78BFA;pointer-events:none;animation:d3Twinkle 2.6s ease infinite}
+    .d3-spark.s2{font-size:9px;color:#5EEAD4;animation-delay:.9s}
+    .d3-spark.s3{font-size:10px;color:#F9A8D4;animation-delay:1.6s}
+    @keyframes d3Twinkle{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.3);opacity:1}}
+    .d3-hero-main{position:relative;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    .d3-hello h1{font-family:var(--display);font-size:1.7rem;font-weight:700;letter-spacing:-.02em;margin:0;line-height:1.15}
+    .d3-sub{font-size:.9rem;color:var(--ink-2);margin:7px 0 0}
+    .d3-date{font-size:.72rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:6px 0 0}
+    .d3-hero-side{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+    .d3-chip{display:inline-flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:9999px;padding:6px 14px 6px 7px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow);transition:border-color .15s,transform .15s}
+    .d3-chip:hover{border-color:#DDD6FE;transform:translateY(-1px)}
+    .d3-chip-av{width:32px;height:32px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;background:linear-gradient(135deg,#A78BFA,#6D28D9);color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:.95rem;flex-shrink:0;animation:d3Morph 9s ease-in-out infinite alternate}
+    @keyframes d3Morph{0%{border-radius:46% 54% 58% 42%/52% 44% 56% 48%}100%{border-radius:56% 44% 44% 56%/46% 56% 44% 54%}}
+    .d3-chip-meta{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+    .d3-chip-meta b{font-size:.88rem;font-weight:700}
+    .d3-chip-meta span{font-size:.68rem;color:var(--muted)}
+    .d3-ring-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .d3-ring{width:50px;height:50px;position:relative;flex-shrink:0}
+    .d3-ring svg{transform:rotate(-90deg)}
+    .pctw{position:absolute;inset:0;display:grid;place-items:center;font-size:.68rem;font-weight:700;color:var(--ink)}
+    .d3-ring-label{font-size:.68rem;color:var(--muted);line-height:1.3}
+    .d3-ring-label b{display:block;color:var(--ink);font-size:.76rem}
+    .d3-hero-btns{display:flex;gap:8px;margin-left:6px}
+    .d3-btn-solid{background:var(--violet-700);color:#fff;font-size:.78rem;font-weight:700;padding:7px 14px;border-radius:9999px;text-decoration:none;transition:filter .15s,transform .15s}
+    .d3-btn-solid:hover{filter:brightness(1.08);transform:translateY(-1px)}
+    .d3-btn-line{border:1px solid var(--line-2);background:var(--card);color:var(--ink-2);font-size:.78rem;font-weight:600;padding:7px 14px;border-radius:9999px;text-decoration:none;transition:border-color .15s,color .15s}
+    .d3-btn-line:hover{border-color:var(--violet-500);color:var(--violet-700)}
+    .d3-guide{position:relative;display:flex;align-items:flex-start;gap:9px;background:linear-gradient(135deg,var(--violet-50),#F9F7FE 60%,var(--violet-50));border:1px solid var(--violet-100);border-radius:13px;padding:10px 14px;margin-top:16px}
+    .d3-guide p{flex:1;font-size:.84rem;color:#5b21b6;line-height:1.5;margin:0;min-width:0}
+    .d3-guide-link{font-size:.78rem;font-weight:700;color:var(--violet-700);text-decoration:none;white-space:nowrap;align-self:center}
+
+    /* ============ TODAY STRIP ============ */
+    .d3-today{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+    .t3{display:flex;flex-direction:column;padding:15px 17px 13px}
+    .t3-head{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+    .t3-blob{width:30px;height:30px}
+    .t3-title{font-size:.8rem;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+    .t3-pill{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:9999px;margin-left:auto;white-space:nowrap}
+    .t3-body{font-size:.84rem;color:var(--ink-2);line-height:1.5;margin:0;flex:1}
+    .t3-src{font-size:.68rem;color:var(--faint);margin:8px 0 0;line-height:1.4}
+    .t3-foot{display:flex;align-items:center;gap:8px;margin-top:10px;min-height:24px}
+    .t3-mini{border:1px solid var(--line);background:var(--card);color:var(--ink-2);font-size:.7rem;font-weight:600;padding:4px 11px;border-radius:9999px;cursor:pointer;font-family:inherit;transition:border-color .15s,color .15s}
+    .t3-mini:hover{border-color:var(--violet-500);color:var(--violet-700)}
+    .t3-note{font-size:.66rem;color:var(--faint);margin-left:auto}
+    .t3-winrow{display:flex;gap:8px;margin-top:2px}
+    .t3-winrow input{flex:1;min-width:0;border:1px solid var(--line-2);border-radius:11px;padding:8px 12px;font-size:.82rem;font-family:inherit;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s,background .15s}
+    .t3-winrow input:focus{border-color:var(--violet-500);background:#fff}
+    .d3-winbtn{position:relative;background:var(--violet-700);color:#fff;font-size:.78rem;font-weight:700;padding:8px 15px;border-radius:11px;font-family:inherit;transition:filter .12s,transform .12s}
+    .d3-winbtn:hover{filter:brightness(1.08)}
+    .d3-winbtn:disabled{opacity:.6}
+    .d3-burst{position:absolute;inset:0;pointer-events:none}
+    .d3-burst i{position:absolute;top:50%;left:50%;font-style:normal;font-size:11px;color:#5EEAD4;opacity:0}
+    .d3-burst i:nth-child(2n){color:#C4B5FD;font-size:9px}
+    .d3-burst.go i{animation:d3Burst .8s cubic-bezier(.22,1,.36,1) both}
+    .d3-burst.go i:nth-child(1){--bx:-30px;--by:-26px}
+    .d3-burst.go i:nth-child(2){--bx:26px;--by:-30px;animation-delay:.04s}
+    .d3-burst.go i:nth-child(3){--bx:-36px;--by:4px;animation-delay:.08s}
+    .d3-burst.go i:nth-child(4){--bx:34px;--by:8px;animation-delay:.05s}
+    .d3-burst.go i:nth-child(5){--bx:-14px;--by:-38px;animation-delay:.1s}
+    .d3-burst.go i:nth-child(6){--bx:12px;--by:-40px;animation-delay:.12s}
+    @keyframes d3Burst{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}25%{opacity:1}100%{transform:translate(calc(-50% + var(--bx)),calc(-50% + var(--by))) scale(1.1);opacity:0}}
+
+    /* ============ KPI ROW ============ */
+    .d3-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:14px}
+    .d3-kpi{display:flex;align-items:center;gap:11px;padding:13px 15px;text-decoration:none}
+    .d3-kpi-blob{width:34px;height:34px}
+    .d3-kpi-num{display:block;font-family:var(--display);font-size:1.45rem;font-weight:700;letter-spacing:-.02em;color:var(--ink);line-height:1.1}
+    .d3-kpi-lab{display:block;font-size:.68rem;color:var(--muted);margin-top:1px}
+
+    /* ============ WHEEL ============ */
+    .d3-seg-wrap{display:flex;justify-content:center;margin:12px 0 4px}
+    .d3-seg{position:relative;display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:9999px;padding:3px}
+    .d3-seg .thumb{position:absolute;top:3px;bottom:3px;border-radius:9999px;background:var(--violet-700);transition:left .22s cubic-bezier(.22,1,.36,1),width .22s cubic-bezier(.22,1,.36,1);box-shadow:0 2px 8px rgba(109,40,217,.3)}
+    .d3-seg button{position:relative;z-index:1;border:none;background:none;color:var(--muted);border-radius:9999px;padding:6px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:color .2s;font-family:inherit}
+    .d3-seg button.on{color:#fff}
+    .d3-caption{text-align:center;font-size:.8rem;color:var(--muted);margin:2px 20px 6px}
+    .d3-wheelwrap{position:relative;width:100%;max-width:420px;margin:0 auto}
+    .d3-anim svg{transform-origin:50% 50%}
+    .d3-anim.play svg{animation:d3Draw .8s cubic-bezier(.22,1,.36,1) both}
+    @keyframes d3Draw{from{opacity:0;transform:scale(.6) rotate(-8deg)}to{opacity:1;transform:none}}
+    .d3-overlay{position:absolute;inset:0;width:100%;height:100%}
+    .d3-wedge{cursor:pointer;fill:transparent;transition:fill .15s}
+    .d3-wedge:hover{fill:rgba(109,40,217,0.07)}
+    .d3-ringleg{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:4px}
+    .d3-ringleg-dots{display:inline-flex;align-items:center;gap:3px}
+    .d3-ringleg-dots i{display:inline-block;border-radius:50%;background:var(--violet-500);opacity:.75}
+    .d3-ringleg span{font-size:.68rem;color:var(--faint)}
+    .d3-tops{display:flex;flex-direction:column;gap:6px;padding:12px 20px 0}
+    .d3-tops-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:.72rem;color:var(--muted)}
+    .d3-tops-row .lbl{font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:.62rem;min-width:96px}
+    .d3-topchip{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:600;padding:4px 11px;border-radius:9999px;text-decoration:none;transition:transform .15s}
+    .d3-topchip:hover{transform:translateY(-1px)}
+    .d3-topchip i{width:7px;height:7px;border-radius:50%;font-style:normal;flex-shrink:0}
+    .d3-detail{margin:14px 20px 6px;background:var(--card);border:1px solid var(--line);border-top-width:3px;border-radius:14px;padding:14px 16px;transition:border-color .3s}
+    .d3d-in{animation:d3dIn .3s cubic-bezier(.22,1,.36,1) both}
+    @keyframes d3dIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .d3d-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+    .d3d-dot{width:26px;height:26px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;flex-shrink:0;display:grid;place-items:center}
+    .d3d-dot i{width:9px;height:9px;border-radius:50%;font-style:normal}
+    .d3d-name{font-family:var(--display);font-size:.95rem;font-weight:700;color:var(--ink);flex:1}
+    .d3d-pill{font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:9999px;white-space:nowrap}
+    .d3d-meta{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+    .d3d-meta .l{font-size:.7rem;color:var(--muted);min-width:72px}
+    .d3d-segs{display:flex;gap:4px;flex:1}
+    .d3d-seg{height:8px;border-radius:4px;flex:1;background:var(--bg);position:relative;overflow:hidden}
+    .d3d-seg b{position:absolute;inset:0;border-radius:4px;transform:scaleX(0);transform-origin:left;animation:d3dSeg .5s cubic-bezier(.22,1,.36,1) var(--d,0s) both}
+    @keyframes d3dSeg{to{transform:scaleX(1)}}
+    .d3d-conf{font-size:.72rem;color:var(--muted)}
+    .d3d-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+    .d3d-chip{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;font-weight:600;padding:5px 10px;border-radius:9999px;line-height:1.25}
+    .d3d-chip.sup{background:var(--amber-bg);color:var(--amber)}
+    .d3d-chip.tip{background:var(--violet-50);color:var(--violet-700)}
+    .d3d-foot{display:flex;justify-content:flex-end;margin-top:10px}
+    .d3d-foot a{font-size:.74rem;font-weight:700;color:var(--violet-700);text-decoration:none}
+
+    /* ============ MOMENTUM ============ */
+    .d3-mo{padding:12px 20px 4px}
+    .d3-mo-big{display:flex;align-items:center;gap:12px}
+    .d3-mo-num{font-family:var(--display);font-size:1.7rem;font-weight:700;letter-spacing:-.02em;line-height:1}
+    .d3-mo-lab{font-size:.72rem;color:var(--muted);margin-top:2px}
+    .d3-days{display:flex;gap:10px;margin:13px 0 0}
+    .d3-day{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.6rem;font-weight:600;color:var(--faint)}
+    .d3-day i{width:11px;height:11px;border-radius:50%;background:var(--line);font-style:normal;transition:transform .2s}
+    .d3-day.hit i{background:var(--violet-600)}
+    .d3-day.today i{box-shadow:0 0 0 2px var(--violet-100)}
+    .d3-day.hit i:hover{transform:scale(1.25)}
+    .d3-streak{font-size:.74rem;color:var(--violet-700);font-weight:600;margin:11px 0 4px}
     .dash-win{display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line);font-size:.85rem;color:var(--ink-2);line-height:1.4}
     .dash-win:first-child{border-top:none}
     .dash-win .st{color:#0E8F66;flex-shrink:0;margin-top:1px}
     .dash-win .wh{margin-left:auto;font-size:.7rem;color:var(--faint);white-space:nowrap}
+
+    /* ============ NEXT STEPS ============ */
+    .d3-step{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:6px 0;text-decoration:none;transition:border-color .15s,transform .15s}
+    .d3-step:hover{border-color:#DDD6FE;transform:translateY(-1px)}
+    .d3-step .ic{width:26px;height:26px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;margin-top:1px}
+    .d3-step .ic svg{width:12px;height:12px}
+    .d3-step .tx{min-width:0;flex:1}
+    .d3-step .tt{font-size:.82rem;font-weight:600;color:var(--ink);line-height:1.3}
+    .d3-step .why{font-size:.7rem;color:var(--muted);margin-top:2px;line-height:1.4}
+    .d3-step .go{color:var(--violet-700);font-weight:700;align-self:center}
+
+    /* ============ EXPLORE ============ */
+    .d3-explore{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:6px 20px 18px}
+    .d3-explore a{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.72rem;font-weight:600;color:var(--ink-2);text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:11px 6px;transition:transform .15s,border-color .15s,background .15s}
+    .d3-explore a:hover{transform:translateY(-2px);border-color:#DDD6FE;background:var(--violet-50);color:var(--violet-700)}
+
+    .doc-row{transition:background .15s}
+    .doc-row:hover{background:var(--bg)}
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width:1080px){
+      .d3-today{grid-template-columns:1fr 1fr}
+      .t3-win{grid-column:1/-1}
+      .d3-kpis{grid-template-columns:repeat(3,1fr)}
+    }
+    @media (max-width:760px){
+      .d3-hero{padding:20px 18px 16px}
+      .d3-hero-side{align-items:flex-start;width:100%}
+      .d3-ring-row{justify-content:flex-start}
+      .d3-today{grid-template-columns:1fr}
+      .d3-kpis{grid-template-columns:1fr 1fr;gap:10px}
+    }
     @media (prefers-reduced-motion:reduce){
-      .dash-avatar{animation:none}
-      .dash-wheel.play svg{animation:none}
+      .d3-spark,.d3-chip-av{animation:none}
+      .d3-anim.play svg{animation:none}
+      .d3d-in,.d3d-seg b{animation:none}
+      .d3d-seg b{transform:none}
+      .d3-burst.go i{animation:none}
       #d-ring{transition:none!important}
     }
   </style>
@@ -205,10 +413,11 @@ import AppLayout from "../layouts/AppLayout.astro";
   <!-- ============ HYDRATION ============ -->
   <script>
     import * as UA from "../lib/ua-data.js";
-    import { scoreWheel, DOMAINS, wheelCompleteness } from "../lib/wheelScore.js";
-    import { domainColor } from "../lib/wheelSvg.js";
-    import { scoreToBand } from "../config/wheelConfig.js";
-    import { buildFamilyGuidance } from "../lib/domainInsights.js";
+    import { scoreWheel, DOMAINS, wheelCompleteness, scoreToBand, HUES } from "../lib/wheelScore.js";
+    import { generateWheelSVG, domainColor } from "../lib/wheelSvg.js";
+    import { domainDetail, buildFamilyGuidance } from "../lib/domainInsights.js";
+    import { matchAdvice } from "../lib/adviceLibrary.js";
+    import { getRecommendations } from "../lib/recommendations.js";
 
     const $ = (id) => document.getElementById(id);
     const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -221,20 +430,43 @@ import AppLayout from "../layouts/AppLayout.astro";
       requestAnimationFrame(step);
     };
 
-    /* ---------- greeting (first name only; upgraded from the passport's
-       guardian name once it loads — "Pelin", never "pelintemurcan") ---------- */
+    /* ---------- session helpers (same pattern as Progress) ---------- */
+    const UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+    const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+    const getRawSession = () => { try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch { return null; } };
+    const isValid = (s) => s && s.access_token && Math.floor(Date.now() / 1000) < (s.expires_at || 0) - 60;
+    const authHeaders = (t) => ({ apikey: ANON, Authorization: "Bearer " + t, "Content-Type": "application/json" });
+    async function getValidSession() {
+      let s = getRawSession();
+      if (isValid(s)) return s;
+      if (s && s.refresh_token) {
+        const r = await fetch(UA_URL + "/auth/v1/token?grant_type=refresh_token", { method: "POST", headers: { apikey: ANON, "Content-Type": "application/json" }, body: JSON.stringify({ refresh_token: s.refresh_token }) });
+        if (r.ok) { const d = await r.json(); d.expires_at = Math.floor(Date.now() / 1000) + (d.expires_in || 3600); localStorage.setItem("ua_session", JSON.stringify(d)); return d; }
+      }
+      return s && s.access_token ? s : null;
+    }
+
+    /* ---------- greeting: time of day + day-aware subline ---------- */
+    const SUBLINES = [
+      "A calm look at the week ahead.",              /* Sun */
+      "Fresh week, small steps — they add up.",      /* Mon */
+      "Here's how things are looking today.",        /* Tue */
+      "Midweek check-in — you're doing the work.",   /* Wed */
+      "Steady progress beats big leaps.",            /* Thu */
+      "Almost the weekend — here's today's picture.",/* Fri */
+      "Weekends count too — at your pace.",          /* Sat */
+    ];
     function setGreeting(name) {
-      const h = new Date().getHours();
+      const now = new Date(), h = now.getHours();
       const part = h < 5 ? "Good night" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
       const emoji = h >= 5 && h < 18 ? "☀️" : "🌙";
       const n = String(name || "").trim().split(/\s+/)[0];
       $("g-hello").textContent = part + (n ? ", " + (n.charAt(0).toUpperCase() + n.slice(1)) : "") + " " + emoji;
-      $("g-date").textContent = new Date().toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" });
+      $("g-sub").textContent = SUBLINES[now.getDay()];
+      $("g-date").textContent = now.toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" });
     }
     (function () {
-      let session = null;
-      try { session = JSON.parse(localStorage.getItem("ua_session")); } catch (e) {}
-      const meta = (session && session.user && session.user.user_metadata) || {};
+      const meta = ((getRawSession() || {}).user || {}).user_metadata || {};
       setGreeting(meta.full_name || "");
     })();
 
@@ -242,23 +474,23 @@ import AppLayout from "../layouts/AppLayout.astro";
       const passports = await UA.getPassports().catch(() => []);
       const p = UA.pickActivePassport(passports);
       const data = (p && p.data) || {};
-
-      // ---------- HERO ----------
       const id = UA.childIdentity(data);
-      /* better greeting name: the guardian's first name from the passport */
+      const first = id.first || "";
+      const passportLink = "/passport" + (p ? "?id=" + p.id : "");
+
+      /* ---------- HERO ---------- */
       const g1 = String((data.household && data.household.g1name) || "").replace(/\s*\([^)]*\)\s*$/, "").trim();
       if (g1) setGreeting(g1);
-      $("d-photo").textContent = (id.first || id.name || "·")[0].toUpperCase();
-      $("d-name").textContent = id.name;
-      const tags = [];
-      if (id.age != null) tags.push(`<span class="tag">Age ${id.age}</span>`);
-      if (id.dx) tags.push(`<span class="tag dx">${esc(id.dx)}</span>`);
-      if (id.languages) tags.push(`<span class="tag">${esc(id.languages)}</span>`);
-      $("d-tags").innerHTML = tags.join("");
-      if (p && p.updated_at) $("d-updated").textContent = "Profile last updated " + UA.relTime(p.updated_at);
-      if (p) { $("d-export").href = `/passport?id=${p.id}&export=1`; $("d-edit").href = `/passport?id=${p.id}`; $("q-passport").href = `/passport?id=${p.id}`; }
+      $("h-avatar").textContent = (first || id.name || "·")[0].toUpperCase();
+      $("h-name").textContent = p ? id.name : "Set up the passport";
+      const subBits = [];
+      if (id.age != null) subBits.push("Age " + id.age);
+      if (id.dx) subBits.push(id.dx);
+      $("h-sub").textContent = p ? (subBits.join(" · ") || "Open profile") : "A few minutes to start";
+      if (!p) $("h-chip").href = "/passport";
+      $("d-edit").href = passportLink;
+      if (p) $("d-export").href = "/passport?id=" + p.id + "&export=1";
 
-      // ---------- COMPLETION (animated) ----------
       const comp = UA.completion(data);
       const C = 2 * Math.PI * 22;
       requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -267,137 +499,188 @@ import AppLayout from "../layouts/AppLayout.astro";
       if (reduceMotion) $("d-pct").textContent = comp.pct + "%";
       else { let t0 = null; const tick = (ts) => { if (!t0) t0 = ts; const pr = Math.min(1, (ts - t0) / 900), e = 1 - Math.pow(1 - pr, 3); $("d-pct").textContent = Math.round(comp.pct * e) + "%"; if (pr < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); }
       const left = comp.total - comp.done;
-      $("d-remaining").textContent = left === 0 ? "All sections complete" : `${left} section${left === 1 ? "" : "s"} remaining`;
+      $("d-remaining").textContent = left === 0 ? "Complete ✦" : left + " section" + (left === 1 ? "" : "s") + " left";
+      if (left === 0) $("d-edit").textContent = "Edit passport";
 
-      // ---------- PERSONALIZED GUIDANCE BAND ----------
+      /* ---------- GUIDANCE LINE (in the hero) ---------- */
       const scored = scoreWheel(data);
-      const guide = buildFamilyGuidance(data, scored, id.first || "Your child");
+      const guide = buildFamilyGuidance(data, scored, first || "Your child");
       if (guide.length) {
-        $("dash-guide-text").textContent = guide.slice(0, 2).join(" ");
-        $("dash-guide").style.display = "flex";
+        $("g-guide-text").textContent = guide.slice(0, 2).join(" ");
+        $("g-guide").style.display = "flex";
       }
 
-      // ---------- SUPPORT WHEEL (rose petals — length = level) ----------
+      /* ================= SUPPORT WHEEL — support-wheel-tab logic ================= */
       const scoredCount = DOMAINS.filter((n) => scored[n].score != null).length;
+      const wheelDeep = (nm) => "/child/support-wheel?domain=" + encodeURIComponent(nm);
+      if (first) $("wheel-title").textContent = first + "'s support wheel";
       let mode = "needs";
-      const SHORTD = { "Communication": "Communication", "Social Connection": "Social", "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility", "Emotional Regulation": "Emotional", "Executive Function": "Executive", "Daily Living Skills": "Daily living", "Learning & Play": "Learning & play" };
-      /* band pill with CORRECT semantics: high support = violet (attention),
-         moderate = amber, low = green. Strength bands stay green-family. */
-      function bandPill(raw, axis) {
-        if (raw == null) return `<span style="font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:9999px;background:#F4F3F8;color:#7B7491">No data</span>`;
-        const b = scoreToBand(raw, axis);
-        let bg = "#E8F6F0", fg = "#0E8F66";
-        if (axis === "need") {
-          if (b.key === "moderate") { bg = "#FBF2E2"; fg = "#A8650A"; }
-          else if (b.key === "high" || b.key === "intensive") { bg = "#EDE9FE"; fg = "#6D28D9"; }
-        }
-        return `<span style="font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:9999px;background:${bg};color:${fg};white-space:nowrap">${esc(b.label)}</span>`;
+      let sel = 0;
+      for (let i = 0; i < DOMAINS.length; i++) { if (scored[DOMAINS[i]].score != null) { sel = i; break; } }
+
+      function levelInfo(score) {
+        if (score == null) return { label: "Not enough data", bg: "#F4F3F8", fg: "#7B7491", seg: "#D8D3E6" };
+        const b = scoreToBand(score);
+        if (b.key === "minimal" || b.key === "low") return { label: b.label, bg: "#E8F6F0", fg: "#0E8F66", seg: "#0E8F66" };
+        if (b.key === "high" || b.key === "intensive") return { label: b.label, bg: "#EDE9FE", fg: "#6D28D9", seg: "#7C3AED" };
+        return { label: b.label, bg: "#FBF2E2", fg: "#A8650A", seg: "#D97706" };
       }
-      function roseSVG() {
-        const cx = 210, cy = 168, r0 = 18, R = 122, seg2 = (2 * Math.PI) / DOMAINS.length;
-        const pt = (r, a) => `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`;
-        let s = "";
-        for (let k = 1; k <= 5; k++) s += `<circle cx="${cx}" cy="${cy}" r="${(r0 + (R - r0) * k / 5).toFixed(1)}" fill="none" stroke="#ECE8F6" stroke-width="1"/>`;
-        DOMAINS.forEach((name, i) => {
-          const a0 = -Math.PI / 2 + i * seg2 + 0.03, a1 = a0 + seg2 - 0.06;
-          const dm = scored[name];
-          const raw = mode === "strengths" ? dm.strength : dm.score;
-          const frac = raw == null ? 0.1 : Math.max(0.12, raw / 100);
-          const r = r0 + (R - r0) * frac;
-          const fill = raw == null ? "#EDEAF6" : domainColor(name).replace("45%)", "60%)");
-          s += `<g data-domain="${esc(name)}" style="cursor:pointer;outline:none" tabindex="0" role="link" aria-label="Open ${esc(name)} in the full wheel">
-            <title>${esc(name)} — tap to explore</title>
-            <path d="M${pt(r0, a0)} L${pt(r, a0)} A${r.toFixed(1)},${r.toFixed(1)} 0 0 1 ${pt(r, a1)} L${pt(r0, a1)} A${r0},${r0} 0 0 0 ${pt(r0, a0)} Z" fill="${fill}" stroke="#fff" stroke-width="1.4"/>
-            <path d="M${pt(r0, a0)} L${pt(R, a0)} A${R},${R} 0 0 1 ${pt(R, a1)} L${pt(r0, a1)} A${r0},${r0} 0 0 0 ${pt(r0, a0)} Z" fill="transparent"/>
-          </g>`;
-          const mid = a0 + (seg2 - 0.06) / 2, lx = cx + (R + 13) * Math.cos(mid), ly = cy + (R + 13) * Math.sin(mid);
-          const anchor = Math.cos(mid) > 0.25 ? "start" : (Math.cos(mid) < -0.25 ? "end" : "middle");
-          s += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="10.5" fill="#7B7491" text-anchor="${anchor}" dominant-baseline="middle" style="pointer-events:none">${SHORTD[name]}</text>`;
-        });
-        for (let k = 1; k <= 4; k++) s += `<circle cx="${cx}" cy="${cy}" r="${(r0 + (R - r0) * k / 5).toFixed(1)}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.3" style="pointer-events:none"/>`;
-        s += `<circle cx="${cx}" cy="${cy}" r="${r0}" fill="var(--card)" stroke="var(--line)"/>`;
-        return `<svg viewBox="0 0 420 336" width="100%" style="max-width:400px;display:block;margin:0 auto" role="img">${s}</svg>`;
-      }
-      function renderWheel() {
-        if (scoredCount < 3) {
-          $("wheel-toggle").innerHTML = "";
-          $("wheel-label").textContent = "";
-          $("wheel-legend").innerHTML = "";
-          $("wheel-body").innerHTML = `<div style="text-align:center;padding:24px 12px"><p style="color:var(--muted);font-size:.85rem;margin-bottom:12px">Fill in more of the passport (communication, sensory, behaviour, daily living) to generate ${esc(id.first || "your child")}'s profile wheel.</p><a class="btn btn-primary btn-sm" href="/passport${p ? "?id=" + p.id : ""}">Continue passport →</a></div>`;
-          return;
-        }
-        /* sliding segmented toggle */
+
+      function renderToggle() {
         const seg = $("wheel-toggle");
-        seg.innerHTML = `<div class="dash-seg"><span class="thumb"></span>` + ["needs", "strengths"].map((m) =>
-          `<button data-mode="${m}" class="${m === mode ? "on" : ""}">${m === "needs" ? "Support needs" : "Strengths"}</button>`).join("") + `</div>`;
+        seg.innerHTML = `<span class="thumb"></span>` + ["needs", "strengths"].map((m) =>
+          `<button data-mode="${m}" class="${m === mode ? "on" : ""}" role="tab" aria-selected="${m === mode}">${m === "needs" ? "Support needs" : "Strengths"}</button>`).join("");
         const onBtn = seg.querySelector("button.on"), thumb = seg.querySelector(".thumb");
         requestAnimationFrame(() => { thumb.style.left = onBtn.offsetLeft + "px"; thumb.style.width = onBtn.offsetWidth + "px"; });
-        seg.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { mode = b.dataset.mode; renderWheel(); }));
-
-        $("wheel-label").innerHTML = mode === "strengths"
-          ? "Longer petals = <strong>stronger</strong> areas · tap a petal to explore"
-          : "Longer petals = <strong>more support helpful</strong> · tap a petal to explore";
-        const body = $("wheel-body");
-        body.classList.remove("play");
-        body.innerHTML = roseSVG();
-        void body.offsetWidth;
-        body.classList.add("play");
-        body.querySelectorAll("[data-domain]").forEach((g) => {
-          const go = () => location.href = "/child/support-wheel?domain=" + encodeURIComponent(g.dataset.domain);
-          g.addEventListener("click", go);
-          g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
-        });
-
-        $("wheel-legend").innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">` + DOMAINS.map((nm) => {
-          const dm = scored[nm];
-          const raw = mode === "strengths" ? dm.strength : dm.score;
-          const conf = mode === "strengths" ? dm.strengthConfidence : dm.confidence;
-          const ansN = mode === "strengths" ? dm.strengthAnswered : dm.answered;
-          const totN = mode === "strengths" ? dm.strengthTotal : dm.total;
-          return `<a href="/child/support-wheel?domain=${encodeURIComponent(nm)}" title="Confidence: ${esc(conf || "none")}${ansN != null && totN != null ? " — " + ansN + " of " + totN + " related questions answered" : ""}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;padding:5px 9px;background:#fff;border:1px solid var(--line);border-radius:9px;text-decoration:none;transition:border-color .15s" onmouseover="this.style.borderColor='#DDD6FE'" onmouseout="this.style.borderColor='var(--line)'"><span style="display:flex;align-items:center;gap:6px;color:var(--ink-2)"><span style="width:7px;height:7px;border-radius:50%;background:${domainColor(nm)};flex-shrink:0"></span>${esc(SHORTD[nm])}</span>${bandPill(raw, mode === "strengths" ? "strength" : "need")}</a>`;
-        }).join("") + `</div><p style="font-size:.68rem;color:var(--faint);margin:8px 0 0">Hover any row for confidence — how many related questions you've answered.</p>`;
+        seg.querySelectorAll("button").forEach((b) =>
+          b.addEventListener("click", () => { mode = b.dataset.mode; renderToggle(); renderWheel(); renderDetail(); }));
+        $("wheel-caption").innerHTML = mode === "strengths"
+          ? "Fuller petals mean <strong>stronger</strong> areas — tap one for detail."
+          : "Fuller petals mean <strong>more support</strong> is helpful — tap one for detail.";
+        $("wheel-leg-text").textContent = mode === "strengths"
+          ? "1 ring = emerging · 5 rings = shining"
+          : "1 ring = minimal support · 5 rings = intensive support";
       }
-      const wc = wheelCompleteness(data);
-      const lowConf = DOMAINS.filter((n) => scored[n].confidence === "low");
-      $("wheel-warning").innerHTML = (scoredCount >= 3 && wc.pct < 70)
-        ? `<div style="background:var(--amber-bg);border:1px solid #f3e2c0;border-radius:12px;padding:10px 14px;font-size:12px;color:var(--amber)"><strong>Wheel is ${wc.pct}% complete</strong> — ${wc.answered} of ${wc.total} contributing questions answered.${lowConf.length ? " Low confidence in: " + lowConf.join(", ") + "." : ""} <a href="/passport${p ? "?id=" + p.id : ""}" style="color:var(--amber);font-weight:600;text-decoration:underline">Complete more →</a></div>`
-        : "";
-      renderWheel();
 
-      // ---------- DOCUMENTS ----------
+      function renderWheel() {
+        const host = $("wheel-host");
+        host.classList.remove("play");
+        host.innerHTML = generateWheelSVG(scored, mode);
+        void host.offsetWidth; /* restart the draw-in */
+        host.classList.add("play");
+        /* keyboard access on the base petals */
+        host.querySelectorAll("[data-domain]").forEach((g) => {
+          g.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              const qi = DOMAINS.indexOf(g.dataset.domain);
+              if (qi > -1) { sel = qi; renderDetail(); buildOverlay(); }
+            }
+          });
+        });
+      }
+
+      /* click overlay + violet selection outline — same geometry as the tab */
+      const tintOf = (nm, a) => { const i = DOMAINS.indexOf(nm); return i === -1 ? "rgba(109,40,217," + a + ")" : "hsla(" + HUES[i] + ",70%,45%," + a + ")"; };
+      const cx = 240, cy = 210, ir = 24, or_ = 138, segA = (2 * Math.PI) / DOMAINS.length;
+      const pt = (r, a) => [(cx + r * Math.cos(a)).toFixed(2), (cy + r * Math.sin(a)).toFixed(2)];
+      function sector(a0, a1) {
+        const p0 = pt(ir, a0), p1 = pt(or_, a0), p2 = pt(or_, a1), p3 = pt(ir, a1);
+        return "M" + p0[0] + "," + p0[1] + " L" + p1[0] + "," + p1[1] + " A" + or_ + "," + or_ + " 0 0 1 " + p2[0] + "," + p2[1] + " L" + p3[0] + "," + p3[1] + " A" + ir + "," + ir + " 0 0 0 " + p0[0] + "," + p0[1] + " Z";
+      }
+      function buildOverlay() {
+        let s = "";
+        for (let i = 0; i < DOMAINS.length; i++) {
+          const a0 = -Math.PI / 2 + i * segA, a1 = a0 + segA, hue = HUES[i], on = i === sel;
+          const attrs = on ? `fill="hsla(${hue},65%,52%,0.12)" stroke="hsl(${hue},65%,45%)" stroke-width="2.5"` : `stroke="none" stroke-width="0"`;
+          s += '<path class="d3-wedge" data-i="' + i + '" d="' + sector(a0, a1) + '" ' + attrs + '></path>';
+        }
+        $("wheel-overlay").innerHTML = s;
+        $("wheel-overlay").querySelectorAll(".d3-wedge").forEach((el) =>
+          el.addEventListener("click", () => { sel = +el.getAttribute("data-i"); renderDetail(); buildOverlay(); }));
+      }
+
+      function renderDetail() {
+        const name = DOMAINS[sel], dm = scored[name];
+        const box = $("wheel-detail");
+        box.style.display = "block";
+        const L = levelInfo(dm.score), det = domainDetail(name, data), dc = domainColor(name);
+        const segCount = dm.score == null ? 0 : (dm.score === 0 ? 0 : scoreToBand(dm.score).rings);
+        const strCount = dm.strength == null ? 0 : (dm.strength === 0 ? 0 : scoreToBand(dm.strength, "strength").rings);
+        let segs = ""; for (let k = 1; k <= 5; k++) segs += `<span class="d3d-seg">${k <= segCount ? `<b style="background:${L.seg};--d:${(k * 0.07).toFixed(2)}s"></b>` : ""}</span>`;
+        let ssegs = ""; for (let k = 1; k <= 5; k++) ssegs += `<span class="d3d-seg">${k <= strCount ? `<b style="background:#0E8F66;--d:${(k * 0.07).toFixed(2)}s"></b>` : ""}</span>`;
+        const confLbl = dm.confidence === "high" ? "High" : dm.confidence === "medium" ? "Medium" : dm.confidence === "low" ? "Low" : "No data";
+        const chips = det.support.slice(0, 2).map((t, i) => `<span class="d3d-chip sup cu-pop" style="--d:${(0.08 + i * 0.05).toFixed(2)}s">${esc(t)}</span>`).join("")
+          + det.strategies.slice(0, 2).map((t, i) => `<span class="d3d-chip tip cu-pop" style="--d:${(0.18 + i * 0.05).toFixed(2)}s">${esc(t)}</span>`).join("");
+        box.style.borderTopColor = dc;
+        box.innerHTML = `<div class="d3d-in">`
+          + `<div class="d3d-head"><span class="d3d-dot" style="background:${tintOf(name, 0.14)}"><i style="background:${dc}"></i></span><span class="d3d-name">${esc(name)}</span><span class="d3d-pill" style="background:${L.bg};color:${L.fg}">${L.label}</span></div>`
+          + (dm.score == null
+              ? `<p style="font-size:.8rem;color:var(--faint);margin:0">Add more in the passport to build this part of the profile.</p>`
+              : `<div class="d3d-meta"><span class="l">Support level</span><span class="d3d-segs">${segs}</span></div>`
+                + (dm.strength != null ? `<div class="d3d-meta"><span class="l">Strengths</span><span class="d3d-segs">${ssegs}</span></div>` : "")
+                + `<div class="d3d-meta"><span class="l">Confidence</span><span class="d3d-conf">${confLbl} — ${dm.answered} of ${dm.total} related questions</span></div>`)
+          + (chips ? `<div class="d3d-chips">${chips}</div>` : "")
+          + `<div class="d3d-foot"><a href="${wheelDeep(name)}">Full detail →</a></div>`
+          + `</div>`;
+      }
+
+      function renderTops() {
+        const host = $("wheel-tops");
+        const needTop = DOMAINS.filter((n) => scored[n].score != null).sort((a, b) => scored[b].score - scored[a].score).slice(0, 2);
+        const strTop = DOMAINS.filter((n) => scored[n].strength != null && scored[n].strength >= 45).sort((a, b) => scored[b].strength - scored[a].strength).slice(0, 2);
+        let html = "";
+        if (needTop.length) html += `<div class="d3-tops-row"><span class="lbl">Most support</span>` + needTop.map((n) => `<a class="d3-topchip" style="background:${tintOf(n, 0.1)};color:${domainColor(n)}" href="${wheelDeep(n)}"><i style="background:${domainColor(n)}"></i>${esc(n)}</a>`).join("") + `</div>`;
+        if (strTop.length) html += `<div class="d3-tops-row"><span class="lbl">Going strong</span>` + strTop.map((n) => `<a class="d3-topchip" style="background:var(--green-bg);color:var(--green)" href="${wheelDeep(n)}"><i style="background:var(--green)"></i>${esc(n)}</a>`).join("") + `</div>`;
+        host.innerHTML = html;
+      }
+
+      if (scoredCount < 3) {
+        $("wheel-toggle").parentElement.style.display = "none";
+        $("wheel-caption").textContent = "";
+        document.querySelector(".d3-ringleg").style.display = "none";
+        $("wheel-host").innerHTML = `<div style="text-align:center;padding:26px 14px"><p style="color:var(--muted);font-size:.85rem;margin:0 0 12px">Fill in more of the passport (communication, sensory, behaviour, daily living) to generate ${esc(first || "your child")}'s support wheel.</p><a class="btn btn-primary btn-sm" href="${passportLink}">Continue passport →</a></div>`;
+      } else {
+        const wc = wheelCompleteness(data);
+        const lowConf = DOMAINS.filter((n) => scored[n].confidence === "low");
+        $("wheel-warning").innerHTML = wc.pct < 70
+          ? `<div style="background:var(--amber-bg);border:1px solid #f3e2c0;border-radius:12px;padding:10px 14px;font-size:12px;color:var(--amber)"><strong>Wheel is ${wc.pct}% complete</strong> — ${wc.answered} of ${wc.total} contributing questions answered.${lowConf.length ? " Lower confidence in: " + esc(lowConf.join(", ")) + "." : ""} <a href="${passportLink}" style="color:var(--amber);font-weight:600;text-decoration:underline">Complete more →</a></div>`
+          : "";
+        renderToggle();
+        renderWheel();
+        buildOverlay();
+        renderDetail();
+        renderTops();
+      }
+
+      /* ================= TIP OF THE DAY ================= */
+      const SECTION_LABEL = { communication: "Communication", sensory: "Sensory", dailyLiving: "Daily living", behaviour: "Behaviour", education: "School", birth: "Development", therapy: "Services", goals: "Goals" };
+      const SECTION_TINT = { communication: ["#EDE9FE", "#6D28D9"], sensory: ["#F9EDF1", "#B14A66"], dailyLiving: ["#E8F6F0", "#0E8F66"], behaviour: ["#FBF2E2", "#A8650A"], education: ["#E6F4F2", "#0E8C82"], birth: ["#EDE9FE", "#6D28D9"], therapy: ["#E6F4F2", "#0E8C82"], goals: ["#EDE9FE", "#6D28D9"] };
+      const tips = matchAdvice(data);
+      const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 864e5);
+      let tipIdx = tips.length ? dayOfYear % tips.length : 0;
+      function renderTip() {
+        if (!tips.length) {
+          $("tip-text").textContent = "Answer a few more passport questions and a daily tip matched to your answers will appear here.";
+          $("tip-src").innerHTML = `<a href="${passportLink}" style="color:var(--violet-700);font-weight:600;text-decoration:none">Continue the passport →</a>`;
+          return;
+        }
+        const t = tips[tipIdx % tips.length];
+        const tint = SECTION_TINT[t.section] || ["#EDE9FE", "#6D28D9"];
+        $("tip-tag").textContent = SECTION_LABEL[t.section] || t.section;
+        $("tip-tag").style.background = tint[0]; $("tip-tag").style.color = tint[1];
+        $("tip-tag").style.display = "inline-block";
+        $("tip-text").textContent = t.tip;
+        $("tip-src").textContent = "Because you noted: " + t.label.toLowerCase();
+        $("tip-copy").style.display = "inline-block";
+        $("tip-note").textContent = tips.length > 1 ? "New tip each day · " + tips.length + " matched" : "Matched to the passport";
+        if (tips.length > 1) $("tip-next").style.display = "inline-block";
+      }
+      renderTip();
+      $("tip-copy").addEventListener("click", () => {
+        const t = tips[tipIdx % tips.length]; if (!t) return;
+        navigator.clipboard && navigator.clipboard.writeText(t.tip).then(() => {
+          $("tip-copy").textContent = "Copied ✓";
+          setTimeout(() => { $("tip-copy").textContent = "Copy"; }, 1600);
+        }).catch(() => {});
+      });
+      $("tip-next").addEventListener("click", () => { tipIdx++; renderTip(); });
+
+      /* ================= DOCUMENTS ================= */
       const docs = p ? await UA.getRecentDocuments(p.id).catch(() => []) : [];
       const docIcon = `<svg viewBox="0 0 16 16" fill="none" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4V1.8z"/><path d="M9 1.8V5h3.4"/></svg>`;
       $("d-docs").innerHTML = docs.length
         ? docs.map((d) => `<div class="doc-row"><span class="doc-ic">${docIcon}</span><span class="doc-meta"><span class="doc-name">${esc(d.file_name)}</span><span class="doc-sub">Uploaded ${UA.fmtDate(d.created_at)}</span></span><span class="doc-status"><span class="pill new">${esc((d.file_type || "file").toUpperCase())}</span></span></div>`).join("")
         : `<div style="color:var(--muted);font-size:.82rem;padding:14px 20px">No documents yet. Upload a report to get started.</div>`;
 
-      // ---------- KPIs (all live, counting up) ----------
-      const pri = (data.goals && data.goals.priorities) || [];
-      countUp($("kpi-focus"), Array.isArray(pri) ? pri.length : 0);
-      countUp($("kpi-docs"), docs.length);
-
-      // ---------- ACTIVITY ----------
+      /* ================= ACTIVITY ================= */
       const acts = p ? await UA.getActivity(p.id) : [];
       const aIcon = { document: ["t-doc", `<path d="M8 3v8M4.5 7.5L8 11l3.5-3.5M3 13.5h10"/>`], profile: ["t-edit", `<path d="M10.5 2.5l3 3L6 13H3v-3l7.5-7.5z"/>`], funding: ["t-fund", `<circle cx="8" cy="8" r="5.5"/><path d="M8 5.5v5M6.3 7.2L8 5.5l1.7 1.7"/>`], provider: ["t-prov", `<circle cx="8" cy="5.2" r="2.4"/><path d="M3.4 13c.5-2.4 2.3-3.5 4.6-3.5s4.1 1.1 4.6 3.5"/>`] };
       $("d-activity").innerHTML = acts.length
         ? acts.map((a) => { const ic = aIcon[a.type] || aIcon.profile; return `<div class="t-item"><span class="t-ic ${ic[0]}"><svg viewBox="0 0 16 16" fill="none" stroke-width="1.7">${ic[1]}</svg></span><div class="t-meta">${esc(a.label)}<div class="t-time">${UA.relTime(a.created_at)}</div></div></div>`; }).join("")
         : `<div style="color:var(--muted);font-size:.82rem;padding:6px 0">Your recent uploads, edits and applications will appear here.</div>`;
 
-      // ---------- INSIGHTS ----------
-      $("d-ai-title").textContent = id.first ? `Insights for ${esc(id.first)}` : "Insights";
-      const snap = UA.domainSnapshot(data);
-      const ins = UA.insights(data, snap, comp, docs.length);
-      const check = `<i class="i-str"><svg viewBox="0 0 16 16" fill="none" stroke-width="2.4"><path d="M3 8.5l3.2 3L13 4.5"/></svg></i>`;
-      const bang = `<i class="i-chl"><svg viewBox="0 0 16 16" fill="none" stroke-width="2.2"><path d="M8 3.5v6M8 12.4v.2"/></svg></i>`;
-      $("d-strengths").innerHTML = ins.strengths.length
-        ? ins.strengths.map((s) => `<div class="ai-li">${check}${esc(s)}</div>`).join("")
-        : `<div class="ai-li" style="color:var(--muted)">Add strengths in the profile to see them summarised here.</div>`;
-      $("d-watch").innerHTML = ins.watch.length
-        ? ins.watch.map((w) => `<div class="ai-li">${bang}Higher support need in ${esc(w)}</div>`).join("")
-        : `<div class="ai-li" style="color:var(--muted)">Complete the scale questions to surface watch areas.</div>`;
-      $("d-actions").innerHTML = ins.actions.map((a, i) => `<a class="ai-action" href="${a.href}"><span class="n">${i + 1}</span>${esc(a.label)}<span class="go">→</span></a>`).join("");
-
-      // ---------- FUNDING ----------
+      /* ================= FUNDING ================= */
       const apps = p ? await UA.getFundingApplications(p.id) : [];
       const fo = UA.fundingOverview(apps);
       $("d-fund-stats").innerHTML = [
@@ -408,37 +691,147 @@ import AppLayout from "../layouts/AppLayout.astro";
       ].map(([n, l]) => `<div class="fund-stat"><div class="fund-num">${n}</div><div class="fund-label">${l}</div></div>`).join("");
       $("d-fund-rows").innerHTML = fo.rows.filter((r) => r.status !== "not_started").concat(fo.rows.filter((r) => r.status === "not_started")).slice(0, 3)
         .map((r) => { const pl = UA.STATUS_PILL[r.status]; return `<div class="fund-row"><span class="fund-name">${esc(r.name)}<small>${esc(r.level)} · ${esc(r.note)}</small></span><span class="pill ${pl.cls}">${pl.label}</span></div>`; }).join("");
-      $("kpi-funding-num").innerHTML = `$${fo.approvedAmount.toLocaleString("en-CA")}<span style="font-size:.9rem;color:var(--muted)">/yr</span>`;
-      $("kpi-funding-sub").textContent = fo.submitted ? `${fo.submitted} program${fo.submitted === 1 ? "" : "s"} active — funding approved` : "Funding approved";
+      $("kpi-funding-num").innerHTML = `$${fo.approvedAmount.toLocaleString("en-CA")}<span style="font-size:.85rem;color:var(--muted)">/yr</span>`;
+      $("kpi-funding-sub").textContent = fo.submitted ? fo.submitted + " program" + (fo.submitted === 1 ? "" : "s") + " active" : "Funding approved";
 
-      // ---------- WAITLIST KPI ----------
+      /* ================= WAITLIST KPI ================= */
       const wl = await UA.getWaitlist();
       if (wl.length) {
         countUp($("kpi-waitlist"), wl.length);
-        $("kpi-waitlist-sub").textContent = "Waitlists · status " + esc(wl[0].status || "New");
+        $("kpi-waitlist-sub").textContent = "Waitlists · " + esc(wl[0].status || "New");
       } else {
         $("kpi-waitlist").textContent = "0";
         $("kpi-waitlist-sub").textContent = "Waitlists joined";
       }
 
-      // ---------- RECENT WINS ----------
-      $("d-explore-title").textContent = id.first ? `Explore ${esc(id.first)}'s profile` : "Explore the profile";
-      try {
-        const UA_URL2 = "https://eghqufgiudxjkbsddtnx.supabase.co";
-        const ANON2 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
-        const sess = JSON.parse(localStorage.getItem("ua_session"));
-        const star = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg>';
-        let winRows = [];
-        if (p && sess && sess.access_token) {
-          const wr = await fetch(UA_URL2 + "/rest/v1/wins?select=text,created_at&passport_id=eq." + p.id + "&order=created_at.desc&limit=3", { headers: { apikey: ANON2, Authorization: "Bearer " + sess.access_token } });
-          if (wr.ok) winRows = await wr.json();
-        }
-        $("d-wins").innerHTML = winRows.length
-          ? winRows.map((w) => `<div class="dash-win"><span class="st">${star}</span><span>${esc(w.text)}</span><span class="wh">${UA.relTime(w.created_at)}</span></div>`).join("")
-          : `<div style="color:var(--muted);font-size:.82rem;padding:8px 0">No wins yet this week — even tiny ones count. <a href="/child/progress" style="color:var(--violet-700);font-weight:600;text-decoration:none">Add the first →</a></div>`;
-      } catch (e) { $("d-wins").innerHTML = ""; }
+      /* ================= NEXT STEPS (recommendations) ================= */
+      const needsSorted = DOMAINS.filter((n) => scored[n].score != null).sort((a, b) => scored[b].score - scored[a].score);
+      const ctx = {
+        documents: docs.map((d) => ({ type: (d.file_type || "") + " " + (d.file_name || ""), date: d.created_at })),
+        appliedTaxCredit: fo.rows.some((r) => r.key === "dtc" && r.status !== "not_started"),
+        fundingProgramsAvailable: fo.total - fo.started,
+        onWaitlists: wl.length > 0,
+        topUnmetNeed: needsSorted.length ? needsSorted[0] + " support" : undefined,
+      };
+      const recs = getRecommendations(data, ctx).filter((r) => r.severity !== "done");
+      const SEV = {
+        warn: ["#FBF2E2", "#A8650A", `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3.5v6M8 12.4v.2"/></svg>`],
+        todo: ["#EDE9FE", "#6D28D9", `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8h9M8 4.5L11.5 8 8 11.5"/></svg>`],
+        info: ["#E6F4F2", "#0E8C82", `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.5 4.2L14 7.2l-4.5 1.5L8 13l-1.5-4.3L2 7.2l4.5-1.5z"/></svg>`],
+      };
+      /* hero-adjacent card: the single top step */
+      const top = recs[0];
+      if (top) {
+        const pillTxt = top.severity === "warn" ? "Worth doing soon" : top.severity === "todo" ? "Good next step" : "Nice to have";
+        const tint = SEV[top.severity] || SEV.info;
+        $("step-pill").textContent = pillTxt;
+        $("step-pill").style.background = tint[0]; $("step-pill").style.color = tint[1];
+        $("step-pill").style.display = "inline-block";
+        $("step-title").textContent = top.title;
+        $("step-why").textContent = top.reason || "";
+        $("step-cta").textContent = top.cta || "Open";
+        $("step-cta").href = top.href;
+        $("step-cta").style.display = "inline-flex";
+        if (recs.length > 1) $("step-more").textContent = (recs.length - 1) + " more below";
+      } else {
+        $("step-title").textContent = "You're all caught up ✦";
+        $("step-why").textContent = "Nothing urgent on the list right now.";
+      }
+      /* the checklist card: the following three */
+      const rest = recs.slice(1, 4);
+      $("d-steps").innerHTML = rest.length
+        ? rest.map((r) => { const t = SEV[r.severity] || SEV.info; return `<a class="d3-step" href="${r.href}"><span class="ic" style="background:${t[0]};color:${t[1]}">${t[2]}</span><span class="tx"><span class="tt">${esc(r.title)}</span>${r.reason ? `<span class="why">${esc(r.reason)}</span>` : ""}</span><span class="go">→</span></a>`; }).join("")
+        : `<div style="color:var(--muted);font-size:.82rem;padding:8px 0 10px">All caught up — check back after your next passport update.</div>`;
+      if (first) $("steps-note").textContent = "Based on " + first + "'s profile — the list updates as you go.";
 
-      // ---------- WORKSHOP ----------
+      /* ================= KPIs ================= */
+      const pri = (data.goals && data.goals.priorities) || [];
+      countUp($("kpi-focus"), Array.isArray(pri) ? pri.length : 0);
+      countUp($("kpi-docs"), docs.length);
+
+      /* ================= WINS + MOMENTUM ================= */
+      $("d-explore-title").textContent = first ? "Explore " + first + "'s profile" : "Explore the profile";
+      const star = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg>';
+      let wins = [];
+      const dayKey = (d) => { const x = new Date(d); return x.getFullYear() + "-" + (x.getMonth() + 1) + "-" + x.getDate(); };
+      const weekStart = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); const wd = (x.getDay() + 6) % 7; x.setDate(x.getDate() - wd); return x.getTime(); };
+
+      function renderMomentum() {
+        const now = new Date();
+        const thisWeek = weekStart(now);
+        const weekWins = wins.filter((w) => new Date(w.created_at).getTime() >= thisWeek).length;
+        countUp($("mo-count"), weekWins);
+        if (!weekWins) { $("mo-count").textContent = "0"; $("mo-lab").textContent = "wins logged this week — tiny ones count"; }
+        else $("mo-lab").textContent = "win" + (weekWins === 1 ? "" : "s") + " this week";
+        /* 7-day dots */
+        const hitDays = new Set(wins.map((w) => dayKey(w.created_at)));
+        let dots = "";
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(now); d.setDate(now.getDate() - i);
+          const letter = d.toLocaleDateString("en-CA", { weekday: "narrow" });
+          dots += `<span class="d3-day${hitDays.has(dayKey(d)) ? " hit" : ""}${i === 0 ? " today" : ""}"><i></i>${letter}</span>`;
+        }
+        $("mo-days").innerHTML = dots;
+        /* weekly streak */
+        const weeks = new Set(wins.map((w) => weekStart(new Date(w.created_at))));
+        let streak = 0, cursor = thisWeek;
+        if (!weeks.has(cursor)) cursor -= 7 * 864e5; /* week just started — count from last week */
+        while (weeks.has(cursor)) { streak++; cursor -= 7 * 864e5; }
+        $("mo-streak").textContent = streak >= 2 ? "✦ " + streak + " weeks in a row with a win" : "";
+        /* recent list */
+        $("d-wins").innerHTML = wins.length
+          ? wins.slice(0, 3).map((w) => `<div class="dash-win"><span class="st">${star}</span><span>${esc(w.text)}</span><span class="wh">${w.justNow ? "just now" : UA.relTime(w.created_at)}</span></div>`).join("")
+          : `<div style="color:var(--muted);font-size:.82rem;padding:8px 0">No wins yet — the first one is a win itself.</div>`;
+        /* month KPI */
+        const m0 = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+        const monthWins = wins.filter((w) => new Date(w.created_at).getTime() >= m0).length;
+        $("kpi-wins").textContent = String(monthWins);
+      }
+
+      try {
+        if (p) {
+          const s = await getValidSession();
+          if (s) {
+            const wr = await fetch(UA_URL + "/rest/v1/wins?select=id,text,created_at&passport_id=eq." + p.id + "&order=created_at.desc&limit=40", { headers: authHeaders(s.access_token) });
+            if (wr.ok) wins = await wr.json();
+          }
+        }
+      } catch (e) { /* momentum stays in empty state */ }
+      renderMomentum();
+
+      /* save a win from the dashboard */
+      async function saveWin() {
+        const inp = $("win-input"), btn = $("win-save");
+        const v = inp.value.trim();
+        if (!v) { inp.focus(); return; }
+        if (!p) { $("win-msg").textContent = "Create the passport first — then wins have a home."; return; }
+        btn.disabled = true;
+        const s = await getValidSession();
+        if (!s) { location.href = "/login"; return; }
+        try {
+          const r = await fetch(UA_URL + "/rest/v1/wins", { method: "POST", headers: Object.assign({}, authHeaders(s.access_token), { Prefer: "return=representation" }), body: JSON.stringify({ user_id: s.user.id, passport_id: p.id, text: v }) });
+          if (!r.ok) throw new Error("save failed");
+          const rows = await r.json(), row = rows && rows[0];
+          wins.unshift({ id: row ? row.id : Date.now(), text: v, created_at: row ? row.created_at : new Date().toISOString(), justNow: true });
+          inp.value = "";
+          $("win-msg").textContent = "Saved" + (first ? " — " + first + " is on a roll." : " — nice one.");
+          renderMomentum();
+          if (!reduceMotion) {
+            const burst = $("win-burst");
+            burst.classList.remove("go"); void burst.offsetWidth; burst.classList.add("go");
+            setTimeout(() => burst.classList.remove("go"), 900);
+          }
+          setTimeout(() => { $("win-msg").textContent = "It lands in the Progress journal, dated today."; }, 4000);
+        } catch (e) {
+          $("win-msg").textContent = "Couldn't save just now — try again in a moment.";
+        } finally {
+          btn.disabled = false;
+        }
+      }
+      $("win-save").addEventListener("click", saveWin);
+      $("win-input").addEventListener("keydown", (e) => { if (e.key === "Enter") saveWin(); });
+
+      /* ================= WORKSHOP ================= */
       const ws = await UA.getNextWorkshop().catch(() => null);
       $("d-workshop").innerHTML = ws
         ? (() => { const d = new Date(ws.starts_at); const day = d.getDate(); const mon = d.toLocaleDateString("en-CA", { month: "short" }); const time = d.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit" }); return `<div class="ws"><span class="ws-date"><b>${day}</b><span>${mon}</span></span><span class="ws-meta"><b>${esc(ws.title)}</b><span>${time} · ${esc(ws.location_type || "Online")}</span></span><a class="btn btn-ghost btn-sm" href="/resources/workshops" style="margin-left:auto">Register</a></div>`; })()

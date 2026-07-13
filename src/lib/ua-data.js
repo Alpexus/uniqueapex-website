@@ -1,25 +1,31 @@
 /* ============================================================
-   ua-data.js — dashboard data layer
+   ua-data.js — dashboard data layer (V2: self-healing session)
    ------------------------------------------------------------
-   One place for every read the dashboard needs. Supabase table
-   and column names here come straight from your masterfile and
-   are reliable. The only ASSUMPTIONS are the *internal* leaf
-   names inside passport.data — those live in FIELD_MAP (now set
-   to your real field names). Domain scoring is exact, via
-   wheelScore.js (a verbatim port of your account engine).
+   One place for every read the app needs.
 
-   Used from a bundled <script> (not is:inline) so imports work:
+   V2 FIX — "the child disappeared": reads used the RAW stored
+   access token. Supabase tokens expire after ~1 hour, so after
+   a while every read silently failed and pages looked empty
+   until something re-authenticated. Now every read:
+     1. refreshes the token first when it's expired
+     2. retries once on a 401 (force-refresh)
+     3. tells the user what's happening via notify.js instead
+        of silently showing an empty app
+   Data is never "lost" — it was never gone.
+
+   Used from a bundled <script>:
      import * as UA from "../lib/ua-data.js";
    ============================================================ */
 
 import { scoreWheel, domainArray, scoreToBand } from "./wheelScore.js";
+import { notify } from "./notify.js";
 
 const SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
 const ANON =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
 // TODO: move both to import.meta.env (PUBLIC_SUPABASE_URL / PUBLIC_SUPABASE_ANON_KEY).
 
-// ---- session + authed fetch ------------------------------------
+// ---- session + authed fetch (self-healing) ----------------------
 export function getSession() {
   try {
     const s = JSON.parse(localStorage.getItem("ua_session") || "null");
@@ -29,30 +35,83 @@ export function getSession() {
   }
 }
 
+const sessionLooksValid = (s) =>
+  s && s.access_token && Math.floor(Date.now() / 1000) < (s.expires_at || 0) - 60;
+
+export function authHeaders(t, json = true) {
+  const h = { apikey: ANON, Authorization: "Bearer " + t };
+  if (json) h["Content-Type"] = "application/json";
+  return h;
+}
+
+let refreshing = null; /* de-dupe concurrent refreshes */
+async function refreshSession(s) {
+  if (!s || !s.refresh_token) return null;
+  if (refreshing) return refreshing;
+  refreshing = (async () => {
+    try {
+      const r = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=refresh_token", {
+        method: "POST",
+        headers: { apikey: ANON, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: s.refresh_token }),
+      });
+      if (!r.ok) return null;
+      const d = await r.json();
+      d.expires_at = Math.floor(Date.now() / 1000) + (d.expires_in || 3600);
+      localStorage.setItem("ua_session", JSON.stringify(d));
+      notify("info", "Signed back in automatically — everything's still here ✓");
+      return d;
+    } catch {
+      return null;
+    } finally {
+      refreshing = null;
+    }
+  })();
+  return refreshing;
+}
+
+/** Always returns a usable session when one can exist — refreshing first if expired. */
+export async function getValidSession() {
+  let s = getSession();
+  if (sessionLooksValid(s)) return s;
+  const fresh = await refreshSession(s);
+  return fresh || s;
+}
+
+let offlineToastAt = 0;
 async function rest(path) {
-  const s = getSession();
+  let s = await getValidSession();
   if (!s) throw new Error("no session");
-  const r = await fetch(SUPABASE_URL + "/rest/v1/" + path, {
-    headers: { apikey: ANON, Authorization: "Bearer " + s.access_token },
-  });
+  let r;
+  try {
+    r = await fetch(SUPABASE_URL + "/rest/v1/" + path, { headers: authHeaders(s.access_token) });
+  } catch (e) {
+    if (Date.now() - offlineToastAt > 8000) {
+      offlineToastAt = Date.now();
+      notify("warn", "Can't reach the server — check your connection. Nothing is lost.");
+    }
+    throw e;
+  }
+  if (r.status === 401) {
+    /* token was revoked/expired server-side — force one refresh + retry */
+    const fresh = await refreshSession(getSession());
+    if (fresh) {
+      r = await fetch(SUPABASE_URL + "/rest/v1/" + path, { headers: authHeaders(fresh.access_token) });
+    }
+  }
   if (!r.ok) throw new Error("rest " + r.status);
   return r.json();
 }
 
 // ================================================================
-// FIELD_MAP — assumed leaf names inside passport.data.
-// These are the ONLY guesses in this file. Adjust to match your
-// real passport object (camelCase examples taken from your
-// masterfile, e.g. communication.respondsToName, emo_anxious).
+// FIELD_MAP — leaf names inside passport.data.
 // ================================================================
 const FIELD_MAP = {
   child: { first: "firstName", last: "lastName", dob: "dob", gender: "gender", city: "city", languages: "homeLanguages" },
   diagnosis: { status: "status", list: "diagnoses", year: "year", summary: "summary" },
-  guardian: { name: "g1name", email: "g1email" }, // household.g1name / household.g1email
+  guardian: { name: "g1name", email: "g1email" },
   strengths: { strengths: "strengths", interests: "interests", dislikes: "dislikes" },
 };
-
-// (Domain scoring now lives in wheelScore.js — exact engine.)
 
 // ---- the 7 funding programs (from masterfile §15) --------------
 export const FUNDING_PROGRAMS = [
@@ -92,7 +151,6 @@ export async function getNextWorkshop() {
 
 export async function getActivity(passportId) {
   const filter = passportId ? "&child_id=eq." + passportId : "";
-  // returns [] gracefully if the table doesn't exist yet
   try {
     return await rest("activity?select=type,label,created_at" + filter +
       "&order=created_at.desc&limit=6");
@@ -111,13 +169,13 @@ export async function getWaitlist() {
 export async function getFundingApplications(passportId) {
   const filter = passportId ? "&child_id=eq." + passportId : "";
   try {
-    return await rest("funding_applications?select=program_key,status" + filter);
+    return await rest("funding_applications?select=id,program_key,status" + filter);
   } catch { return []; }
 }
 
 // ---- derived: hero identity ------------------------------------
 export function childIdentity(data) {
-  const c = (data && data[ "childProfile" ]) || {};
+  const c = (data && data["childProfile"]) || {};
   const m = FIELD_MAP.child;
   const first = c[m.first] || "";
   const last = c[m.last] || "";
@@ -129,7 +187,7 @@ export function childIdentity(data) {
     if (!isNaN(d)) age = Math.floor((Date.now() - d) / 31557600000);
   }
   const dx = (data && data.diagnosis) || {};
-  const dxList = dx.diagnoses; // real field: array of diagnosis names
+  const dxList = dx.diagnoses;
   const langs = c[m.languages];
   return {
     name, first, age,
@@ -140,7 +198,7 @@ export function childIdentity(data) {
   };
 }
 
-// ---- derived: profile completion (exact 14 checks from your account page) -
+// ---- derived: profile completion -------------------------------
 export function completion(data) {
   const d = data || {};
   const s = d.sensory || {};
@@ -170,10 +228,10 @@ export function completion(data) {
 }
 
 // ================================================================
-// DOMAIN SNAPSHOT — now backed by the exact scoreWheel() engine.
+// DOMAIN SNAPSHOT — backed by the exact scoreWheel() engine.
 // ================================================================
 export function domainSnapshot(data) {
-  const rows = domainArray(data); // [{domain, support, n}]
+  const rows = domainArray(data);
   const answered = rows.reduce((a, r) => a + (r.n || 0), 0);
   const conf = answered >= 30 ? "High" : answered >= 12 ? "Medium" : "Low";
   return { rows, confidence: conf, answered, exact: true };
@@ -181,7 +239,7 @@ export function domainSnapshot(data) {
 
 export function levelFor(support) {
   if (support == null) return { cls: "mod", label: "Not enough data" };
-  const b = scoreToBand(support); // shared band table — same as wheel, badges, bars
+  const b = scoreToBand(support);
   if (b.key === "minimal" || b.key === "low") return { cls: "low", label: b.label };
   if (b.key === "high" || b.key === "intensive") return { cls: "high", label: b.label };
   return { cls: "mod", label: b.label };
@@ -196,14 +254,12 @@ export function insights(data, snapshot, comp, docCount) {
   if (Array.isArray(strengthsText)) strengths.push(...strengthsText.slice(0, 3));
   else if (strengthsText) strengths.push(strengthsText);
 
-  // watch areas = highest-support domains we have data for
   const watch = (snapshot.rows || [])
     .filter((r) => r.support != null)
     .sort((a, b) => b.support - a.support)
     .slice(0, 3)
     .map((r) => r.domain);
 
-  // next actions from real gaps
   const actions = [];
   if (comp.pct < 100) actions.push({ label: `Complete the ${comp.total - comp.done} remaining profile section${comp.total - comp.done === 1 ? "" : "s"}`, href: "/children" });
   if (!docCount) actions.push({ label: "Upload your child's latest report", href: "/documents" });

@@ -46,11 +46,19 @@ const filters = [
 <AppFormLayout title="Resources" activeNav="resources">
   <div class="g-page">
     <SectionTabs section="resources" active="guides" />
-    <h1 class="page-title">Parent <em>guides</em></h1>
-    <p class="page-sub">
-      Plain-language walkthroughs for the Québec journey — diagnosis, school, funding and
-      day-to-day life. Written for parents, in EN&nbsp;/&nbsp;FR.
-    </p>
+    <div class="c3-ribbon rib-amber cu-rev">
+      <span class="c3-spark" style="top:12px;right:120px">✦</span>
+      <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
+      <span class="c3-rib-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span>
+      <div class="c3-rib-id">
+        <h1>Parent guides</h1>
+        <p>Plain-language walkthroughs for the Québec journey — diagnosis, school, funding and day-to-day life. EN / FR.</p>
+      </div>
+      <div class="c3-rib-stats">
+        <span class="c3-rstat"><b>{guides.length + 1}</b><span>playbooks</span></span>
+        <span class="c3-rstat"><b>{filters.length - 1}</b><span>topics</span></span>
+      </div>
+    </div>
 
     <div class="g-samplenote">
       <span class="pill wait">Sample guides</span>

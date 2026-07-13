@@ -136,8 +136,28 @@ const { title = "UniqueApex", activeNav = "dashboard" } = Astro.props;
         var c = [["#A78BFA", "#6D28D9"], ["#5EEAD4", "#0E8C82"], ["#FCD34D", "#A8650A"], ["#F9A8D4", "#B14A66"]];
         return c[i % c.length];
       }
-      fetch(SUPABASE_URL + "/rest/v1/passports?select=id,data", {
-        headers: { apikey: ANON, Authorization: "Bearer " + session.access_token }
+      // Refresh the token first if it's expired — otherwise the child
+      // switcher silently shows "No children yet" after ~1 hour.
+      var nowSec = Math.floor(Date.now() / 1000);
+      var tokP = (session.expires_at && nowSec < session.expires_at - 60)
+        ? Promise.resolve(session.access_token)
+        : fetch(SUPABASE_URL + "/auth/v1/token?grant_type=refresh_token", { method: "POST", headers: { apikey: ANON, "Content-Type": "application/json" }, body: JSON.stringify({ refresh_token: session.refresh_token }) })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (d) {
+              if (d && d.access_token) {
+                d.expires_at = Math.floor(Date.now() / 1000) + (d.expires_in || 3600);
+                localStorage.setItem("ua_session", JSON.stringify(d));
+                return d.access_token;
+              }
+              return session.access_token;
+            })
+            .catch(function () { return session.access_token; });
+      var freshTok = session.access_token;
+      tokP.then(function (tok) {
+        freshTok = tok;
+        return fetch(SUPABASE_URL + "/rest/v1/passports?select=id,data", {
+          headers: { apikey: ANON, Authorization: "Bearer " + tok }
+        });
       })
         .then(function (r) { return r.ok ? r.json() : []; })
         .then(function (rows) {
@@ -172,6 +192,23 @@ const { title = "UniqueApex", activeNav = "dashboard" } = Astro.props;
               localStorage.setItem("ua_active_child", btn.dataset.id);
               location.reload();
             });
+          });
+
+          // Plan gate: a second child is part of the Family plan.
+          var addBtn = document.querySelector(".child-menu .row.add");
+          if (addBtn) addBtn.addEventListener("click", function (e) {
+            if (rows.length < 1) return; /* first child: always allowed */
+            e.preventDefault();
+            fetch(SUPABASE_URL + "/rest/v1/subscriptions?select=plan,current_period_end&user_id=eq." + (session.user && session.user.id), {
+              headers: { apikey: ANON, Authorization: "Bearer " + freshTok }
+            }).then(function (r) { return r.ok ? r.json() : []; }).then(function (subs) {
+              var sub = subs && subs[0];
+              var okPeriod = sub && (!sub.current_period_end || new Date(sub.current_period_end) > new Date());
+              var plan = okPeriod && sub ? sub.plan : "free";
+              if (plan === "family" && rows.length < 4) { location.href = "/passport"; return; }
+              if (window.uaNotify) window.uaNotify("info", plan === "family" ? "The Family plan includes up to 4 children." : "Adding another child is part of the Family plan ✦");
+              setTimeout(function () { location.href = "/pricing"; }, 1100);
+            }).catch(function () { location.href = "/passport"; });
           });
         })
         .catch(function () { /* offline / no rows — switcher stays in fallback state */ });

@@ -1,13 +1,113 @@
 ---
+/* PROVIDERS-WAITLISTS-V1 — from stub to a real status view: shows the
+   family's waitlist signups (waitlist table), which services they cover,
+   and what happens next. Rose identity. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
 <AppFormLayout title="Providers" activeNav="providers">
   <SectionTabs section="providers" active="waitlists" />
-  <h1 class="page-title">Waitlists</h1>
-  <p class="page-sub">Part of Providers. This page is scaffolded — content is coming.</p>
-  <div class="ua-stub">
-    <b>Waitlists</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+
+  <div class="pw-wrap">
+    <div class="c3-ribbon rib-rose cu-rev">
+      <span class="c3-spark" style="top:12px;right:120px">✦</span>
+      <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
+      <span class="c3-rib-av"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 2.3"/></svg></span>
+      <div class="c3-rib-id">
+        <h1 id="rb-title">Waitlists</h1>
+        <p>A spot costs nothing to hold — and you can always decline. Here's where you stand.</p>
+      </div>
+      <div class="c3-rib-stats" id="rb-stats"></div>
+    </div>
+
+    <div id="pw-list" class="pw-list"><p class="pw-loading">Checking your waitlists…</p></div>
+
+    <div class="pw-how cu-rev" style="--d:.15s">
+      <p class="pw-how-t">How it works</p>
+      <div class="pw-steps">
+        <div class="pw-step"><span class="n">1</span><p><b>You join once.</b> We keep your place and your child's needs on file — no re-explaining.</p></div>
+        <div class="pw-step"><span class="n">2</span><p><b>We watch the lists.</b> When the directory opens in Montréal, your signup carries over with its original date.</p></div>
+        <div class="pw-step"><span class="n">3</span><p><b>You get first call.</b> A matching spot opens → you hear about it before it's public.</p></div>
+      </div>
+    </div>
   </div>
 </AppFormLayout>
+
+<style is:global>
+  .pw-wrap{display:flex;flex-direction:column;gap:14px;max-width:880px}
+  .pw-loading{font-size:.84rem;color:var(--faint);margin:0}
+  .pw-list{display:flex;flex-direction:column;gap:10px}
+  .pw-card{display:flex;gap:13px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 17px;box-shadow:var(--shadow);transition:transform .16s,border-color .16s}
+  .pw-card:hover{transform:translateY(-2px);border-color:#F3D8E1}
+  .pw-body{flex:1;min-width:0}
+  .pw-name{font-family:var(--display);font-size:.94rem;font-weight:700;color:var(--ink)}
+  .pw-when{font-size:.72rem;color:var(--faint);margin-top:2px}
+  .pw-svcs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .pw-svc{font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:9999px;background:#F9EDF1;color:var(--rose)}
+  .pw-pill{margin-left:auto;flex-shrink:0;font-size:.66rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 11px;border-radius:9999px;white-space:nowrap}
+  .pw-pill.new{background:var(--violet-50);color:var(--violet-700)}
+  .pw-pill.contacted{background:var(--amber-bg);color:var(--amber)}
+  .pw-pill.matched{background:var(--green-bg);color:var(--green)}
+  .pw-pill.waitlisted{background:#FBF2E2;color:var(--amber)}
+  .pw-empty{display:flex;gap:14px;align-items:center;flex-wrap:wrap;border:1.5px dashed #F3D8E1;border-radius:16px;background:#FFFDFD;padding:18px}
+  .pw-empty p{flex:1;font-size:.86rem;color:var(--ink-2);line-height:1.55;margin:0;min-width:220px}
+  .pw-how{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:var(--shadow)}
+  .pw-how-t{font-family:var(--display);font-size:.94rem;font-weight:700;color:var(--ink);margin:0 0 12px}
+  .pw-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .pw-step{display:flex;gap:10px;align-items:flex-start}
+  .pw-step .n{width:26px;height:26px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;background:linear-gradient(135deg,#F9A8D4,#B14A66);color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:.76rem;flex-shrink:0}
+  .pw-step p{font-size:.78rem;color:var(--muted);line-height:1.55;margin:0}
+  .pw-step b{color:var(--ink)}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>
+
+<script>
+  import * as UA from "../../lib/ua-data.js";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  (async () => {
+    const wl = await UA.getWaitlist().catch(() => []);
+    const passports = await UA.getPassports().catch(() => []);
+    const p = UA.pickActivePassport(passports);
+    const id = p ? UA.childIdentity(p.data || {}) : { first: "" };
+    if (id.first) $("rb-title").textContent = id.first + "'s Waitlists";
+
+    $("rb-stats").innerHTML = [
+      `<span class="c3-rstat"><b>${wl.length}</b><span>signup${wl.length === 1 ? "" : "s"}</span></span>`,
+      `<span class="c3-rstat"><b>${wl.filter((w) => (w.status || "").toLowerCase() === "matched").length}</b><span>matched</span></span>`,
+    ].join("");
+
+    const SVC = [["service_slp", "Speech therapy"], ["service_ot", "Occupational therapy"], ["service_aba", "Behaviour / ABA"], ["service_other", "Other services"]];
+    if (!wl.length) {
+      $("pw-list").innerHTML = `<div class="pw-empty cu-rev">
+        <span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66;width:42px;height:42px"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 2.3"/></svg></span>
+        <p><b>No waitlist signups yet.</b> Québec waitlists run long — joining early is the single highest-leverage move. Two minutes, and your place is held with today's date.</p>
+        <a class="btn btn-primary btn-sm" href="/waitlist">Join the waitlist</a>
+      </div>`;
+      return;
+    }
+    $("pw-list").innerHTML = wl.map((w, i) => {
+      const st = (w.status || "New").toLowerCase();
+      const cls = ["new", "contacted", "matched", "waitlisted"].includes(st) ? st : "new";
+      const svcs = SVC.filter(([k]) => w[k]).map(([, lbl]) => `<span class="pw-svc">${lbl}</span>`).join("") || `<span class="pw-svc">General</span>`;
+      const d = new Date(w.created_at);
+      return `<div class="pw-card cu-rev" style="--d:${(0.05 + i * 0.06).toFixed(2)}s">
+        <span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66;width:40px;height:40px"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 2.3"/></svg></span>
+        <span class="pw-body">
+          <span class="pw-name" style="display:block">Coordination waitlist</span>
+          <span class="pw-when" style="display:block">Place held since ${isNaN(d) ? "—" : d.toLocaleDateString("en-CA", { month: "long", day: "numeric", year: "numeric" })}</span>
+          <span class="pw-svcs">${svcs}</span>
+        </span>
+        <span class="pw-pill ${cls}">${esc(w.status || "New")}</span>
+      </div>`;
+    }).join("");
+  })().catch((e) => console.error("[waitlists] hydrate failed", e));
+</script>

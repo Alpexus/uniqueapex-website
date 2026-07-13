@@ -1,7 +1,10 @@
 ---
-/* RESOURCES-HUB-V1 — fixes the bug where /resources rendered a pasted copy
-   of the French homepage. Now a proper hub: five designed cards into the
-   resource sections, in the app shell. */
+/* RESOURCES-HUB-V2 — the warm library (amber identity):
+   · ribbon with live counts + NEXT WORKSHOP pulled live from Supabase
+   · "Start here" featured guide band for brand-new families
+   · five section cards with per-section tints and hover reveals
+   · quick-help band: 811 / 211 tap-to-call — always one thumb away
+   · request-a-resource CTA kept */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 
@@ -23,39 +26,101 @@ const ICONS: Record<string, string> = {
 <AppFormLayout title="Resources" activeNav="resources">
   <SectionTabs section="resources" active="hub" />
 
-  <h1 class="page-title">Resources</h1>
-  <p class="page-sub">Everything we've gathered to make the journey lighter — sessions, playbooks, reads and the wider community.</p>
+  <div class="rh-wrap">
+    <div class="c3-ribbon rib-amber cu-rev">
+      <span class="c3-spark" style="top:12px;right:120px">✦</span>
+      <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
+      <span class="c3-rib-av">✦</span>
+      <div class="c3-rib-id">
+        <h1>The Library</h1>
+        <p>Everything we've gathered to make the journey lighter — sessions, playbooks, reads and the wider community.</p>
+      </div>
+      <div class="c3-rib-stats" id="rb-stats">
+        <span class="c3-rstat"><b>5</b><span>collections</span></span>
+      </div>
+    </div>
 
-  <div class="rh-grid">
-    {SECTIONS.map((s, i) => (
-      <a class="rh-card cu-rev cu-lift" href={s.href} style={`--d:${(i * 0.06).toFixed(2)}s`}>
-        <span class="cu-blob" style={`--blob:${s.bg};color:${s.hue}`}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={ICONS[s.icon]} />
-        </span>
-        <span class="rh-tx">
-          <b>{s.title}</b>
-          <span>{s.desc}</span>
-        </span>
-        <span class="rh-go">→</span>
+    <!-- start here + next workshop -->
+    <div class="rh-toprow">
+      <a class="rh-start cu-rev cu-sparkle-host" href="/resources/guides" style="--d:.05s">
+        <span class="cu-spark" style="top:12px;right:22px">✦</span>
+        <span class="cu-spark s2" style="top:30px;right:44px">✦</span>
+        <span class="rh-start-k">START HERE</span>
+        <b>New to all of this? The first-90-days playbook.</b>
+        <p>What to do after "we think it might be autism" — diagnosis, first services, and who to call, in order.</p>
+        <span class="rh-start-go">Open the guides →</span>
       </a>
-    ))}
-  </div>
+      <div class="rh-next cu-rev" style="--d:.1s">
+        <p class="rh-next-k">NEXT LIVE WORKSHOP</p>
+        <div id="rh-ws"><p class="rh-ws-empty">Checking the calendar…</p></div>
+      </div>
+    </div>
 
-  <div class="rh-cta cu-rev" style="--d:.32s">
-    <p><b>Looking for something we don't have yet?</b> Tell us — the library grows from what families actually need.</p>
-    <a href="mailto:contact@uniqueapex.com?subject=Resource%20request">Request a resource</a>
+    <div class="rh-grid">
+      {SECTIONS.map((s, i) => (
+        <a class="rh-card cu-rev cu-lift" href={s.href} style={`--d:${(0.12 + i * 0.05).toFixed(2)}s;--tint:${s.bg};--hue:${s.hue}`}>
+          <span class="cu-blob" style={`--blob:${s.bg};color:${s.hue}`}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={ICONS[s.icon]} />
+          </span>
+          <span class="rh-tx">
+            <b>{s.title}</b>
+            <span>{s.desc}</span>
+          </span>
+          <span class="rh-go">→</span>
+        </a>
+      ))}
+    </div>
+
+    <div class="rh-help cu-rev" style="--d:.4s">
+      <span class="rh-help-t">Need a human right now?</span>
+      <a class="rh-line" href="tel:811"><b>811</b><span>Info-Santé / Info-Social — 24/7 nurse & social worker</span></a>
+      <a class="rh-line" href="tel:211"><b>211</b><span>Community services navigator for Québec</span></a>
+    </div>
+
+    <div class="rh-cta cu-rev" style="--d:.45s">
+      <p><b>Looking for something we don't have yet?</b> Tell us — the library grows from what families actually need.</p>
+      <a href="mailto:contact@uniqueapex.com?subject=Resource%20request">Request a resource</a>
+    </div>
   </div>
 </AppFormLayout>
 
 <style is:global>
-  .rh-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px;max-width:920px;margin-top:6px}
-  .rh-card{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;text-decoration:none;box-shadow:var(--shadow);position:relative}
+  .rh-wrap{display:flex;flex-direction:column;gap:14px;max-width:960px}
+  .rh-toprow{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}
+  @media (max-width:760px){.rh-toprow{grid-template-columns:1fr}}
+  .rh-start{position:relative;display:block;background:linear-gradient(120deg,#FFFEFB 0%,#FBF4E4 55%,#F3F0FE 100%);border:1px solid #F0E4C4;border-radius:18px;padding:18px 20px;text-decoration:none;box-shadow:var(--shadow);transition:transform .18s,box-shadow .18s}
+  .rh-start:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(168,101,10,.14)}
+  .rh-start .cu-spark{font-style:normal;font-size:13px;color:#E3B23C}
+  .rh-start .cu-spark.s2{font-size:10px;color:#8B5CF6}
+  .rh-start-k{font-size:.62rem;font-weight:800;letter-spacing:.09em;color:var(--amber)}
+  .rh-start b{display:block;font-family:var(--display);font-size:1.05rem;color:var(--ink);margin:6px 0 4px;line-height:1.3}
+  .rh-start p{font-size:.82rem;color:var(--muted);line-height:1.55;margin:0}
+  .rh-start-go{display:inline-block;font-size:.78rem;font-weight:700;color:var(--amber);margin-top:10px}
+  .rh-next{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:var(--shadow)}
+  .rh-next-k{font-size:.62rem;font-weight:800;letter-spacing:.09em;color:var(--violet-700);margin:0 0 10px}
+  .rh-ws-empty{font-size:.8rem;color:var(--faint);margin:0}
+  .rh-ws{display:flex;gap:12px;align-items:center}
+  .rh-ws-date{width:46px;height:50px;border-radius:12px;background:var(--violet-50);display:grid;place-content:center;text-align:center;flex-shrink:0}
+  .rh-ws-date b{font-family:var(--display);font-size:1.1rem;color:var(--violet-700);line-height:1}
+  .rh-ws-date span{font-size:.62rem;font-weight:700;color:var(--violet-600);text-transform:uppercase}
+  .rh-ws-meta b{font-size:.86rem;font-weight:700;color:var(--ink);display:block;line-height:1.3}
+  .rh-ws-meta span{font-size:.74rem;color:var(--muted)}
+  .rh-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}
+  .rh-card{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;text-decoration:none;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .rh-card::after{content:"";position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(closest-side,var(--tint,#EDE9FE),transparent 72%);border-radius:50%;opacity:0;transition:opacity .25s;pointer-events:none}
+  .rh-card:hover::after{opacity:.8}
   .rh-tx{min-width:0;flex:1}
   .rh-tx b{font-family:var(--display);font-size:1rem;color:var(--ink);display:block}
   .rh-tx span{font-size:.83rem;color:var(--muted);line-height:1.5;display:block;margin-top:3px}
-  .rh-go{position:absolute;right:16px;top:50%;transform:translate(4px,-50%);opacity:0;color:var(--violet-700);font-weight:700;transition:opacity .18s,transform .18s}
+  .rh-go{position:absolute;right:16px;top:50%;transform:translate(4px,-50%);opacity:0;color:var(--hue,#6D28D9);font-weight:700;transition:opacity .18s,transform .18s;z-index:1}
   .rh-card:hover .rh-go{opacity:1;transform:translate(0,-50%)}
-  .rh-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;max-width:920px;background:linear-gradient(135deg,var(--violet-50),#F9F7FE 60%,var(--violet-50));border:1px solid var(--violet-100);border-radius:18px;padding:16px 20px;margin-top:14px}
+  .rh-help{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 18px;box-shadow:var(--shadow)}
+  .rh-help-t{font-size:.84rem;font-weight:700;color:var(--ink)}
+  .rh-line{display:inline-flex;align-items:center;gap:10px;background:var(--green-bg);border:1px solid #D5EDDD;border-radius:9999px;padding:7px 16px 7px 10px;text-decoration:none;transition:transform .15s}
+  .rh-line:hover{transform:translateY(-1px)}
+  .rh-line b{font-family:var(--display);font-size:1rem;color:var(--green)}
+  .rh-line span{font-size:.72rem;color:#0a6b4d;max-width:280px;line-height:1.35}
+  .rh-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,var(--violet-50),#F9F7FE 60%,var(--violet-50));border:1px solid var(--violet-100);border-radius:18px;padding:16px 20px}
   .rh-cta p{font-size:.88rem;color:#5b21b6;margin:0;line-height:1.5}
   .rh-cta p b{color:var(--violet-700)}
   .rh-cta a{background:var(--violet-700);color:#fff;font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;text-decoration:none;white-space:nowrap;transition:filter .15s}
@@ -68,4 +133,16 @@ const ICONS: Record<string, string> = {
     try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
     if (!s || !s.access_token) location.href = "/login";
   })();
+</script>
+
+<script>
+  import * as UA from "../../lib/ua-data.js";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  (async () => {
+    const ws = await UA.getNextWorkshop().catch(() => null);
+    $("rh-ws").innerHTML = ws
+      ? (() => { const d = new Date(ws.starts_at); return `<div class="rh-ws"><span class="rh-ws-date"><b>${d.getDate()}</b><span>${d.toLocaleDateString("en-CA", { month: "short" })}</span></span><span class="rh-ws-meta"><b>${esc(ws.title)}</b><span>${d.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit" })} · ${esc(ws.location_type || "Online")}</span></span></div><a class="btn btn-primary btn-sm" href="/resources/workshops" style="margin-top:10px">Save a seat</a>`; })()
+      : `<p class="rh-ws-empty">Nothing scheduled right now — recordings live in <a href="/resources/videos" style="color:var(--violet-700);font-weight:600">Videos</a>.</p>`;
+  })().catch(() => {});
 </script>

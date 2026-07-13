@@ -1,20 +1,289 @@
 ---
+/* PROVIDERS-MATCHES-V1 — from mock to REAL personalized matching.
+   Each service type gets an animated MATCH RING computed straight from the
+   child's wheel (need score = match strength), provenance chips ("why this
+   match"), what-they-do, copyable first-call questions, and honest state
+   (in place ✓ / on waitlist / explore). Sorted by match. Rose identity. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
-import AiPanel from "@/components/AiPanel.astro";
-import "@/styles/mock.css";
 ---
 <AppFormLayout title="Providers" activeNav="providers">
   <SectionTabs section="providers" active="matches" />
-  <h1 class="page-title">Provider Matches</h1>
-  <p class="page-sub">Therapists and services matched to your child's needs and your area.</p>
 
-  <AiPanel section="providers" />
+  <div class="pv-wrap">
+    <div class="c3-ribbon rib-rose cu-rev">
+      <span class="c3-spark" style="top:12px;right:120px">✦</span>
+      <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
+      <span class="c3-rib-av" id="rb-av">·</span>
+      <div class="c3-rib-id">
+        <h1 id="rb-title">Provider Matches</h1>
+        <p id="rb-sub">Matched from the wheel — the ring shows how strongly each service fits right now.</p>
+      </div>
+      <div class="c3-rib-stats" id="rb-stats"></div>
+    </div>
 
-  <div class="mk-grid">
-    <div class="mk-card"><h3>Speech-Language Pathologist</h3><p>Orthophoniste · pediatric</p><div class="mk-meta"><span class="mk-tag">3 km</span><span class="mk-tag warn">Waitlist</span></div></div>
-    <div class="mk-card"><h3>Occupational Therapist</h3><p>Sensory &amp; motor skills</p><div class="mk-meta"><span class="mk-tag">5 km</span><span class="mk-tag">Accepting</span></div></div>
-    <div class="mk-card"><h3>ABA / Behaviour Services</h3><p>Early intervention</p><div class="mk-meta"><span class="mk-tag">Virtual</span></div></div>
-    <div class="mk-card"><h3>Child Psychologist</h3><p>Assessment &amp; support</p><div class="mk-meta"><span class="mk-tag">8 km</span><span class="mk-tag muted">Inquire</span></div></div>
+    <div class="pv-note cu-rev" style="--d:.05s">
+      <span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66;width:34px;height:34px"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="6.5" cy="6.5" r="4.2"/><path d="M9.8 9.8L14 14"/></svg></span>
+      <p><b>The live provider directory is rolling out city by city.</b> Matching already works — it reads the wheel. Join waitlists now and you keep your place when the directory opens in Montréal.</p>
+    </div>
+
+    <div id="pv-gate"></div>
+    <div class="pv-grid" id="pv-grid"></div>
+    <div id="pv-upsell"></div>
   </div>
 </AppFormLayout>
+
+<style is:global>
+  .pv-wrap{display:flex;flex-direction:column;gap:14px;max-width:980px}
+  .pv-note{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid #F3D8E1;border-radius:16px;padding:12px 16px;box-shadow:var(--shadow)}
+  .pv-note p{font-size:.83rem;color:var(--ink-2);line-height:1.5;margin:0}
+  .pv-note b{color:var(--rose)}
+  .pv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+  .pv-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s,border-color .18s}
+  .pv-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(177,74,102,.12);border-color:#F3D8E1}
+  .pv-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .pv-ring{position:relative;width:56px;height:56px;flex-shrink:0}
+  .pv-ring svg{transform:rotate(-90deg)}
+  .pv-ring .pc{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-size:.82rem;font-weight:700;color:var(--ink)}
+  .pv-name{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--ink);line-height:1.25}
+  .pv-fr{font-size:.72rem;color:var(--muted);margin-top:1px}
+  .pv-state{margin-left:auto;flex-shrink:0;font-size:.64rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 10px;border-radius:9999px;white-space:nowrap}
+  .pv-state.inplace{background:var(--green-bg);color:var(--green)}
+  .pv-state.explore{background:#F9EDF1;color:var(--rose)}
+  .pv-state.consider{background:var(--bg);color:var(--muted)}
+  .pv-why{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 9px}
+  .pv-whychip{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:600;background:var(--violet-50);border:1px solid var(--violet-100);color:#7c6bab;border-radius:9999px;padding:4px 10px;line-height:1.3}
+  .pv-desc{font-size:.8rem;color:var(--muted);line-height:1.55;margin:0 0 10px}
+  .pv-qs{background:var(--bg);border-radius:12px;padding:10px 12px;margin-bottom:12px}
+  .pv-qs p{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin:0 0 6px;display:flex;justify-content:space-between;align-items:center}
+  .pv-qs button{border:1px solid var(--line);background:var(--card);color:var(--ink-2);font-size:.64rem;font-weight:700;padding:2px 9px;border-radius:9999px;cursor:pointer;font-family:inherit;letter-spacing:0;text-transform:none}
+  .pv-qs button:hover{border-color:var(--violet-500);color:var(--violet-700)}
+  .pv-qs li{font-size:.76rem;color:var(--ink-2);line-height:1.5;margin-left:16px}
+  .pv-acts{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
+  .pv-sentnote{font-size:.68rem;color:var(--faint);margin:7px 0 0;min-height:0}
+  .pv-sentnote:empty{display:none}
+  .pv-send:disabled{opacity:.55;cursor:default}
+  #pv-upsell{margin-top:2px}
+  #pv-upsell:empty{display:none}
+  .pv-gate-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 22px;text-align:center}
+  .pv-gate-card p{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+  .pv-gate-card a{display:inline-block;background:var(--violet-700);color:#fff;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>
+
+<script>
+  import * as UA from "../lib/ua-data.js";
+  import { scoreWheel, DOMAINS, scoreToBand } from "../lib/wheelScore.js";
+  import { notify } from "../lib/notify.js";
+  import { getPlan, PLANS, upsellHTML } from "../lib/plan.js";
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  (async () => {
+    const passports = await UA.getPassports().catch(() => []);
+    const p = UA.pickActivePassport(passports);
+    if (!p) {
+      $("pv-gate").innerHTML = `<div class="pv-gate-card"><p>Fill in the passport first — the matches on this page are computed from your child's wheel, not a generic list.</p><a href="/passport">Start the passport →</a></div>`;
+      return;
+    }
+    const data = p.data || {};
+    const id = UA.childIdentity(data);
+    const first = id.first || "your child";
+    const scored = scoreWheel(data);
+    const wl = await UA.getWaitlist().catch(() => []);
+    const therapies = (data.therapy || []).filter((t) => t && t.type).map((t) => String(t.type).toLowerCase());
+    const has = (re) => therapies.some((t) => re.test(t));
+    const sc = (nm) => (scored[nm] && scored[nm].score != null ? scored[nm].score : null);
+    const band = (v) => (v == null ? null : scoreToBand(v));
+    const lc = (s) => String(s || "").toLowerCase();
+
+    $("rb-av").textContent = (id.first || id.name || "·")[0].toUpperCase();
+    if (id.first) $("rb-title").textContent = "Matches for " + id.first;
+
+    /* ---------- build the match list from the wheel ---------- */
+    const hasDx = ((data.diagnosis || {}).diagnoses || []).length > 0;
+    const TYPES = [
+      {
+        key: "slp", name: "Speech-Language Pathologist", fr: "Orthophoniste · pediatric",
+        need: sc("Communication"), inPlace: has(/speech|slp|ortho|language/),
+        whyDomain: "Communication",
+        desc: "Works on requesting, back-and-forth exchange, being understood — at the exact level " + first + " is at today.",
+        qs: ["Do you work with children at " + first + "'s communication level?", "What does a typical session look like, and what do we practice at home?", "How long is your waitlist, and is there a cancellation list?"],
+      },
+      {
+        key: "ot", name: "Occupational Therapist", fr: "Ergothérapeute · sensory & daily living",
+        need: Math.max(sc("Sensory Processing") ?? -1, sc("Daily Living Skills") ?? -1) < 0 ? null : Math.max(sc("Sensory Processing") ?? 0, sc("Daily Living Skills") ?? 0),
+        inPlace: has(/occupational|\bot\b|ergo/),
+        whyDomain: (sc("Sensory Processing") ?? 0) >= (sc("Daily Living Skills") ?? 0) ? "Sensory Processing" : "Daily Living Skills",
+        desc: "Sensory regulation, routines that stick, feeding and dressing independence, fine-motor confidence.",
+        qs: ["Do you build sensory diets families can run at home?", "Can you help with eating and dressing routines?", "Do you coordinate with daycares or schools?"],
+      },
+      {
+        key: "beh", name: "Behaviour Support", fr: "Psychoéducateur · behaviour consultant",
+        need: Math.max(sc("Emotional Regulation") ?? -1, sc("Flexibility & Transitions") ?? -1) < 0 ? null : Math.max(sc("Emotional Regulation") ?? 0, sc("Flexibility & Transitions") ?? 0),
+        inPlace: has(/behav|aba|psycho[eé]d/),
+        whyDomain: (sc("Emotional Regulation") ?? 0) >= (sc("Flexibility & Transitions") ?? 0) ? "Emotional Regulation" : "Flexibility & Transitions",
+        desc: "Calm-down plans, transition strategies, and a consistent playbook the whole family can follow.",
+        qs: ["Do you create plans parents can follow at home, not just in-clinic?", "How do you handle meltdowns and transitions?", "Do you offer parent coaching sessions?"],
+      },
+      {
+        key: "psy", name: "Child Psychologist", fr: "Psychologue · assessment & support",
+        need: hasDx ? (sc("Emotional Regulation") != null ? Math.min(sc("Emotional Regulation"), 55) : null) : 78,
+        inPlace: has(/psycholog/),
+        whyDomain: hasDx ? "Emotional Regulation" : null,
+        whyOverride: hasDx ? null : "No formal diagnosis on file yet — a psychologist can do the assessment",
+        desc: hasDx ? "Deeper emotional and cognitive support once the diagnostic picture is clear." : "Runs the formal assessment that unlocks funding, school support and services.",
+        qs: ["Do you assess children of " + first + "'s age?", "What is included in the assessment report?", "Is any part covered by RAMQ or insurance?"],
+      },
+      {
+        key: "social", name: "Social Skills Group", fr: "Groupes d'habiletés sociales",
+        need: sc("Social Connection"), inPlace: has(/social|group/),
+        whyDomain: "Social Connection",
+        desc: "Small, structured groups where back-and-forth play is practiced with peers — connection at " + first + "'s pace.",
+        qs: ["How are the groups matched by age and profile?", "How many children per facilitator?", "Do you share what was practiced so we can echo it at home?"],
+      },
+    ];
+    const cards = TYPES
+      .map((t) => ({ ...t, match: t.need == null ? null : Math.max(15, Math.min(96, Math.round(t.need))) }))
+      .filter((t) => t.match != null)
+      .sort((a, b) => (b.match || 0) - (a.match || 0));
+
+    /* ---------- ribbon ---------- */
+    $("rb-stats").innerHTML = [
+      `<span class="c3-rstat"><b>${cards.length}</b><span>matched services</span></span>`,
+      `<span class="c3-rstat"><b>${therapies.length}</b><span>on the team</span></span>`,
+      `<a class="c3-rstat" href="/providers/waitlists"><b>${wl.length}</b><span>waitlist${wl.length === 1 ? "" : "s"}</span></a>`,
+    ].join("");
+
+    /* ---------- render match cards ---------- */
+    const C = 2 * Math.PI * 23;
+    const ringColor = (m) => { const b = band(m); if (!b) return "#D8D3E6"; if (b.key === "high" || b.key === "intensive") return "#B14A66"; if (b.key === "moderate") return "#D97706"; return "#0E8F66"; };
+    $("pv-grid").innerHTML = cards.map((t, i) => {
+      const state = t.inPlace ? ["inplace", "In place ✓"] : (t.match >= 60 ? ["explore", "Worth exploring"] : ["consider", "Keep in mind"]);
+      const b = band(t.need);
+      const why = t.whyOverride
+        ? `<span class="pv-whychip">✦ ${esc(t.whyOverride)}</span>`
+        : (t.whyDomain && b ? `<span class="pv-whychip">✦ ${esc(t.whyDomain)} shows ${esc(lc(b.label))} on the wheel</span>` : "");
+      const team = t.inPlace ? `<span class="pv-whychip" style="background:var(--green-bg);border-color:#D5EDDD;color:var(--green)">Already on ${esc(first)}'s team</span>` : "";
+      return `<div class="pv-card cu-rev" style="--d:${(0.06 + i * 0.06).toFixed(2)}s">
+        <div class="pv-head">
+          <span class="pv-ring">
+            <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+              <circle cx="28" cy="28" r="23" stroke="var(--line)" stroke-width="5"/>
+              <circle class="pv-arc" cx="28" cy="28" r="23" stroke="${ringColor(t.match)}" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 ${C.toFixed(1)}" data-target="${((t.match / 100) * C).toFixed(1)}" style="transition:stroke-dasharray 1s cubic-bezier(.22,1,.36,1)"/>
+            </svg>
+            <span class="pc">${t.match}%</span>
+          </span>
+          <span style="min-width:0"><span class="pv-name" style="display:block">${esc(t.name)}</span><span class="pv-fr" style="display:block">${esc(t.fr)}</span></span>
+          <span class="pv-state ${state[0]}">${state[1]}</span>
+        </div>
+        <div class="pv-why">${why}${team}</div>
+        <p class="pv-desc">${esc(t.desc)}</p>
+        <div class="pv-qs">
+          <p><span>Ask on the first call</span><button type="button" data-copy="${i}">Copy</button></p>
+          <ul style="margin:0;padding:0">${t.qs.map((q) => `<li>${esc(q)}</li>`).join("")}</ul>
+        </div>
+        <div class="pv-acts">
+          <button type="button" class="btn btn-primary btn-sm pv-send" data-svc="${t.key}">✦ Send intro batch</button>
+          <a class="btn btn-ghost btn-sm" href="/resources/guides">How to reach out</a>
+        </div>
+        <p class="pv-sentnote" data-note="${t.key}"></p>
+      </div>`;
+    }).join("") || `<div class="pv-gate-card" style="grid-column:1/-1"><p>Answer the wheel questions in the passport and matched services appear here.</p><a href="/passport?id=${p.id}">Continue passport →</a></div>`;
+
+    /* animate the rings in */
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      document.querySelectorAll(".pv-arc").forEach((a) => a.setAttribute("stroke-dasharray", a.dataset.target + " " + C.toFixed(1)));
+    }));
+
+    /* copy first-call questions */
+    document.querySelectorAll("[data-copy]").forEach((btn) => btn.addEventListener("click", () => {
+      const t = cards[+btn.dataset.copy];
+      const txt = "Questions for " + t.name + " (" + first + "):\n" + t.qs.map((q) => "• " + q).join("\n");
+      navigator.clipboard && navigator.clipboard.writeText(txt).then(() => notify("ok", "First-call questions copied ✓")).catch(() => {});
+    }));
+
+    /* ================= AUTOMATED OUTREACH ================= */
+    const FN_URL = "https://eghqufgiudxjkbsddtnx.supabase.co/functions/v1/send-outreach";
+    const SVCMAP = { slp: "slp", ot: "ot", beh: "aba", psy: "psych", social: "social" };
+    const SVCNICE = { slp: "speech therapy", ot: "occupational therapy", aba: "behaviour support", psych: "psychology", social: "social groups" };
+    const planKey = await getPlan();
+    let requests = [];
+    try {
+      const s0 = await UA.getValidSession();
+      if (s0) {
+        const rq = await fetch("https://eghqufgiudxjkbsddtnx.supabase.co/rest/v1/outreach_requests?select=service_type,created_at,sent_count&passport_id=eq." + p.id + "&order=created_at.desc", { headers: UA.authHeaders(s0.access_token) });
+        if (rq.ok) requests = await rq.json();
+      }
+    } catch (e) {}
+    function annotate() {
+      document.querySelectorAll(".pv-send").forEach((btn) => {
+        const svc = SVCMAP[btn.dataset.svc];
+        const prior = requests.filter((r) => r.service_type === svc);
+        const note = document.querySelector('[data-note="' + btn.dataset.svc + '"]');
+        if (prior.length) {
+          const last = prior[0];
+          if (note) note.textContent = "Last batch " + new Date(last.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric" }) + " · sent to " + last.sent_count + " provider" + (last.sent_count === 1 ? "" : "s");
+          if (planKey === "free") {
+            btn.disabled = true;
+            btn.textContent = "Free batch used ✓";
+            const up = document.getElementById("pv-upsell");
+            if (up && !up.innerHTML) up.innerHTML = upsellHTML("Your automated intro went out ✦", "The free plan includes one batch per service type. Monthly plans send a fresh batch every 30 days — and the concierge follows up for you.", "Upgrade for follow-ups");
+          }
+        } else if (note) {
+          note.textContent = planKey === "free" ? "Free plan: 1 automated batch included for this service" : "Sends to up to 5 matched providers · replies go to your inbox";
+        }
+      });
+    }
+    annotate();
+    document.querySelectorAll(".pv-send").forEach((btn) => btn.addEventListener("click", async () => {
+      if (btn.disabled) return;
+      const svc = SVCMAP[btn.dataset.svc];
+      if (!confirm("Send an automated introduction about " + first + " to up to 5 matched " + (SVCNICE[svc] || "service") + " providers? Replies go straight to your email.")) return;
+      btn.disabled = true;
+      const old = btn.textContent;
+      btn.textContent = "Sending…";
+      try {
+        const s1 = await UA.getValidSession();
+        const r = await fetch(FN_URL, {
+          method: "POST",
+          headers: { Authorization: "Bearer " + s1.access_token, "Content-Type": "application/json" },
+          body: JSON.stringify({ passport_id: p.id, service_type: svc }),
+        });
+        const out = await r.json().catch(() => ({}));
+        if (r.ok && out.ok) {
+          notify("ok", "Introductions sent to " + out.sent + " provider" + (out.sent === 1 ? "" : "s") + " ✦ Replies land in your inbox.");
+          requests.unshift({ service_type: svc, created_at: new Date().toISOString(), sent_count: out.sent });
+          btn.textContent = old;
+          annotate();
+        } else if (r.status === 402) {
+          notify("warn", out.message || "The free plan includes one batch per service type.");
+          btn.textContent = "Free batch used ✓";
+          const up = document.getElementById("pv-upsell");
+          if (up && !up.innerHTML) up.innerHTML = upsellHTML("That's the free batch ✦", out.message || "Monthly plans send a fresh batch every 30 days.", "See the plans");
+        } else if (r.status === 429) {
+          notify("info", out.message || "The next batch for this service unlocks soon.");
+          btn.disabled = false; btn.textContent = old;
+        } else if (r.status === 503) {
+          notify("info", out.message || "The directory for this service is still filling — you're noted.");
+          btn.disabled = false; btn.textContent = old;
+        } else {
+          notify("err", out.message || "Couldn't send — is the outreach setup deployed?");
+          btn.disabled = false; btn.textContent = old;
+        }
+      } catch (e) {
+        notify("err", "Couldn't reach the outreach service — try again in a moment.");
+        btn.disabled = false; btn.textContent = old;
+      }
+    }));
+  })().catch((e) => console.error("[providers] hydrate failed", e));
+</script>

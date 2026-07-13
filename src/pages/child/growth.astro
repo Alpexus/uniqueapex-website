@@ -1,0 +1,784 @@
+---
+/* GROWTH-V2 — the living record, now the richest page in the app:
+   1 · WHERE THINGS STAND TODAY — the beloved development profile accordion
+       (Communication, Social, Sensory, Daily living, Motor, Emotional,
+       Interests) with can-do / working-on chips + wheel band bars
+   2 · THEN vs NOW — per-domain band comparison since the first check-in
+       (wheel engine untouched; ✦ marks improvements)
+   3 · WHAT CHANGED — the diff feed since the last check-in; old answers
+       are never forgotten
+   4 · THE WINS JOURNAL — a real journal now: warm paper panel, rotating
+       prompts, date-stamped entries with sparkle-burst save
+   5 · THE STORY — the combined timeline (milestones + diagnosis + therapy
+       starts + documents + your own moments, add/delete kept) moved here
+       from Journey, with year chapters
+   Check-ins auto-save via history.js (run snapshots_setup.sql once). */
+import AppFormLayout from "@/layouts/AppFormLayout.astro";
+import SectionTabs from "@/components/SectionTabs.astro";
+---
+<AppFormLayout title="Growth" activeNav="child">
+  <div class="c3-tabs"><SectionTabs section="child" active="growth" /></div>
+
+  <div id="gr-gate"></div>
+
+  <div id="gr-main" style="display:none;max-width:920px">
+
+    <div class="c3-ribbon cu-rev">
+      <span class="c3-spark" style="top:12px;right:120px">✦</span>
+      <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
+      <span class="c3-rib-av" id="rb-av">·</span>
+      <div class="c3-rib-id">
+        <h1 id="rb-title">Growth</h1>
+        <p id="rb-sub">Where you were, where you are — the profile remembers, so you can see how far you've come.</p>
+      </div>
+      <div class="c3-rib-stats" id="rb-stats"></div>
+    </div>
+
+    <!-- ============ 1 · WHERE THINGS STAND TODAY ============ -->
+    <div class="gr-sec cu-rev" style="--d:.05s">
+      <p class="gr-h" id="gr-dev-title">Where things stand today <a class="gr-hlink" id="gr-dev-edit" href="/passport">Edit in passport →</a></p>
+      <div id="gr-dev"></div>
+    </div>
+
+    <!-- ============ 2 · THEN vs NOW ============ -->
+    <div class="gr-sec cu-rev" style="--d:.1s">
+      <p class="gr-h">Then vs now <span class="gr-hsub" id="gr-since"></span></p>
+      <div class="gr-card" id="gr-trends"></div>
+    </div>
+
+    <!-- ============ 3 · WHAT CHANGED ============ -->
+    <div class="gr-sec cu-rev" id="gr-changes-sec" style="--d:.12s;display:none">
+      <p class="gr-h">What changed <span class="gr-hsub" id="gr-changed-when"></span></p>
+      <div id="gr-changes"></div>
+    </div>
+
+    <!-- ============ 4 · THE WINS JOURNAL ============ -->
+    <div class="gr-sec cu-rev" style="--d:.14s">
+      <div class="grj cu-sparkle-host">
+        <span class="cu-spark" style="top:14px;right:26px">✦</span>
+        <span class="cu-spark s2" style="top:32px;right:48px">✦</span>
+        <div class="grj-head">
+          <div>
+            <p class="grj-title">The wins journal</p>
+            <p class="grj-sub" id="grj-sub">Tiny victories add up — future you will want to read these.</p>
+          </div>
+          <div class="grj-mo">
+            <div class="grj-days" id="grj-days" aria-label="Wins over the last 7 days"></div>
+            <p class="grj-streak" id="grj-streak"></p>
+          </div>
+        </div>
+        <div class="grj-addrow">
+          <input type="text" id="win-input" class="grj-field" maxlength="200" placeholder="Something that went well today…" autocomplete="off" />
+          <button class="grj-savebtn" id="win-save" type="button">
+            <span class="grj-burst" id="win-burst" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i></span>
+            ✦ Save win
+          </button>
+        </div>
+      </div>
+      <div id="gr-wins"></div>
+    </div>
+
+    <!-- ============ 5 · THE STORY ============ -->
+    <div class="gr-sec cu-rev" style="--d:.18s;margin-bottom:0">
+      <p class="gr-h" id="gr-story-title">The story
+        <button class="gr-addbtn" id="tl-addbtn"><span style="font-size:1.1em;line-height:1">+</span> Add a moment</button>
+      </p>
+      <div id="gr-mscta"></div>
+      <div class="gr-form" id="tl-form">
+        <div class="gr-form-grid">
+          <input type="date" id="tl-date" class="gr-field2" />
+          <select id="tl-cat" class="gr-field2">
+            <option>Note</option><option>Medical</option><option>Education</option>
+            <option>Therapy</option><option>Assessment</option><option>Funding</option><option>Milestone</option>
+          </select>
+          <input type="text" id="tl-title" class="gr-field2" placeholder="What happened?" />
+          <input type="text" id="tl-note" class="gr-field2" placeholder="Add a note (optional)" />
+        </div>
+        <div class="gr-form-actions">
+          <span id="tl-err" class="gr-err"></span>
+          <button class="gr-ghost" id="tl-cancel">Cancel</button>
+          <button class="gr-savebtn2" id="tl-save">Save</button>
+        </div>
+      </div>
+      <div id="tl"></div>
+    </div>
+  </div>
+</AppFormLayout>
+
+<style is:global>
+  #gr-gate{max-width:920px}
+  .gr-sec{margin-bottom:28px}
+  .gr-h{font-size:.84rem;color:var(--muted);margin:0 0 12px;display:flex;align-items:center;gap:8px;font-weight:600}
+  .gr-hsub{font-weight:500;color:var(--faint);font-size:.74rem}
+  .gr-hlink{margin-left:auto;font-size:.78rem;font-weight:600;color:var(--violet-700);text-decoration:none}
+  .gr-hlink:hover{text-decoration:underline}
+  .gr-card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+
+  /* ---- 1 · development profile accordion ---- */
+  .da-card{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-bottom:10px;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}
+  .da-card:hover{border-color:var(--line-2)}
+  .da-card.open{box-shadow:var(--shadow-lg);border-color:#DDD6FE}
+  .da-card.muted{background:#FBFAFE;box-shadow:none}
+  .da-head{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;border-radius:16px}
+  .da-blob{position:relative;width:40px;height:40px;display:grid;place-items:center;flex-shrink:0}
+  .da-blob::before{content:"";position:absolute;inset:0;background:var(--blob,#EDE9FE);border-radius:46% 54% 58% 42%/52% 44% 56% 48%;transition:transform .5s cubic-bezier(.34,1.5,.64,1)}
+  .da-card:hover .da-blob::before{transform:scale(1.1) rotate(8deg)}
+  .da-blob svg{position:relative;z-index:1}
+  .da-name{font-family:var(--display);font-size:.96rem;font-weight:700;color:var(--ink)}
+  .da-sum{font-size:.79rem;color:var(--muted)}
+  .da-bandrow{display:flex;align-items:center;gap:8px;margin-top:5px}
+  .da-bandpill{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:9999px;white-space:nowrap;flex-shrink:0}
+  .da-chev-svg{color:var(--faint);transition:transform .25s cubic-bezier(.22,1,.36,1);flex-shrink:0}
+  .da-card.open .da-chev-svg{transform:rotate(180deg)}
+  .da-body-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s cubic-bezier(.22,1,.36,1)}
+  .da-card.open .da-body-wrap{grid-template-rows:1fr}
+  .da-body{overflow:hidden;padding:0 16px}
+  .da-card.open .da-body{padding-bottom:18px}
+  .da-lab{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);margin:14px 0 8px}
+  .da-chip{display:inline-flex;align-items:center;gap:6px;font-size:.83rem;font-weight:600;padding:6px 12px;border-radius:9999px;margin:0 6px 6px 0;line-height:1.25;transition:transform .15s}
+  .da-chip:hover{transform:translateY(-1px)}
+  .da-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin-top:4px}
+  .da-tile{border:1px solid var(--line);border-radius:12px;padding:11px 13px;transition:border-color .15s,transform .15s}
+  .da-tile:hover{border-color:#DDD6FE;transform:translateY(-1px)}
+  .da-tile-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .da-tile-name{font-size:.85rem;font-weight:600;color:var(--ink)}
+  .da-badge{font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:9999px;white-space:nowrap}
+  .da-sub{font-size:.78rem;color:var(--muted);margin:6px 0 0;line-height:1.4}
+  .da-note{font-size:.84rem;font-style:italic;color:var(--muted);border-left:3px solid var(--violet-100);padding-left:11px;margin:14px 0 0}
+  .da-empty{font-size:.85rem;color:var(--faint);margin:6px 0 0}
+  .da-empty a{color:var(--violet-700);font-weight:600;text-decoration:none}
+  .da-wheel{display:inline-flex;align-items:center;gap:4px;margin-top:12px;font-size:.78rem;font-weight:600;color:var(--violet-700);text-decoration:none}
+  .da-wheel .arr{transition:transform .18s;display:inline-block}
+  .da-wheel:hover .arr{transform:translateX(3px)}
+
+  /* ---- 2 · then vs now ---- */
+  .gr-trow{display:flex;align-items:center;gap:10px;padding:9px 16px;border-top:1px solid var(--line);text-decoration:none;transition:background .15s}
+  .gr-trow:first-of-type{border-top:none}
+  .gr-trow:hover{background:var(--violet-50)}
+  .gr-tname{font-size:.8rem;width:118px;flex-shrink:0;color:var(--ink-2);display:flex;align-items:center;gap:7px;font-weight:600}
+  .gr-tname .dd{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .gr-band{font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:9999px;white-space:nowrap}
+  .gr-arrow{color:var(--faint);flex-shrink:0}
+  .gr-imp{margin-left:auto;font-size:.72rem;font-weight:700;color:var(--green);white-space:nowrap}
+  .gr-tcap{font-size:.72rem;color:var(--faint);padding:10px 16px 12px;margin:0}
+  .gr-seed{display:flex;gap:12px;align-items:flex-start;padding:18px}
+  .gr-seed p{font-size:.86rem;color:var(--ink-2);line-height:1.55;margin:0}
+  .gr-seed b{color:var(--violet-700)}
+
+  /* ---- 3 · what changed ---- */
+  .gr-chgroup{margin-bottom:10px}
+  .gr-chlab{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:0 0 7px}
+  .gr-chlab.imp{color:var(--green)}
+  .gr-chlab.flag{color:var(--amber)}
+  .gr-chlab.oth{color:var(--faint)}
+  .gr-chip{display:inline-flex;align-items:center;gap:7px;font-size:.78rem;font-weight:600;padding:6px 12px;border-radius:9999px;margin:0 6px 6px 0;line-height:1.3}
+  .gr-chip.imp{background:var(--green-bg);color:#0a6b4d}
+  .gr-chip.flag{background:var(--amber-bg);color:var(--amber)}
+  .gr-chip.oth{background:var(--bg);color:var(--ink-2)}
+  .gr-chip .fromto{font-weight:500;opacity:.85}
+
+  /* ---- 4 · the wins journal ---- */
+  .grj{position:relative;overflow:hidden;background:linear-gradient(135deg,#FFFDF6 0%,#FFF8E9 52%,#F8F5FF 100%);border:1px solid #F0E4C4;border-radius:18px;padding:16px 18px;box-shadow:var(--shadow)}
+  .grj .cu-spark{font-style:normal;font-size:13px;color:#E3B23C}
+  .grj .cu-spark.s2{font-size:10px;color:#8B5CF6}
+  .grj-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+  .grj-title{font-family:var(--display);font-size:1.08rem;font-weight:700;color:var(--ink);margin:0}
+  .grj-sub{font-size:.76rem;color:#A8874A;margin:3px 0 0}
+  .grj-mo{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .grj-days{display:flex;gap:8px}
+  .grj-day{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.58rem;font-weight:700;color:#C9B37E}
+  .grj-day i{width:11px;height:11px;border-radius:50%;background:#F0E4C4;font-style:normal}
+  .grj-day.hit i{background:#E3A82C}
+  .grj-day.today i{box-shadow:0 0 0 2px #F6E7BE}
+  .grj-streak{font-size:.74rem;color:#B07F1E;font-weight:700;margin:0;white-space:nowrap}
+  .grj-addrow{display:flex;gap:8px}
+  .grj-field{flex:1;min-width:0;padding:11px 14px;border:1.5px solid #EBDCB4;border-radius:12px;font-size:.92rem;color:var(--ink);background:#fff;outline:none;font-family:inherit;transition:border-color .15s,box-shadow .15s}
+  .grj-field::placeholder{color:#C2A96E}
+  .grj-field:focus{border-color:#A78BFA;box-shadow:0 0 0 3px rgba(139,92,246,.14)}
+  .grj-savebtn{position:relative;font-size:.84rem;font-weight:700;padding:10px 18px;border-radius:12px;border:none;background:var(--violet-700);color:#fff;cursor:pointer;white-space:nowrap;transition:filter .15s,transform .15s}
+  .grj-savebtn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .grj-savebtn:disabled{opacity:.6}
+  .grj-burst{position:absolute;inset:0;pointer-events:none}
+  .grj-burst i{position:absolute;top:50%;left:50%;font-style:normal;font-size:11px;color:#FCD34D;opacity:0}
+  .grj-burst i:nth-child(2n){color:#C4B5FD;font-size:9px}
+  .grj-burst.go i{animation:grjB .8s cubic-bezier(.22,1,.36,1) both}
+  .grj-burst.go i:nth-child(1){--bx:-30px;--by:-26px}
+  .grj-burst.go i:nth-child(2){--bx:26px;--by:-30px;animation-delay:.04s}
+  .grj-burst.go i:nth-child(3){--bx:-36px;--by:4px;animation-delay:.08s}
+  .grj-burst.go i:nth-child(4){--bx:34px;--by:8px;animation-delay:.05s}
+  .grj-burst.go i:nth-child(5){--bx:-14px;--by:-38px;animation-delay:.1s}
+  .grj-burst.go i:nth-child(6){--bx:12px;--by:-40px;animation-delay:.12s}
+  @keyframes grjB{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}25%{opacity:1}100%{transform:translate(calc(-50% + var(--bx)),calc(-50% + var(--by))) scale(1.1);opacity:0}}
+
+  /* journal entries */
+  .gr-glab{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin:16px 0 8px}
+  .gr-entry{background:#FFFEFA;border:1px solid #F0E7CE;border-left:4px solid #F5CE58;border-radius:14px;padding:12px 14px;display:flex;gap:13px;align-items:flex-start;margin-bottom:9px;position:relative;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+  .gr-entry:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(180,140,40,.12)}
+  .gr-edate{width:42px;flex-shrink:0;text-align:center;background:#FBF2DC;border-radius:10px;padding:5px 2px}
+  .gr-edate b{display:block;font-family:var(--display);font-size:1.05rem;font-weight:700;color:#B07F1E;line-height:1.1}
+  .gr-edate span{display:block;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#C9A557}
+  .gr-etext{font-size:.93rem;color:var(--ink);flex:1;padding-right:16px;line-height:1.55;margin-top:2px}
+  .gr-etext .st{color:#E3A82C;margin-right:6px}
+  .gr-ewhen{font-size:.7rem;color:#C9B37E;white-space:nowrap;margin-top:4px}
+  .gr-del{position:absolute;top:8px;right:10px;border:none;background:none;color:#E4D6B0;font-size:1.05rem;line-height:1;cursor:pointer;padding:2px}
+  .gr-del:hover{color:#B14A66}
+  .gr-cele{animation:grPop .5s cubic-bezier(.34,1.5,.64,1)}
+  @keyframes grPop{from{transform:scale(.92);opacity:.4}to{transform:scale(1);opacity:1}}
+  .gr-cele::before,.gr-cele::after{content:"✦";position:absolute;color:#E3A82C;font-size:14px;animation:grSpark 1s ease forwards;pointer-events:none}
+  .gr-cele::before{top:-8px;left:18px}
+  .gr-cele::after{top:-6px;right:26px;color:#8B5CF6;animation-delay:.12s}
+  @keyframes grSpark{0%{opacity:0;transform:scale(.4) translateY(4px)}35%{opacity:1;transform:scale(1.3) translateY(-4px)}100%{opacity:0;transform:scale(.6) translateY(-14px)}}
+  .gr-empty{font-size:.86rem;color:var(--faint);margin:0}
+  .gr-empty a{color:var(--violet-700);font-weight:600;text-decoration:none}
+
+  /* ---- 5 · the story ---- */
+  .gr-addbtn{margin-left:auto;font-size:.82rem;font-weight:600;padding:7px 14px;border-radius:9999px;border:1px solid var(--violet-700);background:var(--card);color:var(--violet-700);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s,transform .15s;font-family:inherit}
+  .gr-addbtn:hover{background:var(--violet-50);transform:translateY(-1px)}
+  .gr-mscta{display:inline-flex;align-items:center;gap:8px;border:1.5px dashed #C4B5FD;background:#FBFAFE;color:var(--violet-700);font-size:.78rem;font-weight:600;border-radius:9999px;padding:6px 14px;text-decoration:none;margin-bottom:12px;transition:background .15s}
+  .gr-mscta:hover{background:var(--violet-50)}
+  .gr-form{display:none;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .gr-form.show{display:block;animation:grIn .25s cubic-bezier(.22,1,.36,1)}
+  @keyframes grIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  .gr-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+  .gr-field2{width:100%;padding:9px 12px;border:1px solid var(--line-2);border-radius:10px;font-size:.88rem;color:var(--ink);background:var(--card);outline:none;font-family:inherit}
+  .gr-field2:focus{border-color:#A78BFA;box-shadow:0 0 0 3px rgba(139,92,246,.14)}
+  .gr-form-actions{display:flex;align-items:center;gap:10px;margin-top:12px;justify-content:flex-end;flex-wrap:wrap}
+  .gr-err{font-size:.8rem;color:#B14A66;margin-right:auto}
+  .gr-ghost{font-size:.82rem;font-weight:600;padding:8px 14px;border-radius:9999px;border:1px solid var(--line-2);background:var(--card);color:var(--muted);cursor:pointer}
+  .gr-savebtn2{font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;border:none;background:var(--violet-700);color:#fff;cursor:pointer;transition:filter .15s}
+  .gr-savebtn2:hover{filter:brightness(1.1)}
+  .tl-year{position:relative;margin:8px 0 14px;display:flex;align-items:center;gap:8px}
+  .tl-year b{font-family:var(--display);font-size:.78rem;font-weight:700;color:var(--violet-700);background:var(--violet-50);border:1px solid var(--violet-100);border-radius:9999px;padding:3px 14px;z-index:1}
+  .tl-year span{font-size:.7rem;color:var(--faint);font-weight:600}
+  .tl-item{display:flex;gap:14px;padding-bottom:16px;position:relative}
+  .tl-item::before{content:"";position:absolute;left:17px;top:38px;bottom:-2px;width:2.5px;border-radius:2px;background:linear-gradient(to bottom,#DDD6FE,#EAE7F3)}
+  .tl-item.last::before{display:none}
+  .tl-dot{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;z-index:1;border:3px solid var(--card);box-shadow:0 2px 8px rgba(34,27,54,.16)}
+  .tl-card{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;position:relative;box-shadow:var(--shadow);transition:transform .16s,box-shadow .16s,border-color .16s}
+  .tl-item:hover .tl-card{transform:translateY(-2px);box-shadow:0 8px 22px rgba(109,40,217,.10);border-color:#DDD6FE}
+  .tl-item.ms .tl-card{background:linear-gradient(135deg,#F7FBF4,#fff 60%);border-color:#DDEECF}
+  .tl-meta{font-size:.72rem;color:var(--faint);margin-bottom:2px;display:flex;align-items:center;gap:6px}
+  .tl-meta .cat{font-weight:700}
+  .tl-title{font-size:.9rem;font-weight:600;color:var(--ink);margin-bottom:3px;padding-right:18px}
+  .tl-note{font-size:.83rem;color:var(--muted);line-height:1.45}
+  .tl-del{position:absolute;top:8px;right:10px;border:none;background:none;color:#D8D3E6;font-size:1.05rem;line-height:1;cursor:pointer;padding:2px}
+  .tl-del:hover{color:#B14A66}
+  .tl-empty,.gr-gate-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 22px;text-align:center}
+  .tl-empty p,.gr-gate-card p{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+  .gr-gate-card a{display:inline-block;background:var(--violet-700);color:#fff;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none}
+  @media (prefers-reduced-motion:reduce){
+    .gr-cele,.gr-cele::before,.gr-cele::after,.grj-burst.go i{animation:none}
+    .da-body-wrap,.da-chev-svg{transition:none}
+    .gr-form.show{animation:none}
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>
+
+<script>
+  import * as UA from "../../lib/ua-data.js";
+  import { scoreWheel, DOMAINS, scoreToBand, snapshotWheel, HUES } from "../../lib/wheelScore.js";
+  import { domainColor } from "../../lib/wheelSvg.js";
+  import { ensureSnapshot, diffData } from "../../lib/history.js";
+  import { notify } from "../../lib/notify.js";
+  import { getPlan, PLANS, upsellHTML } from "../../lib/plan.js";
+
+  const UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+  const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const present = (v) => v != null && v !== "" && v !== "Select...";
+  const lc = (s) => String(s || "").toLowerCase();
+  const cap = (s) => { s = String(s || ""); return s.charAt(0).toUpperCase() + s.slice(1); };
+  const uniq = (a) => [...new Set(a)];
+  const textToList = (s) => String(s || "").split(/[,\n;•]+/).map((x) => x.trim()).filter(Boolean);
+  const isHigh = (v) => v === "Often" || v === "Daily";
+  const listShort = (arr, n) => arr.slice(0, n).join(" & ") + (arr.length > n ? "…" : "");
+  const tintOf = (nm, a) => { const i = DOMAINS.indexOf(nm); return i === -1 ? "rgba(109,40,217," + a + ")" : "hsla(" + HUES[i] + ",70%,45%," + a + ")"; };
+  const SHORT = { "Communication": "Communication", "Social Connection": "Social", "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility", "Emotional Regulation": "Emotional", "Executive Function": "Executive", "Daily Living Skills": "Daily living", "Learning & Play": "Learning & play" };
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function getSession() { try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch { return null; } }
+  function isValid(s) { return s && s.access_token && Math.floor(Date.now() / 1000) < (s.expires_at || 0) - 60; }
+  function authHeaders(t) { return { apikey: ANON, Authorization: "Bearer " + t, "Content-Type": "application/json" }; }
+  async function getValidSession() {
+    let s = getSession();
+    if (isValid(s)) return s;
+    if (s && s.refresh_token) {
+      const r = await fetch(UA_URL + "/auth/v1/token?grant_type=refresh_token", { method: "POST", headers: { apikey: ANON, "Content-Type": "application/json" }, body: JSON.stringify({ refresh_token: s.refresh_token }) });
+      if (r.ok) { const d = await r.json(); d.expires_at = Math.floor(Date.now() / 1000) + (d.expires_in || 3600); localStorage.setItem("ua_session", JSON.stringify(d)); return d; }
+    }
+    return s && s.access_token ? s : null;
+  }
+  async function restGet(path) { const s = await getValidSession(); if (!s) return []; const r = await fetch(UA_URL + "/rest/v1/" + path, { headers: authHeaders(s.access_token) }); return r.ok ? r.json() : []; }
+
+  /* ================= development profile bits ================= */
+  const TONE = {
+    good: { bg: "#E8F6F0", fg: "#0E8F66" },
+    work: { bg: "#FBF2E2", fg: "#A8650A" },
+    info: { bg: "#EDE9FE", fg: "#6D28D9" },
+    warn: { bg: "#F9EDF1", fg: "#B14A66" },
+    neutral: { bg: "#F4F3F8", fg: "#7B7491" },
+  };
+  const TIC = {
+    good: '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M3 8.5l3.2 3L13 4.5"/></svg>',
+    work: '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M8 3.2v6M8 12.3v.2"/></svg>',
+    info: '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg>',
+    warn: '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M8 2v7M8 12v.2"/></svg>',
+    neutral: '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M3 8h10"/></svg>',
+  };
+  const IC = {
+    msg: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 3z"/></svg>',
+    users: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3.3 2.7-5 6-5s6 1.7 6 5"/><circle cx="17" cy="8.5" r="2.2"/><path d="M16.5 14c2.6.2 4.5 1.7 4.5 5"/></svg>',
+    waves: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg>',
+    home: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-6 8 6"/><path d="M6 10v9h12v-9"/></svg>',
+    run: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="14" cy="5" r="2"/><path d="M6 21l3-5 3 2 1-5 3 3h2"/><path d="M9 12l3-3 2 2"/></svg>',
+    heart: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.5-7-9.5A3.5 3.5 0 0 1 12 7a3.5 3.5 0 0 1 7 3.5C19 15.5 12 20 12 20z"/></svg>',
+    star: '<svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2.5 6.5L21 10l-5 4.5L17.5 21 12 17l-5.5 4L8 14.5 3 10l6.5-.5z"/></svg>',
+    chev: '<svg class="da-chev-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>',
+  };
+  function bandInfo(score) {
+    if (score == null) return null;
+    const b = scoreToBand(score);
+    if (b.key === "minimal" || b.key === "low") return { label: b.label, bg: "#E8F6F0", fg: "#0E8F66", seg: "#0E8F66", rings: score === 0 ? 0 : b.rings };
+    if (b.key === "high" || b.key === "intensive") return { label: b.label, bg: "#EDE9FE", fg: "#6D28D9", seg: "#7C3AED", rings: b.rings };
+    return { label: b.label, bg: "#FBF2E2", fg: "#A8650A", seg: "#D97706", rings: b.rings };
+  }
+
+  /* ================= story bits ================= */
+  const CAT = {
+    Milestone: { c: "#4C9A2A", ic: '<path d="M5 2.5v11" /><path d="M5 3.5h7l-1.6 2.2L12 8H5"/>' },
+    Therapy: { c: "#7C3AED", ic: '<path d="M8 13s-5-3.2-5-6.5A2.5 2.5 0 0 1 8 5a2.5 2.5 0 0 1 5 1.5C13 9.8 8 13 8 13z"/>' },
+    Assessment: { c: "#2563EB", ic: '<rect x="4.5" y="3" width="7" height="10" rx="1.2"/><path d="M6.3 3V2.2h3.4V3"/><path d="M6.5 6.5h3M6.5 9h3"/>' },
+    Diagnosis: { c: "#D85A30", ic: '<path d="M2.5 8h2l1.3-3 2.2 6 1.3-3h3.2"/>' },
+    Education: { c: "#A8650A", ic: '<path d="M2 6l6-2.4L14 6l-6 2.4z"/><path d="M5 7.4V10.5c0 .9 6 .9 6 0V7.4"/>' },
+    Funding: { c: "#0E8C82", ic: '<circle cx="8" cy="8" r="5"/><path d="M8 5.4v5.2M6.6 7h2.1a1.2 1.2 0 0 1 0 2.3H6.8"/>' },
+    Medical: { c: "#D4537E", ic: '<path d="M8 4v8M4 8h8"/>' },
+    Note: { c: "#7B7491", ic: '<path d="M4.5 3h5l2 2v8h-7z"/><path d="M9.5 3v2h2"/>' },
+  };
+  const fmtMY = (dt) => dt.toLocaleDateString("en-CA", { month: "short", year: "numeric" });
+  const fmtD = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" }); };
+  function parseLoose(t) { if (!t) return null; const d = new Date(t); return isNaN(d) ? null : d; }
+  function extractYear(t) { const m = String(t || "").match(/\b(19|20)\d\d\b/); return m ? +m[0] : null; }
+  function parseAgeMonths(s) { if (s == null) return null; s = ("" + s).toLowerCase().trim(); if (!s) return null; const n = parseFloat(s.replace(/[^0-9.]/g, " ").trim().split(/\s+/)[0]); if (isNaN(n)) return null; if (s.indexOf("year") > -1 || s.indexOf("yr") > -1) return n * 12; if (s.indexOf("month") > -1 || s.indexOf("mo") > -1) return n; return n <= 8 ? n * 12 : n; }
+  function ageToDate(dob, ageStr) { const m = parseAgeMonths(ageStr); if (m == null) return null; const d = new Date(dob); if (isNaN(d)) return null; d.setMonth(d.getMonth() + Math.round(m)); return d; }
+
+  let wins = [], allEvents = [], activeP = null, firstName = "";
+
+  const dayKey = (d) => { const x = new Date(d); return x.getFullYear() + "-" + (x.getMonth() + 1) + "-" + x.getDate(); };
+  const weekStart = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); const wd = (x.getDay() + 6) % 7; x.setDate(x.getDate() - wd); return x.getTime(); };
+  const weekWinCount = () => { const t = weekStart(new Date()); return wins.filter((w) => new Date(w.created_at).getTime() >= t).length; };
+
+  function renderMomentum() {
+    const now = new Date();
+    const hitDays = new Set(wins.map((w) => dayKey(w.created_at)));
+    let dots = "";
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now); d.setDate(now.getDate() - i);
+      dots += `<span class="grj-day${hitDays.has(dayKey(d)) ? " hit" : ""}${i === 0 ? " today" : ""}"><i></i>${d.toLocaleDateString("en-CA", { weekday: "narrow" })}</span>`;
+    }
+    $("grj-days").innerHTML = dots;
+    const weeks = new Set(wins.map((w) => weekStart(new Date(w.created_at))));
+    let streak = 0, cursor = weekStart(now);
+    if (!weeks.has(cursor)) cursor -= 7 * 864e5;
+    while (weeks.has(cursor)) { streak++; cursor -= 7 * 864e5; }
+    $("grj-streak").textContent = streak >= 2 ? "✦ " + streak + " weeks in a row" : (weekWinCount() ? "✦ On a roll this week" : "");
+  }
+
+  function groupOf(iso) {
+    const d = new Date(iso); if (isNaN(d)) return "Earlier";
+    const today0 = new Date(); today0.setHours(0, 0, 0, 0);
+    const t = d.getTime();
+    if (t >= today0.getTime()) return "Today";
+    if (t >= today0.getTime() - 864e5) return "Yesterday";
+    if (t >= weekStart(new Date())) return "This week";
+    return "Earlier";
+  }
+  const starIc = '<svg class="st" width="15" height="15" viewBox="0 0 16 16" fill="currentColor" style="display:inline;vertical-align:-2px"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg>';
+  function renderWins(celebrateFirst) {
+    if (!wins.length) { $("gr-wins").innerHTML = `<p class="gr-empty" style="margin-top:12px">The journal is waiting for its first entry — even "tried a new food" counts. ✦</p>`; return; }
+    let h = "", lastG = null;
+    wins.forEach((w, i) => {
+      const g = groupOf(w.created_at);
+      if (g !== lastG) { h += `<p class="gr-glab">${g}</p>`; lastG = g; }
+      const d = new Date(w.created_at);
+      const day = isNaN(d) ? "·" : d.getDate();
+      const mon = isNaN(d) ? "" : d.toLocaleDateString("en-CA", { month: "short" });
+      h += `<div class="gr-entry${celebrateFirst && i === 0 ? " gr-cele" : ""}">
+        <span class="gr-edate"><b>${day}</b><span>${mon}</span></span>
+        <span class="gr-etext">${starIc}${esc(w.text)}</span>
+        <span class="gr-ewhen">${esc(w.when)}</span>
+        <button class="gr-del" data-id="${w.id}" aria-label="Delete win">×</button>
+      </div>`;
+    });
+    $("gr-wins").innerHTML = h;
+    $("gr-wins").querySelectorAll(".gr-del").forEach((b) => b.addEventListener("click", () => delWin(b.dataset.id)));
+  }
+
+  async function delWin(id) {
+    if (!confirm("Remove this win?")) return;
+    const s = await getValidSession(); if (!s) return;
+    const r = await fetch(UA_URL + "/rest/v1/wins?id=eq." + id, { method: "DELETE", headers: authHeaders(s.access_token) });
+    if (r.ok) { wins = wins.filter((w) => String(w.id) !== String(id)); renderWins(); renderMomentum(); }
+  }
+
+  async function saveWin() {
+    const v = $("win-input").value.trim(); if (!v) { $("win-input").focus(); return; }
+    const btn = $("win-save"); btn.disabled = true;
+    const s = await getValidSession(); if (!s) { location.href = "/login"; return; }
+    try {
+      const r = await fetch(UA_URL + "/rest/v1/wins", { method: "POST", headers: Object.assign({}, authHeaders(s.access_token), { Prefer: "return=representation" }), body: JSON.stringify({ user_id: s.user.id, passport_id: activeP.id, text: v }) });
+      if (r.ok) {
+        const rows = await r.json(), row = rows && rows[0];
+        wins.unshift({ id: row ? row.id : Date.now(), text: v, when: "Just now", created_at: row ? row.created_at : new Date().toISOString() });
+        $("win-input").value = "";
+        renderWins(true);
+        renderMomentum();
+        notify("ok", "Win saved to the journal ✦");
+        if (!reduceMotion) {
+          const burst = $("win-burst");
+          burst.classList.remove("go"); void burst.offsetWidth; burst.classList.add("go");
+          setTimeout(() => burst.classList.remove("go"), 900);
+        }
+      }
+    } catch (e) { }
+    btn.disabled = false;
+  }
+
+  /* ---------- story ---------- */
+  function autoEvents(d) {
+    const out = [];
+    const dg = d.diagnosis || {};
+    if (present(dg.date) || (dg.diagnoses && dg.diagnoses.length)) {
+      const dt = present(dg.date) ? parseLoose(dg.date) : null;
+      const y = dt ? dt.getFullYear() : (present(dg.date) ? extractYear(dg.date) : null);
+      out.push({ cat: "Diagnosis", title: "Diagnosed", note: [(dg.diagnoses && dg.diagnoses.length ? dg.diagnoses.join(", ") : ""), dg.diagnosedBy, (!dt && !y) ? "Add the date in the passport" : ""].filter(Boolean).join(" · "), ts: dt ? dt.getTime() : (y ? new Date(y, 0, 1).getTime() : -8640000000000000), display: dt ? fmtMY(dt) : (present(dg.date) ? dg.date : "Date not set"), y: dt ? dt.getFullYear() : (y || "Undated"), auto: true });
+    }
+    (d.therapy || []).forEach((t) => { if (present(t.startDate)) { const dt = parseLoose(t.startDate); if (dt) out.push({ cat: "Therapy", title: "Started " + String(t.type).toLowerCase(), note: [t.provider, t.frequency].filter(Boolean).join(" · "), ts: dt.getTime(), display: fmtMY(dt), y: dt.getFullYear(), auto: true }); } });
+    const dob = d.childProfile && d.childProfile.dob, ms = (d.birth && d.birth.milestones) || {};
+    const MLAB = { sit: "Sat unsupported", crawl: "Crawled", walk: "Walked", firstWord: "First words", phrases: "First phrases", sentences: "First sentences", toiletDay: "Toilet trained (day)", toiletNight: "Toilet trained (night)" };
+    if (dob) Object.keys(MLAB).forEach((k) => { if (present(ms[k])) { const dt = ageToDate(dob, ms[k]); if (dt) out.push({ cat: "Milestone", title: MLAB[k] + " ✦", note: "Around " + ms[k], ts: dt.getTime(), display: fmtMY(dt), y: dt.getFullYear(), auto: true }); } });
+    return out;
+  }
+
+  function renderStory() {
+    const list = allEvents.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    if (!list.length) { $("tl").innerHTML = `<div class="tl-empty"><p>The story starts here — add the first moment, or fill in the passport and it writes itself.</p></div>`; return; }
+    const yearCounts = {};
+    list.forEach((e) => { yearCounts[e.y] = (yearCounts[e.y] || 0) + 1; });
+    let h = "", lastYear = null, idx = 0;
+    list.forEach((e, i) => {
+      if (e.y !== lastYear) {
+        const yc = yearCounts[e.y] || 0;
+        h += `<div class="tl-year"><b>${esc(String(e.y))}</b><span>${yc} moment${yc === 1 ? "" : "s"}</span></div>`;
+        lastYear = e.y;
+      }
+      const cat = CAT[e.cat] || CAT.Note, last = i === list.length - 1;
+      const del = e.auto ? "" : `<button class="tl-del" data-id="${e.id}" aria-label="Delete event">×</button>`;
+      const dl = Math.min(idx * 0.04, 0.4); idx++;
+      h += `<div class="tl-item cu-rev${last ? " last" : ""}${e.cat === "Milestone" ? " ms" : ""}" style="--d:${dl.toFixed(2)}s"><div class="tl-dot" style="background:${cat.c}"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${cat.ic}</svg></div><div class="tl-card">${del}<div class="tl-meta">${esc(e.display)} · <span class="cat" style="color:${cat.c}">${esc(e.cat)}</span></div><div class="tl-title">${esc(e.title)}</div>${e.note ? `<div class="tl-note">${esc(e.note)}</div>` : ""}</div></div>`;
+    });
+    $("tl").innerHTML = h;
+    $("tl").querySelectorAll(".tl-del").forEach((b) => b.addEventListener("click", () => delEvent(b.dataset.id)));
+  }
+
+  async function delEvent(eid) {
+    if (!confirm("Delete this moment?")) return;
+    const s = await getValidSession(); if (!s) return;
+    const r = await fetch(UA_URL + "/rest/v1/timeline_events?id=eq." + eid, { method: "DELETE", headers: authHeaders(s.access_token) });
+    if (r.ok) { allEvents = allEvents.filter((e) => String(e.id) !== String(eid)); renderStory(); }
+  }
+
+  async function saveEvent() {
+    const date = $("tl-date").value, cat = $("tl-cat").value, title = $("tl-title").value.trim(), note = $("tl-note").value.trim();
+    if (!date || !title) { $("tl-err").textContent = "Pick a date and add a title."; return; }
+    $("tl-err").textContent = ""; const btn = $("tl-save"); btn.disabled = true; btn.textContent = "Saving…";
+    const s = await getValidSession(); if (!s) { location.href = "/login"; return; }
+    const body = { user_id: s.user.id, passport_id: activeP.id, event_date: date, category: cat, title, note };
+    try {
+      const r = await fetch(UA_URL + "/rest/v1/timeline_events", { method: "POST", headers: Object.assign({}, authHeaders(s.access_token), { Prefer: "return=representation" }), body: JSON.stringify(body) });
+      if (r.ok) {
+        const rows = await r.json(), ev = rows && rows[0], dt = new Date(date);
+        allEvents.push({ id: ev ? ev.id : Date.now(), cat, title, note, ts: dt.getTime(), display: fmtMY(dt), y: dt.getFullYear(), auto: false });
+        $("tl-title").value = ""; $("tl-note").value = ""; $("tl-date").value = "";
+        $("tl-form").classList.remove("show"); renderStory();
+      } else { $("tl-err").textContent = "Couldn't save. Is the timeline table set up?"; }
+    } catch (e) { $("tl-err").textContent = "Couldn't save. Check your connection."; }
+    btn.disabled = false; btn.textContent = "Save";
+  }
+
+  (async () => {
+    const passports = await UA.getPassports().catch(() => []);
+    const p = UA.pickActivePassport(passports);
+    if (!p) {
+      $("gr-gate").innerHTML = `<div class="gr-gate-card"><p>Create your child's passport to start the growth story.</p><a href="/passport">Start the passport →</a></div>`;
+      return;
+    }
+    activeP = p;
+    $("gr-main").style.display = "block";
+    const d = p.data || {};
+    const id = UA.childIdentity(d);
+    firstName = id.first || "";
+    const first = firstName || "your child";
+    const scored = scoreWheel(d);
+    const passportLink = "/passport?id=" + p.id;
+
+    $("rb-av").textContent = (firstName || id.name || "·")[0].toUpperCase();
+    if (firstName) {
+      $("rb-title").textContent = firstName + "'s Growth";
+      $("gr-dev-title").firstChild.textContent = "Where " + firstName + " stands today ";
+      $("grj-sub").textContent = "Tiny victories add up — the story of " + firstName + " you'll want to reread.";
+      $("gr-story-title").firstChild.textContent = firstName + "'s story ";
+    }
+    $("gr-dev-edit").href = passportLink;
+
+    /* rotating journal prompt */
+    const PROMPTS = [
+      "Something that went well today…",
+      "What made you smile today?",
+      "A tiny step counts — what was it?",
+      "What went better than expected?",
+      "What did " + first + " try for the first time?",
+      "A calm moment worth remembering?",
+    ];
+    $("win-input").placeholder = PROMPTS[Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 864e5) % PROMPTS.length];
+
+    /* ============ 1 · development profile ============ */
+    function commCard() {
+      const c = d.communication || {}; const can = [], work = [];
+      if (c.style === "Fluent Verbal" || c.style === "Verbal") can.push("Communicates verbally");
+      const mm = { "Words": "Uses words", "Sentences": "Uses sentences", "Sounds": "Uses sounds", "Pictures (PECS)": "Uses picture cards", "Sign language": "Uses sign language", "Device / AAC app": "Uses an AAC device" };
+      (c.means || []).forEach((m) => { if (mm[m]) can.push(mm[m]); });
+      if (c.canExpressNeeds === "Consistently") can.push("Expresses needs reliably");
+      else if (c.canExpressNeeds === "Sometimes") can.push("Expresses needs sometimes");
+      if (c.style === "Non-Speaking" || c.style === "Limited Verbal") work.push("Building spoken communication");
+      const cm = { "Requesting": "Requesting things", "Conversation": "Back-and-forth conversation", "Question Answering": "Answering questions", "Emotional Expression": "Putting feelings into words", "Social Communication": "Social communication" };
+      (c.challenges || []).forEach((x) => { if (cm[x]) work.push(cm[x]); });
+      if (c.canExpressNeeds === "Rarely") work.push("Expressing needs");
+      const groups = []; if (can.length) groups.push({ label: "Can do", tone: "good", items: uniq(can) }); if (work.length) groups.push({ label: "Working on", tone: "work", items: uniq(work) });
+      const sum = [c.style, c.canExpressNeeds ? ("expresses needs " + lc(c.canExpressNeeds)) : ""].filter(present).join(" · ");
+      return { icon: "msg", name: "Communication", sum, mode: "chips", groups, note: "", empty: !groups.length };
+    }
+    function socialCard() {
+      const b = d.behaviour || {}; const can = [], work = [];
+      if (b.peersInterest === "Yes") can.push("Shows interest in other children");
+      if (b.peersInteract === "Yes") can.push("Plays with peers"); else if (b.peersInteract === "Sometimes") can.push("Plays alongside others");
+      if (b.followsInstructions === "Yes") can.push("Follows familiar instructions");
+      if (b.peersInterest === "No") work.push("Connecting with other children");
+      if (b.peersInteract === "No" || b.peersInteract === "Sometimes") work.push("Back-and-forth play");
+      if (b.followsInstructions === "No" || b.followsInstructions === "Sometimes") work.push("Following instructions");
+      const groups = []; if (can.length) groups.push({ label: "Can do", tone: "good", items: uniq(can) }); if (work.length) groups.push({ label: "Working on", tone: "work", items: uniq(work) });
+      const sum = [b.peersInterest === "Yes" ? "interested in peers" : "", b.peersInteract ? ("plays " + (b.peersInteract === "Yes" ? "with others" : b.peersInteract === "Sometimes" ? "alongside" : "independently")) : ""].filter(Boolean).join(" · ");
+      return { icon: "users", name: "Social interaction", sum: cap(sum), mode: "chips", groups, note: "", empty: !groups.length };
+    }
+    function sensoryCard() {
+      const s = d.sensory || {};
+      const SENSES = [["auditory", "Sound"], ["visual", "Sight"], ["tactile", "Touch"], ["oral", "Taste & mouth"], ["smell", "Smell"], ["movement", "Movement"], ["body", "Body awareness"]];
+      const seekRe = /seek|fascinat|spinning|crav|crash|rough play|chew|mouth|constantly moving|makes noise/i;
+      const avoidRe = /avoid|cover|bother|distress|dislike|fearful|overwhelm|misses|doesn't/i;
+      const items = [], sensitive = [], seeking = [];
+      SENSES.forEach(([k, label]) => {
+        const o = s[k]; if (!o || typeof o !== "object") return;
+        if (o.typical) { items.push({ name: label, badge: "Comfortable", tone: "good" }); return; }
+        if (o.signs && o.signs.length) {
+          const seek = o.signs.some((x) => seekRe.test(x)) && !o.signs.some((x) => avoidRe.test(x));
+          if (seek) seeking.push(label.toLowerCase()); else sensitive.push(label.toLowerCase());
+          items.push({ name: label, badge: seek ? "Seeking" : "Sensitive", tone: seek ? "info" : "work", sub: o.signs.slice(0, 2).join(", ") + (o.severity ? " (" + lc(o.severity) + ")" : "") });
+        }
+      });
+      const parts = []; if (sensitive.length) parts.push("sensitive to " + listShort(sensitive, 2)); if (seeking.length) parts.push("seeks " + listShort(seeking, 2));
+      const sum = cap(parts.join(" · ")) || (items.length ? "No concerns flagged" : "");
+      return { icon: "waves", name: "Sensory profile", sum, mode: "grid", items, note: present(s.notes) ? s.notes : "", empty: !items.length };
+    }
+    function dailyCard() {
+      const dl = d.dailyLiving || {};
+      const toneFor = (v) => (["Independent", "Fully trained", "Good", "Strong", "None"].indexOf(v) > -1) ? "good" : (["Variable", "Developing", "Mild", "Not applicable"].indexOf(v) > -1) ? "neutral" : "work";
+      const defs = [["eating", "Eating"], ["dressing", "Dressing"], ["toileting", "Toileting"], ["sleep", "Sleep"], ["safety", "Safety"]];
+      const items = []; defs.forEach(([k, label]) => { const v = dl[k]; if (present(v)) items.push({ name: label, badge: v, tone: toneFor(v) }); });
+      const indep = items.filter((i) => i.tone === "good"), sup = items.filter((i) => i.tone === "work");
+      const sum = [indep.length ? (cap(indep[0].name) + " independent") : "", sup.length ? (sup[0].name.toLowerCase() + " with support") : ""].filter(Boolean).join(" · ");
+      return { icon: "home", name: "Daily living", sum, mode: "grid", items, note: present(dl.dietaryRestrictions) ? ("Dietary needs: " + dl.dietaryRestrictions) : "", empty: !items.length };
+    }
+    function motorCard() {
+      const m = d.motor || {};
+      const clean2 = (x) => cap(String(x).replace(/^Difficulty (with |using )?/i, "").trim());
+      const work = []; (m.gross || []).forEach((x) => work.push(clean2(x))); (m.fine || []).forEach((x) => work.push(clean2(x)));
+      const hasData = (m.gross && m.gross.length) || (m.fine && m.fine.length) || present(m.notes);
+      const can = []; if (hasData) { if (!(m.gross && m.gross.length)) can.push("Gross motor on track"); if (!(m.fine && m.fine.length)) can.push("Fine motor on track"); }
+      const groups = []; if (can.length) groups.push({ label: "On track", tone: "good", items: can }); if (work.length) groups.push({ label: "Working on", tone: "work", items: uniq(work) });
+      const sum = hasData ? [(m.gross && m.gross.length) ? "gross motor support" : "strong gross motor", (m.fine && m.fine.length) ? "fine motor support" : "strong fine motor"].join(" · ") : "";
+      return { icon: "run", name: "Motor skills", sum: cap(sum), mode: "chips", groups, note: present(m.notes) ? m.notes : "", empty: !hasData };
+    }
+    function emotionalCard() {
+      const b = d.behaviour || {}, ch = b.challenges || {};
+      const settled = !isHigh(ch.meltdowns) && !isHigh(ch.emotional) && !isHigh(ch.anxiety);
+      const helps = textToList(b.strategies), trig = textToList(b.triggers);
+      const wmap = { meltdowns: "Big reactions / meltdowns", emotional: "Regulating emotions", anxiety: "Anxiety", rigidity: "Coping with change", aggression: "Aggression", selfInjury: "Self-injury", repetitive: "Repetitive behaviours", defiance: "Following directions", hyperactivity: "Focus and impulsivity", elopement: "Safety / flight risk" };
+      const work = Object.keys(wmap).filter((k) => isHigh(ch[k])).map((k) => wmap[k]);
+      const hasData = helps.length || trig.length || work.length || Object.keys(ch).some((k) => present(ch[k]));
+      const groups = [];
+      if (helps.length) groups.push({ label: "What helps", tone: "good", items: helps });
+      else if (settled && hasData) groups.push({ label: "Strengths", tone: "good", items: ["Generally calm and settled"] });
+      if (trig.length) groups.push({ label: "Triggers", tone: "work", items: trig });
+      if (work.length) groups.push({ label: "Working on", tone: "work", items: work });
+      const sum = !hasData ? "" : (settled ? "Generally settled" : "Working on big reactions");
+      return { icon: "heart", name: "Emotional regulation", sum, mode: "chips", groups, note: "", empty: !hasData || !groups.length };
+    }
+    function interestsCard() {
+      const s = d.strengths || {};
+      const loves = textToList(s.interests), avoid = textToList(s.dislikes);
+      const groups = []; if (loves.length) groups.push({ label: "Loves", tone: "good", items: loves.map(cap) }); if (avoid.length) groups.push({ label: "Things to avoid", tone: "warn", items: avoid.map(cap) });
+      const sum = loves.length ? loves.slice(0, 4).map(cap).join(", ") : "";
+      return { icon: "star", name: "Interests & motivators", sum, mode: "chips", groups, note: "", empty: !groups.length };
+    }
+
+    const cards = [commCard(), socialCard(), sensoryCard(), dailyCard(), motorCard(), emotionalCard(), interestsCard()];
+    const WHEEL_OF = { "Communication": "Communication", "Social interaction": "Social Connection", "Sensory profile": "Sensory Processing", "Daily living": "Daily Living Skills", "Motor skills": "Daily Living Skills", "Emotional regulation": "Emotional Regulation", "Interests & motivators": "Learning & Play" };
+    const chipHtml = (items, tone) => { const t = TONE[tone]; return items.map((x) => `<span class="da-chip" style="background:${t.bg};color:${t.fg}">${TIC[tone]}${esc(x)}</span>`).join(""); };
+    const emptyBody = () => `<p class="da-empty">Not recorded yet. <a href="${passportLink}">Add in passport →</a></p>`;
+    const bodyChips = (c) => { if (c.empty) return emptyBody(); let h = ""; c.groups.forEach((g) => { h += `<p class="da-lab">${g.label}</p><div>${chipHtml(g.items, g.tone)}</div>`; }); if (c.note) h += `<p class="da-note">${esc(c.note)}</p>`; return h; };
+    const bodyGrid = (c) => { if (c.empty) return emptyBody(); let h = '<div class="da-tiles">'; c.items.forEach((it) => { const t = TONE[it.tone]; h += `<div class="da-tile"><div class="da-tile-top"><span class="da-tile-name">${esc(it.name)}</span><span class="da-badge" style="background:${t.bg};color:${t.fg}">${esc(it.badge)}</span></div>${it.sub ? `<p class="da-sub">${esc(it.sub)}</p>` : ""}</div>`; }); h += "</div>"; if (c.note) h += `<p class="da-note">${esc(c.note)}</p>`; return h; };
+    const bandBar = (wheelDomain) => {
+      if (!wheelDomain) return "";
+      const dm = scored[wheelDomain];
+      const b = bandInfo(dm ? dm.score : null);
+      if (!b) return "";
+      let segs = "";
+      for (let k = 1; k <= 5; k++) segs += `<i>${k <= b.rings ? `<b style="background:${b.seg};--d:${(0.1 + k * 0.06).toFixed(2)}s"></b>` : ""}</i>`;
+      return `<span class="da-bandrow"><span class="c3-bar5" style="max-width:110px">${segs}</span><span class="da-bandpill" style="background:${b.bg};color:${b.fg}">${b.label}</span></span>`;
+    };
+    let opened = false;
+    $("gr-dev").innerHTML = cards.map((c, ci) => {
+      const body = c.mode === "grid" ? bodyGrid(c) : bodyChips(c);
+      const isOpen = !c.empty && !opened; if (isOpen) opened = true;
+      const sum = c.empty ? "Not recorded yet" : (c.sum || "");
+      const wheelDomain = WHEEL_OF[c.name];
+      const dc = wheelDomain ? domainColor(wheelDomain) : "#6D28D9";
+      const blobTint = wheelDomain ? tintOf(wheelDomain, 0.12) : "rgba(109,40,217,.12)";
+      return `<div class="da-card cu-rev ${isOpen ? "open" : ""} ${c.empty ? "muted" : ""}" style="--d:${(ci * 0.05).toFixed(2)}s">
+        <div class="da-head" role="button" tabindex="0" aria-expanded="${isOpen ? "true" : "false"}">
+          <span class="da-blob" style="--blob:${c.empty ? "var(--bg)" : blobTint};color:${c.empty ? "var(--faint)" : dc}">${IC[c.icon]}</span>
+          <span style="flex:1;min-width:0"><span class="da-name" style="display:block">${esc(c.name)}</span><span class="da-sum" style="display:block">${esc(sum)}</span>${c.empty ? "" : bandBar(wheelDomain)}</span>
+          ${IC.chev}
+        </div>
+        <div class="da-body-wrap"><div class="da-body">${body}${!c.empty && wheelDomain ? `<a class="da-wheel" href="/child/support-wheel?domain=${encodeURIComponent(wheelDomain)}">See in Support Wheel <span class="arr">→</span></a>` : ""}</div></div>
+      </div>`;
+    }).join("");
+    $("gr-dev").querySelectorAll(".da-head").forEach((h) => {
+      const toggle = () => {
+        const card = h.parentElement;
+        card.classList.toggle("open");
+        h.setAttribute("aria-expanded", card.classList.contains("open") ? "true" : "false");
+      };
+      h.addEventListener("click", toggle);
+      h.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+    });
+
+    /* ============ 2+3 · check-ins: trends + diff ============ */
+    const snap = await ensureSnapshot(p, snapshotWheel(scored)).catch(() => ({ rows: [], created: false }));
+    const rows = snap.rows || [];
+    if (snap.created && rows.length >= 2) notify("info", "Check-in recorded — then-vs-now just updated");
+    const planKey = await getPlan();
+    const allowHistory = PLANS[planKey].history;
+    if (!allowHistory && rows.length >= 2) {
+      /* history is RECORDING for everyone — reading it back is a plan perk */
+      $("gr-since").textContent = "";
+      $("gr-trends").innerHTML = `<div style="padding:14px 16px">` + upsellHTML(
+        first + "'s history is safely recording ✦",
+        rows.length + " check-ins saved. Then-vs-now comparisons and the what-changed feed are part of the monthly plans — nothing is lost, it unlocks the moment you upgrade.",
+        "Unlock the history"
+      ) + `</div>`;
+      $("gr-changes-sec").style.display = "none";
+    } else {
+
+    function bandPill(sc) {
+      if (sc == null) return `<span class="gr-band" style="background:#F4F3F8;color:#7B7491">No data</span>`;
+      const b = scoreToBand(sc);
+      let bg = "#E8F6F0", fg = "#0E8F66";
+      if (b.key === "moderate") { bg = "#FBF2E2"; fg = "#A8650A"; }
+      else if (b.key === "high" || b.key === "intensive") { bg = "#EDE9FE"; fg = "#6D28D9"; }
+      return `<span class="gr-band" style="background:${bg};color:${fg}">${b.label.split(" ")[0]}</span>`;
+    }
+    if (rows.length >= 2) {
+      const base = rows[0];
+      const baseWheel = base.wheel || {};
+      $("gr-since").textContent = "since " + fmtD(base.taken_at);
+      const trendRows = DOMAINS.map((n) => {
+        const bw = baseWheel.domains && baseWheel.domains[n] ? baseWheel.domains[n] : baseWheel[n];
+        const oldSc = bw ? bw.score : null;
+        const nowSc = scored[n].score;
+        const improved = oldSc != null && nowSc != null && scoreToBand(nowSc).rings < scoreToBand(oldSc).rings;
+        const worse = oldSc != null && nowSc != null && scoreToBand(nowSc).rings > scoreToBand(oldSc).rings;
+        return `<a class="gr-trow" href="/child/support-wheel?domain=${encodeURIComponent(n)}">
+          <span class="gr-tname"><span class="dd" style="background:${domainColor(n)}"></span>${esc(SHORT[n])}</span>
+          ${bandPill(oldSc)}
+          <svg class="gr-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9.5 4.5L13 8l-3.5 3.5"/></svg>
+          ${bandPill(nowSc)}
+          ${improved ? `<span class="gr-imp">✦ less support needed</span>` : worse ? `<span class="gr-imp" style="color:var(--amber)">needs more right now</span>` : ""}
+        </a>`;
+      }).join("");
+      $("gr-trends").innerHTML = trendRows + `<p class="gr-tcap">Bands come from the same wheel engine as everywhere else — tap a row to explore. "Needs more right now" isn't a setback; it's the profile getting more honest.</p>`;
+    } else {
+      $("gr-since").textContent = "";
+      $("gr-trends").innerHTML = `<div class="gr-seed">
+        <span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9;width:40px;height:40px"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg></span>
+        <p><b>Today became ${esc(first)}'s baseline. ✦</b> The profile now remembers where you started — after the next passport update, this turns into a then-vs-now picture of every area. ${rows.length === 0 ? "(If nothing appears after updating, run <b>snapshots_setup.sql</b> in Supabase once.)" : ""}</p>
+      </div>`;
+    }
+    if (rows.length >= 2) {
+      const prev = rows[rows.length - 2], cur = rows[rows.length - 1];
+      const diff = diffData(prev.data, cur.data);
+      $("gr-changed-when").textContent = "since your check-in on " + fmtD(prev.taken_at);
+      const chip = (e, cls) => `<span class="gr-chip ${cls}">${esc(e.label)}${e.from || e.to ? `<span class="fromto">${e.from ? esc(e.from) + " → " : ""}${esc(e.to)}</span>` : ""}</span>`;
+      let h = "";
+      if (diff.improved.length) h += `<div class="gr-chgroup"><p class="gr-chlab imp">✦ Improvements to celebrate</p>${diff.improved.map((e) => chip(e, "imp")).join("")}</div>`;
+      if (diff.flags.length) h += `<div class="gr-chgroup"><p class="gr-chlab flag">Newly flagged — worth a look</p>${diff.flags.map((e) => chip(e, "flag")).join("")}</div>`;
+      if (diff.other.length) h += `<div class="gr-chgroup"><p class="gr-chlab oth">Updated</p>${diff.other.map((e) => chip(e, "oth")).join("")}</div>`;
+      if (h) {
+        $("gr-changes").innerHTML = h;
+        $("gr-changes-sec").style.display = "block";
+      }
+    }
+    } /* end history plan gate */
+
+    /* ============ 4 · wins ============ */
+    const w = await restGet("wins?select=id,text,created_at&passport_id=eq." + p.id + "&order=created_at.desc").catch(() => []);
+    wins = (w || []).map((x) => ({ id: x.id, text: x.text, when: UA.relTime(x.created_at), created_at: x.created_at }));
+    renderWins();
+    renderMomentum();
+    $("win-save").addEventListener("click", saveWin);
+    $("win-input").addEventListener("keydown", (e) => { if (e.key === "Enter") saveWin(); });
+
+    /* ============ 5 · the story (milestones live inside it) ============ */
+    const msData = (d.birth && d.birth.milestones) || {};
+    const MLAB2 = { sit: 1, crawl: 1, walk: 1, firstWord: 1, phrases: 1, sentences: 1, toiletDay: 1, toiletNight: 1 };
+    const naLike = (v) => /^(n\/?a|na|-+|none|\?+)$/i.test(String(v).trim());
+    const msRecorded = Object.keys(MLAB2).filter((k) => present(msData[k]) && !naLike(msData[k])).length;
+    const msMissing = Object.keys(MLAB2).length - msRecorded;
+    if (msMissing > 0) {
+      $("gr-mscta").innerHTML = `<a class="gr-mscta" href="${passportLink}"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>${msMissing} early milestone${msMissing === 1 ? "" : "s"} still to record — add ages in the passport and they appear in the story</a>`;
+    }
+    allEvents = autoEvents(d);
+    const docRows = await restGet("documents?select=id,file_name,created_at&passport_id=eq." + p.id + "&order=created_at.desc&limit=25").catch(() => []);
+    (docRows || []).forEach((doc) => { const dt = new Date(doc.created_at); if (!isNaN(dt)) allEvents.push({ cat: "Assessment", title: (doc.file_name || "Document") + " added", note: "Uploaded to documents", ts: dt.getTime(), display: fmtMY(dt), y: dt.getFullYear(), auto: true }); });
+    const ev = await restGet("timeline_events?select=id,event_date,category,title,note&passport_id=eq." + p.id + "&order=event_date.desc").catch(() => []);
+    (ev || []).forEach((e) => { const dt = new Date(e.event_date); allEvents.push({ id: e.id, cat: e.category || "Note", title: e.title, note: e.note || "", ts: isNaN(dt) ? 0 : dt.getTime(), display: isNaN(dt) ? e.event_date : fmtMY(dt), y: isNaN(dt) ? "Earlier" : dt.getFullYear(), auto: false }); });
+    renderStory();
+    $("tl-addbtn").addEventListener("click", () => { const f = $("tl-form"); f.classList.toggle("show"); if (f.classList.contains("show")) $("tl-title").focus(); });
+    $("tl-cancel").addEventListener("click", () => { $("tl-form").classList.remove("show"); $("tl-err").textContent = ""; });
+    $("tl-save").addEventListener("click", saveEvent);
+
+    /* ============ ribbon ============ */
+    $("rb-stats").innerHTML = [
+      `<span class="c3-rstat"><b>${wins.length}</b><span>wins in the journal</span></span>`,
+      `<span class="c3-rstat"><b>${rows.length}</b><span>check-in${rows.length === 1 ? "" : "s"} saved</span></span>`,
+      `<span class="c3-rstat"><b>${allEvents.length}</b><span>story moments</span></span>`,
+    ].join("");
+  })().catch((e) => console.error("[growth] hydrate failed", e));
+</script>

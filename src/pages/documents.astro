@@ -10,8 +10,17 @@ import SectionTabs from "@/components/SectionTabs.astro";
 ---
 <AppFormLayout title="Documents" activeNav="documents">
   <SectionTabs section="documents" active="vault" />
-  <h1 class="page-title">Document Vault</h1>
-  <p class="page-sub">Reports, evaluations and letters — stored privately in Canada, ready whenever you need them.</p>
+
+  <div class="c3-ribbon rib-teal cu-rev" style="max-width:920px">
+    <span class="c3-spark" style="top:12px;right:120px">✦</span>
+    <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
+    <span class="c3-rib-av"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg></span>
+    <div class="c3-rib-id">
+      <h1 id="rb-title">The Vault</h1>
+      <p>Reports, evaluations and letters — stored privately in Canada, uploaded once, never dug for again.</p>
+    </div>
+    <div class="c3-rib-stats" id="rb-stats"></div>
+  </div>
 
   <div id="dv-setup"></div>
 
@@ -24,6 +33,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     <p class="dv-drop-s">PDF, Word, photos · up to 10 MB · only you can see it</p>
   </div>
 
+  <div id="dv-plan" style="max-width:920px;margin-bottom:12px"></div>
   <div class="dv-pending" id="dv-pending" style="display:none">
     <span class="dv-pname" id="dv-pname"></span>
     <select id="dv-cat" class="dv-select">
@@ -91,6 +101,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
 <script>
   import * as UA from "../lib/ua-data.js";
+  import { notify } from "../lib/notify.js";
+  import { getPlan, PLANS, upsellHTML } from "../lib/plan.js";
 
   const UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
   const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
@@ -114,12 +126,21 @@ import SectionTabs from "@/components/SectionTabs.astro";
   const fileSvg = '<svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg>';
   const CAT_COLOR = { Evaluation: ["#EDE9FE", "#6D28D9"], Medical: ["#F9EDF1", "#B14A66"], School: ["#FBF2E2", "#A8650A"], Funding: ["#E6F4F2", "#0E8C82"], Therapy: ["#EAF3DE", "#4C9A2A"], Other: ["#F4F3F8", "#7B7491"] };
 
-  let docs = [], filter = "All", query = "", pendingFile = null, activeP = null;
+  let docs = [], filter = "All", query = "", pendingFile = null, activeP = null, planKey = "free";
+  const atLimit = () => planKey === "free" && docs.length >= PLANS.free.vaultFiles;
 
   function render() {
     /* filter chips with counts */
     const counts = {};
     docs.forEach((d) => { const c = d.category || "Other"; counts[c] = (counts[c] || 0) + 1; });
+
+    /* live ribbon stats */
+    const rb = $("rb-stats");
+    if (rb) rb.innerHTML = [
+      `<span class="c3-rstat"><b>${docs.length}</b><span>file${docs.length === 1 ? "" : "s"} stored</span></span>`,
+      `<span class="c3-rstat"><b>${Object.keys(counts).length}</b><span>categories</span></span>`,
+      docs[0] ? `<span class="c3-rstat"><b style="font-size:.82rem">${esc(fmtDate(docs[0].created_at))}</b><span>latest upload</span></span>` : "",
+    ].join("");
     const cats = ["All"].concat(Object.keys(CAT_COLOR).filter((c) => counts[c]));
     $("dv-filters").innerHTML = cats.map((c) =>
       `<button class="dv-f ${c === filter ? "on" : ""}" data-c="${c}">${c}<span class="fc">${c === "All" ? docs.length : counts[c]}</span></button>`).join("");
@@ -167,6 +188,12 @@ import SectionTabs from "@/components/SectionTabs.astro";
   }
 
   function showPending(file) {
+    if (atLimit()) {
+      notify("warn", "The free vault holds " + PLANS.free.vaultFiles + " files — monthly plans are unlimited.");
+      const host = $("dv-plan");
+      if (host && !host.innerHTML) host.innerHTML = upsellHTML("The vault is full ✦", "Free includes " + PLANS.free.vaultFiles + " documents. Upgrade for an unlimited vault — nothing you've stored is ever lost.", "See the plans");
+      return;
+    }
     if (file.size > 10 * 1024 * 1024) { alert("That file is over 10 MB — try a smaller version."); return; }
     pendingFile = file;
     $("dv-pname").textContent = file.name;
@@ -199,8 +226,10 @@ import SectionTabs from "@/components/SectionTabs.astro";
       if (!ins.ok) throw new Error("setup");
       const rows = await ins.json();
       docs.unshift(rows[0] || row);
+      const savedName = pendingFile.name;
       $("dv-pending").style.display = "none"; pendingFile = null;
       render();
+      notify("ok", '"' + savedName + '" is safe in the vault ✓');
     } catch (e) {
       msg.textContent = e.message === "setup"
         ? "Storage isn't set up yet — run documents_setup.sql in Supabase (ask Claude for the steps)."
@@ -212,6 +241,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
   (async () => {
     const passports = await UA.getPassports().catch(() => []);
     activeP = UA.pickActivePassport(passports);
+    planKey = await getPlan();
     const s = await getValidSession();
     if (s) {
       const r = await fetch(UA_URL + "/rest/v1/documents?select=id,file_name,file_type,category,storage_path,created_at&user_id=eq." + s.user.id + "&order=created_at.desc", { headers: authHeaders(s.access_token) }).catch(() => null);
