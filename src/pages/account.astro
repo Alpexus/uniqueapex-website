@@ -1,24 +1,33 @@
 ---
-/* ============================================================
-   account.astro  →  /account   (CONSOLIDATED — replaces old account)
-   ------------------------------------------------------------
-   The single post-login page. Uses AppLayout (no marketing
-   navbar). Login already redirects here, so nothing else needs
-   to change. The Support snapshot card renders your REAL petal
-   wheel (ported verbatim in wheelScore.js + wheelSvg.js), scored
-   for whichever child is selected in the header switcher.
-
-   You can delete the old src/pages/dashboard.astro now (this is
-   its successor). If you'd rather the URL be /dashboard, rename
-   this file and update your login redirect target.
-   ============================================================ */
+/* DASHBOARD-V2 — visual + interaction redesign of /account:
+   · time-of-day greeting with the parent's name
+   · gradient hero, morphing blob avatar, animated completion ring
+   · quick-action chips (add a win, add event, update passport, export)
+   · LIVE KPI tiles with blob icons + count-ups (replaces the two dead "—")
+   · personalized "this week" guidance band from domainInsights
+   · wheel card: sliding toggle, draw-in animation, colored legend dots,
+     deep link into the full wheel
+   All existing data hydration kept. */
 import AppLayout from "../layouts/AppLayout.astro";
 ---
 <AppLayout title="Dashboard" activeNav="dashboard">
 
+  <!-- ===== GREETING ===== -->
+  <div class="dash-greet cu-rev">
+    <div>
+      <h1 id="g-hello">Welcome back</h1>
+      <p id="g-date"></p>
+    </div>
+    <div class="dash-quick" id="dash-quick">
+      <a class="dq" href="/child/progress"><span class="dq-ic" style="--blob:#E8F6F0;color:#0E8F66"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg></span>Add a win</a>
+      <a class="dq" href="/child/timeline"><span class="dq-ic" style="--blob:#FBF2E2;color:#A8650A"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg></span>Add event</a>
+      <a class="dq" id="q-passport" href="/passport"><span class="dq-ic" style="--blob:#EDE9FE;color:#6D28D9"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.8 2.6l2.6 2.6L6 12.6H3.4V10z"/></svg></span>Update passport</a>
+    </div>
+  </div>
+
   <!-- ===== HERO ===== -->
-  <div class="card hero">
-    <div class="hero-photo" id="d-photo">·</div>
+  <div class="card hero cu-hero-grad cu-rev" style="--d:.05s">
+    <div class="hero-photo dash-avatar" id="d-photo">·</div>
     <div class="hero-id">
       <h1 id="d-name">Loading…</h1>
       <div class="hero-tags" id="d-tags"></div>
@@ -29,7 +38,7 @@ import AppLayout from "../layouts/AppLayout.astro";
         <span class="ring">
           <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
             <circle cx="26" cy="26" r="22" stroke="var(--line)" stroke-width="5"/>
-            <circle id="d-ring" cx="26" cy="26" r="22" stroke="var(--violet-600)" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 138.2"/>
+            <circle id="d-ring" cx="26" cy="26" r="22" stroke="var(--violet-600)" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 138.2" style="transition:stroke-dasharray 1s cubic-bezier(.22,1,.36,1)"/>
           </svg>
           <span class="pct" id="d-pct">—</span>
         </span>
@@ -43,28 +52,37 @@ import AppLayout from "../layouts/AppLayout.astro";
     </div>
   </div>
 
-  <!-- ===== KPI STRIP ===== -->
-  <div class="kpis">
-    <div class="card kpi"><div class="kpi-label"><span class="k-dot" style="background:var(--violet-600)"></span>Applications submitted</div><div class="kpi-num">—</div><div class="kpi-sub">With provider matching</div></div>
-    <div class="card kpi"><div class="kpi-label"><span class="k-dot" style="background:var(--teal)"></span>Providers contacted</div><div class="kpi-num">—</div><div class="kpi-sub">With provider matching</div></div>
-    <div class="card kpi"><div class="kpi-label"><span class="k-dot" style="background:var(--amber)"></span>Waitlists joined</div><div class="kpi-num" id="kpi-waitlist">—</div><div class="kpi-sub" id="kpi-waitlist-sub">From your application</div></div>
-    <div class="card kpi"><div class="kpi-label"><span class="k-dot" style="background:var(--green)"></span>Funding approved</div><div class="kpi-num" id="kpi-funding-num">$0<span style="font-size:.9rem;color:var(--muted)">/yr</span></div><div class="kpi-sub" id="kpi-funding-sub">No programs yet</div></div>
+  <!-- ===== GUIDANCE BAND (personalized) ===== -->
+  <div class="dash-guide cu-rev cu-sparkle-host" id="dash-guide" style="--d:.1s;display:none">
+    <span class="cu-spark" style="top:10px;right:60px">✦</span>
+    <span class="cu-spark s2" style="top:26px;right:40px">✦</span>
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0;margin-top:2px"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg>
+    <p id="dash-guide-text"></p>
+    <a href="/child" class="dash-guide-link">More →</a>
+  </div>
+
+  <!-- ===== KPI STRIP (all live) ===== -->
+  <div class="kpis" id="d-kpis">
+    <div class="card kpi cu-rev cu-lift" style="--d:.12s"><div class="kpi-row"><span class="cu-blob kpi-blob" style="--blob:#EDE9FE;color:#6D28D9"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 1.5l2 4.2 4.5.5-3.3 3.1.9 4.5L8 11.7 3.9 13.8l.9-4.5L1.5 6.2 6 5.7z"/></svg></span><div><div class="kpi-num" id="kpi-focus">—</div><div class="kpi-label2">Focus areas</div></div></div></div>
+    <div class="card kpi cu-rev cu-lift" style="--d:.16s"><div class="kpi-row"><span class="cu-blob kpi-blob" style="--blob:#E6F4F2;color:#0E8C82"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg></span><div><div class="kpi-num" id="kpi-docs">—</div><div class="kpi-label2">Documents stored</div></div></div></div>
+    <div class="card kpi cu-rev cu-lift" style="--d:.2s"><div class="kpi-row"><span class="cu-blob kpi-blob" style="--blob:#FBF2E2;color:#A8650A"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 2.3"/></svg></span><div><div class="kpi-num" id="kpi-waitlist">—</div><div class="kpi-label2" id="kpi-waitlist-sub">Waitlists joined</div></div></div></div>
+    <div class="card kpi cu-rev cu-lift" style="--d:.24s"><div class="kpi-row"><span class="cu-blob kpi-blob" style="--blob:#E8F6F0;color:#0E8F66"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M6.5 6.7L8 5l1.5 1.7"/></svg></span><div><div class="kpi-num" id="kpi-funding-num">$0</div><div class="kpi-label2" id="kpi-funding-sub">Funding approved</div></div></div></div>
   </div>
 
   <div class="grid">
     <!-- ===== LEFT ===== -->
     <div class="col">
 
-      <!-- Support wheel (your real petal chart) -->
-      <div class="card">
+      <!-- Support wheel -->
+      <div class="card cu-rev" style="--d:.18s">
         <div class="card-head">
           <span class="card-title">Support wheel</span>
-          <a class="card-link" href="/passport" id="wheel-edit">Update profile →</a>
+          <a class="card-link" href="/child/support-wheel">Explore full wheel →</a>
         </div>
         <div id="wheel-warning" style="padding:0 20px"></div>
-        <div id="wheel-toggle" style="display:flex;gap:8px;justify-content:center;margin:12px 0 4px"></div>
+        <div id="wheel-toggle" class="dash-seg-wrap"></div>
         <p id="wheel-label" style="text-align:center;font-size:13px;color:var(--muted);margin:0 20px 4px"></p>
-        <div id="wheel-body" style="padding:4px 16px 8px"></div>
+        <div id="wheel-body" class="dash-wheel" style="padding:4px 16px 8px"></div>
         <div id="wheel-legend" style="padding:0 20px 16px"></div>
         <div style="padding:0 20px 18px">
           <div style="background:var(--amber-bg);border:1px solid #f3e2c0;border-radius:12px;padding:10px 12px">
@@ -74,7 +92,7 @@ import AppLayout from "../layouts/AppLayout.astro";
       </div>
 
       <!-- Recent reports -->
-      <div class="card">
+      <div class="card cu-rev" style="--d:.24s">
         <div class="card-head"><span class="card-title">Recent reports</span><a class="card-link" href="/documents">View all →</a></div>
         <div id="d-docs"><div style="color:var(--muted);font-size:.82rem;padding:14px 20px">Loading…</div></div>
         <div class="card-foot">
@@ -84,7 +102,7 @@ import AppLayout from "../layouts/AppLayout.astro";
       </div>
 
       <!-- Activity -->
-      <div class="card">
+      <div class="card cu-rev" style="--d:.3s">
         <div class="card-head"><span class="card-title">Recent activity</span></div>
         <div class="timeline" id="d-activity"><div style="color:var(--muted);font-size:.82rem;padding:6px 0">Loading…</div></div>
       </div>
@@ -94,7 +112,7 @@ import AppLayout from "../layouts/AppLayout.astro";
     <div class="col">
 
       <!-- AI insights -->
-      <div class="card ai-card">
+      <div class="card ai-card cu-rev" style="--d:.2s">
         <div class="card-head"><span class="card-title" id="d-ai-title">Insights</span><span class="ai-badge"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--violet-700)"><path d="M8 1.5l1.5 4.2L14 7.2l-4.5 1.5L8 13l-1.5-4.3L2 7.2l4.5-1.5z"/></svg>AI · Beta</span></div>
         <div class="ai-group"><h4>Key strengths</h4><div id="d-strengths"><div class="ai-li" style="color:var(--muted)">Loading…</div></div></div>
         <div class="ai-group"><h4>Watch areas</h4><div id="d-watch"></div></div>
@@ -103,28 +121,122 @@ import AppLayout from "../layouts/AppLayout.astro";
       </div>
 
       <!-- Funding overview -->
-      <div class="card">
+      <div class="card cu-rev" style="--d:.26s">
         <div class="card-head"><span class="card-title">Funding overview</span><a class="card-link" href="/funding">Open navigator →</a></div>
         <div class="fund-stats" id="d-fund-stats"></div>
         <div id="d-fund-rows"></div>
       </div>
 
+      <!-- Recent wins -->
+      <div class="card cu-rev" style="--d:.3s">
+        <div class="card-head"><span class="card-title">Recent wins</span><a class="card-link" href="/child/progress">All wins →</a></div>
+        <div id="d-wins" style="padding:6px 20px 16px"><div style="color:var(--muted);font-size:.82rem;padding:8px 0">Loading…</div></div>
+      </div>
+
       <!-- Next workshop -->
-      <div class="card">
-        <div class="card-head"><span class="card-title">Next workshop</span><a class="card-link" href="/workshops">All workshops →</a></div>
+      <div class="card cu-rev" style="--d:.32s">
+        <div class="card-head"><span class="card-title">Next workshop</span><a class="card-link" href="/resources/workshops">All workshops →</a></div>
         <div id="d-workshop"><div style="color:var(--muted);font-size:.82rem;padding:14px 20px">Loading…</div></div>
+      </div>
+
+      <!-- Explore the profile -->
+      <div class="card cu-rev" style="--d:.36s">
+        <div class="card-head"><span class="card-title" id="d-explore-title">Explore the profile</span></div>
+        <div class="dash-explore">
+          <a href="/child"><span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="5.2" r="2.6"/><path d="M2.8 13.5c.6-2.8 2.6-4.2 5.2-4.2s4.6 1.4 5.2 4.2"/></svg></span>Overview</a>
+          <a href="/child/support-wheel"><span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.6"/><path d="M8 2.4v11.2M2.4 8h11.2M4.2 4.2l7.6 7.6M11.8 4.2l-7.6 7.6"/></svg></span>Wheel</a>
+          <a href="/child/progress"><span class="cu-blob" style="--blob:#E8F6F0;color:#0E8F66;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 13V3M2.5 13h11M5.5 10l2-2.6 2 1.4 2.7-4"/></svg></span>Progress</a>
+          <a href="/child/timeline"><span class="cu-blob" style="--blob:#FBF2E2;color:#A8650A;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2.5v11M8 5h4.5M8 9H4"/><circle cx="8" cy="2.8" r="1.2" fill="currentColor" stroke="none"/></svg></span>Timeline</a>
+          <a href="/child/assessments"><span class="cu-blob" style="--blob:#E6F4F2;color:#0E8C82;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg></span>Assessments</a>
+          <a href="/child/strengths"><span class="cu-blob" style="--blob:#EAF3DE;color:#4C9A2A;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg></span>Strengths</a>
+        </div>
       </div>
     </div>
   </div>
+
+  <style is:global>
+    .dash-greet{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+    .dash-greet h1{font-family:var(--display);font-size:1.45rem;font-weight:700;letter-spacing:-.015em;color:var(--ink);margin:0}
+    .dash-greet p{font-size:.82rem;color:var(--muted);margin:3px 0 0}
+    .dash-quick{display:flex;gap:8px;flex-wrap:wrap}
+    .dq{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;font-weight:600;color:var(--ink-2);background:var(--card);border:1px solid var(--line);border-radius:9999px;padding:7px 15px 7px 8px;text-decoration:none;box-shadow:var(--shadow);transition:transform .16s,border-color .16s,box-shadow .16s}
+    .dq:hover{transform:translateY(-2px);border-color:#DDD6FE;box-shadow:0 8px 20px rgba(109,40,217,.12);color:var(--ink)}
+    .dq-ic{position:relative;width:26px;height:26px;display:grid;place-items:center;font-size:.85rem;font-weight:700;flex-shrink:0}
+    .dq-ic::before{content:"";position:absolute;inset:0;background:var(--blob,#EDE9FE);border-radius:46% 54% 58% 42%/52% 44% 56% 48%;transition:transform .4s cubic-bezier(.34,1.5,.64,1)}
+    .dq:hover .dq-ic::before{transform:scale(1.12) rotate(9deg)}
+    .dq-ic > *{position:relative}
+    .dash-avatar{border-radius:46% 54% 58% 42%/52% 44% 56% 48% !important;animation:dashMorph 9s ease-in-out infinite alternate;box-shadow:0 6px 18px rgba(109,40,217,.25)}
+    @keyframes dashMorph{0%{border-radius:46% 54% 58% 42%/52% 44% 56% 48%}50%{border-radius:58% 42% 46% 54%/44% 56% 48% 52%}100%{border-radius:52% 48% 42% 58%/56% 46% 54% 44%}}
+    .dash-guide{position:relative;display:flex;align-items:flex-start;gap:10px;background:linear-gradient(135deg,var(--violet-50),#F9F7FE 55%,var(--violet-50));border:1px solid var(--violet-100);border-radius:14px;padding:12px 16px;margin:14px 0 0;color:var(--violet-700)}
+    .dash-guide p{flex:1;font-size:.86rem;color:#5b21b6;line-height:1.55;margin:0;min-width:0}
+    .dash-guide-link{font-size:.8rem;font-weight:700;color:var(--violet-700);text-decoration:none;white-space:nowrap;align-self:center}
+    .dash-guide .cu-spark{font-style:normal;font-size:12px;color:#8B5CF6}
+    .dash-guide .cu-spark.s2{font-size:9px;color:#5EEAD4}
+    .kpi-row{display:flex;align-items:center;gap:12px}
+    .kpi-blob{width:38px;height:38px}
+    .kpi-label2{font-size:.74rem;color:var(--muted);margin-top:1px}
+    .dash-seg-wrap{display:flex;justify-content:center;margin:12px 0 4px}
+    .dash-seg{position:relative;display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:9999px;padding:3px}
+    .dash-seg .thumb{position:absolute;top:3px;bottom:3px;border-radius:9999px;background:var(--violet-700);transition:left .22s cubic-bezier(.22,1,.36,1),width .22s cubic-bezier(.22,1,.36,1);box-shadow:0 2px 8px rgba(109,40,217,.3)}
+    .dash-seg button{position:relative;z-index:1;border:none;background:none;color:var(--muted);border-radius:9999px;padding:6px 15px;font-size:13px;font-weight:600;cursor:pointer;transition:color .2s;font-family:inherit}
+    .dash-seg button.on{color:#fff}
+    .dash-wheel svg{transform-origin:50% 50%}
+    .dash-wheel.play svg{animation:dashDraw .8s cubic-bezier(.22,1,.36,1) both}
+    @keyframes dashDraw{from{opacity:0;transform:scale(.6) rotate(-8deg)}to{opacity:1;transform:none}}
+    .dash-wheel [data-domain]:hover path:first-of-type{opacity:.75}
+    .dash-wheel [data-domain]:focus{outline:none}
+    .dash-wheel [data-domain]:focus-visible path:last-of-type{fill:rgba(109,40,217,.08)}
+    .doc-row{transition:background .15s}
+    .doc-row:hover{background:var(--bg)}
+    .dash-explore{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:6px 20px 18px}
+    .dash-explore a{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.72rem;font-weight:600;color:var(--ink-2);text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:11px 6px;transition:transform .15s,border-color .15s,background .15s}
+    .dash-explore a:hover{transform:translateY(-2px);border-color:#DDD6FE;background:var(--violet-50);color:var(--violet-700)}
+    .dash-win{display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line);font-size:.85rem;color:var(--ink-2);line-height:1.4}
+    .dash-win:first-child{border-top:none}
+    .dash-win .st{color:#0E8F66;flex-shrink:0;margin-top:1px}
+    .dash-win .wh{margin-left:auto;font-size:.7rem;color:var(--faint);white-space:nowrap}
+    @media (prefers-reduced-motion:reduce){
+      .dash-avatar{animation:none}
+      .dash-wheel.play svg{animation:none}
+      #d-ring{transition:none!important}
+    }
+  </style>
 
   <!-- ============ HYDRATION ============ -->
   <script>
     import * as UA from "../lib/ua-data.js";
     import { scoreWheel, DOMAINS, wheelCompleteness } from "../lib/wheelScore.js";
-    import { generateWheelSVG, confidenceBadge } from "../lib/wheelSvg.js";
+    import { domainColor } from "../lib/wheelSvg.js";
+    import { scoreToBand } from "../config/wheelConfig.js";
+    import { buildFamilyGuidance } from "../lib/domainInsights.js";
 
     const $ = (id) => document.getElementById(id);
     const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const countUp = (el, target, dur = 800) => {
+      const n = Number(target);
+      if (reduceMotion || !n) { el.textContent = target; return; }
+      let t0 = null;
+      const step = (ts) => { if (!t0) t0 = ts; const pr = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - pr, 3); el.textContent = Math.round(n * e); if (pr < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    };
+
+    /* ---------- greeting (first name only; upgraded from the passport's
+       guardian name once it loads — "Pelin", never "pelintemurcan") ---------- */
+    function setGreeting(name) {
+      const h = new Date().getHours();
+      const part = h < 5 ? "Good night" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+      const emoji = h >= 5 && h < 18 ? "☀️" : "🌙";
+      const n = String(name || "").trim().split(/\s+/)[0];
+      $("g-hello").textContent = part + (n ? ", " + (n.charAt(0).toUpperCase() + n.slice(1)) : "") + " " + emoji;
+      $("g-date").textContent = new Date().toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" });
+    }
+    (function () {
+      let session = null;
+      try { session = JSON.parse(localStorage.getItem("ua_session")); } catch (e) {}
+      const meta = (session && session.user && session.user.user_metadata) || {};
+      setGreeting(meta.full_name || "");
+    })();
 
     (async () => {
       const passports = await UA.getPassports().catch(() => []);
@@ -133,6 +245,9 @@ import AppLayout from "../layouts/AppLayout.astro";
 
       // ---------- HERO ----------
       const id = UA.childIdentity(data);
+      /* better greeting name: the guardian's first name from the passport */
+      const g1 = String((data.household && data.household.g1name) || "").replace(/\s*\([^)]*\)\s*$/, "").trim();
+      if (g1) setGreeting(g1);
       $("d-photo").textContent = (id.first || id.name || "·")[0].toUpperCase();
       $("d-name").textContent = id.name;
       const tags = [];
@@ -141,21 +256,68 @@ import AppLayout from "../layouts/AppLayout.astro";
       if (id.languages) tags.push(`<span class="tag">${esc(id.languages)}</span>`);
       $("d-tags").innerHTML = tags.join("");
       if (p && p.updated_at) $("d-updated").textContent = "Profile last updated " + UA.relTime(p.updated_at);
-      if (p) { $("d-export").href = `/passport?id=${p.id}&export=1`; $("d-edit").href = `/passport?id=${p.id}`; $("wheel-edit").href = `/passport?id=${p.id}`; }
+      if (p) { $("d-export").href = `/passport?id=${p.id}&export=1`; $("d-edit").href = `/passport?id=${p.id}`; $("q-passport").href = `/passport?id=${p.id}`; }
 
-      // ---------- COMPLETION ----------
+      // ---------- COMPLETION (animated) ----------
       const comp = UA.completion(data);
       const C = 2 * Math.PI * 22;
-      $("d-ring").setAttribute("stroke-dasharray", `${(comp.pct / 100) * C} ${C}`);
-      $("d-pct").textContent = comp.pct + "%";
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        $("d-ring").setAttribute("stroke-dasharray", `${(comp.pct / 100) * C} ${C}`);
+      }));
+      if (reduceMotion) $("d-pct").textContent = comp.pct + "%";
+      else { let t0 = null; const tick = (ts) => { if (!t0) t0 = ts; const pr = Math.min(1, (ts - t0) / 900), e = 1 - Math.pow(1 - pr, 3); $("d-pct").textContent = Math.round(comp.pct * e) + "%"; if (pr < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); }
       const left = comp.total - comp.done;
       $("d-remaining").textContent = left === 0 ? "All sections complete" : `${left} section${left === 1 ? "" : "s"} remaining`;
 
-      // ---------- SUPPORT WHEEL (your real petal chart) ----------
+      // ---------- PERSONALIZED GUIDANCE BAND ----------
       const scored = scoreWheel(data);
+      const guide = buildFamilyGuidance(data, scored, id.first || "Your child");
+      if (guide.length) {
+        $("dash-guide-text").textContent = guide.slice(0, 2).join(" ");
+        $("dash-guide").style.display = "flex";
+      }
+
+      // ---------- SUPPORT WHEEL (rose petals — length = level) ----------
       const scoredCount = DOMAINS.filter((n) => scored[n].score != null).length;
       let mode = "needs";
-
+      const SHORTD = { "Communication": "Communication", "Social Connection": "Social", "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility", "Emotional Regulation": "Emotional", "Executive Function": "Executive", "Daily Living Skills": "Daily living", "Learning & Play": "Learning & play" };
+      /* band pill with CORRECT semantics: high support = violet (attention),
+         moderate = amber, low = green. Strength bands stay green-family. */
+      function bandPill(raw, axis) {
+        if (raw == null) return `<span style="font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:9999px;background:#F4F3F8;color:#7B7491">No data</span>`;
+        const b = scoreToBand(raw, axis);
+        let bg = "#E8F6F0", fg = "#0E8F66";
+        if (axis === "need") {
+          if (b.key === "moderate") { bg = "#FBF2E2"; fg = "#A8650A"; }
+          else if (b.key === "high" || b.key === "intensive") { bg = "#EDE9FE"; fg = "#6D28D9"; }
+        }
+        return `<span style="font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:9999px;background:${bg};color:${fg};white-space:nowrap">${esc(b.label)}</span>`;
+      }
+      function roseSVG() {
+        const cx = 210, cy = 168, r0 = 18, R = 122, seg2 = (2 * Math.PI) / DOMAINS.length;
+        const pt = (r, a) => `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`;
+        let s = "";
+        for (let k = 1; k <= 5; k++) s += `<circle cx="${cx}" cy="${cy}" r="${(r0 + (R - r0) * k / 5).toFixed(1)}" fill="none" stroke="#ECE8F6" stroke-width="1"/>`;
+        DOMAINS.forEach((name, i) => {
+          const a0 = -Math.PI / 2 + i * seg2 + 0.03, a1 = a0 + seg2 - 0.06;
+          const dm = scored[name];
+          const raw = mode === "strengths" ? dm.strength : dm.score;
+          const frac = raw == null ? 0.1 : Math.max(0.12, raw / 100);
+          const r = r0 + (R - r0) * frac;
+          const fill = raw == null ? "#EDEAF6" : domainColor(name).replace("45%)", "60%)");
+          s += `<g data-domain="${esc(name)}" style="cursor:pointer;outline:none" tabindex="0" role="link" aria-label="Open ${esc(name)} in the full wheel">
+            <title>${esc(name)} — tap to explore</title>
+            <path d="M${pt(r0, a0)} L${pt(r, a0)} A${r.toFixed(1)},${r.toFixed(1)} 0 0 1 ${pt(r, a1)} L${pt(r0, a1)} A${r0},${r0} 0 0 0 ${pt(r0, a0)} Z" fill="${fill}" stroke="#fff" stroke-width="1.4"/>
+            <path d="M${pt(r0, a0)} L${pt(R, a0)} A${R},${R} 0 0 1 ${pt(R, a1)} L${pt(r0, a1)} A${r0},${r0} 0 0 0 ${pt(r0, a0)} Z" fill="transparent"/>
+          </g>`;
+          const mid = a0 + (seg2 - 0.06) / 2, lx = cx + (R + 13) * Math.cos(mid), ly = cy + (R + 13) * Math.sin(mid);
+          const anchor = Math.cos(mid) > 0.25 ? "start" : (Math.cos(mid) < -0.25 ? "end" : "middle");
+          s += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="10.5" fill="#7B7491" text-anchor="${anchor}" dominant-baseline="middle" style="pointer-events:none">${SHORTD[name]}</text>`;
+        });
+        for (let k = 1; k <= 4; k++) s += `<circle cx="${cx}" cy="${cy}" r="${(r0 + (R - r0) * k / 5).toFixed(1)}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.3" style="pointer-events:none"/>`;
+        s += `<circle cx="${cx}" cy="${cy}" r="${r0}" fill="var(--card)" stroke="var(--line)"/>`;
+        return `<svg viewBox="0 0 420 336" width="100%" style="max-width:400px;display:block;margin:0 auto" role="img">${s}</svg>`;
+      }
       function renderWheel() {
         if (scoredCount < 3) {
           $("wheel-toggle").innerHTML = "";
@@ -164,30 +326,37 @@ import AppLayout from "../layouts/AppLayout.astro";
           $("wheel-body").innerHTML = `<div style="text-align:center;padding:24px 12px"><p style="color:var(--muted);font-size:.85rem;margin-bottom:12px">Fill in more of the passport (communication, sensory, behaviour, daily living) to generate ${esc(id.first || "your child")}'s profile wheel.</p><a class="btn btn-primary btn-sm" href="/passport${p ? "?id=" + p.id : ""}">Continue passport →</a></div>`;
           return;
         }
-        // toggle
-        $("wheel-toggle").innerHTML = ["needs", "strengths"].map((m) => {
-          const on = m === mode;
-          const lbl = m === "needs" ? "Support needs" : "Strengths";
-          return `<button data-mode="${m}" style="border:1px solid ${on ? "#6d28d9" : "var(--line-2)"};background:${on ? "#6d28d9" : "#fff"};color:${on ? "#fff" : "var(--muted)"};border-radius:9999px;padding:5px 14px;font-size:13px;font-weight:600;cursor:pointer">${lbl}</button>`;
-        }).join("");
-        $("wheel-toggle").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { mode = b.dataset.mode; renderWheel(); }));
-        // label + svg
+        /* sliding segmented toggle */
+        const seg = $("wheel-toggle");
+        seg.innerHTML = `<div class="dash-seg"><span class="thumb"></span>` + ["needs", "strengths"].map((m) =>
+          `<button data-mode="${m}" class="${m === mode ? "on" : ""}">${m === "needs" ? "Support needs" : "Strengths"}</button>`).join("") + `</div>`;
+        const onBtn = seg.querySelector("button.on"), thumb = seg.querySelector(".thumb");
+        requestAnimationFrame(() => { thumb.style.left = onBtn.offsetLeft + "px"; thumb.style.width = onBtn.offsetWidth + "px"; });
+        seg.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { mode = b.dataset.mode; renderWheel(); }));
+
         $("wheel-label").innerHTML = mode === "strengths"
-          ? "Showing <strong>strengths</strong> — fuller petals mean stronger areas."
-          : "Showing <strong>support needs</strong> — fuller petals mean more support is helpful.";
-        $("wheel-body").innerHTML = generateWheelSVG(scored, mode);
-        // legend
+          ? "Longer petals = <strong>stronger</strong> areas · tap a petal to explore"
+          : "Longer petals = <strong>more support helpful</strong> · tap a petal to explore";
+        const body = $("wheel-body");
+        body.classList.remove("play");
+        body.innerHTML = roseSVG();
+        void body.offsetWidth;
+        body.classList.add("play");
+        body.querySelectorAll("[data-domain]").forEach((g) => {
+          const go = () => location.href = "/child/support-wheel?domain=" + encodeURIComponent(g.dataset.domain);
+          g.addEventListener("click", go);
+          g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+        });
+
         $("wheel-legend").innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">` + DOMAINS.map((nm) => {
           const dm = scored[nm];
           const raw = mode === "strengths" ? dm.strength : dm.score;
-          const shown = raw == null ? "—" : raw;
           const conf = mode === "strengths" ? dm.strengthConfidence : dm.confidence;
           const ansN = mode === "strengths" ? dm.strengthAnswered : dm.answered;
           const totN = mode === "strengths" ? dm.strengthTotal : dm.total;
-          return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;padding:4px 8px;background:#fff;border:1px solid var(--line);border-radius:8px"><span style="color:var(--ink-2)">${esc(nm)}</span><span style="display:flex;align-items:center;gap:6px"><span style="font-weight:700;color:var(--ink)">${shown}</span>${confidenceBadge(conf, ansN, totN)}</span></div>`;
-        }).join("") + `</div>`;
+          return `<a href="/child/support-wheel?domain=${encodeURIComponent(nm)}" title="Confidence: ${esc(conf || "none")}${ansN != null && totN != null ? " — " + ansN + " of " + totN + " related questions answered" : ""}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;padding:5px 9px;background:#fff;border:1px solid var(--line);border-radius:9px;text-decoration:none;transition:border-color .15s" onmouseover="this.style.borderColor='#DDD6FE'" onmouseout="this.style.borderColor='var(--line)'"><span style="display:flex;align-items:center;gap:6px;color:var(--ink-2)"><span style="width:7px;height:7px;border-radius:50%;background:${domainColor(nm)};flex-shrink:0"></span>${esc(SHORTD[nm])}</span>${bandPill(raw, mode === "strengths" ? "strength" : "need")}</a>`;
+        }).join("") + `</div><p style="font-size:.68rem;color:var(--faint);margin:8px 0 0">Hover any row for confidence — how many related questions you've answered.</p>`;
       }
-      // completeness warning
       const wc = wheelCompleteness(data);
       const lowConf = DOMAINS.filter((n) => scored[n].confidence === "low");
       $("wheel-warning").innerHTML = (scoredCount >= 3 && wc.pct < 70)
@@ -201,6 +370,11 @@ import AppLayout from "../layouts/AppLayout.astro";
       $("d-docs").innerHTML = docs.length
         ? docs.map((d) => `<div class="doc-row"><span class="doc-ic">${docIcon}</span><span class="doc-meta"><span class="doc-name">${esc(d.file_name)}</span><span class="doc-sub">Uploaded ${UA.fmtDate(d.created_at)}</span></span><span class="doc-status"><span class="pill new">${esc((d.file_type || "file").toUpperCase())}</span></span></div>`).join("")
         : `<div style="color:var(--muted);font-size:.82rem;padding:14px 20px">No documents yet. Upload a report to get started.</div>`;
+
+      // ---------- KPIs (all live, counting up) ----------
+      const pri = (data.goals && data.goals.priorities) || [];
+      countUp($("kpi-focus"), Array.isArray(pri) ? pri.length : 0);
+      countUp($("kpi-docs"), docs.length);
 
       // ---------- ACTIVITY ----------
       const acts = p ? await UA.getActivity(p.id) : [];
@@ -235,22 +409,39 @@ import AppLayout from "../layouts/AppLayout.astro";
       $("d-fund-rows").innerHTML = fo.rows.filter((r) => r.status !== "not_started").concat(fo.rows.filter((r) => r.status === "not_started")).slice(0, 3)
         .map((r) => { const pl = UA.STATUS_PILL[r.status]; return `<div class="fund-row"><span class="fund-name">${esc(r.name)}<small>${esc(r.level)} · ${esc(r.note)}</small></span><span class="pill ${pl.cls}">${pl.label}</span></div>`; }).join("");
       $("kpi-funding-num").innerHTML = `$${fo.approvedAmount.toLocaleString("en-CA")}<span style="font-size:.9rem;color:var(--muted)">/yr</span>`;
-      $("kpi-funding-sub").textContent = fo.submitted ? `${fo.submitted} program${fo.submitted === 1 ? "" : "s"} active` : "No programs yet";
+      $("kpi-funding-sub").textContent = fo.submitted ? `${fo.submitted} program${fo.submitted === 1 ? "" : "s"} active — funding approved` : "Funding approved";
 
-      // ---------- WAITLIST KPI (your real waitlist table, by email) ----------
+      // ---------- WAITLIST KPI ----------
       const wl = await UA.getWaitlist();
       if (wl.length) {
-        $("kpi-waitlist").textContent = wl.length;
-        $("kpi-waitlist-sub").textContent = "Status · " + esc(wl[0].status || "New");
+        countUp($("kpi-waitlist"), wl.length);
+        $("kpi-waitlist-sub").textContent = "Waitlists · status " + esc(wl[0].status || "New");
       } else {
         $("kpi-waitlist").textContent = "0";
-        $("kpi-waitlist-sub").textContent = "Not on waitlist yet";
+        $("kpi-waitlist-sub").textContent = "Waitlists joined";
       }
+
+      // ---------- RECENT WINS ----------
+      $("d-explore-title").textContent = id.first ? `Explore ${esc(id.first)}'s profile` : "Explore the profile";
+      try {
+        const UA_URL2 = "https://eghqufgiudxjkbsddtnx.supabase.co";
+        const ANON2 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+        const sess = JSON.parse(localStorage.getItem("ua_session"));
+        const star = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg>';
+        let winRows = [];
+        if (p && sess && sess.access_token) {
+          const wr = await fetch(UA_URL2 + "/rest/v1/wins?select=text,created_at&passport_id=eq." + p.id + "&order=created_at.desc&limit=3", { headers: { apikey: ANON2, Authorization: "Bearer " + sess.access_token } });
+          if (wr.ok) winRows = await wr.json();
+        }
+        $("d-wins").innerHTML = winRows.length
+          ? winRows.map((w) => `<div class="dash-win"><span class="st">${star}</span><span>${esc(w.text)}</span><span class="wh">${UA.relTime(w.created_at)}</span></div>`).join("")
+          : `<div style="color:var(--muted);font-size:.82rem;padding:8px 0">No wins yet this week — even tiny ones count. <a href="/child/progress" style="color:var(--violet-700);font-weight:600;text-decoration:none">Add the first →</a></div>`;
+      } catch (e) { $("d-wins").innerHTML = ""; }
 
       // ---------- WORKSHOP ----------
       const ws = await UA.getNextWorkshop().catch(() => null);
       $("d-workshop").innerHTML = ws
-        ? (() => { const d = new Date(ws.starts_at); const day = d.getDate(); const mon = d.toLocaleDateString("en-CA", { month: "short" }); const time = d.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit" }); return `<div class="ws"><span class="ws-date"><b>${day}</b><span>${mon}</span></span><span class="ws-meta"><b>${esc(ws.title)}</b><span>${time} · ${esc(ws.location_type || "Online")}</span></span><a class="btn btn-ghost btn-sm" href="/workshops" style="margin-left:auto">Register</a></div>`; })()
+        ? (() => { const d = new Date(ws.starts_at); const day = d.getDate(); const mon = d.toLocaleDateString("en-CA", { month: "short" }); const time = d.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit" }); return `<div class="ws"><span class="ws-date"><b>${day}</b><span>${mon}</span></span><span class="ws-meta"><b>${esc(ws.title)}</b><span>${time} · ${esc(ws.location_type || "Online")}</span></span><a class="btn btn-ghost btn-sm" href="/resources/workshops" style="margin-left:auto">Register</a></div>`; })()
         : `<div style="color:var(--muted);font-size:.82rem;padding:14px 20px">No upcoming workshops scheduled.</div>`;
     })().catch((e) => console.error("[dashboard] hydrate failed", e));
   </script>

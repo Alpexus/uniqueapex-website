@@ -1,4 +1,7 @@
 ---
+/* SUPPORT-WHEEL-V2 — visual redesign: token colors, animated wheel draw-in,
+   sliding needs/strengths toggle, domain-tinted detail panel with staggered
+   chip pop-ins, ring-scale legend. Scoring + data logic unchanged. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
@@ -11,66 +14,96 @@ import SectionTabs from "@/components/SectionTabs.astro";
   <div class="sw-wrap">
     <div id="sw-warning"></div>
 
-    <div class="sw-card">
-      <div id="sw-toggle" class="sw-toggle"></div>
+    <div class="sw-card cu-rev">
+      <div class="sw-tophead">
+        <div id="sw-toggle" class="sw-seg" role="tablist"></div>
+      </div>
       <p id="sw-caption" class="sw-caption"></p>
       <div class="sw-row">
         <div class="sw-wheelcol">
           <div class="sw-wheelwrap">
-            <div id="sw-wheel"></div>
+            <div id="sw-wheel" class="sw-anim"></div>
             <svg id="sw-overlay" class="sw-overlay" viewBox="0 0 480 420" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+          </div>
+          <div class="sw-legend">
+            <span class="sw-leg-rings">
+              <i style="width:5px;height:5px"></i><i style="width:7px;height:7px"></i><i style="width:9px;height:9px"></i><i style="width:11px;height:11px"></i><i style="width:13px;height:13px"></i>
+            </span>
+            <span id="sw-leg-text">1 ring = minimal · 5 rings = intensive</span>
           </div>
         </div>
         <div id="sw-detail" class="sw-detail"></div>
       </div>
     </div>
 
-    <div class="sw-card sw-disc">
+    <div class="sw-card sw-disc cu-rev" style="--d:.12s">
       <p><strong>Preliminary profile — not a diagnosis.</strong> Generated from your passport answers. Confidence reflects how many related questions you've completed. For any concerns, speak with a qualified professional.</p>
     </div>
   </div>
 </AppFormLayout>
 
 <style is:global>
-  .sw-wrap{display:flex;flex-direction:column;gap:16px;max-width:880px}
-  .sw-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px 22px}
-  .sw-toggle{display:flex;gap:8px;justify-content:center;margin-bottom:8px}
-  .sw-tg{border:1px solid #e2e8f0;background:#fff;color:#64748b;border-radius:9999px;padding:6px 16px;font-size:.82rem;font-weight:600;cursor:pointer}
-  .sw-tg.on{background:#6d28d9;color:#fff;border-color:#6d28d9}
-  .sw-caption{text-align:center;font-size:.82rem;color:#64748b;margin:0 0 12px}
+  .sw-wrap{display:flex;flex-direction:column;gap:16px;max-width:920px}
+  .sw-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px 22px;box-shadow:var(--shadow)}
+  .sw-tophead{display:flex;justify-content:center;margin-bottom:8px}
+
+  /* sliding segmented toggle */
+  .sw-seg{position:relative;display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:9999px;padding:3px}
+  .sw-seg .thumb{position:absolute;top:3px;bottom:3px;border-radius:9999px;background:var(--violet-700);transition:left .22s cubic-bezier(.22,1,.36,1),width .22s cubic-bezier(.22,1,.36,1);box-shadow:0 2px 8px rgba(109,40,217,.3)}
+  .sw-tg{position:relative;z-index:1;border:none;background:none;color:var(--muted);border-radius:9999px;padding:7px 18px;font-size:.83rem;font-weight:600;cursor:pointer;transition:color .2s;font-family:inherit}
+  .sw-tg.on{color:#fff}
+
+  .sw-caption{text-align:center;font-size:.82rem;color:var(--muted);margin:0 0 12px}
   .sw-row{display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start}
   .sw-wheelcol{flex:1 1 300px;min-width:260px}
   .sw-wheelwrap{position:relative;width:100%;max-width:420px;margin:0 auto}
+  .sw-anim svg{transform-origin:50% 50%}
+  .sw-anim.play svg{animation:swDraw .8s cubic-bezier(.22,1,.36,1) both}
+  @keyframes swDraw{from{opacity:0;transform:scale(.6) rotate(-8deg)}to{opacity:1;transform:none}}
   .sw-overlay{position:absolute;inset:0;width:100%;height:100%}
   .sw-wedge{cursor:pointer;fill:transparent;transition:fill .15s}
-  .sw-wedge:hover{fill:rgba(109,40,217,0.06)}
-  .sw-detail{flex:1 1 300px;min-width:280px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:18px 20px;min-height:260px}
-  .swd-head{display:flex;align-items:center;gap:9px;margin-bottom:14px}
-  .swd-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0}
-  .swd-name{font-size:1.05rem;font-weight:700;color:#1e293b;flex:1}
-  .swd-pill{font-size:.72rem;font-weight:700;padding:3px 11px;border-radius:9999px}
+  .sw-wedge:hover{fill:rgba(109,40,217,0.07)}
+  .sw-legend{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:6px}
+  .sw-leg-rings{display:inline-flex;align-items:center;gap:3px}
+  .sw-leg-rings i{display:inline-block;border-radius:50%;background:var(--violet-500);opacity:.75}
+  .sw-legend span{font-size:.7rem;color:var(--faint)}
+
+  /* detail panel */
+  .sw-detail{flex:1 1 300px;min-width:280px;background:var(--card);border:1px solid var(--line);border-top-width:3px;border-radius:16px;padding:18px 20px;min-height:280px;transition:border-color .3s}
+  .swd-in{animation:swdIn .3s cubic-bezier(.22,1,.36,1) both}
+  @keyframes swdIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .swd-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .swd-dot{width:30px;height:30px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;flex-shrink:0;display:grid;place-items:center}
+  .swd-dot i{width:11px;height:11px;border-radius:50%;font-style:normal}
+  .swd-name{font-family:var(--display);font-size:1.05rem;font-weight:700;color:var(--ink);flex:1}
+  .swd-pill{font-size:.72rem;font-weight:700;padding:3px 11px;border-radius:9999px;white-space:nowrap}
   .swd-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .swd-meta .l{font-size:.74rem;color:#64748b;min-width:78px}
+  .swd-meta .l{font-size:.74rem;color:var(--muted);min-width:78px}
   .swd-segs{display:flex;gap:4px;flex:1}
-  .swd-seg{height:8px;border-radius:3px;flex:1}
-  .swd-dots{display:flex;gap:5px}
-  .swd-d3{width:8px;height:8px;border-radius:50%}
-  .swd-lab{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#94a3b8;margin:15px 0 8px}
+  .swd-seg{height:9px;border-radius:4px;flex:1;background:var(--bg);position:relative;overflow:hidden}
+  .swd-seg b{position:absolute;inset:0;border-radius:4px;transform:scaleX(0);transform-origin:left;animation:swdSeg .5s cubic-bezier(.22,1,.36,1) var(--d,0s) both}
+  @keyframes swdSeg{to{transform:scaleX(1)}}
+  .swd-lab{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);margin:15px 0 8px}
   .swd-chips{display:flex;flex-wrap:wrap;gap:7px}
-  .swd-chip{display:inline-flex;align-items:center;gap:6px;font-size:.83rem;font-weight:600;padding:6px 11px;border-radius:10px;line-height:1.25}
-  .swd-chip.str{background:#ECFDF5;color:#15803d}
-  .swd-chip.sup{background:#FFFBEB;color:#b45309}
-  .swd-chip.tip{background:#F5F3FF;color:#6d28d9}
-  .swd-none{font-size:.83rem;color:#94a3b8}
-  .swd-ctx{font-size:.82rem;color:#64748b;font-style:italic;margin:0 0 12px}
-  .sw-disc{background:#fffbeb;border-color:#f3e2c0}
-  .sw-disc p{color:#b45309;font-size:.74rem;line-height:1.5;margin:0}
+  .swd-chip{display:inline-flex;align-items:center;gap:6px;font-size:.83rem;font-weight:600;padding:6px 11px;border-radius:9999px;line-height:1.25;transition:transform .15s}
+  .swd-chip:hover{transform:translateY(-1px)}
+  .swd-chip.str{background:var(--green-bg);color:var(--green)}
+  .swd-chip.sup{background:var(--amber-bg);color:var(--amber)}
+  .swd-chip.tip{background:var(--violet-50);color:var(--violet-700)}
+  .swd-none{font-size:.83rem;color:var(--faint)}
+  .swd-ctx{font-size:.82rem;color:var(--muted);font-style:italic;margin:0 0 12px}
+  .sw-disc{background:var(--amber-bg);border-color:#EBDCC3}
+  .sw-disc p{color:var(--amber);font-size:.74rem;line-height:1.5;margin:0}
   .sw-prompt{text-align:center;padding:28px 16px}
-  .sw-prompt p{color:#64748b;font-size:.9rem;margin:0 0 14px}
-  .sw-prompt a{display:inline-block;background:#6d28d9;color:#fff;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none}
-  .sw-warn{background:#fffbeb;border:1px solid #f3e2c0;border-radius:12px;padding:12px 16px}
-  .sw-warn p{color:#b45309;font-size:.8rem;line-height:1.5;margin:0}
-  .sw-warn a{color:#b45309;font-weight:600;text-decoration:underline}
+  .sw-prompt p{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+  .sw-prompt a{display:inline-block;background:var(--violet-700);color:#fff;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none}
+  .sw-warn{background:var(--amber-bg);border:1px solid #EBDCC3;border-radius:12px;padding:12px 16px}
+  .sw-warn p{color:var(--amber);font-size:.8rem;line-height:1.5;margin:0}
+  .sw-warn a{color:var(--amber);font-weight:600;text-decoration:underline}
+  @media (prefers-reduced-motion:reduce){
+    .sw-anim.play svg,.swd-in,.swd-seg b{animation:none}
+    .swd-seg b{transform:none}
+  }
 </style>
 
 <script is:inline>
@@ -85,120 +118,21 @@ import SectionTabs from "@/components/SectionTabs.astro";
   import * as UA from "../../lib/ua-data.js";
   import { scoreWheel, DOMAINS, wheelCompleteness, scoreToBand, HUES } from "../../lib/wheelScore.js";
   import { generateWheelSVG, domainColor } from "../../lib/wheelSvg.js";
+  import { domainDetail } from "../../lib/domainInsights.js";
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const SENSE_LABELS = { auditory: "Sound", visual: "Sight", tactile: "Touch", oral: "Taste & mouth", smell: "Smell", movement: "Movement & balance", body: "Body awareness" };
-  const isHigh = (v) => v === "Often" || v === "Daily";
-  const present = (v) => v != null && v !== "";
-  const uniq = (a) => [...new Set(a)];
 
   const icCheck = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
   const icBang = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M8 3.2v6M8 12.3v.2"/></svg>';
   const icStar = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg>';
 
-  function domainDetail(name, d) {
-    const strengths = [], support = [], strategies = [];
-    let context = "";
-    const comm = d.communication || {}, beh = d.behaviour || {}, bch = beh.challenges || {},
-          sen = d.sensory || {}, dl = d.dailyLiving || {}, motor = d.motor || {}, str = d.strengths || {};
-    switch (name) {
-      case "Communication": {
-        if (comm.style === "Fluent Verbal" || comm.style === "Verbal") strengths.push("Communicates verbally");
-        (comm.means || []).forEach((m) => {
-          if (m === "Words") strengths.push("Uses words");
-          else if (m === "Sentences") strengths.push("Uses sentences");
-          else if (m === "Sign language") strengths.push("Uses sign language");
-          else if (m === "Device / AAC app") strengths.push("Uses an AAC device");
-          else if (m === "Pictures (PECS)") strengths.push("Uses picture communication");
-        });
-        if (comm.canExpressNeeds === "Consistently") strengths.push("Expresses needs reliably");
-        if (comm.style === "Non-Speaking" || comm.style === "Limited Verbal") support.push("Building spoken communication");
-        const cmap = { "Requesting": "Requesting things", "Conversation": "Back-and-forth conversation", "Question Answering": "Answering questions", "Emotional Expression": "Putting feelings into words", "Social Communication": "Social communication" };
-        (comm.challenges || []).forEach((c) => { if (cmap[c]) support.push(cmap[c]); });
-        if (comm.canExpressNeeds === "Rarely") support.push("Expressing needs");
-        strategies.push("Visual supports and picture cards", "Offer simple choices", "Model short, clear phrases", "Give a little extra time to respond");
-        break;
-      }
-      case "Social Connection": {
-        if (beh.peersInterest === "Yes") strengths.push("Shows interest in other children");
-        if (beh.peersInteract === "Yes") strengths.push("Plays with peers");
-        else if (beh.peersInteract === "Sometimes") strengths.push("Plays alongside peers");
-        if (beh.peersInterest === "No") support.push("Connecting with other children");
-        if (beh.peersInteract === "No" || beh.peersInteract === "Sometimes") support.push("Back-and-forth play");
-        strategies.push("Structured, shared activities", "Turn-taking games", "Short play dates with clear roles", "Social stories before new situations");
-        break;
-      }
-      case "Sensory Processing": {
-        Object.keys(SENSE_LABELS).forEach((k) => {
-          const o = sen[k];
-          if (!o || typeof o !== "object") return;
-          if (o.typical) strengths.push("Comfortable with " + SENSE_LABELS[k].toLowerCase());
-          else if (o.signs && o.signs.length) {
-            const sig = o.signs.slice(0, 2).join(", ").toLowerCase();
-            support.push(SENSE_LABELS[k] + ": " + sig + (o.severity ? " (" + o.severity.toLowerCase() + ")" : ""));
-          }
-        });
-        if (present(sen.notes)) context = "Your note: " + sen.notes;
-        strategies.push("Sensory breaks through the day", "Noise-reducing headphones in loud places", "Deep-pressure input (tight hugs, weighted items)", "Prepare for known triggers in advance");
-        break;
-      }
-      case "Flexibility & Transitions": {
-        if (!isHigh(bch.rigidity) && bch.rigidity !== "Sometimes") strengths.push("Handles changes fairly well");
-        if (isHigh(bch.rigidity)) support.push("Changes in routine");
-        else if (bch.rigidity === "Sometimes") support.push("Some difficulty with transitions");
-        strategies.push("Visual schedules", "Countdown warnings before transitions", "First then language", "Keep routines predictable where you can");
-        break;
-      }
-      case "Emotional Regulation": {
-        if (!isHigh(bch.meltdowns) && !isHigh(bch.emotional) && !isHigh(bch.anxiety)) strengths.push("Generally calm and settled");
-        if (isHigh(bch.meltdowns)) support.push("Big emotional reactions / meltdowns");
-        if (isHigh(bch.emotional)) support.push("Regulating emotions in the moment");
-        if (isHigh(bch.anxiety)) support.push("Anxiety");
-        if (present(beh.triggers)) context = "Known triggers: " + beh.triggers;
-        if (present(beh.strategies)) strategies.push(beh.strategies);
-        strategies.push("A calm-down space", "Naming feelings together", "Simple breathing or counting", "Stay calm and steady during big feelings");
-        break;
-      }
-      case "Executive Function": {
-        if (dl.multiStep === "Yes") strengths.push("Follows multi-step instructions");
-        if (dl.safety === "Strong") strengths.push("Good safety awareness");
-        if (dl.multiStep === "No" || dl.multiStep === "Sometimes") support.push("Following multi-step instructions");
-        if (isHigh(bch.hyperactivity)) support.push("Staying focused / sitting still");
-        if (isHigh(bch.defiance)) support.push("Following directions");
-        strategies.push("Break tasks into small steps", "Visual checklists", "Use timers for activities", "One instruction at a time");
-        break;
-      }
-      case "Daily Living Skills": {
-        if (dl.eating === "Independent") strengths.push("Eats independently");
-        if (dl.dressing === "Independent") strengths.push("Dresses independently");
-        if (dl.toileting === "Fully trained") strengths.push("Toilet trained");
-        if (dl.sleep === "Good") strengths.push("Sleeps well");
-        if (dl.eating === "With support" || dl.eating === "Not yet") support.push("Eating skills");
-        if (dl.dressing === "With support" || dl.dressing === "Not yet") support.push("Dressing skills");
-        if (dl.toileting === "In progress" || dl.toileting === "Not started") support.push("Toilet training");
-        if (dl.feeding === "Mild" || dl.feeding === "Significant") support.push("Feeding");
-        if ((motor.fine || []).length) support.push("Fine motor skills");
-        if ((motor.gross || []).length) support.push("Gross motor skills");
-        strategies.push("Visual step-by-step routines", "Adaptive tools (easy-grip, velcro)", "Practice one skill at a time", "Celebrate small wins");
-        break;
-      }
-      case "Learning & Play": {
-        const interests = String(str.interests || "").split(/[,\n;•]+/).map((x) => x.trim()).filter(Boolean);
-        if (interests.length) strengths.push("Engages deeply with " + interests.slice(0, 3).join(", ").toLowerCase());
-        strategies.push("Build learning around their interests", "Play-based teaching", "Short, frequent sessions", "Visual and hands-on materials");
-        break;
-      }
-    }
-    return { strengths: uniq(strengths), support: uniq(support), strategies: uniq(strategies), context };
-  }
-
   function levelInfo(score) {
-    if (score == null) return { label: "Not enough data", bg: "#f1f5f9", fg: "#64748b", seg: "#cbd5e1" };
+    if (score == null) return { label: "Not enough data", bg: "#F4F3F8", fg: "#7B7491", seg: "#D8D3E6" };
     const b = scoreToBand(score);
-    if (b.key === "minimal" || b.key === "low") return { label: b.label, bg: "#ECFDF5", fg: "#15803d", seg: "#16a34a" };
-    if (b.key === "high" || b.key === "intensive") return { label: b.label, bg: "#F5F3FF", fg: "#6d28d9", seg: "#7c3aed" };
-    return { label: b.label, bg: "#FFFBEB", fg: "#b45309", seg: "#d97706" };
+    if (b.key === "minimal" || b.key === "low") return { label: b.label, bg: "#E8F6F0", fg: "#0E8F66", seg: "#0E8F66" };
+    if (b.key === "high" || b.key === "intensive") return { label: b.label, bg: "#EDE9FE", fg: "#6D28D9", seg: "#7C3AED" };
+    return { label: b.label, bg: "#FBF2E2", fg: "#A8650A", seg: "#D97706" };
   }
 
   (async () => {
@@ -217,13 +151,14 @@ import SectionTabs from "@/components/SectionTabs.astro";
       $("sw-caption").textContent = "";
       $("sw-wheel").innerHTML = `<div class="sw-prompt"><p>Fill in more of the passport (communication, sensory, behaviour, daily living) to generate ${esc(first)}'s support wheel.</p><a href="${passportLink}">Continue passport →</a></div>`;
       $("sw-detail").style.display = "none";
+      document.querySelector(".sw-legend").style.display = "none";
       return;
     }
 
     const wc = wheelCompleteness(data);
     const lowConf = DOMAINS.filter((nm) => scored[nm].confidence === "low");
     $("sw-warning").innerHTML = (wc.pct < 70)
-      ? `<div class="sw-warn"><p><strong>Wheel is ${wc.pct}% complete</strong> — ${wc.answered} of ${wc.total} contributing questions answered.${lowConf.length ? " Lower confidence in: " + esc(lowConf.join(", ")) + "." : ""} <a href="${passportLink}">Complete more →</a></p></div>`
+      ? `<div class="sw-warn cu-rev"><p><strong>Wheel is ${wc.pct}% complete</strong> — ${wc.answered} of ${wc.total} contributing questions answered.${lowConf.length ? " Lower confidence in: " + esc(lowConf.join(", ")) + "." : ""} <a href="${passportLink}">Complete more →</a></p></div>`
       : "";
 
     let sel = 0;
@@ -233,15 +168,27 @@ import SectionTabs from "@/components/SectionTabs.astro";
     let mode = "needs";
 
     function renderToggle() {
-      $("sw-toggle").innerHTML = ["needs", "strengths"].map((m) =>
-        `<button class="sw-tg ${m === mode ? "on" : ""}" data-mode="${m}">${m === "needs" ? "Support needs" : "Strengths"}</button>`).join("");
-      $("sw-toggle").querySelectorAll("button").forEach((b) =>
-        b.addEventListener("click", () => { mode = b.dataset.mode; renderToggle(); renderWheel(); }));
+      const seg = $("sw-toggle");
+      seg.innerHTML = `<span class="thumb"></span>` + ["needs", "strengths"].map((m) =>
+        `<button class="sw-tg ${m === mode ? "on" : ""}" data-mode="${m}" role="tab" aria-selected="${m === mode}">${m === "needs" ? "Support needs" : "Strengths"}</button>`).join("");
+      const onBtn = seg.querySelector(".sw-tg.on"), thumb = seg.querySelector(".thumb");
+      requestAnimationFrame(() => { thumb.style.left = onBtn.offsetLeft + "px"; thumb.style.width = onBtn.offsetWidth + "px"; });
+      seg.querySelectorAll("button").forEach((b) =>
+        b.addEventListener("click", () => { mode = b.dataset.mode; renderToggle(); renderWheel(); renderDetail(); }));
       $("sw-caption").innerHTML = mode === "strengths"
         ? "Fuller petals mean <strong>stronger</strong> areas."
         : "Fuller petals mean <strong>more support</strong> is helpful.";
+      $("sw-leg-text").textContent = mode === "strengths"
+        ? "1 ring = emerging · 5 rings = shining"
+        : "1 ring = minimal support · 5 rings = intensive support";
     }
-    function renderWheel() { $("sw-wheel").innerHTML = generateWheelSVG(scored, mode); }
+    function renderWheel() {
+      const host = $("sw-wheel");
+      host.classList.remove("play");
+      host.innerHTML = generateWheelSVG(scored, mode);
+      void host.offsetWidth; /* restart the draw-in animation */
+      host.classList.add("play");
+    }
 
     const cx = 240, cy = 210, ir = 24, or_ = 138, seg = (2 * Math.PI) / n;
     const pt = (r, a) => [(cx + r * Math.cos(a)).toFixed(2), (cy + r * Math.sin(a)).toFixed(2)];
@@ -261,31 +208,34 @@ import SectionTabs from "@/components/SectionTabs.astro";
         el.addEventListener("click", () => { sel = +el.getAttribute("data-i"); renderDetail(); buildOverlay(); }));
     }
 
-    function block(title, items, cls) {
+    function block(title, items, cls, dBase) {
       const icon = cls === "str" ? icCheck : cls === "sup" ? icBang : icStar;
       const inner = items.length
-        ? items.map((t) => `<span class="swd-chip ${cls}">${icon}${esc(t)}</span>`).join("")
+        ? items.map((t, i) => `<span class="swd-chip ${cls} cu-pop" style="--d:${(dBase + i * 0.045).toFixed(2)}s">${icon}${esc(t)}</span>`).join("")
         : `<span class="swd-none">${cls === "sup" ? "Nothing flagged right now" : "Add details in the passport to see this"}</span>`;
       return `<p class="swd-lab">${title}</p><div class="swd-chips">${inner}</div>`;
     }
     function renderDetail() {
       const name = DOMAINS[sel], dm = scored[name];
       const L = levelInfo(dm.score), det = domainDetail(name, data);
+      const dc = domainColor(name);
       const segCount = dm.score == null ? 0 : (dm.score === 0 ? 0 : scoreToBand(dm.score).rings);
       const strCount = dm.strength == null ? 0 : (dm.strength === 0 ? 0 : scoreToBand(dm.strength, "strength").rings);
-      let segs = ""; for (let k = 1; k <= 5; k++) segs += `<span class="swd-seg" style="background:${k <= segCount ? L.seg : "#e2e8f0"}"></span>`;
-      let ssegs = ""; for (let k = 1; k <= 5; k++) ssegs += `<span class="swd-seg" style="background:${k <= strCount ? "#16a34a" : "#e2e8f0"}"></span>`;
+      let segs = ""; for (let k = 1; k <= 5; k++) segs += `<span class="swd-seg">${k <= segCount ? `<b style="background:${L.seg};--d:${(k * 0.07).toFixed(2)}s"></b>` : ""}</span>`;
+      let ssegs = ""; for (let k = 1; k <= 5; k++) ssegs += `<span class="swd-seg">${k <= strCount ? `<b style="background:#0E8F66;--d:${(k * 0.07).toFixed(2)}s"></b>` : ""}</span>`;
       const confLbl = dm.confidence === "high" ? "High" : dm.confidence === "medium" ? "Medium" : dm.confidence === "low" ? "Low" : "No data";
-      $("sw-detail").innerHTML =
-        `<div class="swd-head"><span class="swd-dot" style="background:${domainColor(name)}"></span><span class="swd-name">${esc(name)}</span><span class="swd-pill" style="background:${L.bg};color:${L.fg}">${L.label}</span></div>`
+      $("sw-detail").style.borderTopColor = dc;
+      $("sw-detail").innerHTML = `<div class="swd-in">`
+        + `<div class="swd-head"><span class="swd-dot" style="background:${dc}22"><i style="background:${dc}"></i></span><span class="swd-name">${esc(name)}</span><span class="swd-pill" style="background:${L.bg};color:${L.fg}">${L.label}</span></div>`
         + (dm.score == null ? `<p class="swd-none">Add more in the passport to build this part of the profile.</p>` :
             `<div class="swd-meta"><span class="l">Support level</span><span class="swd-segs">${segs}</span></div>`
             + (dm.strength != null ? `<div class="swd-meta"><span class="l">Strengths</span><span class="swd-segs">${ssegs}</span></div>` : "")
-            + `<div class="swd-meta"><span class="l">Confidence</span><span style="font-size:.78rem;color:#64748b">${confLbl} — based on ${dm.answered} of ${dm.total} related questions</span></div>`)
+            + `<div class="swd-meta"><span class="l">Confidence</span><span style="font-size:.78rem;color:var(--muted)">${confLbl} — based on ${dm.answered} of ${dm.total} related questions</span></div>`)
         + (det.context ? `<p class="swd-ctx" style="margin-top:12px">${esc(det.context)}</p>` : "")
-        + block("Strengths", det.strengths, "str")
-        + block("Areas we're supporting", det.support, "sup")
-        + block("Strategies that help", det.strategies, "tip");
+        + block("Strengths", det.strengths, "str", 0.08)
+        + block("Areas we're supporting", det.support, "sup", 0.16)
+        + block("Strategies that help", det.strategies, "tip", 0.24)
+        + `</div>`;
     }
 
     renderToggle();

@@ -1,13 +1,78 @@
 ---
+/* DOCUMENTS-AI-V1 — the AI Report Reader home: how it works, honest
+   status, and where summaries will appear. Links to the vault for
+   uploads and to the child Assessments tab for manual records. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
 <AppFormLayout title="Documents" activeNav="documents">
   <SectionTabs section="documents" active="ai-summaries" />
   <h1 class="page-title">AI Summaries</h1>
-  <p class="page-sub">Part of Documents. This page is scaffolded — content is coming.</p>
-  <div class="ua-stub">
-    <b>AI Summaries</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+  <p class="page-sub">Dense clinical reports, translated into plain parent language — what was found, what's recommended, what to do next.</p>
+
+  <div class="da2-hero cu-rev cu-sparkle-host">
+    <span class="cu-spark" style="top:14px;right:80px">✦</span>
+    <span class="cu-spark s2" style="top:34px;right:56px">✦</span>
+    <div class="da2-hero-ic">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/><path d="M12 11l.9 2.1L15 14l-2.1.9L12 17l-.9-2.1L9 14l2.1-.9z"/></svg>
+    </div>
+    <div class="da2-hero-tx">
+      <b>AI Report Reader</b>
+      <p>A 20-page evaluation becomes a one-page summary in minutes. Your report never leaves your private vault — the summary is saved right beside it.</p>
+    </div>
+    <a class="da2-btn" href="/documents">Upload a report</a>
   </div>
+
+  <div class="da2-steps">
+    <div class="da2-step cu-rev" style="--d:.08s">
+      <span class="n">1</span>
+      <b>Upload the report</b>
+      <p>Any evaluation PDF — speech, OT, psychoeducational, developmental — into your private vault.</p>
+    </div>
+    <div class="da2-step cu-rev" style="--d:.14s">
+      <span class="n">2</span>
+      <b>AI reads it for you</b>
+      <p>Key findings, recommendations and dates are pulled out and rewritten without the jargon.</p>
+    </div>
+    <div class="da2-step cu-rev" style="--d:.2s">
+      <span class="n">3</span>
+      <b>Use it everywhere</b>
+      <p>The summary lands here and feeds your recommendations hub — ready for IEP meetings and funding forms.</p>
+    </div>
+  </div>
+
+  <div class="da2-status cu-rev" style="--d:.26s">
+    <p><strong>Rolling out now.</strong> The Report Reader is in final testing with pilot families. Until it reaches your account, you can capture findings by hand in <a href="/child/assessments">Assessments</a> — everything you save there carries over.</p>
+  </div>
+
+  <p class="da2-note cu-rev" style="--d:.3s">AI can make mistakes and never replaces professional advice — always check the summary against the original report.</p>
 </AppFormLayout>
+
+<style is:global>
+  .da2-hero{position:relative;display:flex;align-items:center;gap:16px;max-width:920px;background:linear-gradient(120deg,var(--violet-50),#F9F7FE 55%,#F0FBF9),var(--card);border:1px solid var(--violet-100);border-radius:18px;padding:20px 22px;margin-bottom:16px;flex-wrap:wrap;box-shadow:var(--shadow)}
+  .da2-hero-ic{width:52px;height:52px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:#fff;display:grid;place-items:center;flex-shrink:0;box-shadow:0 6px 16px rgba(109,40,217,.28)}
+  .da2-hero-tx{flex:1;min-width:220px}
+  .da2-hero-tx b{font-family:var(--display);font-size:1.05rem;color:var(--ink)}
+  .da2-hero-tx p{font-size:.86rem;color:var(--ink-2);line-height:1.55;margin:4px 0 0;max-width:56ch}
+  .da2-btn{background:var(--violet-700);color:#fff;font-size:.84rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none;white-space:nowrap;transition:filter .15s,transform .15s}
+  .da2-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+  .da2-hero .cu-spark{font-style:normal;font-size:13px;color:#8B5CF6}
+  .da2-hero .cu-spark.s2{font-size:10px;color:#5EEAD4}
+  .da2-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;max-width:920px;margin-bottom:16px}
+  .da2-step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
+  .da2-step .n{width:26px;height:26px;border-radius:9px;background:var(--violet-50);color:var(--violet-700);font-size:.8rem;font-weight:700;display:grid;place-items:center;margin-bottom:9px}
+  .da2-step b{font-family:var(--display);font-size:.92rem;color:var(--ink);display:block}
+  .da2-step p{font-size:.82rem;color:var(--muted);line-height:1.5;margin:4px 0 0}
+  .da2-status{max-width:920px;background:var(--amber-bg);border:1px solid #EBDCC3;border-radius:14px;padding:13px 17px}
+  .da2-status p{font-size:.84rem;color:var(--amber);line-height:1.55;margin:0}
+  .da2-status a{color:var(--amber);font-weight:700}
+  .da2-note{max-width:920px;font-size:.74rem;color:var(--faint);margin-top:12px}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>

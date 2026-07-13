@@ -1,13 +1,83 @@
 ---
+/* SETTINGS-SUBSCRIPTION-V1 — functional subscription page for the pilot:
+   shows the real plan from the account (defaults to Free), what's included,
+   the upgrade path to /pricing, and an honest empty billing history.
+   Stripe checkout wires in here later without changing the layout. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
+import "@/styles/settings.css";
 ---
 <AppFormLayout title="Settings" activeNav="settings">
   <SectionTabs section="settings" active="subscription" />
-  <h1 class="page-title">Subscription</h1>
-  <p class="page-sub">Part of Settings. This page is scaffolded — content is coming.</p>
-  <div class="ua-stub">
-    <b>Subscription</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+  <div class="set-wrap">
+    <h1 class="page-title">Subscription</h1>
+    <p class="page-sub">Your plan, what it includes, and your billing history.</p>
+
+    <div class="plan-banner">
+      <div>
+        <div class="pn" id="plan-name">Free</div>
+        <div class="pp" id="plan-desc">Every family starts here — one child profile, the Support Wheel, and one outreach batch per service type.</div>
+      </div>
+      <span class="pill" id="plan-pill">Current plan</span>
+    </div>
+
+    <div class="set-section">
+      <h2>Included in your plan</h2>
+      <div id="plan-features">
+        <div class="set-row"><div class="l"><h3>Family Passport</h3><p>One child profile — fill it once, export it for any provider or school.</p></div><span class="always">Included</span></div>
+        <div class="set-row"><div class="l"><h3>Support Wheel &amp; insights</h3><p>Your child's profile visualized, with personalized family guidance.</p></div><span class="always">Included</span></div>
+        <div class="set-row"><div class="l"><h3>Provider outreach</h3><p>One outreach batch per service type to matched providers.</p></div><span class="always">Included</span></div>
+        <div class="set-row"><div class="l"><h3>Document storage</h3><p>Keep reports and assessments in one private place.</p></div><span class="always">Included</span></div>
+      </div>
+    </div>
+
+    <div class="set-section">
+      <h2>Get more support</h2>
+      <div class="set-row">
+        <div class="l"><h3>Member &amp; Family+ plans</h3><p>Priority matching, AI report summaries, workshops, community, and concierge credit.</p></div>
+        <a class="set-btn" style="text-decoration:none" href="/pricing">See plans</a>
+      </div>
+      <div class="set-row">
+        <div class="l"><h3>À la carte</h3><p>AI Report Reader $17/report · Report translation EN↔FR $99/report — no subscription needed.</p></div>
+        <a class="set-btn ghost" style="text-decoration:none" href="/pricing">Learn more</a>
+      </div>
+    </div>
+
+    <div class="set-section">
+      <h2>Billing history</h2>
+      <div id="billing-rows">
+        <div class="set-row">
+          <div class="l"><h3>No charges yet</h3><p>You're on the free plan. When you upgrade, receipts will appear here — you'll never be charged without adding a payment method first.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="set-section">
+      <h2>Questions</h2>
+      <div class="set-row">
+        <div class="l"><h3>Billing help</h3><p>Anything unclear about plans or charges — we answer personally.</p></div>
+        <a class="set-btn ghost" style="text-decoration:none" href="mailto:contact@uniqueapex.com?subject=Billing%20question">Contact us</a>
+      </div>
+    </div>
   </div>
 </AppFormLayout>
+
+<script is:inline>
+  (function () {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem("ua_session")); } catch(e){}
+    if (!s || !s.access_token) { location.href = "/login"; return; }
+    /* Plan comes from account metadata; defaults to Free. When Stripe lands,
+       the webhook writes user_metadata.plan and this page just works. */
+    var meta = (s.user && s.user.user_metadata) || {};
+    var plan = meta.plan || "free";
+    var PLANS = {
+      free:    { name: "Free",    desc: "Every family starts here — one child profile, the Support Wheel, and one outreach batch per service type." },
+      member:  { name: "Member",  desc: "Priority matching, AI report summaries, workshops and community — everything a family in motion needs." },
+      familyplus: { name: "Family+", desc: "Our most complete plan: everything in Member plus concierge credit and report translation." }
+    };
+    var p = PLANS[plan] || PLANS.free;
+    document.getElementById("plan-name").textContent = p.name;
+    document.getElementById("plan-desc").textContent = p.desc;
+  })();
+</script>

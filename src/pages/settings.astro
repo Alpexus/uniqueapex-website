@@ -1,4 +1,7 @@
 ---
+/* SETTINGS-ACCOUNT-V2 — fully functional: name, language and timezone save
+   to the Supabase account (user metadata); password change is real; email
+   change sends Supabase's confirmation link. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 import "@/styles/settings.css";
@@ -18,11 +21,25 @@ import "@/styles/settings.css";
       <div class="set-field">
         <label for="set-email">Email address</label>
         <input class="set-input" id="set-email" type="email" placeholder="you@email.com" />
-        <span class="set-hint">Used to sign in and for important account contact.</span>
+        <span class="set-hint">Used to sign in. If you change it, we'll email a confirmation link to the new address before it takes effect.</span>
       </div>
       <div class="set-row">
         <div class="l"><h3>Password</h3><p>Change the password you use to sign in.</p></div>
-        <button class="set-btn ghost" type="button">Change password</button>
+        <button class="set-btn ghost" type="button" id="pw-toggle">Change password</button>
+      </div>
+      <div id="pw-fields" style="display:none">
+        <div class="set-field">
+          <label for="set-pw1">New password</label>
+          <input class="set-input" id="set-pw1" type="password" autocomplete="new-password" placeholder="At least 8 characters" />
+        </div>
+        <div class="set-field">
+          <label for="set-pw2">Confirm new password</label>
+          <input class="set-input" id="set-pw2" type="password" autocomplete="new-password" placeholder="Type it again" />
+        </div>
+        <div class="set-actions" style="margin-top:0">
+          <button class="set-btn" type="button" id="pw-save">Update password</button>
+          <span class="set-hint" id="pw-msg" style="align-self:center"></span>
+        </div>
       </div>
       <div class="set-row">
         <div class="l"><h3>Login method</h3><p>Email and password. Google / Apple sign-in coming later.</p></div>
@@ -43,45 +60,105 @@ import "@/styles/settings.css";
       </div>
     </div>
 
-    <div class="set-actions"><button class="set-btn" type="button">Save changes</button></div>
+    <div class="set-actions">
+      <button class="set-btn" type="button" id="acc-save">Save changes</button>
+      <span class="set-hint" id="acc-msg" style="align-self:center"></span>
+    </div>
   </div>
 </AppFormLayout>
 
-
-<script is:inline>
-  (function(){
-    var raw = localStorage.getItem("ua_session"), s = null;
-    try { s = raw ? JSON.parse(raw) : null; } catch(e){}
-    if (s && s.user && s.user.email) { var em = document.getElementById('set-email'); if (em && !em.value) em.value = s.user.email; }
-    try { var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; var t = document.getElementById('set-tz'); if (t && !t.value) t.value = tz; } catch(e){}
-  })();
-</script>
-
 <script is:inline>
   (function () {
-    function K(n){ return "ua_pref_" + n; }
-    document.querySelectorAll('input[type=checkbox][data-pref]').forEach(function(c){
-      var v = localStorage.getItem(K(c.dataset.pref));
-      if (v !== null) c.checked = v === "1";
-      c.addEventListener('change', function(){ localStorage.setItem(K(c.dataset.pref), c.checked ? "1" : "0"); });
-    });
-    document.querySelectorAll('.seg[data-pref]').forEach(function(seg){
-      var key = seg.dataset.pref, saved = localStorage.getItem(K(key));
-      var btns = seg.querySelectorAll('button');
+    /* ---------- session + Supabase helpers ---------- */
+    var UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+    var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+    function getSession(){ try { return JSON.parse(localStorage.getItem("ua_session")); } catch(e){ return null; } }
+    var s = getSession();
+    if (!s || !s.access_token) { location.href = "/login"; return; }
+    var meta = (s.user && s.user.user_metadata) || {};
+
+    function patchUser(body) {
+      return fetch(UA_URL + "/auth/v1/user", {
+        method: "PUT",
+        headers: { apikey: ANON, Authorization: "Bearer " + s.access_token, "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }).then(function(r){ return r.json().then(function(j){ return { ok: r.ok, j: j }; }); });
+    }
+    function saveSessionUser(user) {
+      try { var cur = getSession(); if (cur && user) { cur.user = user; localStorage.setItem("ua_session", JSON.stringify(cur)); } } catch(e){}
+    }
+
+    /* ---------- prefill ---------- */
+    var nameEl = document.getElementById("set-name");
+    var emailEl = document.getElementById("set-email");
+    var tzEl = document.getElementById("set-tz");
+    if (meta.full_name) nameEl.value = meta.full_name;
+    if (s.user && s.user.email) emailEl.value = s.user.email;
+    tzEl.value = meta.timezone || (function(){ try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch(e){ return ""; } })();
+
+    /* ---------- language segment (persists locally + to account) ---------- */
+    var K = function(n){ return "ua_pref_" + n; };
+    document.querySelectorAll(".seg[data-pref]").forEach(function(seg){
+      var key = seg.dataset.pref;
+      var saved = meta.lang || localStorage.getItem(K(key));
+      var btns = seg.querySelectorAll("button");
       btns.forEach(function(b){
-        if (saved !== null) b.classList.toggle('on', b.dataset.val === saved);
-        b.addEventListener('click', function(){
-          btns.forEach(function(x){ x.classList.remove('on'); });
-          b.classList.add('on'); localStorage.setItem(K(key), b.dataset.val);
+        if (saved) b.classList.toggle("on", b.dataset.val === saved);
+        b.addEventListener("click", function(){
+          btns.forEach(function(x){ x.classList.remove("on"); });
+          b.classList.add("on");
+          localStorage.setItem(K(key), b.dataset.val);
         });
       });
     });
-    document.querySelectorAll('.radio-card input[type=radio]').forEach(function(r){
-      r.addEventListener('change', function(){
-        document.querySelectorAll('.radio-card input[name="'+r.name+'"]').forEach(function(x){
-          x.closest('.radio-card').classList.toggle('sel', x.checked);
-        });
-      });
+
+    /* ---------- save identity + preferences ---------- */
+    document.getElementById("acc-save").addEventListener("click", function(){
+      var msg = document.getElementById("acc-msg");
+      msg.textContent = "Saving…";
+      var langBtn = document.querySelector('.seg[data-pref="lang"] button.on');
+      var body = { data: {
+        full_name: nameEl.value.trim(),
+        timezone: tzEl.value.trim(),
+        lang: langBtn ? langBtn.dataset.val : "en"
+      }};
+      var emailChanged = s.user && emailEl.value.trim() && emailEl.value.trim() !== s.user.email;
+      if (emailChanged) body.email = emailEl.value.trim();
+      patchUser(body).then(function(res){
+        if (res.ok) {
+          saveSessionUser(res.j);
+          msg.textContent = emailChanged
+            ? "Saved. Check " + emailEl.value.trim() + " for a confirmation link."
+            : "Saved.";
+          msg.style.color = "#15803D";
+        } else {
+          msg.textContent = (res.j && (res.j.msg || res.j.message || res.j.error_description)) || "Couldn't save — try again.";
+          msg.style.color = "#B42318";
+        }
+      }).catch(function(){ msg.textContent = "Couldn't reach the server — check your connection."; msg.style.color = "#B42318"; });
+    });
+
+    /* ---------- password change ---------- */
+    var pwFields = document.getElementById("pw-fields");
+    document.getElementById("pw-toggle").addEventListener("click", function(){
+      pwFields.style.display = pwFields.style.display === "none" ? "block" : "none";
+    });
+    document.getElementById("pw-save").addEventListener("click", function(){
+      var p1 = document.getElementById("set-pw1").value;
+      var p2 = document.getElementById("set-pw2").value;
+      var msg = document.getElementById("pw-msg");
+      if (p1.length < 8) { msg.textContent = "Use at least 8 characters."; msg.style.color = "#B42318"; return; }
+      if (p1 !== p2) { msg.textContent = "Passwords don't match."; msg.style.color = "#B42318"; return; }
+      msg.textContent = "Updating…"; msg.style.color = "";
+      patchUser({ password: p1 }).then(function(res){
+        if (res.ok) {
+          msg.textContent = "Password updated."; msg.style.color = "#15803D";
+          document.getElementById("set-pw1").value = ""; document.getElementById("set-pw2").value = "";
+        } else {
+          msg.textContent = (res.j && (res.j.msg || res.j.message)) || "Couldn't update — try again.";
+          msg.style.color = "#B42318";
+        }
+      }).catch(function(){ msg.textContent = "Couldn't reach the server."; msg.style.color = "#B42318"; });
     });
   })();
 </script>

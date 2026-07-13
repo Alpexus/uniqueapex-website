@@ -1,13 +1,86 @@
 ---
+/* RESOURCES-VIDEOS-V1 — designed video library.
+   ══════════════════════════════════════════════════════════════════
+   EDIT HERE (Pelin): VIDEOS is the whole content. Each item:
+   title, desc, length ("12 min"), kind ("Recording" | "Explainer"),
+   href ("" = Coming soon card; a YouTube/Vimeo URL once you have one).
+   Workshop recordings belong here after each session.
+   ══════════════════════════════════════════════════════════════════ */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
+
+const VIDEOS = [
+  { title: "Welcome to UniqueApex — your family's home base", desc: "A 4-minute tour: the passport, the Support Wheel, and how families use them day to day.", length: "4 min", kind: "Explainer", href: "" },
+  { title: "Understanding your child's evaluation report", desc: "Recording of our live workshop — what the scores mean and the questions to ask.", length: "58 min", kind: "Recording", href: "" },
+  { title: "The Support Wheel in 3 minutes", desc: "How petals, rings and confidence work — and why there are no alarming red zones.", length: "3 min", kind: "Explainer", href: "" },
+  { title: "Visual schedules that actually get used", desc: "Building a morning routine board with your child, step by step.", length: "9 min", kind: "Explainer", href: "" },
+];
 ---
 <AppFormLayout title="Resources" activeNav="resources">
   <SectionTabs section="resources" active="videos" />
+
   <h1 class="page-title">Videos</h1>
-  <p class="page-sub">Part of Resources. This page is scaffolded — content is coming.</p>
-  <div class="ua-stub">
-    <b>Videos</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+  <p class="page-sub">Workshop recordings and bite-size explainers — watch anytime, at your own pace.</p>
+
+  <div class="rv-note cu-rev">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M10 9.5l5 2.5-5 2.5z"/></svg>
+    Every live workshop is recorded and lands here within a week — so missing a session never means missing out.
+  </div>
+
+  <div class="rv-grid">
+    {VIDEOS.map((v, i) => (
+      <article class="rv-card cu-rev cu-lift" style={`--d:${(0.06 + i * 0.06).toFixed(2)}s`}>
+        <div class="rv-thumb">
+          <span class="rv-play">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5l11 6.5-11 6.5z"/></svg>
+          </span>
+          {v.href ? <span class="rv-len">{v.length}</span> : <span class="rv-soon">Coming soon</span>}
+        </div>
+        <div class="rv-body">
+          <span class={v.kind === "Recording" ? "rv-kind rec" : "rv-kind"}>{v.kind}</span>
+          <h3>{v.title}</h3>
+          <p>{v.desc}</p>
+          {v.href && <a class="rv-link" href={v.href} target="_blank" rel="noopener">Watch <span class="arr">→</span></a>}
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <div class="rv-cta cu-rev" style="--d:.34s">
+    <p><b>Don't want to miss the live sessions?</b> Reserve a spot and we'll send the join link.</p>
+    <a href="/resources/workshops">See upcoming workshops</a>
   </div>
 </AppFormLayout>
+
+<style is:global>
+  .rv-note{display:flex;align-items:center;gap:9px;max-width:920px;background:var(--violet-50);border:1px solid var(--violet-100);border-radius:12px;padding:11px 15px;font-size:.82rem;color:#5b21b6;margin:4px 0 16px}
+  .rv-note svg{color:var(--violet-700);flex-shrink:0}
+  .rv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;max-width:920px}
+  .rv-card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+  .rv-thumb{position:relative;height:120px;background:linear-gradient(135deg,#EDE9FE,#E6F4F2);display:grid;place-items:center}
+  .rv-play{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.92);color:var(--violet-700);display:grid;place-items:center;box-shadow:0 4px 14px rgba(34,27,54,.18);transition:transform .2s}
+  .rv-card:hover .rv-play{transform:scale(1.12)}
+  .rv-len{position:absolute;bottom:8px;right:10px;font-size:.68rem;font-weight:700;background:rgba(34,27,54,.75);color:#fff;padding:2px 8px;border-radius:6px}
+  .rv-soon{position:absolute;bottom:8px;right:10px;font-size:.68rem;font-weight:700;background:var(--amber-bg);color:var(--amber);padding:2px 8px;border-radius:6px}
+  .rv-body{padding:13px 16px 15px;display:flex;flex-direction:column;flex:1}
+  .rv-kind{font-size:.66rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--teal);margin-bottom:5px}
+  .rv-kind.rec{color:var(--violet-700)}
+  .rv-card h3{font-family:var(--display);font-size:.94rem;font-weight:700;color:var(--ink);margin:0 0 5px;line-height:1.35}
+  .rv-card p{font-size:.81rem;color:var(--muted);line-height:1.5;margin:0;flex:1}
+  .rv-link{margin-top:9px;font-size:.8rem;font-weight:600;color:var(--violet-700);text-decoration:none}
+  .rv-link .arr{display:inline-block;transition:transform .18s}
+  .rv-link:hover .arr{transform:translateX(3px)}
+  .rv-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;max-width:920px;background:linear-gradient(135deg,var(--violet-50),#F9F7FE 60%,var(--violet-50));border:1px solid var(--violet-100);border-radius:18px;padding:16px 20px;margin-top:14px}
+  .rv-cta p{font-size:.88rem;color:#5b21b6;margin:0}
+  .rv-cta p b{color:var(--violet-700)}
+  .rv-cta a{background:var(--violet-700);color:#fff;font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;text-decoration:none;white-space:nowrap;transition:filter .15s}
+  .rv-cta a:hover{filter:brightness(1.1)}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>

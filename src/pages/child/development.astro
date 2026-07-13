@@ -1,4 +1,7 @@
 ---
+/* DEVELOPMENT-V2 — visual redesign: domain-colored blob icons (matching the
+   wheel hues), buttery-smooth accordion expand, staggered card entrances,
+   token colors, hover lift. Card-building logic unchanged. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
@@ -17,35 +20,48 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
 <style is:global>
   .da-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;max-width:880px}
-  .da-top .tinfo{font-size:.82rem;color:#64748b;display:flex;align-items:center;gap:6px}
-  .da-top a{font-size:.82rem;color:#6d28d9;font-weight:600;text-decoration:none}
+  .da-top .tinfo{font-size:.82rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .da-top a{font-size:.82rem;color:var(--violet-700);font-weight:600;text-decoration:none}
   .da-top a:hover{text-decoration:underline}
   #da-acc{max-width:880px}
-  .da-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;margin-bottom:10px;overflow:hidden}
-  .da-card.muted{background:#fcfcfd}
-  .da-head{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer}
-  .da-head:hover{background:#f8fafc}
-  .da-ic{width:34px;height:34px;border-radius:10px;background:#F5F3FF;color:#6d28d9;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .da-card.muted .da-ic{background:#f1f5f9;color:#94a3b8}
-  .da-name{font-size:.95rem;font-weight:700;color:#1e293b}
-  .da-sum{font-size:.82rem;color:#64748b}
-  .da-chev-svg{color:#94a3b8;transition:transform .2s;flex-shrink:0}
+  .da-card{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-bottom:10px;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}
+  .da-card:hover{border-color:var(--line-2)}
+  .da-card.open{box-shadow:var(--shadow-lg);border-color:#DDD6FE}
+  .da-card.muted{background:#FBFAFE;box-shadow:none}
+  .da-head{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-radius:16px}
+  .da-blob{position:relative;width:40px;height:40px;display:grid;place-items:center;flex-shrink:0}
+  .da-blob::before{content:"";position:absolute;inset:0;background:var(--blob,#EDE9FE);border-radius:46% 54% 58% 42%/52% 44% 56% 48%;transition:transform .5s cubic-bezier(.34,1.5,.64,1)}
+  .da-card:hover .da-blob::before{transform:scale(1.1) rotate(8deg)}
+  .da-blob svg{position:relative;z-index:1}
+  .da-card.muted .da-blob::before{background:var(--bg)}
+  .da-name{font-family:var(--display);font-size:.98rem;font-weight:700;color:var(--ink)}
+  .da-sum{font-size:.82rem;color:var(--muted)}
+  .da-chev-svg{color:var(--faint);transition:transform .25s cubic-bezier(.22,1,.36,1);flex-shrink:0}
   .da-card.open .da-chev-svg{transform:rotate(180deg)}
-  .da-card.collapsed .da-body{display:none}
-  .da-body{padding:2px 16px 18px}
-  .da-lab{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#94a3b8;margin:14px 0 8px}
-  .da-chip{display:inline-flex;align-items:center;gap:6px;font-size:.83rem;font-weight:600;padding:6px 11px;border-radius:10px;margin:0 6px 6px 0;line-height:1.25}
+  .da-body-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s cubic-bezier(.22,1,.36,1)}
+  .da-card.open .da-body-wrap{grid-template-rows:1fr}
+  .da-body{overflow:hidden;padding:0 16px}
+  .da-card.open .da-body{padding-bottom:18px}
+  .da-lab{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);margin:14px 0 8px}
+  .da-chip{display:inline-flex;align-items:center;gap:6px;font-size:.83rem;font-weight:600;padding:6px 12px;border-radius:9999px;margin:0 6px 6px 0;line-height:1.25;transition:transform .15s}
+  .da-chip:hover{transform:translateY(-1px)}
   .da-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin-top:4px}
-  .da-tile{border:1px solid #e2e8f0;border-radius:12px;padding:11px 13px}
+  .da-tile{border:1px solid var(--line);border-radius:12px;padding:11px 13px;transition:border-color .15s,transform .15s}
+  .da-tile:hover{border-color:#DDD6FE;transform:translateY(-1px)}
   .da-tile-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .da-tile-name{font-size:.85rem;font-weight:600;color:#1e293b}
+  .da-tile-name{font-size:.85rem;font-weight:600;color:var(--ink)}
   .da-badge{font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:9999px;white-space:nowrap}
-  .da-sub{font-size:.78rem;color:#64748b;margin:6px 0 0;line-height:1.4}
-  .da-note{font-size:.84rem;font-style:italic;color:#64748b;border-left:3px solid #EDE9FE;padding-left:11px;margin:14px 0 0;border-radius:0}
-  .da-empty{font-size:.85rem;color:#94a3b8;margin:6px 0 0}
-  .da-wheel{display:inline-block;margin-top:12px;font-size:.78rem;font-weight:600;color:#6d28d9;text-decoration:none}
-  .da-wheel:hover{text-decoration:underline}
-  .da-empty a{color:#6d28d9;font-weight:600;text-decoration:none}
+  .da-sub{font-size:.78rem;color:var(--muted);margin:6px 0 0;line-height:1.4}
+  .da-note{font-size:.84rem;font-style:italic;color:var(--muted);border-left:3px solid var(--violet-100);padding-left:11px;margin:14px 0 0}
+  .da-empty{font-size:.85rem;color:var(--faint);margin:6px 0 0}
+  .da-wheel{display:inline-flex;align-items:center;gap:4px;margin-top:12px;font-size:.78rem;font-weight:600;color:var(--violet-700);text-decoration:none}
+  .da-wheel .arr{transition:transform .18s;display:inline-block}
+  .da-wheel:hover .arr{transform:translateX(3px)}
+  .da-empty a{color:var(--violet-700);font-weight:600;text-decoration:none}
+  @media (prefers-reduced-motion:reduce){
+    .da-body-wrap{transition:none}
+    .da-blob::before,.da-chev-svg{transition:none}
+  }
 </style>
 
 <script is:inline>
@@ -58,6 +74,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
 <script>
   import * as UA from "../../lib/ua-data.js";
+  import { domainColor } from "../../lib/wheelSvg.js";
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -70,11 +87,11 @@ import SectionTabs from "@/components/SectionTabs.astro";
   const listShort = (arr, n) => arr.slice(0, n).join(" & ") + (arr.length > n ? "…" : "");
 
   const TONE = {
-    good: { bg: "#ECFDF5", fg: "#15803d" },
-    work: { bg: "#FFFBEB", fg: "#b45309" },
-    info: { bg: "#F5F3FF", fg: "#6d28d9" },
-    warn: { bg: "#FEF2F2", fg: "#b91c1c" },
-    neutral: { bg: "#f1f5f9", fg: "#64748b" },
+    good: { bg: "#E8F6F0", fg: "#0E8F66" },
+    work: { bg: "#FBF2E2", fg: "#A8650A" },
+    info: { bg: "#EDE9FE", fg: "#6D28D9" },
+    warn: { bg: "#F9EDF1", fg: "#B14A66" },
+    neutral: { bg: "#F4F3F8", fg: "#7B7491" },
   };
   const TIC = {
     good: '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M3 8.5l3.2 3L13 4.5"/></svg>',
@@ -84,13 +101,13 @@ import SectionTabs from "@/components/SectionTabs.astro";
     neutral: '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M3 8h10"/></svg>',
   };
   const IC = {
-    msg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 3z"/></svg>',
-    users: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3.3 2.7-5 6-5s6 1.7 6 5"/><circle cx="17" cy="8.5" r="2.2"/><path d="M16.5 14c2.6.2 4.5 1.7 4.5 5"/></svg>',
-    waves: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg>',
-    home: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-6 8 6"/><path d="M6 10v9h12v-9"/></svg>',
-    run: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="14" cy="5" r="2"/><path d="M6 21l3-5 3 2 1-5 3 3h2"/><path d="M9 12l3-3 2 2"/></svg>',
-    heart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.5-7-9.5A3.5 3.5 0 0 1 12 7a3.5 3.5 0 0 1 7 3.5C19 15.5 12 20 12 20z"/></svg>',
-    star: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2.5 6.5L21 10l-5 4.5L17.5 21 12 17l-5.5 4L8 14.5 3 10l6.5-.5z"/></svg>',
+    msg: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 3z"/></svg>',
+    users: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3.3 2.7-5 6-5s6 1.7 6 5"/><circle cx="17" cy="8.5" r="2.2"/><path d="M16.5 14c2.6.2 4.5 1.7 4.5 5"/></svg>',
+    waves: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg>',
+    home: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-6 8 6"/><path d="M6 10v9h12v-9"/></svg>',
+    run: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="14" cy="5" r="2"/><path d="M6 21l3-5 3 2 1-5 3 3h2"/><path d="M9 12l3-3 2 2"/></svg>',
+    heart: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.5-7-9.5A3.5 3.5 0 0 1 12 7a3.5 3.5 0 0 1 7 3.5C19 15.5 12 20 12 20z"/></svg>',
+    star: '<svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2.5 6.5L21 10l-5 4.5L17.5 21 12 17l-5.5 4L8 14.5 3 10l6.5-.5z"/></svg>',
     chev: '<svg class="da-chev-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>',
   };
 
@@ -202,15 +219,24 @@ import SectionTabs from "@/components/SectionTabs.astro";
     const bodyGrid = (c) => { if (c.empty) return emptyBody(); let h = '<div class="da-grid">'; c.items.forEach((it) => { const t = TONE[it.tone]; h += `<div class="da-tile"><div class="da-tile-top"><span class="da-tile-name">${esc(it.name)}</span><span class="da-badge" style="background:${t.bg};color:${t.fg}">${esc(it.badge)}</span></div>${it.sub ? `<p class="da-sub">${esc(it.sub)}</p>` : ""}</div>`; }); h += "</div>"; if (c.note) h += `<p class="da-note">${esc(c.note)}</p>`; return h; };
 
     let opened = false;
-    $("da-acc").innerHTML = cards.map((c) => {
+    $("da-acc").innerHTML = cards.map((c, ci) => {
       const body = c.mode === "grid" ? bodyGrid(c) : bodyChips(c);
       const isOpen = !c.empty && !opened; if (isOpen) opened = true;
       const sum = c.empty ? "Not recorded yet" : (c.sum || "");
-      return `<div class="da-card ${isOpen ? "open" : "collapsed"} ${c.empty ? "muted" : ""}"><div class="da-head"><span class="da-ic">${IC[c.icon]}</span><span style="flex:1;min-width:0"><span class="da-name" style="display:block">${esc(c.name)}</span><span class="da-sum" style="display:block">${esc(sum)}</span></span>${IC.chev}</div><div class="da-body">${body}${!c.empty && WHEEL_OF[c.name] ? `<a class="da-wheel" href="/child/support-wheel?domain=${encodeURIComponent(WHEEL_OF[c.name])}">See in Support Wheel →</a>` : ""}</div></div>`;
+      const wheelDomain = WHEEL_OF[c.name];
+      const dc = wheelDomain ? domainColor(wheelDomain) : "#6D28D9";
+      return `<div class="da-card cu-rev ${isOpen ? "open" : ""} ${c.empty ? "muted" : ""}" style="--d:${(ci * 0.06).toFixed(2)}s">
+        <div class="da-head">
+          <span class="da-blob" style="--blob:${c.empty ? "var(--bg)" : dc + "1f"};color:${c.empty ? "var(--faint)" : dc}">${IC[c.icon]}</span>
+          <span style="flex:1;min-width:0"><span class="da-name" style="display:block">${esc(c.name)}</span><span class="da-sum" style="display:block">${esc(sum)}</span></span>
+          ${IC.chev}
+        </div>
+        <div class="da-body-wrap"><div class="da-body">${body}${!c.empty && wheelDomain ? `<a class="da-wheel" href="/child/support-wheel?domain=${encodeURIComponent(wheelDomain)}">See in Support Wheel <span class="arr">→</span></a>` : ""}</div></div>
+      </div>`;
     }).join("");
 
     $("da-acc").querySelectorAll(".da-head").forEach((h) => h.addEventListener("click", () => {
-      const card = h.parentElement; card.classList.toggle("open"); card.classList.toggle("collapsed");
+      h.parentElement.classList.toggle("open");
     }));
   })().catch((e) => console.error("[development] hydrate failed", e));
 </script>

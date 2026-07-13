@@ -1,4 +1,7 @@
 ---
+/* ASSESSMENTS-V2 — visual redesign: AI Report Reader pitch card, blob doc
+   rows, type-colored record cards, recommendations hub with one-tap copy
+   (for IEP emails and funding applications). Data logic unchanged. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
@@ -11,13 +14,27 @@ import SectionTabs from "@/components/SectionTabs.astro";
   <div id="as-gate"></div>
 
   <div id="as-main" style="display:none">
-    <div class="as-sec">
-      <p class="as-h">Reports <a class="as-link" href="/documents">Upload a report →</a></p>
+
+    <div class="as-ai cu-rev cu-sparkle-host">
+      <span class="cu-spark" style="top:12px;right:74px">✦</span>
+      <span class="cu-spark s2" style="top:30px;right:52px">✦</span>
+      <div class="as-ai-ic">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/><path d="M12 11l.9 2.1L15 14l-2.1.9L12 17l-.9-2.1L9 14l2.1-.9z"/></svg>
+      </div>
+      <div class="as-ai-tx">
+        <b>AI Report Reader</b>
+        <p>Assessment reports are dense. Upload one and get a plain-language summary — what was found, what's recommended, and what to do next.</p>
+      </div>
+      <a class="as-ai-btn" href="/documents">Upload a report</a>
+    </div>
+
+    <div class="as-sec cu-rev" style="--d:.08s">
+      <p class="as-h">Reports <a class="as-link" href="/documents">Upload a report <span class="arr">→</span></a></p>
       <p class="as-sub2">The files themselves — PDFs, scans, and originals live here.</p>
       <div id="as-docs"></div>
     </div>
 
-    <div class="as-sec">
+    <div class="as-sec cu-rev" style="--d:.14s">
       <p class="as-h">Assessment records <button class="as-addbtn" id="as-addbtn"><span style="font-size:1.1em;line-height:1">+</span> Add assessment</button></p>
       <p class="as-sub2">The key findings and recommendations, captured so nothing gets lost.</p>
       <div class="as-form" id="as-form">
@@ -40,58 +57,75 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <div id="as-records"></div>
     </div>
 
-    <div class="as-sec" style="margin-bottom:0">
-      <p class="as-h">All recommendations</p>
-      <div class="as-card" id="as-hub"></div>
+    <div class="as-sec cu-rev" style="--d:.2s;margin-bottom:0">
+      <p class="as-h">All recommendations <button class="as-copybtn" id="as-copy" style="display:none">Copy list</button></p>
+      <div class="as-card as-hubcard" id="as-hub"></div>
     </div>
   </div>
 </AppFormLayout>
 
 <style is:global>
-  #as-main, #as-gate{max-width:860px}
+  #as-main, #as-gate{max-width:880px}
   .as-sec{margin-bottom:24px}
-  .as-h{font-size:.84rem;color:#64748b;margin:0 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:600}
-  .as-sub2{font-size:.76rem;color:#94a3b8;margin:-8px 0 10px}
-  .as-link{font-size:.8rem;font-weight:600;color:#6d28d9;text-decoration:none}
-  .as-link:hover{text-decoration:underline}
-  .as-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 18px}
-  .as-doc{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:11px 14px;margin-bottom:8px}
-  .as-doc .ic{width:32px;height:32px;border-radius:9px;background:#F5F3FF;color:#6d28d9;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .as-doc .nm{font-size:.86rem;font-weight:600;color:#1e293b}
-  .as-doc .mt{font-size:.74rem;color:#94a3b8}
-  .as-pill{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:9999px;background:#f1f5f9;color:#64748b;margin-left:auto;white-space:nowrap}
-  .as-addbtn{font-size:.82rem;font-weight:600;padding:7px 14px;border-radius:9999px;border:1px solid #6d28d9;background:#fff;color:#6d28d9;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-  .as-addbtn:hover{background:#F5F3FF}
-  .as-form{display:none;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin-bottom:14px}
-  .as-form.show{display:block}
+  .as-h{font-size:.84rem;color:var(--muted);margin:0 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:600}
+  .as-sub2{font-size:.76rem;color:var(--faint);margin:-8px 0 10px}
+  .as-link{font-size:.8rem;font-weight:600;color:var(--violet-700);text-decoration:none}
+  .as-link .arr{display:inline-block;transition:transform .18s}
+  .as-link:hover .arr{transform:translateX(3px)}
+  .as-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
+
+  /* AI pitch card */
+  .as-ai{position:relative;display:flex;align-items:center;gap:16px;background:linear-gradient(120deg,var(--violet-50),#F9F7FE 55%,#F0FBF9),var(--card);border:1px solid var(--violet-100);border-radius:18px;padding:18px 20px;margin-bottom:22px;flex-wrap:wrap;box-shadow:var(--shadow)}
+  .as-ai-ic{width:48px;height:48px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:#fff;display:grid;place-items:center;flex-shrink:0;box-shadow:0 6px 16px rgba(109,40,217,.28)}
+  .as-ai-tx{flex:1;min-width:220px}
+  .as-ai-tx b{font-family:var(--display);font-size:1rem;color:var(--ink)}
+  .as-ai-tx p{font-size:.84rem;color:var(--ink-2);line-height:1.5;margin:3px 0 0;max-width:52ch}
+  .as-ai-btn{background:var(--violet-700);color:#fff;font-size:.84rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none;white-space:nowrap;transition:filter .15s,transform .15s}
+  .as-ai-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+  .as-ai .cu-spark{font-style:normal;font-size:13px;color:#8B5CF6}
+  .as-ai .cu-spark.s2{font-size:10px;color:#5EEAD4}
+
+  .as-doc{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:8px;box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
+  .as-doc:hover{transform:translateY(-1px);border-color:#DDD6FE}
+  .as-doc .nm{font-size:.86rem;font-weight:600;color:var(--ink)}
+  .as-doc .mt{font-size:.74rem;color:var(--faint)}
+  .as-pill{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:9999px;background:var(--bg);color:var(--muted);margin-left:auto;white-space:nowrap}
+  .as-addbtn,.as-copybtn{font-size:.82rem;font-weight:600;padding:7px 14px;border-radius:9999px;border:1px solid var(--violet-700);background:var(--card);color:var(--violet-700);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s,transform .15s;font-family:inherit}
+  .as-addbtn:hover,.as-copybtn:hover{background:var(--violet-50);transform:translateY(-1px)}
+  .as-form{display:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .as-form.show{display:block;animation:asIn .25s cubic-bezier(.22,1,.36,1)}
+  @keyframes asIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
   .as-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:10px}
-  .as-field{width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:10px;font-size:.88rem;color:#1e293b;background:#fff;outline:none;font-family:inherit}
-  .as-field:focus{border-color:#a78bfa;box-shadow:0 0 0 2px #ede9fe}
+  .as-field{width:100%;padding:9px 12px;border:1px solid var(--line-2);border-radius:10px;font-size:.88rem;color:var(--ink);background:var(--card);outline:none;font-family:inherit}
+  .as-field:focus{border-color:#A78BFA;box-shadow:0 0 0 3px rgba(139,92,246,.14)}
   .as-area{min-height:64px;margin-bottom:10px;resize:vertical;line-height:1.5}
   .as-form-actions{display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-wrap:wrap}
-  .as-err{font-size:.8rem;color:#dc2626;margin-right:auto}
-  .as-ghost{font-size:.82rem;font-weight:600;padding:8px 14px;border-radius:9999px;border:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer}
-  .as-savebtn{font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;border:none;background:#6d28d9;color:#fff;cursor:pointer}
-  .as-savebtn:hover{background:#5b21b6}
-  .as-rec-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px 16px;margin-bottom:10px;position:relative}
-  .as-rec-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
-  .as-rec-type{font-size:.92rem;font-weight:700;color:#1e293b}
-  .as-rec-meta{font-size:.76rem;color:#94a3b8}
-  .as-rec-lab{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#94a3b8;margin:10px 0 5px}
-  .as-rec-text{font-size:.86rem;color:#334155;line-height:1.5;white-space:pre-line}
+  .as-err{font-size:.8rem;color:#B14A66;margin-right:auto}
+  .as-ghost{font-size:.82rem;font-weight:600;padding:8px 14px;border-radius:9999px;border:1px solid var(--line-2);background:var(--card);color:var(--muted);cursor:pointer}
+  .as-savebtn{font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;border:none;background:var(--violet-700);color:#fff;cursor:pointer;transition:filter .15s}
+  .as-savebtn:hover{filter:brightness(1.1)}
+  .as-rec-card{background:var(--card);border:1px solid var(--line);border-left-width:4px;border-radius:14px;padding:14px 16px;margin-bottom:10px;position:relative;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+  .as-rec-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-lg)}
+  .as-rec-head{display:flex;align-items:center;gap:9px;margin-bottom:8px;flex-wrap:wrap}
+  .as-rec-type{font-family:var(--display);font-size:.94rem;font-weight:700;color:var(--ink)}
+  .as-rec-meta{font-size:.76rem;color:var(--faint)}
+  .as-rec-lab{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);margin:10px 0 5px}
+  .as-rec-text{font-size:.86rem;color:var(--ink-2);line-height:1.5;white-space:pre-line}
   .as-rec-list{margin:0;padding-left:18px}
-  .as-rec-list li{font-size:.86rem;color:#334155;line-height:1.5;margin-bottom:3px}
-  .as-del{position:absolute;top:10px;right:12px;border:none;background:none;color:#cbd5e1;font-size:1.1rem;line-height:1;cursor:pointer;padding:2px}
-  .as-del:hover{color:#dc2626}
-  .as-hub-item{display:flex;gap:9px;align-items:flex-start;margin-bottom:9px}
-  .as-hub-item .ic{color:#6d28d9;flex-shrink:0;margin-top:2px}
-  .as-hub-item .tx{font-size:.86rem;color:#334155;line-height:1.45}
-  .as-hub-item .src{font-size:.72rem;color:#94a3b8}
-  .as-empty{font-size:.86rem;color:#94a3b8;margin:0}
-  .as-empty a{color:#6d28d9;font-weight:600;text-decoration:none}
-  .as-gate-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px 22px;text-align:center}
-  .as-gate-card p{color:#64748b;font-size:.9rem;margin:0 0 14px}
-  .as-gate-card a{display:inline-block;background:#6d28d9;color:#fff;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none}
+  .as-rec-list li{font-size:.86rem;color:var(--ink-2);line-height:1.5;margin-bottom:3px}
+  .as-del{position:absolute;top:10px;right:12px;border:none;background:none;color:#D8D3E6;font-size:1.1rem;line-height:1;cursor:pointer;padding:2px}
+  .as-del:hover{color:#B14A66}
+  .as-hubcard{background:linear-gradient(135deg,var(--violet-50),#F9F7FE 60%,var(--violet-50));border-color:var(--violet-100)}
+  .as-hub-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:9px}
+  .as-hub-item .n{width:20px;height:20px;border-radius:7px;background:#fff;color:var(--violet-700);font-size:.7rem;font-weight:700;display:grid;place-items:center;flex-shrink:0;border:1px solid var(--violet-100)}
+  .as-hub-item .tx{font-size:.86rem;color:#3b2a63;line-height:1.45}
+  .as-hub-item .src{font-size:.72rem;color:#9d8bc4}
+  .as-empty{font-size:.86rem;color:var(--faint);margin:0}
+  .as-empty a{color:var(--violet-700);font-weight:600;text-decoration:none}
+  .as-gate-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 22px;text-align:center}
+  .as-gate-card p{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+  .as-gate-card a{display:inline-block;background:var(--violet-700);color:#fff;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none}
+  @media (prefers-reduced-motion:reduce){.as-form.show{animation:none}}
 </style>
 
 <script is:inline>
@@ -126,17 +160,21 @@ import SectionTabs from "@/components/SectionTabs.astro";
   async function restGet(path) { const s = await getValidSession(); if (!s) return []; const r = await fetch(UA_URL + "/rest/v1/" + path, { headers: authHeaders(s.access_token) }); return r.ok ? r.json() : []; }
 
   const fileSvg = '<svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg>';
-  const dotSvg = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3"/></svg>';
   const fmtDate = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" }); };
+  const TYPE_COLOR = {
+    "Speech / language": "#7C3AED", "Occupational therapy": "#0E8C82", "Psychoeducational": "#2563EB",
+    "Behavioural / ABA": "#D85A30", "Developmental pediatric": "#D4537E", "Physiotherapy": "#4C9A2A", "Other": "#7B7491",
+  };
 
   let records = [], activeP = null;
 
   function renderRecords() {
     if (!records.length) { $("as-records").innerHTML = `<p class="as-empty">No assessment records yet. Add one above to capture its findings and recommendations.</p>`; return; }
-    $("as-records").innerHTML = records.map((r) => {
+    $("as-records").innerHTML = records.map((r, i) => {
       const recs = textToList(r.recommendations);
-      return `<div class="as-rec-card"><button class="as-del" data-id="${r.id}" aria-label="Delete record">×</button>`
-        + `<div class="as-rec-head"><span class="as-rec-type">${esc(r.assessment_type || "Assessment")}</span><span class="as-rec-meta">${[esc(r.provider || ""), r.assessment_date ? esc(fmtDate(r.assessment_date)) : ""].filter(Boolean).join(" · ")}</span></div>`
+      const tc = TYPE_COLOR[r.assessment_type] || TYPE_COLOR.Other;
+      return `<div class="as-rec-card cu-pop" style="--d:${(i * 0.06).toFixed(2)}s;border-left-color:${tc}"><button class="as-del" data-id="${r.id}" aria-label="Delete record">×</button>`
+        + `<div class="as-rec-head"><span class="as-rec-type" style="color:${tc}">${esc(r.assessment_type || "Assessment")}</span><span class="as-rec-meta">${[esc(r.provider || ""), r.assessment_date ? esc(fmtDate(r.assessment_date)) : ""].filter(Boolean).join(" · ")}</span></div>`
         + (r.findings ? `<p class="as-rec-lab">Key findings</p><div class="as-rec-text">${esc(r.findings)}</div>` : "")
         + (recs.length ? `<p class="as-rec-lab">Recommendations</p><ul class="as-rec-list">${recs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : "")
         + `</div>`;
@@ -147,9 +185,11 @@ import SectionTabs from "@/components/SectionTabs.astro";
   function renderHub() {
     const all = [];
     records.forEach((r) => textToList(r.recommendations).forEach((x) => all.push({ tx: x, src: r.assessment_type || "Assessment" })));
+    $("as-copy").style.display = all.length ? "" : "none";
     $("as-hub").innerHTML = all.length
-      ? all.map((a) => `<div class="as-hub-item"><span class="ic">${dotSvg}</span><span><span class="tx" style="display:block">${esc(a.tx)}</span><span class="src">From ${esc(a.src)}</span></span></div>`).join("")
-      : `<p class="as-empty">Recommendations you add to records gather here automatically — one ready-made list for IEP meetings, funding applications, and new providers.</p>`;
+      ? all.map((a, i) => `<div class="as-hub-item"><span class="n">${i + 1}</span><span><span class="tx" style="display:block">${esc(a.tx)}</span><span class="src">From ${esc(a.src)}</span></span></div>`).join("")
+      : `<p class="as-empty" style="color:#9d8bc4">Recommendations you add to records gather here automatically — one ready-made list for IEP meetings, funding applications, and new providers.</p>`;
+    window.__asHubList = all;
   }
 
   async function delRecord(id) {
@@ -189,8 +229,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
     const docs = await restGet("documents?select=id,file_name,file_type,created_at&passport_id=eq." + p.id + "&order=created_at.desc&limit=30").catch(() => []);
     $("as-docs").innerHTML = (docs && docs.length)
-      ? docs.map((doc) => `<div class="as-doc"><span class="ic">${fileSvg}</span><span><span class="nm" style="display:block">${esc(doc.file_name || "Document")}</span><span class="mt">Uploaded ${esc(fmtDate(doc.created_at))}</span></span><span class="as-pill">${esc((doc.file_type || "file").toUpperCase())}</span></div>`).join("")
-      : `<p class="as-empty">No reports yet. <a href="/documents">Upload the first one →</a> — every evaluation lives in one place, and the <strong>AI Report Reader</strong> can turn any report into a plain-language summary in minutes.</p>`;
+      ? docs.map((doc, i) => `<div class="as-doc cu-pop" style="--d:${(i * 0.05).toFixed(2)}s"><span class="cu-blob" style="--blob:#EDE9FE;width:36px;height:36px;color:#6D28D9">${fileSvg}</span><span><span class="nm" style="display:block">${esc(doc.file_name || "Document")}</span><span class="mt">Uploaded ${esc(fmtDate(doc.created_at))}</span></span><span class="as-pill">${esc((doc.file_type || "file").toUpperCase())}</span></div>`).join("")
+      : `<p class="as-empty">No reports yet. <a href="/documents">Upload the first one →</a> — every evaluation lives in one place.</p>`;
 
     const recs = await restGet("assessments?select=id,assessment_type,provider,assessment_date,findings,recommendations&passport_id=eq." + p.id + "&order=assessment_date.desc.nullslast").catch(() => []);
     records = recs || [];
@@ -200,5 +240,14 @@ import SectionTabs from "@/components/SectionTabs.astro";
     $("as-addbtn").addEventListener("click", () => { const f = $("as-form"); f.classList.toggle("show"); if (f.classList.contains("show")) $("as-provider").focus(); });
     $("as-cancel").addEventListener("click", () => { $("as-form").classList.remove("show"); $("as-err").textContent = ""; });
     $("as-save").addEventListener("click", saveRecord);
+    $("as-copy").addEventListener("click", () => {
+      const all = window.__asHubList || [];
+      const txt = all.map((a, i) => (i + 1) + ". " + a.tx + " (" + a.src + ")").join("\n");
+      navigator.clipboard.writeText(txt).then(() => {
+        const b = $("as-copy"); const old = b.textContent;
+        b.textContent = "Copied ✓";
+        setTimeout(() => { b.textContent = old; }, 1600);
+      });
+    });
   })().catch((e) => console.error("[assessments] hydrate failed", e));
 </script>

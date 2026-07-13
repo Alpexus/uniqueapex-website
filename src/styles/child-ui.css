@@ -1,0 +1,53 @@
+/* ============================================================
+   child-ui.css — CHILD-UI-V1
+   Shared design language for the /child tabs (and any app page).
+   Imported once by AppFormLayout.astro. Everything is class-
+   scoped ("cu-" prefix) — no element or global rules, so it can
+   never interfere with the passport form or Tailwind.
+   ============================================================ */
+
+/* ---------- entrance reveal (stagger with style="--d:.08s") ---------- */
+.cu-rev{opacity:0;animation:cuIn .55s cubic-bezier(.22,1,.36,1) var(--d,0s) both}
+@keyframes cuIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+
+/* ---------- pop-in for chips / small items ---------- */
+.cu-pop{opacity:0;animation:cuPop .4s cubic-bezier(.34,1.5,.64,1) var(--d,0s) both}
+@keyframes cuPop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+
+/* ---------- hover lift + violet glow ---------- */
+.cu-lift{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background .18s ease}
+.cu-lift:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(109,40,217,.12);border-color:#DDD6FE}
+
+/* ---------- wiggle on hover (chips, badges) ---------- */
+.cu-wiggle:hover{animation:cuWig .45s ease}
+@keyframes cuWig{25%{transform:rotate(-2.5deg)}75%{transform:rotate(2.5deg)}}
+
+/* ---------- organic blob icon (set color via style="--blob:#FBF2E2") ---------- */
+.cu-blob{position:relative;width:44px;height:44px;display:grid;place-items:center;flex-shrink:0}
+.cu-blob::before{content:"";position:absolute;inset:0;background:var(--blob,#EDE9FE);border-radius:46% 54% 58% 42% / 52% 44% 56% 48%;transition:transform .5s cubic-bezier(.34,1.5,.64,1)}
+.cu-blob>*{position:relative;z-index:1}
+a:hover .cu-blob::before,button:hover .cu-blob::before,.cu-lift:hover .cu-blob::before{transform:scale(1.12) rotate(9deg)}
+
+/* ---------- twinkle sparkles (inside a position:relative parent) ---------- */
+.cu-spark{position:absolute;width:11px;height:11px;color:#8B5CF6;opacity:.85;pointer-events:none}
+.cu-spark.s2{width:8px;height:8px;color:#C4B5FD}
+.cu-lift:hover .cu-spark,.cu-sparkle-host:hover .cu-spark{animation:cuTwinkle 1s ease infinite}
+@keyframes cuTwinkle{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.35);opacity:1}}
+
+/* ---------- animated bar fill (set style="--w:63%;--d:.3s") ---------- */
+.cu-fill{display:block;height:100%;border-radius:inherit;width:0;animation:cuGrow .9s cubic-bezier(.22,1,.36,1) var(--d,.25s) both}
+@keyframes cuGrow{from{width:0}to{width:var(--w,0%)}}
+
+/* ---------- soft gradient blob decoration for hero cards ---------- */
+.cu-hero-grad{position:relative;overflow:hidden}
+.cu-hero-grad::before{content:"";position:absolute;top:-70px;right:-40px;width:280px;height:240px;background:radial-gradient(closest-side,rgba(139,92,246,.16),transparent 72%);border-radius:50%;pointer-events:none}
+.cu-hero-grad::after{content:"";position:absolute;bottom:-90px;left:16%;width:250px;height:210px;background:radial-gradient(closest-side,rgba(94,234,212,.13),transparent 72%);border-radius:50%;pointer-events:none}
+
+/* ---------- reduced motion: everything lands instantly ---------- */
+@media (prefers-reduced-motion:reduce){
+  .cu-rev,.cu-pop{animation:none;opacity:1}
+  .cu-fill{animation:none;width:var(--w,0%)}
+  .cu-lift,.cu-lift:hover{transform:none}
+  .cu-wiggle:hover,.cu-lift:hover .cu-spark,.cu-sparkle-host:hover .cu-spark{animation:none}
+  .cu-blob::before,.cu-lift{transition:none}
+}

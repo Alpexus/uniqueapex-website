@@ -823,9 +823,17 @@ const scale4 = [
   }
   function exportPDF() {
     var p = buildPassport();
-    var secs = buildSections(p);
     var included = {};
     document.querySelectorAll(".sec-include").forEach(function(cb){ included[cb.getAttribute("data-key")] = cb.checked; });
+    /* FAMILY-REPORT-V1: branded report replaces the old label:value dump.
+       window.UAReport is exposed by the module script below; if it hasn't
+       loaded yet we fall back to the plain export so the button never dies. */
+    if (window.UAReport && window.UAReport.buildReportHTML) {
+      document.getElementById("print-view").innerHTML = window.UAReport.buildReportHTML(p, included);
+      window.print();
+      return;
+    }
+    var secs = buildSections(p);
     var name = [p.childProfile.firstName, p.childProfile.lastName].filter(Boolean).join(" ") || "Family Passport";
     var today = new Date().toLocaleDateString();
     var html = '<div class="pv-header"><h1>'+name+' — Family Passport</h1><div class="sub">Generated '+today+' · UniqueApex</div></div>';
@@ -1064,4 +1072,11 @@ const scale4 = [
     nextBtn.style.display = "inline-block"; saveResult.innerHTML = ""; showStep(currentStep);
   });
   showStep(1);
+</script>
+
+<!-- FAMILY-REPORT-V1: module script exposing the branded report builder to
+     the inline form script above (which can't use imports itself). -->
+<script>
+  import { buildReportHTML } from "../lib/familyReport.js";
+  window.UAReport = { buildReportHTML };
 </script>

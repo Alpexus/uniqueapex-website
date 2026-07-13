@@ -1,13 +1,122 @@
 ---
+/* SETTINGS-PRIVACY-V1 — functional Privacy & Data page.
+   · Download your data: real JSON export of every child profile
+   · Delete child profile data: real deletion with typed confirmation
+   · Delete account: request flow (self-serve deletion needs a server key,
+     so for now it opens a pre-filled email to support)                     */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
+import "@/styles/settings.css";
 ---
 <AppFormLayout title="Settings" activeNav="settings">
   <SectionTabs section="settings" active="privacy" />
-  <h1 class="page-title">Privacy</h1>
-  <p class="page-sub">Part of Settings. This page is scaffolded — content is coming.</p>
-  <div class="ua-stub">
-    <b>Privacy</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+  <div class="set-wrap">
+    <h1 class="page-title">Privacy &amp; Data</h1>
+    <p class="page-sub">Your family's information belongs to you. See it, download it, or delete it — anytime.</p>
+
+    <div class="set-section">
+      <h2>Where your data lives</h2>
+      <div class="set-row">
+        <div class="l"><h3>Stored in Canada</h3><p>All profiles are hosted in a Canadian data region (Supabase, Canada Central).</p></div>
+        <span class="always">🇨🇦 Canada</span>
+      </div>
+      <div class="set-row">
+        <div class="l"><h3>Who can see your child's profile</h3><p>Only you. Providers see information only when you export and share it yourself.</p></div>
+        <span class="always" style="background:#F4F3F8;color:#7B7491">Only you</span>
+      </div>
+      <div class="set-row">
+        <div class="l"><h3>What we store</h3><p>Your account email and preferences, the Family Passport answers you save, and documents you upload. Nothing is sold or shared with advertisers — ever.</p></div>
+      </div>
+    </div>
+
+    <div class="set-section">
+      <h2>Download your data</h2>
+      <div class="set-row">
+        <div class="l"><h3>Export everything</h3><p>Every child profile you've saved, as a JSON file you can keep or move anywhere.</p></div>
+        <button class="set-btn ghost" type="button" id="dl-data">Download my data</button>
+      </div>
+      <span class="set-hint" id="dl-msg"></span>
+    </div>
+
+    <div class="set-section danger-zone">
+      <h2>Danger zone</h2>
+      <div class="set-row">
+        <div class="l"><h3>Delete all child profile data</h3><p>Permanently deletes every Family Passport you've saved. Your sign-in stays active. This cannot be undone.</p></div>
+        <button class="set-btn danger" type="button" id="del-open">Delete profiles…</button>
+      </div>
+      <div id="del-confirm" style="display:none">
+        <div class="set-field">
+          <label for="del-input">Type <b>DELETE</b> to confirm</label>
+          <input class="set-input" id="del-input" type="text" autocomplete="off" placeholder="DELETE" />
+        </div>
+        <div class="set-actions" style="margin-top:0">
+          <button class="set-btn danger solid" type="button" id="del-go">Permanently delete</button>
+          <button class="set-btn ghost" type="button" id="del-cancel">Cancel</button>
+          <span class="set-hint" id="del-msg" style="align-self:center"></span>
+        </div>
+      </div>
+      <div class="set-row">
+        <div class="l"><h3>Delete my account</h3><p>Removes your sign-in and all data. We handle these personally within 48 hours.</p></div>
+        <a class="set-btn danger" style="text-decoration:none" id="del-acc" href="mailto:contact@uniqueapex.com?subject=Account%20deletion%20request&body=Please%20delete%20my%20UniqueApex%20account%20and%20all%20associated%20data.">Request deletion</a>
+      </div>
+    </div>
   </div>
 </AppFormLayout>
+
+<script is:inline>
+  (function () {
+    var UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+    var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem("ua_session")); } catch(e){}
+    if (!s || !s.access_token) { location.href = "/login"; return; }
+    var H = { apikey: ANON, Authorization: "Bearer " + s.access_token };
+
+    /* ---------- download all data ---------- */
+    document.getElementById("dl-data").addEventListener("click", function(){
+      var msg = document.getElementById("dl-msg");
+      msg.textContent = "Preparing your export…";
+      fetch(UA_URL + "/rest/v1/passports?select=id,created_at,data", { headers: H })
+        .then(function(r){ return r.ok ? r.json() : Promise.reject(); })
+        .then(function(rows){
+          var payload = {
+            exportedAt: new Date().toISOString(),
+            account: (s.user && s.user.email) || "",
+            childProfiles: rows || []
+          };
+          var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "uniqueapex-data-export.json";
+          document.body.appendChild(a); a.click(); a.remove();
+          msg.textContent = "Export downloaded (" + (rows ? rows.length : 0) + " profile" + (rows && rows.length === 1 ? "" : "s") + ").";
+          msg.style.color = "#15803D";
+        })
+        .catch(function(){ msg.textContent = "Couldn't export — try again."; msg.style.color = "#B42318"; });
+    });
+
+    /* ---------- delete all passports ---------- */
+    var confirmBox = document.getElementById("del-confirm");
+    document.getElementById("del-open").addEventListener("click", function(){ confirmBox.style.display = "block"; });
+    document.getElementById("del-cancel").addEventListener("click", function(){
+      confirmBox.style.display = "none"; document.getElementById("del-input").value = "";
+      document.getElementById("del-msg").textContent = "";
+    });
+    document.getElementById("del-go").addEventListener("click", function(){
+      var msg = document.getElementById("del-msg");
+      if (document.getElementById("del-input").value.trim() !== "DELETE") {
+        msg.textContent = "Type DELETE (in capitals) to confirm."; msg.style.color = "#B42318"; return;
+      }
+      msg.textContent = "Deleting…"; msg.style.color = "";
+      fetch(UA_URL + "/rest/v1/passports?user_id=eq." + encodeURIComponent(s.user.id), {
+        method: "DELETE", headers: H
+      }).then(function(r){
+        if (r.ok) {
+          localStorage.removeItem("ua_active_child");
+          msg.textContent = "All child profile data deleted."; msg.style.color = "#15803D";
+          setTimeout(function(){ location.href = "/account"; }, 1200);
+        } else { msg.textContent = "Couldn't delete — try again."; msg.style.color = "#B42318"; }
+      }).catch(function(){ msg.textContent = "Couldn't reach the server."; msg.style.color = "#B42318"; });
+    });
+  })();
+</script>

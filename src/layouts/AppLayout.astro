@@ -19,8 +19,10 @@
               resources | settings
    ============================================================ */
 import "../styles/app.css";
+import "../styles/child-ui.css"; // shared motion + blob design language
 import Sidebar from "../components/Sidebar.astro";
 import BottomBar from "../components/BottomBar.astro";
+import HeaderActions from "../components/HeaderActions.astro";
 
 export interface Props {
   title?: string;
@@ -72,13 +74,7 @@ const { title = "UniqueApex", activeNav = "dashboard" } = Astro.props;
           <input type="search" placeholder="Search documents, providers, programs…" />
         </div>
 
-        <div class="header-right">
-          <button class="icon-btn" aria-label="Notifications">
-            <svg viewBox="0 0 16 16" fill="none" stroke-width="1.6"><path d="M8 2a4 4 0 014 4c0 3 1.2 4 1.2 4H2.8S4 9 4 6a4 4 0 014-4zM6.6 13a1.5 1.5 0 002.8 0"/></svg>
-            <span class="dot"></span>
-          </button>
-          <a class="icon-btn" href="/settings" aria-label="Account"><span class="avatar" id="ua-hdr-avatar" style="width:26px;height:26px;font-size:.62rem">·</span></a>
-        </div>
+        <HeaderActions />
       </header>
 
       <main class="content">

@@ -1,13 +1,92 @@
 ---
+/* DOCUMENTS-EXPORTS-V1 — raw data out of the platform, no lock-in.
+   The JSON export works today (same engine as Privacy & Data). */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
 <AppFormLayout title="Documents" activeNav="documents">
   <SectionTabs section="documents" active="exports" />
   <h1 class="page-title">Exports</h1>
-  <p class="page-sub">Part of Documents. This page is scaffolded — content is coming.</p>
-  <div class="ua-stub">
-    <b>Exports</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+  <p class="page-sub">Your data belongs to you. Take it with you anytime — no questions, no lock-in.</p>
+
+  <div class="dx-grid">
+
+    <div class="dx-card cu-rev cu-lift">
+      <span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M8 11l4 4 4-4"/><path d="M4 19h16"/></svg>
+      </span>
+      <div class="dx-tx">
+        <div class="dx-head"><b>Everything, as JSON</b><span class="dx-pill ready">Ready</span></div>
+        <p>Every child profile you've saved, in a single machine-readable file. Perfect for backups or moving to another tool.</p>
+        <button class="dx-btn" id="dx-json">Download my data</button>
+        <span class="dx-msg" id="dx-msg"></span>
+      </div>
+    </div>
+
+    <div class="dx-card cu-rev cu-lift" style="--d:.08s">
+      <span class="cu-blob" style="--blob:#E6F4F2;color:#0E8C82">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 4v16"/></svg>
+      </span>
+      <div class="dx-tx">
+        <div class="dx-head"><b>Timeline &amp; wins as a spreadsheet</b><span class="dx-pill soon">Coming soon</span></div>
+        <p>Events, milestones and wins as CSV — for your own charts, or for a professional who asks for the history.</p>
+      </div>
+    </div>
+
+    <div class="dx-card cu-rev cu-lift" style="--d:.14s">
+      <span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+      </span>
+      <div class="dx-tx">
+        <div class="dx-head"><b>Delete instead?</b></div>
+        <p>Downloading isn't the same as leaving. If you want your data gone, that lives in <a href="/settings/privacy" style="color:var(--violet-700);font-weight:600">Privacy &amp; Data</a> — deletion is just as easy as export.</p>
+      </div>
+    </div>
+
   </div>
 </AppFormLayout>
+
+<style is:global>
+  .dx-grid{display:flex;flex-direction:column;gap:12px;max-width:820px}
+  .dx-card{display:flex;gap:15px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow)}
+  .dx-tx{flex:1;min-width:0}
+  .dx-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .dx-head b{font-family:var(--display);font-size:1rem;color:var(--ink)}
+  .dx-pill{font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:9999px}
+  .dx-pill.ready{background:var(--green-bg);color:var(--green)}
+  .dx-pill.soon{background:var(--amber-bg);color:var(--amber)}
+  .dx-card p{font-size:.85rem;color:var(--muted);line-height:1.55;margin:5px 0 0;max-width:64ch}
+  .dx-btn{display:inline-block;margin-top:11px;background:var(--violet-700);color:#fff;font-size:.82rem;font-weight:600;padding:8px 17px;border-radius:9999px;border:none;cursor:pointer;transition:filter .15s;font-family:inherit}
+  .dx-btn:hover{filter:brightness(1.1)}
+  .dx-msg{font-size:.76rem;color:var(--muted);margin-left:10px}
+</style>
+
+<script is:inline>
+  (function () {
+    var UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+    var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem("ua_session")); } catch (e) {}
+    if (!s || !s.access_token) { location.href = "/login"; return; }
+
+    document.getElementById("dx-json").addEventListener("click", function () {
+      var msg = document.getElementById("dx-msg");
+      msg.textContent = "Preparing your export…";
+      fetch(UA_URL + "/rest/v1/passports?select=id,created_at,data", {
+        headers: { apikey: ANON, Authorization: "Bearer " + s.access_token }
+      })
+        .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+        .then(function (rows) {
+          var payload = { exportedAt: new Date().toISOString(), account: (s.user && s.user.email) || "", childProfiles: rows || [] };
+          var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "uniqueapex-data-export.json";
+          document.body.appendChild(a); a.click(); a.remove();
+          msg.textContent = "Export downloaded (" + (rows ? rows.length : 0) + " profile" + (rows && rows.length === 1 ? "" : "s") + ").";
+          msg.style.color = "#15803D";
+        })
+        .catch(function () { msg.textContent = "Couldn't export — try again."; msg.style.color = "#B42318"; });
+    });
+  })();
+</script>

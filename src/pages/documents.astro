@@ -1,27 +1,236 @@
 ---
+/* DOCUMENTS-VAULT-V2 — the mock is now a REAL vault:
+   · drag & drop or click to upload (Supabase Storage, private bucket)
+   · every file gets a category; filter chips + search
+   · download via signed links, delete with confirm
+   Needs one-time setup in Supabase → see documents_setup.sql in the
+   repo root. Until then the page shows a friendly setup note. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
-import AiPanel from "@/components/AiPanel.astro";
-import "@/styles/mock.css";
 ---
 <AppFormLayout title="Documents" activeNav="documents">
   <SectionTabs section="documents" active="vault" />
   <h1 class="page-title">Document Vault</h1>
-  <p class="page-sub">Reports, evaluations and letters — stored securely and ready to share.</p>
+  <p class="page-sub">Reports, evaluations and letters — stored privately in Canada, ready whenever you need them.</p>
 
-  <div class="mk-actions">
-    <button class="mk-btn" type="button">＋ Upload document</button>
-    <button class="mk-btn ghost" type="button">New folder</button>
+  <div id="dv-setup"></div>
+
+  <div class="dv-drop cu-rev" id="dv-drop">
+    <input type="file" id="dv-file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.heic" style="display:none" />
+    <div class="dv-drop-ic">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5M8 9l4-4 4 4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+    </div>
+    <p class="dv-drop-t"><b>Drop a file here</b> or click to choose</p>
+    <p class="dv-drop-s">PDF, Word, photos · up to 10 MB · only you can see it</p>
   </div>
 
-  <AiPanel section="documents" />
-
-  <div class="mk-grid">
-    <div class="mk-card"><h3>Speech &amp; Language Report</h3><p>Orthophonie evaluation</p><div class="mk-meta"><span class="mk-tag">PDF</span><span class="mk-tag muted">Mar 2025</span></div></div>
-    <div class="mk-card"><h3>OT Evaluation</h3><p>Occupational therapy</p><div class="mk-meta"><span class="mk-tag">PDF</span><span class="mk-tag muted">Jan 2025</span></div></div>
-    <div class="mk-card"><h3>Diagnosis Letter</h3><p>Developmental pediatrician</p><div class="mk-meta"><span class="mk-tag">PDF</span><span class="mk-tag muted">Nov 2024</span></div></div>
-    <div class="mk-card"><h3>IEP / Plan d'intervention</h3><p>School plan</p><div class="mk-meta"><span class="mk-tag">DOCX</span><span class="mk-tag muted">Sep 2024</span></div></div>
+  <div class="dv-pending" id="dv-pending" style="display:none">
+    <span class="dv-pname" id="dv-pname"></span>
+    <select id="dv-cat" class="dv-select">
+      <option>Evaluation</option><option>Medical</option><option>School</option><option>Funding</option><option>Therapy</option><option>Other</option>
+    </select>
+    <button class="dv-btn" id="dv-upload">Upload</button>
+    <button class="dv-btn ghost" id="dv-cancel">Cancel</button>
+    <span class="dv-msg" id="dv-msg"></span>
   </div>
 
-  <p class="page-sub" style="margin-top:18px">This is the wide, tabbed layout for the vault. <b>If you already have a working vault with real uploads, don't overwrite your file</b> — apply the two changes in the README to keep your upload logic and just gain the tabs + width.</p>
+  <div class="dv-bar cu-rev" style="--d:.08s">
+    <div class="dv-filters" id="dv-filters"></div>
+    <input type="search" id="dv-search" class="dv-searchbox" placeholder="Search documents…" />
+  </div>
+
+  <div class="dv-grid" id="dv-grid"><p class="dv-empty">Loading…</p></div>
 </AppFormLayout>
+
+<style is:global>
+  #dv-grid,.dv-bar,.dv-drop,.dv-pending,#dv-setup{max-width:920px}
+  .dv-drop{border:2px dashed var(--line-2);border-radius:18px;background:var(--card);padding:26px 20px;text-align:center;cursor:pointer;transition:border-color .18s,background .18s;margin-bottom:12px}
+  .dv-drop:hover,.dv-drop.over{border-color:var(--violet-500);background:var(--violet-50)}
+  .dv-drop-ic{width:46px;height:46px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;background:var(--violet-50);color:var(--violet-700);display:grid;place-items:center;margin:0 auto 10px;transition:transform .3s cubic-bezier(.34,1.5,.64,1)}
+  .dv-drop:hover .dv-drop-ic{transform:scale(1.1) rotate(6deg)}
+  .dv-drop-t{font-size:.92rem;color:var(--ink-2);margin:0}
+  .dv-drop-t b{color:var(--violet-700)}
+  .dv-drop-s{font-size:.74rem;color:var(--faint);margin:4px 0 0}
+  .dv-pending{display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:var(--card);border:1px solid var(--violet-100);border-radius:14px;padding:12px 15px;margin-bottom:12px;box-shadow:var(--shadow)}
+  .dv-pname{font-size:.85rem;font-weight:600;color:var(--ink);flex:1;min-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dv-select{padding:8px 11px;border:1px solid var(--line-2);border-radius:10px;font-size:.84rem;color:var(--ink);background:var(--card);font-family:inherit}
+  .dv-btn{font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;border:none;background:var(--violet-700);color:#fff;cursor:pointer;transition:filter .15s}
+  .dv-btn:hover{filter:brightness(1.1)}
+  .dv-btn.ghost{background:var(--card);color:var(--muted);border:1px solid var(--line-2)}
+  .dv-msg{font-size:.78rem;color:var(--muted)}
+  .dv-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .dv-filters{display:flex;flex-wrap:wrap;gap:6px}
+  .dv-f{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;padding:5px 12px;border-radius:9999px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;transition:border-color .15s;font-family:inherit}
+  .dv-f .fc{font-size:.68rem;color:var(--faint);font-weight:700}
+  .dv-f.on{background:var(--violet-700);color:#fff;border-color:var(--violet-700)}
+  .dv-f.on .fc{color:#DDD6FE}
+  .dv-searchbox{padding:8px 14px;border:1px solid var(--line-2);border-radius:9999px;font-size:.84rem;color:var(--ink);background:var(--card);outline:none;min-width:200px;font-family:inherit}
+  .dv-searchbox:focus{border-color:#A78BFA;box-shadow:0 0 0 3px rgba(139,92,246,.14)}
+  .dv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+  .dv-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:flex-start;transition:transform .15s,border-color .15s}
+  .dv-card:hover{transform:translateY(-2px);border-color:#DDD6FE}
+  .dv-card .nm{font-size:.86rem;font-weight:600;color:var(--ink);line-height:1.35;overflow-wrap:anywhere}
+  .dv-card .mt{font-size:.73rem;color:var(--faint);margin-top:2px}
+  .dv-cat{font-size:.66rem;font-weight:700;padding:2px 8px;border-radius:9999px;background:var(--violet-50);color:var(--violet-700)}
+  .dv-acts{display:flex;gap:10px;margin-top:8px}
+  .dv-acts button{border:none;background:none;font-size:.76rem;font-weight:600;color:var(--violet-700);cursor:pointer;padding:0;font-family:inherit}
+  .dv-acts button.del{color:#B14A66}
+  .dv-acts button:hover{text-decoration:underline}
+  .dv-empty{font-size:.86rem;color:var(--faint);grid-column:1/-1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;text-align:center;margin:0}
+  .dv-setupnote{background:var(--amber-bg);border:1px solid #EBDCC3;border-radius:14px;padding:14px 17px;margin-bottom:14px}
+  .dv-setupnote p{font-size:.82rem;color:var(--amber);line-height:1.55;margin:0}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>
+
+<script>
+  import * as UA from "../lib/ua-data.js";
+
+  const UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+  const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  function getSession() { try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch { return null; } }
+  function isValid(s) { return s && s.access_token && Math.floor(Date.now() / 1000) < (s.expires_at || 0) - 60; }
+  function authHeaders(t, json = true) { const h = { apikey: ANON, Authorization: "Bearer " + t }; if (json) h["Content-Type"] = "application/json"; return h; }
+  async function getValidSession() {
+    let s = getSession();
+    if (isValid(s)) return s;
+    if (s && s.refresh_token) {
+      const r = await fetch(UA_URL + "/auth/v1/token?grant_type=refresh_token", { method: "POST", headers: { apikey: ANON, "Content-Type": "application/json" }, body: JSON.stringify({ refresh_token: s.refresh_token }) });
+      if (r.ok) { const d = await r.json(); d.expires_at = Math.floor(Date.now() / 1000) + (d.expires_in || 3600); localStorage.setItem("ua_session", JSON.stringify(d)); return d; }
+    }
+    return s && s.access_token ? s : null;
+  }
+
+  const fmtDate = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" }); };
+  const fileSvg = '<svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg>';
+  const CAT_COLOR = { Evaluation: ["#EDE9FE", "#6D28D9"], Medical: ["#F9EDF1", "#B14A66"], School: ["#FBF2E2", "#A8650A"], Funding: ["#E6F4F2", "#0E8C82"], Therapy: ["#EAF3DE", "#4C9A2A"], Other: ["#F4F3F8", "#7B7491"] };
+
+  let docs = [], filter = "All", query = "", pendingFile = null, activeP = null;
+
+  function render() {
+    /* filter chips with counts */
+    const counts = {};
+    docs.forEach((d) => { const c = d.category || "Other"; counts[c] = (counts[c] || 0) + 1; });
+    const cats = ["All"].concat(Object.keys(CAT_COLOR).filter((c) => counts[c]));
+    $("dv-filters").innerHTML = cats.map((c) =>
+      `<button class="dv-f ${c === filter ? "on" : ""}" data-c="${c}">${c}<span class="fc">${c === "All" ? docs.length : counts[c]}</span></button>`).join("");
+    $("dv-filters").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { filter = b.dataset.c; render(); }));
+
+    const list = docs.filter((d) =>
+      (filter === "All" || (d.category || "Other") === filter) &&
+      (!query || (d.file_name || "").toLowerCase().includes(query)));
+    if (!list.length) {
+      $("dv-grid").innerHTML = `<p class="dv-empty">${docs.length ? "Nothing matches — try another filter or search." : "The vault is empty. Upload the first document above — a report, a letter, anything you never want to dig for again."}</p>`;
+      return;
+    }
+    $("dv-grid").innerHTML = list.map((d, i) => {
+      const cc = CAT_COLOR[d.category] || CAT_COLOR.Other;
+      return `<div class="dv-card cu-pop" style="--d:${Math.min(i * 0.04, 0.4).toFixed(2)}s">
+        <span class="cu-blob" style="--blob:${cc[0]};width:38px;height:38px;color:${cc[1]}">${fileSvg}</span>
+        <span style="flex:1;min-width:0">
+          <span class="nm" style="display:block">${esc(d.file_name || "Document")}</span>
+          <span class="mt" style="display:block"><span class="dv-cat" style="background:${cc[0]};color:${cc[1]}">${esc(d.category || "Other")}</span> · ${esc(fmtDate(d.created_at))}</span>
+          <span class="dv-acts">${d.storage_path ? `<button data-dl="${esc(d.storage_path)}">Download</button>` : ""}<button class="del" data-del="${d.id}" data-path="${esc(d.storage_path || "")}">Delete</button></span>
+        </span>
+      </div>`;
+    }).join("");
+    $("dv-grid").querySelectorAll("[data-dl]").forEach((b) => b.addEventListener("click", () => download(b.dataset.dl)));
+    $("dv-grid").querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", () => remove(b.dataset.del, b.dataset.path)));
+  }
+
+  async function download(path) {
+    const s = await getValidSession(); if (!s) return;
+    const r = await fetch(UA_URL + "/storage/v1/object/sign/documents/" + path, {
+      method: "POST", headers: authHeaders(s.access_token), body: JSON.stringify({ expiresIn: 3600 }),
+    });
+    if (r.ok) {
+      const j = await r.json();
+      window.open(UA_URL + "/storage/v1" + j.signedURL, "_blank");
+    } else alert("Couldn't create a download link — try again.");
+  }
+
+  async function remove(id, path) {
+    if (!confirm("Delete this document? This cannot be undone.")) return;
+    const s = await getValidSession(); if (!s) return;
+    if (path) await fetch(UA_URL + "/storage/v1/object/documents/" + path, { method: "DELETE", headers: authHeaders(s.access_token, false) }).catch(() => {});
+    const r = await fetch(UA_URL + "/rest/v1/documents?id=eq." + id, { method: "DELETE", headers: authHeaders(s.access_token) });
+    if (r.ok) { docs = docs.filter((d) => d.id !== id); render(); }
+  }
+
+  function showPending(file) {
+    if (file.size > 10 * 1024 * 1024) { alert("That file is over 10 MB — try a smaller version."); return; }
+    pendingFile = file;
+    $("dv-pname").textContent = file.name;
+    $("dv-msg").textContent = "";
+    $("dv-pending").style.display = "flex";
+  }
+
+  async function upload() {
+    if (!pendingFile) return;
+    const s = await getValidSession(); if (!s) { location.href = "/login"; return; }
+    const msg = $("dv-msg"), btn = $("dv-upload");
+    btn.disabled = true; msg.textContent = "Uploading…";
+    const safe = pendingFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = s.user.id + "/" + Date.now() + "_" + safe;
+    try {
+      const up = await fetch(UA_URL + "/storage/v1/object/documents/" + path, {
+        method: "POST",
+        headers: { apikey: ANON, Authorization: "Bearer " + s.access_token, "Content-Type": pendingFile.type || "application/octet-stream" },
+        body: pendingFile,
+      });
+      if (!up.ok) { throw new Error(up.status === 404 ? "setup" : "upload"); }
+      const row = {
+        user_id: s.user.id, passport_id: activeP ? activeP.id : null,
+        file_name: pendingFile.name, file_type: (pendingFile.name.split(".").pop() || "file").toLowerCase(),
+        storage_path: path, category: $("dv-cat").value,
+      };
+      const ins = await fetch(UA_URL + "/rest/v1/documents", {
+        method: "POST", headers: Object.assign({}, authHeaders(s.access_token), { Prefer: "return=representation" }), body: JSON.stringify(row),
+      });
+      if (!ins.ok) throw new Error("setup");
+      const rows = await ins.json();
+      docs.unshift(rows[0] || row);
+      $("dv-pending").style.display = "none"; pendingFile = null;
+      render();
+    } catch (e) {
+      msg.textContent = e.message === "setup"
+        ? "Storage isn't set up yet — run documents_setup.sql in Supabase (ask Claude for the steps)."
+        : "Upload failed — check your connection and try again.";
+    }
+    btn.disabled = false;
+  }
+
+  (async () => {
+    const passports = await UA.getPassports().catch(() => []);
+    activeP = UA.pickActivePassport(passports);
+    const s = await getValidSession();
+    if (s) {
+      const r = await fetch(UA_URL + "/rest/v1/documents?select=id,file_name,file_type,category,storage_path,created_at&user_id=eq." + s.user.id + "&order=created_at.desc", { headers: authHeaders(s.access_token) }).catch(() => null);
+      if (r && r.ok) docs = await r.json();
+      else if (r && (r.status === 404 || r.status === 400)) {
+        $("dv-setup").innerHTML = `<div class="dv-setupnote"><p><strong>One-time setup needed:</strong> the documents table and storage bucket don't exist yet in Supabase. Open <strong>documents_setup.sql</strong> in the project folder and follow the three steps inside (about 3 minutes) — then this page comes alive.</p></div>`;
+      }
+    }
+    render();
+
+    /* upload interactions */
+    const drop = $("dv-drop"), input = $("dv-file");
+    drop.addEventListener("click", () => input.click());
+    input.addEventListener("change", () => { if (input.files[0]) showPending(input.files[0]); input.value = ""; });
+    ["dragover", "dragenter"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+    ["dragleave", "drop"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+    drop.addEventListener("drop", (e) => { const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (f) showPending(f); });
+    $("dv-upload").addEventListener("click", upload);
+    $("dv-cancel").addEventListener("click", () => { pendingFile = null; $("dv-pending").style.display = "none"; });
+    $("dv-search").addEventListener("input", (e) => { query = e.target.value.toLowerCase(); render(); });
+  })().catch((e) => console.error("[documents] hydrate failed", e));
+</script>

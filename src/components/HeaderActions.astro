@@ -1,0 +1,152 @@
+---
+/* HeaderActions.astro — HDR-ACTIONS-V1
+   The two buttons on the right of the app header, now functional:
+   · Bell → dropdown of personalized next-step notifications, generated
+     from the child's real data by src/lib/recommendations.js. The violet
+     dot shows only when there's something new; opening the panel marks
+     items as seen (per browser).
+   · Avatar → account menu: dashboard, settings, sign out.
+   Used by BOTH AppLayout and AppFormLayout so behavior stays identical. */
+---
+<div class="header-right">
+  <div class="hdr-wrap">
+    <button class="icon-btn" id="ua-bell" aria-label="Notifications" aria-haspopup="true">
+      <svg viewBox="0 0 16 16" fill="none" stroke-width="1.6"><path d="M8 2a4 4 0 014 4c0 3 1.2 4 1.2 4H2.8S4 9 4 6a4 4 0 014-4zM6.6 13a1.5 1.5 0 002.8 0"/></svg>
+      <span class="dot" id="ua-bell-dot" style="display:none"></span>
+    </button>
+    <div class="hdr-panel" id="ua-bell-panel" role="menu" aria-label="Notifications">
+      <div class="hdr-panel-h">Notifications</div>
+      <div id="ua-bell-list"><p class="hdr-empty">Loading…</p></div>
+    </div>
+  </div>
+
+  <div class="hdr-wrap">
+    <button class="icon-btn" id="ua-user-btn" aria-label="Account menu" aria-haspopup="true">
+      <span class="avatar" id="ua-hdr-avatar" style="width:26px;height:26px;font-size:.62rem">·</span>
+    </button>
+    <div class="hdr-panel hdr-user" id="ua-user-menu" role="menu" aria-label="Account">
+      <div class="hdr-user-h">
+        <span class="avatar" id="ua-menu-avatar" style="width:34px;height:34px;font-size:.75rem">·</span>
+        <div class="hdr-user-id"><b id="ua-menu-name">Account</b><span id="ua-menu-email"></span></div>
+      </div>
+      <a class="hdr-item" href="/account"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="5" height="5" rx="1.2"/><rect x="9" y="2" width="5" height="5" rx="1.2"/><rect x="2" y="9" width="5" height="5" rx="1.2"/><rect x="9" y="9" width="5" height="5" rx="1.2"/></svg>My dashboard</a>
+      <a class="hdr-item" href="/settings"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.3 1.3M11.1 11.1l1.3 1.3M12.4 3.6l-1.3 1.3M4.9 11.1l-1.3 1.3"/></svg>Settings</a>
+      <hr class="hdr-sep" />
+      <button class="hdr-item hdr-out" id="ua-signout" type="button"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2H3.5A1.5 1.5 0 002 3.5v9A1.5 1.5 0 003.5 14H6M10.5 11l3-3-3-3M13.5 8H6"/></svg>Sign out</button>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .hdr-wrap{position:relative}
+  .hdr-panel{position:absolute;top:calc(100% + 10px);right:0;width:320px;background:var(--card,#fff);border:1px solid var(--line,#EAE7F3);border-radius:14px;box-shadow:var(--shadow-lg,0 8px 32px rgba(34,27,54,.10));padding:8px;display:none;z-index:70}
+  .hdr-panel.open{display:block;animation:hdrIn .16s ease}
+  @keyframes hdrIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+  .hdr-panel-h{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint,#A9A3BC);padding:6px 10px 8px}
+  .hdr-ntf{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;padding:9px 10px;border-radius:10px;text-decoration:none;transition:background .12s}
+  .hdr-ntf:hover{background:var(--bg,#F7F6FB)}
+  .hdr-ntf .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex-shrink:0;font-size:.72rem;font-weight:700}
+  .hdr-ntf .ic.warn{background:#FBF2E2;color:#A8650A}
+  .hdr-ntf .ic.todo{background:#EDE9FE;color:#6D28D9}
+  .hdr-ntf .ic.info{background:#E6F4F2;color:#0E8C82}
+  .hdr-ntf b{display:block;font-size:.82rem;color:var(--ink,#221B36);font-weight:600;line-height:1.3}
+  .hdr-ntf span{display:block;font-size:.74rem;color:var(--muted,#7B7491);line-height:1.4;margin-top:1px}
+  .hdr-empty{font-size:.82rem;color:var(--muted,#7B7491);padding:14px 10px;margin:0;text-align:center}
+  .hdr-user{width:240px}
+  .hdr-user-h{display:flex;align-items:center;gap:10px;padding:10px 10px 12px;border-bottom:1px solid var(--line,#EAE7F3);margin-bottom:6px}
+  .hdr-user-id{min-width:0;line-height:1.25}
+  .hdr-user-id b{display:block;font-size:.85rem;color:var(--ink,#221B36);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hdr-user-id span{font-size:.72rem;color:var(--muted,#7B7491);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+  .hdr-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border-radius:9px;font-size:.85rem;font-weight:500;color:var(--ink-2,#494060);text-decoration:none;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left}
+  .hdr-item:hover{background:var(--bg,#F7F6FB);color:var(--ink,#221B36)}
+  .hdr-item svg{flex-shrink:0;opacity:.7}
+  .hdr-sep{border:none;border-top:1px solid var(--line,#EAE7F3);margin:5px 6px}
+  .hdr-out{color:#B42318}
+  .hdr-out:hover{background:#FFFBFA;color:#B42318}
+</style>
+
+<script>
+  import * as UA from "../lib/ua-data.js";
+  import { getRecommendations } from "../lib/recommendations.js";
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  /* ---------- open/close behaviour ---------- */
+  const panels = [
+    { btn: $("ua-bell"), panel: $("ua-bell-panel") },
+    { btn: $("ua-user-btn"), panel: $("ua-user-menu") },
+  ];
+  const closeAll = () => panels.forEach((p) => p.panel && p.panel.classList.remove("open"));
+  panels.forEach(({ btn, panel }) => {
+    if (!btn || !panel) return;
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const was = panel.classList.contains("open");
+      closeAll();
+      if (!was) {
+        panel.classList.add("open");
+        if (panel.id === "ua-bell-panel") markSeen();
+      }
+    });
+    panel.addEventListener("click", (e) => e.stopPropagation());
+  });
+  document.addEventListener("click", closeAll);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAll(); });
+
+  /* ---------- account menu ---------- */
+  let session = null;
+  try { session = JSON.parse(localStorage.getItem("ua_session")); } catch (e) {}
+  const user = (session && session.user) || {};
+  const meta = user.user_metadata || {};
+  const email = user.email || "";
+  if (email) {
+    $("ua-menu-email").textContent = email;
+    $("ua-menu-name").textContent = meta.full_name || email.split("@")[0];
+    const ini = (meta.full_name || email)[0].toUpperCase();
+    const mAv = $("ua-menu-avatar"); if (mAv) mAv.textContent = ini;
+  }
+  $("ua-signout").addEventListener("click", () => {
+    localStorage.removeItem("ua_session");
+    localStorage.removeItem("ua_active_child");
+    location.href = "/login";
+  });
+
+  /* ---------- personalized notifications ---------- */
+  const SEEN_KEY = "ua_seen_notifs";
+  let currentIds = [];
+  function markSeen() {
+    try { localStorage.setItem(SEEN_KEY, JSON.stringify(currentIds)); } catch (e) {}
+    const dot = $("ua-bell-dot"); if (dot) dot.style.display = "none";
+  }
+  (async () => {
+    const list = $("ua-bell-list");
+    try {
+      const passports = await UA.getPassports().catch(() => []);
+      const p = UA.pickActivePassport(passports);
+      const data = (p && p.data) || null;
+      const recs = getRecommendations(data, {})
+        .filter((r) => r.severity !== "done")
+        .slice(0, 6);
+      currentIds = recs.map((r) => r.id);
+      if (!recs.length) {
+        list.innerHTML = `<p class="hdr-empty">You're all caught up 🎉</p>`;
+      } else {
+        const IC = { warn: "!", todo: "→", info: "i" };
+        list.innerHTML = recs.map((r) =>
+          `<a class="hdr-ntf" href="${esc(r.href || "#")}">
+            <span class="ic ${esc(r.severity)}">${IC[r.severity] || "i"}</span>
+            <span style="min-width:0"><b>${esc(r.title)}</b>${r.reason ? `<span>${esc(r.reason)}</span>` : ""}</span>
+          </a>`).join("");
+      }
+      /* dot: only when something unseen */
+      let seen = [];
+      try { seen = JSON.parse(localStorage.getItem(SEEN_KEY)) || []; } catch (e) {}
+      const hasNew = currentIds.some((id) => !seen.includes(id));
+      const dot = $("ua-bell-dot");
+      if (dot) dot.style.display = hasNew ? "" : "none";
+    } catch (e) {
+      list.innerHTML = `<p class="hdr-empty">Couldn't load notifications.</p>`;
+    }
+  })();
+</script>

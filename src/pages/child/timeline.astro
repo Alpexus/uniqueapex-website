@@ -1,4 +1,7 @@
 ---
+/* TIMELINE-V2 — visual redesign: gradient journey spine with year badge
+   pills, ringed category dots, staggered card entrances with hover lift,
+   colored filter chips with counts. Event data logic unchanged. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
@@ -11,7 +14,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
   <div id="tl-gate"></div>
 
   <div id="tl-main" style="display:none">
-    <div class="tl-bar">
+    <div class="tl-bar cu-rev">
       <div class="tl-filters" id="tl-filters"></div>
       <button class="tl-addbtn" id="tl-addbtn"><span style="font-size:1.1em;line-height:1">+</span> Add event</button>
     </div>
@@ -38,37 +41,47 @@ import SectionTabs from "@/components/SectionTabs.astro";
 </AppFormLayout>
 
 <style is:global>
-  #tl-main, #tl-gate{max-width:820px}
+  #tl-main, #tl-gate{max-width:840px}
   .tl-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:14px}
   .tl-filters{display:flex;flex-wrap:wrap;gap:6px}
-  .tl-f{font-size:.78rem;font-weight:600;padding:5px 11px;border-radius:9999px;border:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer}
-  .tl-f.on{background:#6d28d9;color:#fff;border-color:#6d28d9}
-  .tl-addbtn{font-size:.82rem;font-weight:600;padding:7px 14px;border-radius:9999px;border:1px solid #6d28d9;background:#fff;color:#6d28d9;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-  .tl-addbtn:hover{background:#F5F3FF}
-  .tl-form{display:none;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px;margin-bottom:16px}
-  .tl-form.show{display:block}
+  .tl-f{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;padding:5px 12px;border-radius:9999px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;transition:border-color .15s,background .15s,transform .15s;font-family:inherit}
+  .tl-f:hover{border-color:var(--line-2);transform:translateY(-1px)}
+  .tl-f .fd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .tl-f .fc{font-size:.68rem;color:var(--faint);font-weight:700}
+  .tl-f.on{background:var(--violet-700);color:#fff;border-color:var(--violet-700)}
+  .tl-f.on .fc{color:#DDD6FE}
+  .tl-addbtn{font-size:.82rem;font-weight:600;padding:7px 14px;border-radius:9999px;border:1px solid var(--violet-700);background:var(--card);color:var(--violet-700);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s,transform .15s}
+  .tl-addbtn:hover{background:var(--violet-50);transform:translateY(-1px)}
+  .tl-form{display:none;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .tl-form.show{display:block;animation:tlFormIn .25s cubic-bezier(.22,1,.36,1)}
+  @keyframes tlFormIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
   .tl-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-  .tl-field{width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:10px;font-size:.88rem;color:#1e293b;background:#fff;outline:none}
-  .tl-field:focus{border-color:#a78bfa;box-shadow:0 0 0 2px #ede9fe}
+  .tl-field{width:100%;padding:9px 12px;border:1px solid var(--line-2);border-radius:10px;font-size:.88rem;color:var(--ink);background:var(--card);outline:none;font-family:inherit}
+  .tl-field:focus{border-color:#A78BFA;box-shadow:0 0 0 3px rgba(139,92,246,.14)}
   .tl-form-actions{display:flex;align-items:center;gap:10px;margin-top:12px;justify-content:flex-end;flex-wrap:wrap}
-  .tl-err{font-size:.8rem;color:#dc2626;margin-right:auto}
-  .tl-ghost{font-size:.82rem;font-weight:600;padding:8px 14px;border-radius:9999px;border:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer}
-  .tl-savebtn{font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;border:none;background:#6d28d9;color:#fff;cursor:pointer}
-  .tl-savebtn:hover{background:#5b21b6}
-  .tl-year{font-size:.78rem;font-weight:700;color:#94a3b8;margin:4px 0 10px 46px}
+  .tl-err{font-size:.8rem;color:#B14A66;margin-right:auto}
+  .tl-ghost{font-size:.82rem;font-weight:600;padding:8px 14px;border-radius:9999px;border:1px solid var(--line-2);background:var(--card);color:var(--muted);cursor:pointer}
+  .tl-savebtn{font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;border:none;background:var(--violet-700);color:#fff;cursor:pointer;transition:filter .15s}
+  .tl-savebtn:hover{filter:brightness(1.1)}
+  /* the journey spine */
+  .tl-year{position:relative;margin:6px 0 12px;padding-left:0;display:flex;align-items:center}
+  .tl-year b{font-family:var(--display);font-size:.76rem;font-weight:700;color:var(--violet-700);background:var(--violet-50);border:1px solid var(--violet-100);border-radius:9999px;padding:3px 13px;margin-left:6px;z-index:1}
   .tl-item{display:flex;gap:14px;padding-bottom:16px;position:relative}
-  .tl-item::before{content:"";position:absolute;left:15px;top:32px;bottom:-2px;width:2px;background:#e2e8f0}
+  .tl-item::before{content:"";position:absolute;left:17px;top:38px;bottom:-2px;width:2.5px;border-radius:2px;background:linear-gradient(to bottom,#DDD6FE,#EAE7F3)}
   .tl-item.last::before{display:none}
-  .tl-dot{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;z-index:1}
-  .tl-card{flex:1;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:11px 14px;position:relative}
-  .tl-meta{font-size:.72rem;color:#94a3b8;margin-bottom:2px}
-  .tl-title{font-size:.9rem;font-weight:600;color:#1e293b;margin-bottom:3px;padding-right:18px}
-  .tl-note{font-size:.83rem;color:#64748b;line-height:1.45}
-  .tl-del{position:absolute;top:8px;right:10px;border:none;background:none;color:#cbd5e1;font-size:1.05rem;line-height:1;cursor:pointer;padding:2px}
-  .tl-del:hover{color:#dc2626}
-  .tl-empty,.tl-gate-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px 22px;text-align:center}
-  .tl-empty p,.tl-gate-card p{color:#64748b;font-size:.9rem;margin:0 0 14px}
-  .tl-gate-card a{display:inline-block;background:#6d28d9;color:#fff;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none}
+  .tl-dot{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;z-index:1;border:3px solid var(--card);box-shadow:0 2px 8px rgba(34,27,54,.16)}
+  .tl-card{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;position:relative;box-shadow:var(--shadow);transition:transform .16s,box-shadow .16s,border-color .16s}
+  .tl-item:hover .tl-card{transform:translateY(-2px);box-shadow:0 8px 22px rgba(109,40,217,.10);border-color:#DDD6FE}
+  .tl-meta{font-size:.72rem;color:var(--faint);margin-bottom:2px;display:flex;align-items:center;gap:6px}
+  .tl-meta .cat{font-weight:700}
+  .tl-title{font-size:.9rem;font-weight:600;color:var(--ink);margin-bottom:3px;padding-right:18px}
+  .tl-note{font-size:.83rem;color:var(--muted);line-height:1.45}
+  .tl-del{position:absolute;top:8px;right:10px;border:none;background:none;color:#D8D3E6;font-size:1.05rem;line-height:1;cursor:pointer;padding:2px}
+  .tl-del:hover{color:#B14A66}
+  .tl-empty,.tl-gate-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 22px;text-align:center}
+  .tl-empty p,.tl-gate-card p{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+  .tl-gate-card a{display:inline-block;background:var(--violet-700);color:#fff;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none}
+  @media (prefers-reduced-motion:reduce){.tl-form.show{animation:none}}
 </style>
 
 <script is:inline>
@@ -103,14 +116,14 @@ import SectionTabs from "@/components/SectionTabs.astro";
   async function restGet(path) { const s = await getValidSession(); if (!s) return []; const r = await fetch(UA_URL + "/rest/v1/" + path, { headers: authHeaders(s.access_token) }); return r.ok ? r.json() : []; }
 
   const CAT = {
-    Milestone: { c: "#65a30d", ic: '<path d="M5 2.5v11" /><path d="M5 3.5h7l-1.6 2.2L12 8H5"/>' },
-    Therapy: { c: "#7c3aed", ic: '<path d="M8 13s-5-3.2-5-6.5A2.5 2.5 0 0 1 8 5a2.5 2.5 0 0 1 5 1.5C13 9.8 8 13 8 13z"/>' },
-    Assessment: { c: "#2563eb", ic: '<rect x="4.5" y="3" width="7" height="10" rx="1.2"/><path d="M6.3 3V2.2h3.4V3"/><path d="M6.5 6.5h3M6.5 9h3"/>' },
-    Diagnosis: { c: "#ea580c", ic: '<path d="M2.5 8h2l1.3-3 2.2 6 1.3-3h3.2"/>' },
-    Education: { c: "#b45309", ic: '<path d="M2 6l6-2.4L14 6l-6 2.4z"/><path d="M5 7.4V10.5c0 .9 6 .9 6 0V7.4"/>' },
-    Funding: { c: "#0d9488", ic: '<circle cx="8" cy="8" r="5"/><path d="M8 5.4v5.2M6.6 7h2.1a1.2 1.2 0 0 1 0 2.3H6.8"/>' },
-    Medical: { c: "#dc2626", ic: '<path d="M8 4v8M4 8h8"/>' },
-    Note: { c: "#64748b", ic: '<path d="M4.5 3h5l2 2v8h-7z"/><path d="M9.5 3v2h2"/>' },
+    Milestone: { c: "#4C9A2A", ic: '<path d="M5 2.5v11" /><path d="M5 3.5h7l-1.6 2.2L12 8H5"/>' },
+    Therapy: { c: "#7C3AED", ic: '<path d="M8 13s-5-3.2-5-6.5A2.5 2.5 0 0 1 8 5a2.5 2.5 0 0 1 5 1.5C13 9.8 8 13 8 13z"/>' },
+    Assessment: { c: "#2563EB", ic: '<rect x="4.5" y="3" width="7" height="10" rx="1.2"/><path d="M6.3 3V2.2h3.4V3"/><path d="M6.5 6.5h3M6.5 9h3"/>' },
+    Diagnosis: { c: "#D85A30", ic: '<path d="M2.5 8h2l1.3-3 2.2 6 1.3-3h3.2"/>' },
+    Education: { c: "#A8650A", ic: '<path d="M2 6l6-2.4L14 6l-6 2.4z"/><path d="M5 7.4V10.5c0 .9 6 .9 6 0V7.4"/>' },
+    Funding: { c: "#0E8C82", ic: '<circle cx="8" cy="8" r="5"/><path d="M8 5.4v5.2M6.6 7h2.1a1.2 1.2 0 0 1 0 2.3H6.8"/>' },
+    Medical: { c: "#D4537E", ic: '<path d="M8 4v8M4 8h8"/>' },
+    Note: { c: "#7B7491", ic: '<path d="M4.5 3h5l2 2v8h-7z"/><path d="M9.5 3v2h2"/>' },
   };
   const fmtMY = (dt) => dt.toLocaleDateString("en-CA", { month: "short", year: "numeric" });
   function parseLoose(t) { if (!t) return null; const d = new Date(t); return isNaN(d) ? null : d; }
@@ -136,18 +149,22 @@ import SectionTabs from "@/components/SectionTabs.astro";
   let allEvents = [], filter = "All", activeP = null;
 
   function render() {
-    const cats = ["All"].concat(Object.keys(CAT).filter((k) => allEvents.some((e) => e.cat === k)));
-    $("tl-filters").innerHTML = cats.map((c) => `<button class="tl-f ${c === filter ? "on" : ""}" data-c="${c}">${c}</button>`).join("");
+    const counts = {};
+    allEvents.forEach((e) => { counts[e.cat] = (counts[e.cat] || 0) + 1; });
+    const cats = ["All"].concat(Object.keys(CAT).filter((k) => counts[k]));
+    $("tl-filters").innerHTML = cats.map((c) =>
+      `<button class="tl-f ${c === filter ? "on" : ""}" data-c="${c}">${c !== "All" ? `<span class="fd" style="background:${CAT[c].c}"></span>` : ""}${c}<span class="fc">${c === "All" ? allEvents.length : counts[c]}</span></button>`).join("");
     $("tl-filters").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { filter = b.dataset.c; render(); }));
 
     const list = allEvents.filter((e) => filter === "All" || e.cat === filter).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
     if (!list.length) { $("tl").innerHTML = `<div class="tl-empty"><p>Nothing here yet. Add your child's first event, or fill in the passport.</p></div>`; return; }
-    let h = "", lastYear = null;
+    let h = "", lastYear = null, idx = 0;
     list.forEach((e, i) => {
-      if (e.y !== lastYear) { h += `<div class="tl-year">${esc(String(e.y))}</div>`; lastYear = e.y; }
+      if (e.y !== lastYear) { h += `<div class="tl-year"><b>${esc(String(e.y))}</b></div>`; lastYear = e.y; }
       const cat = CAT[e.cat] || CAT.Note, last = i === list.length - 1;
       const del = e.auto ? "" : `<button class="tl-del" data-id="${e.id}" aria-label="Delete event">×</button>`;
-      h += `<div class="tl-item${last ? " last" : ""}"><div class="tl-dot" style="background:${cat.c}"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${cat.ic}</svg></div><div class="tl-card">${del}<div class="tl-meta">${esc(e.display)} · ${esc(e.cat)}</div><div class="tl-title">${esc(e.title)}</div>${e.note ? `<div class="tl-note">${esc(e.note)}</div>` : ""}</div></div>`;
+      const dl = Math.min(idx * 0.05, 0.45); idx++;
+      h += `<div class="tl-item cu-rev${last ? " last" : ""}" style="--d:${dl.toFixed(2)}s"><div class="tl-dot" style="background:${cat.c}"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${cat.ic}</svg></div><div class="tl-card">${del}<div class="tl-meta">${esc(e.display)} · <span class="cat" style="color:${cat.c}">${esc(e.cat)}</span></div><div class="tl-title">${esc(e.title)}</div>${e.note ? `<div class="tl-note">${esc(e.note)}</div>` : ""}</div></div>`;
     });
     $("tl").innerHTML = h;
     $("tl").querySelectorAll(".tl-del").forEach((b) => b.addEventListener("click", () => delEvent(b.dataset.id)));

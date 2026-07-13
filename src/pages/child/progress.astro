@@ -1,4 +1,8 @@
 ---
+/* PROGRESS-V2 — visual redesign: stat strip with count-ups, blob milestone
+   cards with staggered pop-ins, sparkle celebration when a win is saved,
+   animated growth bars with wheel-matched colors + band pills.
+   Wins/milestones data logic unchanged. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
@@ -11,12 +15,14 @@ import SectionTabs from "@/components/SectionTabs.astro";
   <div id="pg-gate"></div>
 
   <div id="pg-main" style="display:none">
-    <div class="pg-sec">
+    <div class="pg-stats cu-rev" id="pg-stats"></div>
+
+    <div class="pg-sec cu-rev" style="--d:.06s">
       <p class="pg-h">Milestones reached</p>
       <div class="pg-ms" id="pg-ms"></div>
     </div>
 
-    <div class="pg-sec">
+    <div class="pg-sec cu-rev" style="--d:.12s">
       <p class="pg-h">Wins journal <button class="pg-addbtn" id="pg-addbtn"><span style="font-size:1.1em;line-height:1">+</span> Add a win</button></p>
       <div class="pg-form" id="pg-form">
         <input type="text" id="pg-input" class="pg-field" placeholder="Something that went well…" />
@@ -25,7 +31,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <div id="pg-wins"></div>
     </div>
 
-    <div class="pg-sec" style="margin-bottom:0">
+    <div class="pg-sec cu-rev" style="--d:.18s;margin-bottom:0">
       <p class="pg-h">Growth over time</p>
       <div class="pg-chart" id="pg-chart"></div>
     </div>
@@ -33,39 +39,61 @@ import SectionTabs from "@/components/SectionTabs.astro";
 </AppFormLayout>
 
 <style is:global>
-  #pg-main, #pg-gate{max-width:820px}
+  #pg-main, #pg-gate{max-width:860px}
+  .pg-stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+  .pg-stat{flex:1;min-width:150px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
+  .pg-stat .n{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--ink);line-height:1.1}
+  .pg-stat .l{font-size:.74rem;color:var(--muted);margin-top:1px}
   .pg-sec{margin-bottom:24px}
-  .pg-h{font-size:.84rem;color:#64748b;margin:0 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:600}
-  .pg-ms{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
-  .pg-mcard{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center}
-  a.pg-miss{border-style:dashed;background:#fbfcfe;text-decoration:none}
-  a.pg-miss:hover{background:#f5f3ff;border-color:#c4b5fd}
-  .pg-mic{width:34px;height:34px;border-radius:9px;background:#ECFDF5;color:#15803d;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .pg-mname{font-size:.84rem;font-weight:600;color:#1e293b}
-  .pg-mwhen{font-size:.78rem;color:#64748b}
-  .pg-addbtn{font-size:.82rem;font-weight:600;padding:7px 14px;border-radius:9999px;border:1px solid #6d28d9;background:#fff;color:#6d28d9;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-  .pg-addbtn:hover{background:#F5F3FF}
+  .pg-h{font-size:.84rem;color:var(--muted);margin:0 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:600}
+  .pg-ms{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px}
+  .pg-mcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;gap:11px;align-items:center;box-shadow:var(--shadow)}
+  a.pg-miss{border-style:dashed;background:#FBFAFE;text-decoration:none;box-shadow:none}
+  a.pg-miss:hover{background:var(--violet-50);border-color:#C4B5FD}
+  .pg-mname{font-size:.84rem;font-weight:600;color:var(--ink)}
+  .pg-mwhen{font-size:.78rem;color:var(--muted)}
+  .pg-addbtn{font-size:.82rem;font-weight:600;padding:7px 14px;border-radius:9999px;border:1px solid var(--violet-700);background:var(--card);color:var(--violet-700);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s,transform .15s}
+  .pg-addbtn:hover{background:var(--violet-50);transform:translateY(-1px)}
   .pg-form{display:none;gap:8px;margin-bottom:12px}
-  .pg-form.show{display:flex}
-  .pg-field{flex:1;padding:9px 12px;border:1px solid #e2e8f0;border-radius:10px;font-size:.88rem;color:#1e293b;background:#fff;outline:none}
-  .pg-field:focus{border-color:#a78bfa;box-shadow:0 0 0 2px #ede9fe}
-  .pg-savebtn{font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;border:none;background:#6d28d9;color:#fff;cursor:pointer;white-space:nowrap}
-  .pg-savebtn:hover{background:#5b21b6}
-  .pg-win{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:11px 14px;display:flex;gap:11px;align-items:flex-start;margin-bottom:8px;position:relative}
-  .pg-wic{color:#16a34a;flex-shrink:0;margin-top:1px}
-  .pg-wtext{font-size:.9rem;color:#1e293b;flex:1;padding-right:18px}
-  .pg-wdate{font-size:.74rem;color:#94a3b8;white-space:nowrap}
-  .pg-del{position:absolute;top:8px;right:10px;border:none;background:none;color:#cbd5e1;font-size:1.05rem;line-height:1;cursor:pointer;padding:2px}
-  .pg-del:hover{color:#dc2626}
-  .pg-chart{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px 16px}
-  .pg-empty{font-size:.86rem;color:#94a3b8;margin:0}
-  .pg-empty a{color:#6d28d9;font-weight:600;text-decoration:none}
+  .pg-form.show{display:flex;animation:pgFormIn .25s cubic-bezier(.22,1,.36,1)}
+  @keyframes pgFormIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  .pg-field{flex:1;padding:9px 12px;border:1px solid var(--line-2);border-radius:10px;font-size:.88rem;color:var(--ink);background:var(--card);outline:none;font-family:inherit}
+  .pg-field:focus{border-color:#A78BFA;box-shadow:0 0 0 3px rgba(139,92,246,.14)}
+  .pg-savebtn{font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;border:none;background:var(--violet-700);color:#fff;cursor:pointer;white-space:nowrap;transition:filter .15s}
+  .pg-savebtn:hover{filter:brightness(1.1)}
+  .pg-win{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;display:flex;gap:11px;align-items:flex-start;margin-bottom:8px;position:relative;box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
+  .pg-win:hover{transform:translateY(-1px);border-color:var(--line-2)}
+  .pg-wic{color:#0E8F66;flex-shrink:0;margin-top:1px}
+  .pg-wtext{font-size:.9rem;color:var(--ink);flex:1;padding-right:18px}
+  .pg-wdate{font-size:.74rem;color:var(--faint);white-space:nowrap}
+  .pg-del{position:absolute;top:8px;right:10px;border:none;background:none;color:#D8D3E6;font-size:1.05rem;line-height:1;cursor:pointer;padding:2px}
+  .pg-del:hover{color:#B14A66}
+  /* celebration: sparkles burst around a just-saved win */
+  .pg-cele{animation:pgPop .5s cubic-bezier(.34,1.5,.64,1)}
+  @keyframes pgPop{from{transform:scale(.92);opacity:.4}to{transform:scale(1);opacity:1}}
+  .pg-cele::before,.pg-cele::after{content:"✦";position:absolute;color:#8B5CF6;font-size:14px;animation:pgSpark 1s ease forwards;pointer-events:none}
+  .pg-cele::before{top:-8px;left:18px}
+  .pg-cele::after{top:-6px;right:26px;color:#5EEAD4;animation-delay:.12s}
+  @keyframes pgSpark{0%{opacity:0;transform:scale(.4) translateY(4px)}35%{opacity:1;transform:scale(1.3) translateY(-4px)}100%{opacity:0;transform:scale(.6) translateY(-14px)}}
+  .pg-chart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px;box-shadow:var(--shadow)}
+  .pg-row{display:flex;align-items:center;gap:10px;margin:0 -8px 2px;padding:4px 8px;border-radius:9px;text-decoration:none;transition:background .15s}
+  .pg-row:hover{background:var(--violet-50)}
+  .pg-rname{font-size:.8rem;width:112px;flex-shrink:0;color:var(--ink-2);display:flex;align-items:center;gap:7px}
+  .pg-rname .dd{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .pg-bar{flex:1;height:9px;border-radius:5px;background:var(--bg);position:relative;overflow:hidden}
+  .pg-band{font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:9999px;flex-shrink:0;min-width:72px;text-align:center}
+  .pg-cap{font-size:.72rem;color:var(--faint);margin-top:12px}
+  .pg-empty{font-size:.86rem;color:var(--faint);margin:0}
+  .pg-empty a{color:var(--violet-700);font-weight:600;text-decoration:none}
   .pg-chart-empty{text-align:center;padding:18px 10px}
-  .pg-chart-empty .ic{color:#cbd5e1;margin-bottom:8px}
-  .pg-chart-empty p{font-size:.86rem;color:#94a3b8;margin:0;line-height:1.5}
-  .pg-gate-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px 22px;text-align:center}
-  .pg-gate-card p{color:#64748b;font-size:.9rem;margin:0 0 14px}
-  .pg-gate-card a{display:inline-block;background:#6d28d9;color:#fff;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none}
+  .pg-chart-empty .ic{color:#D8D3E6;margin-bottom:8px}
+  .pg-chart-empty p{font-size:.86rem;color:var(--faint);margin:0;line-height:1.5}
+  .pg-gate-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 22px;text-align:center}
+  .pg-gate-card p{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+  .pg-gate-card a{display:inline-block;background:var(--violet-700);color:#fff;font-size:.85rem;font-weight:600;padding:9px 18px;border-radius:9999px;text-decoration:none}
+  @media (prefers-reduced-motion:reduce){
+    .pg-cele,.pg-cele::before,.pg-cele::after,.pg-form.show{animation:none}
+  }
 </style>
 
 <script is:inline>
@@ -79,14 +107,29 @@ import SectionTabs from "@/components/SectionTabs.astro";
 <script>
   import * as UA from "../../lib/ua-data.js";
   import { scoreWheel, DOMAINS, scoreToBand } from "../../lib/wheelScore.js";
+  import { domainColor } from "../../lib/wheelSvg.js";
 
   const UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
   const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const present = (v) => v != null && v !== "";
-  const SHORT = { "Communication": "Communication", "Social Connection": "Social", "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility", "Emotional Regulation": "Emotional", "Executive Function": "Executive", "Daily Living Skills": "Daily living", "Learning & Play": "Learning & play" };
-  const barColor = (sc) => { if (sc == null) return "#cbd5e1"; const k = scoreToBand(sc).key; return (k === "minimal" || k === "low") ? "#16a34a" : k === "moderate" ? "#d97706" : "#7c3aed"; };
+  const SHORT = { "Communication": "Communication", "Social Connection": "Social", "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility", "Emotional Regulation": "Emotional", "Executive Function": "Executive", "Daily Living Skills": "Daily living", "Learning & play": "Learning & play", "Learning & Play": "Learning & play" };
+  const barColor = (sc) => { if (sc == null) return "#D8D3E6"; const k = scoreToBand(sc).key; return (k === "minimal" || k === "low") ? "#0E8F66" : k === "moderate" ? "#D97706" : "#7C3AED"; };
+  const bandStyle = (sc) => {
+    if (sc == null) return ["#7B7491", "#F4F3F8", "No data"];
+    const b = scoreToBand(sc); const word = b.label.split(" ")[0];
+    if (b.key === "minimal" || b.key === "low") return ["#0E8F66", "#E8F6F0", word];
+    if (b.key === "moderate") return ["#A8650A", "#FBF2E2", word];
+    return ["#6D28D9", "#EDE9FE", word];
+  };
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const countUp = (el, target, dur = 800) => {
+    if (reduceMotion || !target) { el.textContent = target; return; }
+    let t0 = null;
+    const step = (ts) => { if (!t0) t0 = ts; const pr = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - pr, 3); el.textContent = Math.round(target * e); if (pr < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  };
 
   function getSession() { try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch { return null; } }
   function isValid(s) { return s && s.access_token && Math.floor(Date.now() / 1000) < (s.expires_at || 0) - 60; }
@@ -116,9 +159,19 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
   let wins = [], activeP = null;
 
-  function renderWins() {
+  function updateStats(msCount) {
+    const stats = [
+      [msCount, "milestones recorded", "#E8F6F0", "#0E8F66", '<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 2.5v11M5 3.5h7l-1.6 2.2L12 8H5"/></svg>'],
+      [wins.length, "wins celebrated", "#EDE9FE", "#6D28D9", starSvg],
+    ];
+    $("pg-stats").innerHTML = stats.map(([n, l, bg, fg, ic], i) =>
+      `<div class="pg-stat"><span class="cu-blob" style="--blob:${bg};width:40px;height:40px;color:${fg}">${ic}</span><span><span class="n" data-count="${n}">0</span><span class="l" style="display:block">${l}</span></span></div>`).join("");
+    $("pg-stats").querySelectorAll("[data-count]").forEach((el, i) => setTimeout(() => countUp(el, +el.dataset.count), 120 + i * 90));
+  }
+
+  function renderWins(celebrateFirst) {
     if (!wins.length) { $("pg-wins").innerHTML = `<p class="pg-empty">No wins recorded yet — add the first one above. Every small step counts.</p>`; return; }
-    $("pg-wins").innerHTML = wins.map((w) => `<div class="pg-win"><span class="pg-wic">${starSvg}</span><span class="pg-wtext">${esc(w.text)}</span><span class="pg-wdate">${esc(w.when)}</span><button class="pg-del" data-id="${w.id}" aria-label="Delete win">×</button></div>`).join("");
+    $("pg-wins").innerHTML = wins.map((w, i) => `<div class="pg-win${celebrateFirst && i === 0 ? " pg-cele" : ""}"><span class="pg-wic">${starSvg}</span><span class="pg-wtext">${esc(w.text)}</span><span class="pg-wdate">${esc(w.when)}</span><button class="pg-del" data-id="${w.id}" aria-label="Delete win">×</button></div>`).join("");
     $("pg-wins").querySelectorAll(".pg-del").forEach((b) => b.addEventListener("click", () => delWin(b.dataset.id)));
   }
 
@@ -126,7 +179,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     if (!confirm("Remove this win?")) return;
     const s = await getValidSession(); if (!s) return;
     const r = await fetch(UA_URL + "/rest/v1/wins?id=eq." + id, { method: "DELETE", headers: authHeaders(s.access_token) });
-    if (r.ok) { wins = wins.filter((w) => w.id !== id); renderWins(); }
+    if (r.ok) { wins = wins.filter((w) => w.id !== id); renderWins(); updateStats(window.__pgMs || 0); }
   }
 
   async function saveWin() {
@@ -138,7 +191,9 @@ import SectionTabs from "@/components/SectionTabs.astro";
       if (r.ok) {
         const rows = await r.json(), row = rows && rows[0];
         wins.unshift({ id: row ? row.id : Date.now(), text: v, when: "Just now" });
-        $("pg-input").value = ""; $("pg-form").classList.remove("show"); renderWins();
+        $("pg-input").value = ""; $("pg-form").classList.remove("show");
+        renderWins(true); /* 🎉 sparkle celebration on the new row */
+        updateStats(window.__pgMs || 0);
       }
     } catch (e) { /* leave input for retry */ }
     btn.disabled = false; btn.textContent = "Save";
@@ -160,9 +215,10 @@ import SectionTabs from "@/components/SectionTabs.astro";
     const naLike = (v) => /^(n\/?a|na|-+|none|\?+)$/i.test(String(v).trim());
     const recKeys = Object.keys(MLAB).filter((k) => present(ms[k]) && !naLike(ms[k]));
     const missing = Object.keys(MLAB).length - recKeys.length;
+    window.__pgMs = recKeys.length;
     const mItems = recKeys.map((k) => ({ name: MLAB[k], when: "around " + ms[k], ic: MIC[k] || MIC.firstWord }));
-    let msHtml = mItems.map((m) => `<div class="pg-mcard"><span class="pg-mic"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${m.ic}</svg></span><span><span class="pg-mname" style="display:block">${esc(m.name)}</span><span class="pg-mwhen">${esc(m.when)}</span></span></div>`).join("");
-    if (missing > 0) msHtml += `<a class="pg-mcard pg-miss" href="/passport?id=${p.id}"><span class="pg-mic" style="background:#f1f5f9;color:#94a3b8"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 4v8M4 8h8"/></svg></span><span><span class="pg-mname" style="display:block;color:#64748b">${missing} more to record</span><span class="pg-mwhen">Add ages in the passport →</span></span></a>`;
+    let msHtml = mItems.map((m, i) => `<div class="pg-mcard cu-pop cu-lift" style="--d:${(0.08 + i * 0.05).toFixed(2)}s"><span class="cu-blob" style="--blob:#E8F6F0;width:38px;height:38px;color:#0E8F66"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${m.ic}</svg></span><span><span class="pg-mname" style="display:block">${esc(m.name)}</span><span class="pg-mwhen">${esc(m.when)}</span></span></div>`).join("");
+    if (missing > 0) msHtml += `<a class="pg-mcard pg-miss cu-pop" style="--d:${(0.08 + mItems.length * 0.05).toFixed(2)}s" href="/passport?id=${p.id}"><span class="cu-blob" style="--blob:var(--bg);width:38px;height:38px;color:var(--faint)"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 4v8M4 8h8"/></svg></span><span><span class="pg-mname" style="display:block;color:var(--muted)">${missing} more to record</span><span class="pg-mwhen">Add ages in the passport →</span></span></a>`;
     $("pg-ms").innerHTML = (mItems.length || missing)
       ? msHtml
       : `<p class="pg-empty">No milestones recorded yet. <a href="/passport?id=${p.id}">Add them in the passport →</a></p>`;
@@ -170,6 +226,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     const w = await restGet("wins?select=id,text,created_at&passport_id=eq." + p.id + "&order=created_at.desc").catch(() => []);
     wins = (w || []).map((x) => ({ id: x.id, text: x.text, when: UA.relTime(x.created_at) }));
     renderWins();
+    updateStats(recKeys.length);
 
     const first = UA.childIdentity(data).first || "your child";
     const scored = scoreWheel(data);
@@ -177,8 +234,16 @@ import SectionTabs from "@/components/SectionTabs.astro";
     if (scoredCount < 3) {
       $("pg-chart").innerHTML = `<div class="pg-chart-empty"><div class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg></div><p>This fills in once more of the passport is completed (communication, sensory, behaviour, daily living).</p></div>`;
     } else {
-      const rows = DOMAINS.map((n) => { const sc = scored[n].score, w = sc == null ? 0 : sc; return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span style="font-size:.8rem;width:104px;flex-shrink:0;color:#64748b">${esc(SHORT[n] || n)}</span><span style="flex:1;height:9px;border-radius:5px;background:#eef2f7;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:${w}%;background:${barColor(sc)};border-radius:5px"></span></span></div>`; }).join("");
-      $("pg-chart").innerHTML = `<p style="font-size:.8rem;color:#64748b;margin:0 0 14px">Where things stand today — a fuller bar means more support is helpful right now.</p>${rows}<p class="pg-cap" style="margin-top:14px">This becomes a trend chart as ${esc(first)}'s profile is updated over time.</p>`;
+      const rows = DOMAINS.map((n, i) => {
+        const sc = scored[n].score, w = sc == null ? 0 : sc;
+        const [bc, bb, bw] = bandStyle(sc);
+        return `<a class="pg-row" href="/child/support-wheel?domain=${encodeURIComponent(n)}" title="See ${esc(SHORT[n] || n)} in the Support Wheel">
+          <span class="pg-rname"><span class="dd" style="background:${domainColor(n)}"></span>${esc(SHORT[n] || n)}</span>
+          <span class="pg-bar"><span class="cu-fill" style="--w:${w}%;--d:${(0.25 + i * 0.06).toFixed(2)}s;background:${barColor(sc)}"></span></span>
+          <span class="pg-band" style="color:${bc};background:${bb}">${bw}</span>
+        </a>`;
+      }).join("");
+      $("pg-chart").innerHTML = `<p style="font-size:.8rem;color:var(--muted);margin:0 0 14px">Where things stand today — a fuller bar means more support is helpful right now. Tap a row to explore it in the wheel.</p>${rows}<p class="pg-cap">This becomes a trend chart as ${esc(first)}'s profile is updated over time.</p>`;
     }
 
     $("pg-addbtn").addEventListener("click", () => { const f = $("pg-form"); f.classList.toggle("show"); if (f.classList.contains("show")) $("pg-input").focus(); });

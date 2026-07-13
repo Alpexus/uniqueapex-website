@@ -1,13 +1,118 @@
 ---
+/* RESOURCES-COMMUNITY-V1 — the community resource directory.
+   ══════════════════════════════════════════════════════════════════
+   EDIT HERE (Pelin): GROUPS below is the whole directory. Each item:
+   name, desc, and either href (website), tel (phone), or neither
+   (renders as info-only). I only prefilled links I'm confident are
+   stable (211, 811, canada.ca, quebec.ca) — please verify and add
+   the org websites you trust before launch.
+   ══════════════════════════════════════════════════════════════════ */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
+
+const GROUPS = [
+  {
+    title: "Right now, by phone",
+    hue: "#B14A66", bg: "#F9EDF1", icon: "phone",
+    items: [
+      { name: "811 — Info-Santé / Info-Social", desc: "Free 24/7 provincial line. Option 2 reaches a psychosocial professional — for parents too.", tel: "811" },
+      { name: "211 Grand Montréal", desc: "Free helpline that finds community resources near you — food, respite, support groups, anything.", tel: "211", href: "https://www.211qc.ca" },
+    ],
+  },
+  {
+    title: "Government support",
+    hue: "#0E8C82", bg: "#E6F4F2", icon: "gov",
+    items: [
+      { name: "Gouvernement du Québec — family supports", desc: "The Supplement for Handicapped Children, respite programs, and provincial services — start here.", href: "https://www.quebec.ca" },
+      { name: "Government of Canada — disability benefits", desc: "The Disability Tax Credit, Child Disability Benefit and RDSP — federal supports most families qualify for.", href: "https://www.canada.ca" },
+      { name: "Your local CLSC", desc: "The front door to public services: evaluations, social work support, and program referrals. Find yours through 211 or your CIUSSS." },
+    ],
+  },
+  {
+    title: "Community organizations",
+    hue: "#6D28D9", bg: "#EDE9FE", icon: "users",
+    items: [
+      { name: "Fédération québécoise de l'autisme", desc: "Provincial federation — information, guides and the directory of regional autism associations." },
+      { name: "Autisme Montréal", desc: "Montréal's autism association: family support, activities, respite information and training." },
+      { name: "Miriam Foundation / Gold Centre", desc: "Montréal assessment and intervention services for autism and developmental delays." },
+      { name: "AlterGo", desc: "Accessible sports and leisure for Montrealers with functional limitations — adapted activities your child can join." },
+    ],
+  },
+  {
+    title: "Parent-to-parent",
+    hue: "#A8650A", bg: "#FBF2E2", icon: "heart",
+    items: [
+      { name: "Parents support groups (via 211)", desc: "Local parent groups meet across the city — 211 keeps the current list by neighbourhood." },
+      { name: "UniqueApex parent community", desc: "Our own space for members — swap experiences with families a few steps ahead of you. Opens with the Member plan.", href: "/pricing" },
+    ],
+  },
+];
+const ICONS: Record<string, string> = {
+  phone: `<path d="M5 3h4l2 5-2.5 1.5a11 11 0 006 6L16 13l5 2v4a2 2 0 01-2 2A16 16 0 013 5a2 2 0 012-2z"/>`,
+  gov: `<path d="M3 21h18M4 18h16M6 18v-7M10 18v-7M14 18v-7M18 18v-7M3 11l9-7 9 7z"/>`,
+  users: `<circle cx="9" cy="8" r="3"/><path d="M3 19c0-3.3 2.7-5 6-5s6 1.7 6 5"/><circle cx="17" cy="8.5" r="2.2"/><path d="M16.5 14c2.6.2 4.5 1.7 4.5 5"/>`,
+  heart: `<path d="M12 20s-7.5-4.7-9.3-9A5 5 0 0112 6.2 5 5 0 0121.3 11c-1.8 4.3-9.3 9-9.3 9z"/>`,
+};
 ---
 <AppFormLayout title="Resources" activeNav="resources">
   <SectionTabs section="resources" active="community" />
-  <h1 class="page-title">Community Resources</h1>
-  <p class="page-sub">Part of Resources. This page is scaffolded — content is coming.</p>
-  <div class="ua-stub">
-    <b>Community Resources</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+
+  <h1 class="page-title">Community resources</h1>
+  <p class="page-sub">The organizations, helplines and programs every Québec family should know — gathered in one place.</p>
+
+  {GROUPS.map((g, gi) => (
+    <div class="rc-sec cu-rev" style={`--d:${(gi * 0.08).toFixed(2)}s`}>
+      <p class="rc-h">
+        <span class="cu-blob" style={`--blob:${g.bg};width:34px;height:34px;color:${g.hue}`}>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={ICONS[g.icon]} />
+        </span>
+        {g.title}
+      </p>
+      <div class="rc-grid">
+        {g.items.map((it) => (
+          <div class="rc-card cu-lift">
+            <b>{it.name}</b>
+            <p>{it.desc}</p>
+            <div class="rc-actions">
+              {it.tel && <a class="rc-btn" href={`tel:${it.tel}`}>Call {it.tel}</a>}
+              {it.href && <a class="rc-btn ghost" href={it.href} target="_blank" rel="noopener">Visit website →</a>}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  ))}
+
+  <div class="rc-cta cu-rev" style="--d:.36s">
+    <p><b>Know an organization families should hear about?</b> Send it in — this directory grows with the community.</p>
+    <a href="mailto:contact@uniqueapex.com?subject=Community%20resource%20suggestion">Suggest a resource</a>
   </div>
 </AppFormLayout>
+
+<style is:global>
+  .rc-sec{max-width:920px;margin-bottom:22px}
+  .rc-h{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:.98rem;font-weight:700;color:var(--ink);margin:0 0 11px}
+  .rc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+  .rc-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+  .rc-card b{font-size:.88rem;color:var(--ink);line-height:1.35}
+  .rc-card p{font-size:.81rem;color:var(--muted);line-height:1.5;margin:4px 0 0;flex:1}
+  .rc-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .rc-actions:empty{display:none}
+  .rc-btn{font-size:.76rem;font-weight:600;padding:6px 13px;border-radius:9999px;background:var(--violet-700);color:#fff;text-decoration:none;transition:filter .15s}
+  .rc-btn:hover{filter:brightness(1.1)}
+  .rc-btn.ghost{background:var(--card);color:var(--violet-700);border:1px solid var(--violet-100)}
+  .rc-btn.ghost:hover{background:var(--violet-50);filter:none}
+  .rc-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;max-width:920px;background:linear-gradient(135deg,var(--violet-50),#F9F7FE 60%,var(--violet-50));border:1px solid var(--violet-100);border-radius:18px;padding:16px 20px}
+  .rc-cta p{font-size:.88rem;color:#5b21b6;margin:0}
+  .rc-cta p b{color:var(--violet-700)}
+  .rc-cta a{background:var(--violet-700);color:#fff;font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;text-decoration:none;white-space:nowrap;transition:filter .15s}
+  .rc-cta a:hover{filter:brightness(1.1)}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) location.href = "/login";
+  })();
+</script>
