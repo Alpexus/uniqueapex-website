@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
     if (userErr || !userData?.user) return json({ error: "auth" }, 401);
     const user = userData.user;
 
-    const { passport_id, service_type, lat, lng, radius_km } = await req.json();
+    const { passport_id, service_type, lat, lng, radius_km, provider_ids, message } = await req.json();
     if (!passport_id || !SERVICE_LABEL[service_type]) return json({ error: "bad_request" }, 400);
     const useRadius = typeof lat === "number" && typeof lng === "number" && typeof radius_km === "number" && radius_km > 0;
 
@@ -89,22 +89,42 @@ Deno.serve(async (req) => {
       .select("provider_id").eq("passport_id", passport_id).gte("sent_at", since);
     const excluded = new Set((recent || []).map((r) => r.provider_id));
 
-    // 5 · pick providers (contactable = has email; nearest first when a radius is set)
-    const { data: pool } = await admin.from("providers")
-      .select("id,name,email,service_type,lat,lng")
-      .eq("service_type", service_type).eq("active", true).not("email", "is", null);
+    // 5 · pick providers (contactable = has email).
+    //    NEW: the matches page sends the family's hand-picked clinics as
+    //    provider_ids — the server still validates each one (right service,
+    //    active, has email) and applies the 90-day exclusion, so the list
+    //    can't be tampered with. Without provider_ids we fall back to the
+    //    legacy auto-pick (nearest first when a radius is given).
     const kmBetween = (a1: number, o1: number, a2: number, o2: number) => {
       const R = 6371, t = Math.PI / 180;
       const dA = (a2 - a1) * t, dO = (o2 - o1) * t;
       const h = Math.sin(dA / 2) ** 2 + Math.cos(a1 * t) * Math.cos(a2 * t) * Math.sin(dO / 2) ** 2;
       return 2 * R * Math.asin(Math.sqrt(h));
     };
-    let candidates = (pool || []).filter((p) => !excluded.has(p.id));
-    if (useRadius) {
-      candidates = candidates
-        .map((p) => ({ ...p, _d: (typeof p.lat === "number" && typeof p.lng === "number") ? kmBetween(lat, lng, p.lat, p.lng) : Infinity }))
-        .filter((p) => p._d <= radius_km)
-        .sort((a, b) => a._d - b._d);
+    const chosenIds = Array.isArray(provider_ids)
+      ? provider_ids.filter((x: unknown) => typeof x === "string").slice(0, BATCH_SIZE)
+      : [];
+    let candidates: any[] = [];
+    if (chosenIds.length) {
+      const { data: picked } = await admin.from("providers")
+        .select("id,name,email,service_type,lat,lng")
+        .in("id", chosenIds).eq("service_type", service_type)
+        .eq("active", true).not("email", "is", null);
+      candidates = (picked || []).filter((p) => !excluded.has(p.id));
+      if (!candidates.length) {
+        return json({ error: "protected", message: "The selected clinics were all contacted about this child in the last 90 days (or aren't contactable yet) — pick different ones." }, 409);
+      }
+    } else {
+      const { data: pool } = await admin.from("providers")
+        .select("id,name,email,service_type,lat,lng")
+        .eq("service_type", service_type).eq("active", true).not("email", "is", null);
+      candidates = (pool || []).filter((p) => !excluded.has(p.id));
+      if (useRadius) {
+        candidates = candidates
+          .map((p) => ({ ...p, _d: (typeof p.lat === "number" && typeof p.lng === "number") ? kmBetween(lat, lng, p.lat, p.lng) : Infinity }))
+          .filter((p) => p._d <= radius_km)
+          .sort((a, b) => a._d - b._d);
+      }
     }
     const targets = candidates.slice(0, BATCH_SIZE);
     if (!targets.length) {
@@ -129,18 +149,28 @@ Deno.serve(async (req) => {
     const svc = SERVICE_LABEL[service_type];
 
     const subject = `Family seeking ${svc} — ${first}${age != null ? `, ${age} y/o` : ""} (Montréal)`;
-    const bodyFor = (providerName: string) => `Hello ${providerName},
 
-${parent} is looking for ${svc} for their ${age != null ? age + "-year-old " : ""}child, ${first}${dx ? ` (${dx})` : ""}, in the Montréal area.
+    // The family can edit the MIDDLE of the email on the matches page.
+    // The per-clinic greeting and the platform footer are always added
+    // server-side, so the framing, Reply-To note and 90-day promise
+    // can never be edited away.
+    const custom = typeof message === "string" && message.trim()
+      ? message.trim().slice(0, 2400)
+      : null;
+    const defaultCore = `${parent} is looking for ${svc} for their ${age != null ? age + "-year-old " : ""}child, ${first}${dx ? ` (${dx})` : ""}, in the Montréal area.
 
 They asked UniqueApex — a coordination platform for families of children with neurodevelopmental needs — to introduce them to a small number of matched providers. If you are accepting new clients (or have a waitlist they can join), simply reply to this email: it goes directly to the family at ${parentEmail}.
 
 A one-page family profile with ${first}'s strengths, needs and history is ready to share on request.
 
 Thank you for the work you do,
-UniqueApex · uniqueapex.com
+UniqueApex · uniqueapex.com`;
+    const bodyFor = (providerName: string) => `Hello ${providerName},
+
+${custom ?? defaultCore}
+
 —
-You received this because your practice offers ${svc} in this region. We won't contact you about this family again for at least 90 days.`;
+Sent via UniqueApex (uniqueapex.com) on the family's behalf — replying to this email reaches them directly at ${parentEmail}. You received it because your practice offers ${svc} in this region; we won't contact you about this family again for at least 90 days.`;
 
     const RESEND = Deno.env.get("RESEND_API_KEY")!;
     const send = (to: string, subj: string, text: string, replyTo?: string) =>
@@ -179,7 +209,7 @@ You received this because your practice offers ${svc} in this region. We won't c
       } catch (_) { /* confirmation is best-effort */ }
     }
 
-    return json({ ok: true, sent, requested: targets.length, plan });
+    return json({ ok: true, sent, requested: targets.length, plan, request_id: reqRow.id });
   } catch (e) {
     return json({ error: "unexpected", message: String(e) }, 500);
   }
