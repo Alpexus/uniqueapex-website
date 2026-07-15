@@ -53,8 +53,9 @@ Deno.serve(async (req) => {
     if (userErr || !userData?.user) return json({ error: "auth" }, 401);
     const user = userData.user;
 
-    const { passport_id, service_type } = await req.json();
+    const { passport_id, service_type, lat, lng, radius_km } = await req.json();
     if (!passport_id || !SERVICE_LABEL[service_type]) return json({ error: "bad_request" }, 400);
+    const useRadius = typeof lat === "number" && typeof lng === "number" && typeof radius_km === "number" && radius_km > 0;
 
     // the passport must belong to the caller
     const { data: passport } = await admin.from("passports")
@@ -88,12 +89,31 @@ Deno.serve(async (req) => {
       .select("provider_id").eq("passport_id", passport_id).gte("sent_at", since);
     const excluded = new Set((recent || []).map((r) => r.provider_id));
 
-    // 5 · pick providers
+    // 5 · pick providers (contactable = has email; nearest first when a radius is set)
     const { data: pool } = await admin.from("providers")
-      .select("id,name,email,service_type").eq("service_type", service_type).eq("active", true);
-    const targets = (pool || []).filter((p) => !excluded.has(p.id)).slice(0, BATCH_SIZE);
+      .select("id,name,email,service_type,lat,lng")
+      .eq("service_type", service_type).eq("active", true).not("email", "is", null);
+    const kmBetween = (a1: number, o1: number, a2: number, o2: number) => {
+      const R = 6371, t = Math.PI / 180;
+      const dA = (a2 - a1) * t, dO = (o2 - o1) * t;
+      const h = Math.sin(dA / 2) ** 2 + Math.cos(a1 * t) * Math.cos(a2 * t) * Math.sin(dO / 2) ** 2;
+      return 2 * R * Math.asin(Math.sqrt(h));
+    };
+    let candidates = (pool || []).filter((p) => !excluded.has(p.id));
+    if (useRadius) {
+      candidates = candidates
+        .map((p) => ({ ...p, _d: (typeof p.lat === "number" && typeof p.lng === "number") ? kmBetween(lat, lng, p.lat, p.lng) : Infinity }))
+        .filter((p) => p._d <= radius_km)
+        .sort((a, b) => a._d - b._d);
+    }
+    const targets = candidates.slice(0, BATCH_SIZE);
     if (!targets.length) {
-      return json({ error: "no_providers", message: "No new providers for this service yet — the directory is filling. Your request is noted." }, 503);
+      return json({
+        error: "no_providers",
+        message: useRadius
+          ? `No new ${SERVICE_LABEL[service_type]} providers within ${radius_km} km right now — try a wider radius, or send without a distance limit.`
+          : "No new providers for this service yet — the directory is filling. Your request is noted.",
+      }, 503);
     }
 
     // 6 · compose from the passport

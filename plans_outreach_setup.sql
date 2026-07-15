@@ -46,6 +46,7 @@ $$;
 --                      where tablename = 'passports';
 drop policy if exists "own passports insert" on public.passports;
 drop policy if exists "Allow individual insert" on public.passports;
+drop policy if exists "Owner can insert own passports" on public.passports;  -- ← the one in Pelin's project
 
 create policy "passport insert within plan limit" on public.passports
   for insert with check (

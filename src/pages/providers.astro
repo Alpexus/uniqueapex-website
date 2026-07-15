@@ -27,6 +27,27 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <p><b>The live provider directory is rolling out city by city.</b> Matching already works — it reads the wheel. Join waitlists now and you keep your place when the directory opens in Montréal.</p>
     </div>
 
+    <div class="pv-loc cu-rev" style="--d:.08s">
+      <span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66;width:34px;height:34px;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 14.5s-4.8-4.6-4.8-8a4.8 4.8 0 019.6 0c0 3.4-4.8 8-4.8 8z"/><circle cx="8" cy="6.3" r="1.7"/></svg></span>
+      <div class="pv-loc-tx">
+        <b>Match by distance</b>
+        <span>Enter your postal code and pick how far you'd travel — batches go to the closest providers first.</span>
+      </div>
+      <input class="pv-postal" id="pv-postal" maxlength="7" placeholder="H2V 2K3" autocomplete="postal-code" />
+      <div class="pv-radius" id="pv-radius">
+        <button type="button" data-km="5">5 km</button>
+        <button type="button" data-km="10">10 km</button>
+        <button type="button" data-km="20">20 km</button>
+        <button type="button" data-km="30">30 km</button>
+        <button type="button" data-km="50">50 km</button>
+        <button type="button" data-km="0" class="on">Anywhere</button>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm" id="pv-mapbtn">🗺 Map</button>
+    </div>
+    <p class="pv-loc-hint" id="pv-loc-hint">Distances are approximate (postal-code area), private, and never shared with providers.</p>
+    <div id="pv-nopostal"></div>
+    <div id="pv-map" class="pv-map" style="display:none"></div>
+
     <div id="pv-gate"></div>
     <div class="pv-grid" id="pv-grid"></div>
     <div id="pv-upsell"></div>
@@ -38,6 +59,26 @@ import SectionTabs from "@/components/SectionTabs.astro";
   .pv-note{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid #F3D8E1;border-radius:16px;padding:12px 16px;box-shadow:var(--shadow)}
   .pv-note p{font-size:.83rem;color:var(--ink-2);line-height:1.5;margin:0}
   .pv-note b{color:var(--rose)}
+  .pv-loc{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 16px;box-shadow:var(--shadow)}
+  .pv-loc-tx{flex:1;min-width:210px}
+  .pv-loc-tx b{display:block;font-family:var(--display);font-size:.88rem;color:var(--ink)}
+  .pv-loc-tx span{display:block;font-size:.72rem;color:var(--muted);margin-top:2px;line-height:1.4}
+  .pv-postal{width:104px;padding:8px 11px;border:1px solid var(--line-2);border-radius:10px;font-size:.86rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);background:var(--card);outline:none;font-family:inherit}
+  .pv-postal:focus{border-color:#F9A8D4;box-shadow:0 0 0 3px rgba(177,74,102,.12)}
+  .pv-radius{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:9999px;padding:3px}
+  .pv-radius button{border:none;background:none;font-size:.72rem;font-weight:700;color:var(--muted);padding:5px 12px;border-radius:9999px;cursor:pointer;font-family:inherit;transition:background .15s,color .15s;white-space:nowrap}
+  .pv-radius button:hover{color:var(--ink)}
+  .pv-radius button.on{background:var(--rose);color:#fff}
+  .pv-loc-hint{font-size:.66rem;color:var(--faint);margin:-6px 0 0 4px}
+  .pv-geonote{font-size:.7rem;font-weight:600;color:var(--teal);margin:7px 0 0}
+  .pv-geonote:empty{display:none}
+  .pv-map{height:400px;border-radius:16px;border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden;position:relative;z-index:1}
+  .pv-warn{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--amber-bg);border:1px solid #EBDCC3;border-radius:14px;padding:12px 16px}
+  .pv-warn p{flex:1;font-size:.82rem;color:var(--amber);line-height:1.5;margin:0;min-width:220px}
+  #pv-nopostal:empty{display:none}
+  .pv-mappop{font-family:'Inter',sans-serif;font-size:.8rem;line-height:1.4}
+  .pv-mappop b{display:block;font-size:.84rem}
+  .pv-mappop .svc{font-weight:700;text-transform:uppercase;font-size:.64rem;letter-spacing:.05em}
   .pv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
   .pv-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s,border-color .18s}
   .pv-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(177,74,102,.12);border-color:#F3D8E1}
@@ -83,6 +124,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
   import { scoreWheel, DOMAINS, scoreToBand } from "../lib/wheelScore.js";
   import { notify } from "../lib/notify.js";
   import { getPlan, PLANS, upsellHTML } from "../lib/plan.js";
+  import { coordsForPostal, haversineKm } from "../lib/geo.js";
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -196,6 +238,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
           <button type="button" class="btn btn-primary btn-sm pv-send" data-svc="${t.key}">✦ Send intro batch</button>
           <a class="btn btn-ghost btn-sm" href="/resources/guides">How to reach out</a>
         </div>
+        <p class="pv-geonote" data-geo="${t.key}"></p>
         <p class="pv-sentnote" data-note="${t.key}"></p>
       </div>`;
     }).join("") || `<div class="pv-gate-card" style="grid-column:1/-1"><p>Answer the wheel questions in the passport and matched services appear here.</p><a href="/passport?id=${p.id}">Continue passport →</a></div>`;
@@ -245,19 +288,163 @@ import SectionTabs from "@/components/SectionTabs.astro";
       });
     }
     annotate();
+
+    /* ---------- distance matching (postal-area based) ---------- */
+    const GEO_KEY = "ua_home_geo_" + (((await UA.getValidSession()) || {}).user || {}).id;
+    let home = { postal: "", km: 0 };
+    try { home = Object.assign(home, JSON.parse(localStorage.getItem(GEO_KEY) || "{}")); } catch (e) {}
+    /* the address ON FILE lives in the passport (household.postal) —
+       it wins over the device-local value and syncs across devices */
+    let passportPostal = String(((data.household || {}).postal) || ((data.childProfile || {}).postalCode) || "").trim().toUpperCase();
+    if (passportPostal) home.postal = passportPostal;
+    async function savePostalToPassport(postal) {
+      try {
+        const s2 = await UA.getValidSession();
+        if (!s2) return;
+        const newData = Object.assign({}, data);
+        newData.household = Object.assign({}, data.household || {}, { postal });
+        const r2 = await fetch("https://eghqufgiudxjkbsddtnx.supabase.co/rest/v1/passports?id=eq." + p.id, {
+          method: "PATCH",
+          headers: Object.assign({}, UA.authHeaders(s2.access_token), { Prefer: "return=minimal" }),
+          body: JSON.stringify({ data: newData }),
+        });
+        if (r2.ok) {
+          passportPostal = postal;
+          data.household = newData.household;
+          renderWarn();
+          notify("ok", "Postal code saved to " + first + "'s passport ✓ — matching now works on every device");
+        }
+      } catch (e) {}
+    }
+    function renderWarn() {
+      $("pv-nopostal").innerHTML = passportPostal ? "" :
+        `<div class="pv-warn cu-rev"><span class="cu-blob" style="--blob:#FBF2E2;color:#A8650A;width:34px;height:34px;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3.2v6M8 12.3v.2"/></svg></span><p><b>No address on file for ${esc(first)}.</b> Type your postal code above — we'll save it to the passport so distance matching and outreach know where you are, on every device.</p></div>`;
+    }
+    renderWarn();
+    let dirProviders = [];
+    try {
+      const sg = await UA.getValidSession();
+      if (sg) {
+        const rg = await fetch("https://eghqufgiudxjkbsddtnx.supabase.co/rest/v1/providers?select=name,city,service_type,lat,lng,email&active=eq.true", { headers: UA.authHeaders(sg.access_token) });
+        if (rg.ok) dirProviders = await rg.json();
+      }
+    } catch (e) {}
+    const homeCoords = () => coordsForPostal(home.postal);
+
+    /* ---------- map view (Leaflet + OpenStreetMap, loaded on demand) ---------- */
+    const SVCCOLOR = { slp: "#6D28D9", ot: "#0E8C82", aba: "#B14A66", psych: "#2563EB", social: "#4C9A2A" };
+    let map = null, homeLayer = null;
+    function loadLeaflet() {
+      return new Promise((res, rej) => {
+        if (window.L) return res(window.L);
+        const css = document.createElement("link");
+        css.rel = "stylesheet";
+        css.href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";
+        document.head.appendChild(css);
+        const js = document.createElement("script");
+        js.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";
+        js.onload = () => res(window.L);
+        js.onerror = rej;
+        document.head.appendChild(js);
+      });
+    }
+    function drawHome() {
+      if (!map || !window.L) return;
+      if (homeLayer) { map.removeLayer(homeLayer); homeLayer = null; }
+      const hc = homeCoords();
+      if (!hc) return;
+      homeLayer = window.L.layerGroup();
+      homeLayer.addLayer(window.L.circleMarker(hc, { radius: 8, color: "#221B36", weight: 2, fillColor: "#FCD34D", fillOpacity: 1 }).bindPopup("<div class='pv-mappop'><b>Home ✦</b>approximate — postal area</div>"));
+      if (home.km > 0) homeLayer.addLayer(window.L.circle(hc, { radius: home.km * 1000, color: "#B14A66", weight: 1.5, fillColor: "#B14A66", fillOpacity: 0.06, dashArray: "6 6" }));
+      homeLayer.addTo(map);
+      if (home.km > 0) map.fitBounds(window.L.circle(hc, { radius: home.km * 1000 }).getBounds().pad(0.1));
+    }
+    async function openMap() {
+      const box = $("pv-map");
+      const showing = box.style.display !== "none";
+      if (showing) { box.style.display = "none"; $("pv-mapbtn").textContent = "🗺 Map"; return; }
+      box.style.display = "block";
+      $("pv-mapbtn").textContent = "Hide map";
+      try {
+        const L = await loadLeaflet();
+        if (!map) {
+          map = L.map("pv-map").setView([45.53, -73.65], 10);
+          L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 18, attribution: "© OpenStreetMap contributors",
+          }).addTo(map);
+          dirProviders.filter((d2) => typeof d2.lat === "number" && typeof d2.lng === "number").forEach((d2) => {
+            const col = SVCCOLOR[d2.service_type] || "#6D28D9";
+            L.circleMarker([d2.lat, d2.lng], { radius: 7, color: "#fff", weight: 1.5, fillColor: col, fillOpacity: d2.email ? 0.95 : 0.35 })
+              .bindPopup(`<div class='pv-mappop'><b>${esc(d2.name || "Provider")}</b><span class='svc' style='color:${col}'>${esc(SVCNICE[d2.service_type] || d2.service_type)}</span> · ${esc(d2.city || "")}${d2.email ? "" : "<br><i>awaiting email — not contactable yet</i>"}</div>`)
+              .addTo(map);
+          });
+        }
+        setTimeout(() => { map.invalidateSize(); drawHome(); }, 60);
+      } catch (e) {
+        notify("warn", "The map couldn't load — check your connection.");
+        box.style.display = "none";
+        $("pv-mapbtn").textContent = "🗺 Map";
+      }
+    }
+    $("pv-mapbtn").addEventListener("click", openMap);
+    function updateGeo() {
+      const hc = homeCoords();
+      document.querySelectorAll("[data-geo]").forEach((el) => {
+        const svc = SVCMAP[el.dataset.geo];
+        const all = dirProviders.filter((d) => d.service_type === svc && d.email);
+        if (!all.length) { el.textContent = ""; return; }
+        if (hc && home.km > 0) {
+          const near = all.filter((d) => typeof d.lat === "number" && haversineKm(hc[0], hc[1], d.lat, d.lng) <= home.km).length;
+          el.textContent = near + " of " + all.length + " contactable provider" + (all.length === 1 ? "" : "s") + " within " + home.km + " km";
+        } else {
+          el.textContent = all.length + " contactable provider" + (all.length === 1 ? "" : "s") + " in the directory";
+        }
+      });
+      $("pv-loc-hint").textContent = home.postal && !hc
+        ? "That postal code isn't in our map yet — batches will ignore distance until it is."
+        : "Distances are approximate (postal-code area), private, and never shared with providers.";
+      drawHome();
+    }
+    $("pv-postal").value = home.postal;
+    document.querySelectorAll("#pv-radius button").forEach((b) => {
+      b.classList.toggle("on", +b.dataset.km === home.km);
+      b.addEventListener("click", () => {
+        document.querySelectorAll("#pv-radius button").forEach((x) => x.classList.remove("on"));
+        b.classList.add("on");
+        home.km = +b.dataset.km;
+        localStorage.setItem(GEO_KEY, JSON.stringify(home));
+        updateGeo();
+      });
+    });
+    $("pv-postal").addEventListener("input", () => {
+      home.postal = $("pv-postal").value.trim().toUpperCase();
+      localStorage.setItem(GEO_KEY, JSON.stringify(home));
+      updateGeo();
+    });
+    /* when they finish typing a real postal code, put it ON FILE in the passport */
+    $("pv-postal").addEventListener("change", () => {
+      const v = $("pv-postal").value.trim().toUpperCase();
+      if (coordsForPostal(v) && v !== passportPostal) savePostalToPassport(v);
+    });
+    updateGeo();
+
     document.querySelectorAll(".pv-send").forEach((btn) => btn.addEventListener("click", async () => {
       if (btn.disabled) return;
       const svc = SVCMAP[btn.dataset.svc];
-      if (!confirm("Send an automated introduction about " + first + " to up to 5 matched " + (SVCNICE[svc] || "service") + " providers? Replies go straight to your email.")) return;
+      const hc = homeCoords();
+      const withKm = hc && home.km > 0;
+      if (!confirm("Send an automated introduction about " + first + " to up to 5 matched " + (SVCNICE[svc] || "service") + " providers" + (withKm ? " within " + home.km + " km" : "") + "? Replies go straight to your email.")) return;
       btn.disabled = true;
       const old = btn.textContent;
       btn.textContent = "Sending…";
       try {
         const s1 = await UA.getValidSession();
+        const payload = { passport_id: p.id, service_type: svc };
+        if (withKm) { payload.lat = hc[0]; payload.lng = hc[1]; payload.radius_km = home.km; }
         const r = await fetch(FN_URL, {
           method: "POST",
           headers: { Authorization: "Bearer " + s1.access_token, "Content-Type": "application/json" },
-          body: JSON.stringify({ passport_id: p.id, service_type: svc }),
+          body: JSON.stringify(payload),
         });
         const out = await r.json().catch(() => ({}));
         if (r.ok && out.ok) {

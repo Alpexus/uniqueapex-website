@@ -1,0 +1,9 @@
+-- ============================================================
+-- PLACEHOLDER — do not run this file.
+-- The one and only provider import is:
+--   PROVIDERS_IMPORT_RUN_THIS.sql
+-- (delivered via Cowork — in your Claude outputs folder).
+-- It contains: table widening (addresses + coordinates),
+-- the provider_staff (therapists) table, 128 clinics and
+-- 170 therapists, merged from both spreadsheet versions.
+-- ============================================================
