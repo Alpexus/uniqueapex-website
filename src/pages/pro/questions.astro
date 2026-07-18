@@ -1,0 +1,80 @@
+---
+/* PRO-QUESTIONS-V1 — the Q&A service: families ask short questions
+   between sessions, the provider answers when convenient. Threads,
+   not chat — calmer for everyone. Preview; TODO-LIVE: questions table. */
+import ProviderLayout from "@/layouts/ProviderLayout.astro";
+---
+<ProviderLayout title="Questions — UniqueApex Pro" active="questions">
+  <div class="pgrid">
+    <div class="pc">
+      <div class="pc-h"><b>Family questions</b><span>answer once, it stays in the family's record — fewer repeated emails</span></div>
+      <div id="q-list"></div>
+      <p class="pnote">Questions are asynchronous by design: families know this isn't a chat or an emergency line, and you answer on your own time. You can switch the service off in Settings.</p>
+    </div>
+  </div>
+</ProviderLayout>
+
+<style is:global>
+  .q-item{border-top:1px solid var(--p-line);padding:13px 0}
+  .q-item:first-child{border-top:none}
+  .q-top{display:flex;align-items:center;gap:11px;cursor:pointer}
+  .q-top .av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:.78rem;font-weight:800;color:#fff;flex-shrink:0}
+  .q-top .tx{flex:1;min-width:0}
+  .q-top .tx b{display:block;font-size:.84rem;color:var(--p-ink)}
+  .q-top .tx span{display:block;font-size:.7rem;color:var(--p-faint)}
+  .q-body{padding:10px 0 0 43px}
+  .q-msg{font-size:.84rem;color:var(--p-ink2);line-height:1.6;background:var(--p-bg);border-radius:12px;padding:11px 14px;margin-bottom:10px}
+  .q-ans{font-size:.84rem;color:var(--p-ink2);line-height:1.6;background:var(--p-teal-50);border:1px solid var(--p-teal-100);border-radius:12px;padding:11px 14px;margin-bottom:10px}
+  .q-ans b{color:var(--p-teal-d);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:3px}
+  .q-reply{display:flex;gap:8px;align-items:flex-end}
+  .q-reply textarea{flex:1;min-height:64px}
+</style>
+
+<script is:inline>
+  (function () {
+    var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    var COLORS = ["#B14A66", "#6D28D9", "#0E8C82", "#A8650A"];
+    var QS = [
+      { fam: "Liam's parent", when: "2 hours ago", q: "Liam started refusing the picture cards this week — should we pause them at home or push through?", ans: null, open: true },
+      { fam: "Éloi's parent", when: "Yesterday", q: "Can we get a short note for the daycare about his transition strategies?", ans: null, open: false },
+      { fam: "Noor's parent", when: "3 days ago", q: "Which of the /r/ exercises should we prioritise this week?", ans: "Focus on the mirror game 5 minutes a day — skip sheet B for now, we'll do it together Thursday.", open: false },
+    ];
+
+    function render() {
+      var host = document.getElementById("q-list");
+      host.innerHTML = QS.map(function (x, i) {
+        var body = "";
+        if (x.open) {
+          body = "<div class='q-body'><p class='q-msg'>" + esc(x.q) + "</p>" +
+            (x.ans ? "<div class='q-ans'><b>Your answer</b>" + esc(x.ans) + "</div>"
+                   : "<div class='q-reply'><textarea class='pin' placeholder='Write a short answer…' data-i='" + i + "'></textarea><button class='pbtn' data-send='" + i + "' type='button'>Send</button></div>") +
+            "</div>";
+        }
+        return "<div class='q-item'>" +
+          "<div class='q-top' data-open='" + i + "'>" +
+          "<span class='av' style='background:" + COLORS[i % COLORS.length] + "'>" + esc(x.fam[0]) + "</span>" +
+          "<span class='tx'><b>" + esc(x.fam) + "</b><span>" + esc(x.when) + (x.ans ? " · answered" : " · waiting") + "</span></span>" +
+          (x.ans ? "<span class='ppill green'>answered</span>" : "<span class='ppill rose'>waiting</span>") +
+          "</div>" + body + "</div>";
+      }).join("");
+
+      host.querySelectorAll("[data-open]").forEach(function (t) {
+        t.addEventListener("click", function () {
+          var i = +t.getAttribute("data-open");
+          QS[i].open = !QS[i].open;
+          render();
+        });
+      });
+      host.querySelectorAll("[data-send]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var i = +b.getAttribute("data-send");
+          var ta = host.querySelector("textarea[data-i='" + i + "']");
+          if (!ta.value.trim()) { ta.focus(); return; }
+          QS[i].ans = ta.value.trim();
+          render();
+        });
+      });
+    }
+    render();
+  })();
+</script>

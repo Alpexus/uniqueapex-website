@@ -1,0 +1,160 @@
+---
+/* PRO-ONBOARDING-V1 — "join as a provider" request form.
+   Sends via Web3Forms (same channel as the contact page) so the
+   request lands in the contact@uniqueapex.com inbox with the
+   clinic's details and message. No backend needed. */
+import "@fontsource-variable/inter/index.css";
+import "../../styles/global.css";
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Join as a provider — UniqueApex Pro</title>
+  </head>
+  <body class="ob-body">
+    <div class="ob-wrap">
+      <a class="ob-brand" href="/">
+        <img src="/Logo.png" alt="UniqueApex" />
+        <span><b>UniqueApex</b><i>PRO</i></span>
+      </a>
+
+      <div class="ob-card" id="ob-form-card">
+        <h1>Join as a provider</h1>
+        <p class="ob-sub">Tell us about your practice — we'll reach out personally. Pilot clinics in Montréal start free.</p>
+
+        <div class="ob-grid">
+          <label class="ob-field"><span>Clinic / practice name *</span><input id="ob-clinic" type="text" placeholder="e.g. Clinique Orthophonie Plateau" /></label>
+          <label class="ob-field"><span>Your name *</span><input id="ob-name" type="text" placeholder="First and last name" /></label>
+          <label class="ob-field"><span>Email *</span><input id="ob-email" type="email" placeholder="you@yourclinic.com" /></label>
+          <label class="ob-field"><span>Phone</span><input id="ob-phone" type="tel" placeholder="(514) 555-0123" /></label>
+        </div>
+
+        <span class="ob-lbl">Services you offer *</span>
+        <div class="ob-chips" id="ob-services">
+          <label><input type="checkbox" value="Speech-language therapy" /> Speech-language</label>
+          <label><input type="checkbox" value="Occupational therapy" /> Occupational</label>
+          <label><input type="checkbox" value="Behaviour support" /> Behaviour</label>
+          <label><input type="checkbox" value="Child psychology" /> Psychology</label>
+          <label><input type="checkbox" value="Social skills groups" /> Social skills</label>
+        </div>
+
+        <label class="ob-field"><span>Area / borough</span><input id="ob-area" type="text" placeholder="e.g. Le Plateau, Montréal" /></label>
+        <label class="ob-field"><span>Anything you'd like us to know? *</span><textarea id="ob-msg" rows="4" placeholder="Team size, waitlist situation, what you'd want from UniqueApex…"></textarea></label>
+
+        <input type="text" id="ob-honey" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+        <p id="ob-err" class="ob-err" hidden></p>
+        <button class="ob-btn" id="ob-send" type="button">Send my request</button>
+        <p class="ob-privacy">We only use this to contact you about onboarding — see the <a href="/privacy">privacy policy</a>.</p>
+      </div>
+
+      <div class="ob-card ob-done" id="ob-done" hidden>
+        <div style="font-size:2.2rem">🌱</div>
+        <h1>Request received</h1>
+        <p class="ob-sub" style="margin-bottom:16px">Thank you — we read every request personally and reply within a few days. In the meantime, feel free to explore the <a href="/pro" style="color:#0E8C82;font-weight:700;text-decoration:none">portal preview</a>.</p>
+        <a class="ob-btn" style="display:inline-block;text-decoration:none;text-align:center" href="/">Back to uniqueapex.com</a>
+      </div>
+    </div>
+
+<style is:global>
+  .ob-body{margin:0;min-height:100vh;font-family:'Inter Variable','Inter',system-ui,sans-serif;background:linear-gradient(150deg,#0B3F3A,#0E8C82 70%,#14B8A6);display:grid;place-items:center;padding:24px;box-sizing:border-box}
+  .ob-body *{box-sizing:border-box}
+  .ob-wrap{width:100%;max-width:560px}
+  .ob-brand{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;margin-bottom:20px}
+  .ob-brand img{height:38px;width:auto}
+  .ob-brand span b{color:#fff;font-size:1.05rem}
+  .ob-brand span i{font-style:normal;font-size:.62rem;font-weight:800;letter-spacing:.24em;color:#99F6E4;display:block}
+  .ob-card{background:#fff;border-radius:22px;padding:30px 28px;box-shadow:0 30px 70px rgba(4,47,43,.4);position:relative}
+  .ob-card h1{font-size:1.3rem;font-weight:800;color:#152523;margin:0 0 4px}
+  .ob-sub{font-size:.84rem;color:#5D7370;margin:0 0 20px;line-height:1.55}
+  .ob-sub a{color:#0E8C82;font-weight:700}
+  .ob-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+  @media (max-width:560px){.ob-grid{grid-template-columns:1fr}}
+  .ob-field{display:block;margin-bottom:13px}
+  .ob-field span{display:block;font-size:.72rem;font-weight:700;color:#2E4441;margin-bottom:5px}
+  .ob-field input,.ob-field textarea{width:100%;padding:10px 13px;border:1px solid #CFDEDB;border-radius:12px;font-size:.88rem;font-family:inherit;color:#152523;outline:none;resize:vertical}
+  .ob-field input:focus,.ob-field textarea:focus{border-color:#7BD5CC;box-shadow:0 0 0 3px rgba(14,140,130,.16)}
+  .ob-lbl{display:block;font-size:.72rem;font-weight:700;color:#2E4441;margin-bottom:7px}
+  .ob-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:15px}
+  .ob-chips label{display:inline-flex;align-items:center;gap:7px;border:1.5px solid #CFDEDB;border-radius:9999px;padding:7px 13px;font-size:.78rem;font-weight:600;color:#2E4441;cursor:pointer}
+  .ob-chips label:has(input:checked){border-color:#0E8C82;background:#E6F4F2;color:#0B6E66}
+  .ob-chips input{width:15px;height:15px;accent-color:#0E8C82;cursor:pointer}
+  .ob-err{font-size:.8rem;font-weight:600;background:#F9EDF1;color:#B14A66;border-radius:12px;padding:11px 14px;margin:0 0 13px}
+  .ob-err[hidden]{display:none}
+  .ob-btn{width:100%;border:none;border-radius:12px;background:#0E8C82;color:#fff;font-size:.95rem;font-weight:800;font-family:inherit;padding:13px;cursor:pointer;transition:filter .15s}
+  .ob-btn:hover{filter:brightness(1.08)}
+  .ob-btn:disabled{opacity:.6;cursor:default}
+  .ob-privacy{font-size:.7rem;color:#93A6A3;text-align:center;margin:12px 0 0}
+  .ob-privacy a{color:#0E8C82;font-weight:700;text-decoration:none}
+  .ob-done{text-align:center}
+  .ob-done[hidden]{display:none}
+  #ob-form-card[hidden]{display:none}
+</style>
+
+<script is:inline>
+  (function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var loadTime = Date.now();
+
+    function err(t) { var e = $("ob-err"); e.textContent = t; e.hidden = false; }
+
+    $("ob-send").addEventListener("click", function () {
+      $("ob-err").hidden = true;
+      var clinic = $("ob-clinic").value.trim();
+      var name = $("ob-name").value.trim();
+      var email = $("ob-email").value.trim();
+      var msg = $("ob-msg").value.trim();
+      var services = [];
+      document.querySelectorAll("#ob-services input:checked").forEach(function (c) { services.push(c.value); });
+
+      if (!clinic || !name || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) || !msg) {
+        err("Please fill the required fields (clinic, your name, a valid email, and your message).");
+        return;
+      }
+      if (!services.length) { err("Tick at least one service you offer."); return; }
+      if ($("ob-honey").value || Date.now() - loadTime < 2500) {
+        $("ob-form-card").hidden = true; $("ob-done").hidden = false; return;
+      }
+
+      var btn = $("ob-send");
+      btn.disabled = true; btn.textContent = "Sending…";
+
+      fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          access_key: "f4d53ef2-b415-4409-85cb-637999c33e23",
+          subject: "Provider onboarding request — " + clinic,
+          from_name: "UniqueApex Pro onboarding",
+          "Clinic": clinic,
+          "Contact name": name,
+          "Email": email,
+          "Phone": $("ob-phone").value.trim() || "—",
+          "Services": services.join(", "),
+          "Area": $("ob-area").value.trim() || "—",
+          "Message": msg
+        })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d && d.success) {
+            $("ob-form-card").hidden = true;
+            $("ob-done").hidden = false;
+            window.scrollTo({ top: 0 });
+          } else {
+            err("Couldn't send — please try again, or email contact@uniqueapex.com directly.");
+            btn.disabled = false; btn.textContent = "Send my request";
+          }
+        })
+        .catch(function () {
+          err("Couldn't send — please try again, or email contact@uniqueapex.com directly.");
+          btn.disabled = false; btn.textContent = "Send my request";
+        });
+    });
+  })();
+</script>
+  </body>
+</html>

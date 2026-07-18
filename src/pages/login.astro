@@ -1,53 +1,80 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+/* FAMILY-LOGIN-V2 — the parent portal door, now the violet twin of
+   /pro/login (same layout language, opposite brand color).
+   Sign-in logic unchanged: Supabase password grant → ua_session →
+   /account. Keeps the email-confirmed banner. */
+import "@fontsource-variable/inter/index.css";
+import "../styles/global.css";
 ---
-
-<Layout title="Sign In">
-  <!-- Email-confirmed banner -->
-  <div id="confirmed-banner" style="display:none;position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:50;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 20px;border-radius:9999px;font-size:14px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.08)">
-    ✓ Email confirmed — you can sign in now
-  </div>
-
-  <div class="min-h-screen flex items-center justify-center px-4 py-16">
-    <div class="w-full max-w-md">
-
-      <div class="text-center mb-8">
-        <a href="/" class="inline-flex items-center gap-2 mb-6">
-          <img src="/Logo.png" alt="UniqueApex" class="h-10 w-auto" />
-          <span class="text-lg font-bold text-slate-800">Unique<span class="text-violet-700">Apex</span></span>
-        </a>
-        <h1 class="text-3xl font-bold text-slate-800">Welcome back</h1>
-        <p class="text-slate-500 mt-2">Sign in to access your child's passport</p>
-      </div>
-
-      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-5">
-        <div>
-          <label class="block text-sm font-medium text-slate-600 mb-2">Email address</label>
-          <input id="email" type="email" class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400" placeholder="you@example.com" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-600 mb-2">Password</label>
-          <input id="password" type="password" class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400" placeholder="Your password" />
-        </div>
-        <p id="error-msg" style="display:none;color:#ef4444;font-size:14px"></p>
-        <button id="signin-btn" class="w-full bg-violet-700 hover:bg-violet-800 text-white font-semibold py-3 rounded-full transition-colors">
-          Sign In
-        </button>
-        <p class="text-center text-sm text-slate-500">
-          Don't have an account?
-          <a href="/signup" class="text-violet-700 font-semibold hover:underline">Create one →</a>
-        </p>
-      </div>
-
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Family sign in — UniqueApex</title>
+  </head>
+  <body class="fl-body">
+    <div id="confirmed-banner" style="display:none;position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:50;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 20px;border-radius:9999px;font-size:14px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.2)">
+      ✓ Email confirmed — you can sign in now
     </div>
-  </div>
-</Layout>
+
+    <div class="fl-wrap">
+      <a class="fl-brand" href="/">
+        <img src="/Logo.png" alt="UniqueApex" />
+        <span><b>UniqueApex</b><i>FAMILIES</i></span>
+      </a>
+
+      <div class="fl-card">
+        <h1>Welcome back</h1>
+        <p class="fl-sub">Sign in to your child's passport and journey.</p>
+
+        <label class="fl-field"><span>Email</span><input id="email" type="email" autocomplete="email" placeholder="you@example.com" /></label>
+        <label class="fl-field"><span>Password</span><input id="password" type="password" autocomplete="current-password" placeholder="Your password" /></label>
+
+        <p id="error-msg" class="fl-err" style="display:none"></p>
+
+        <button class="fl-btn" id="signin-btn" type="button">Sign in</button>
+
+        <div class="fl-alt">
+          <p>Don't have an account? <a href="/signup">Create one →</a></p>
+          <p class="fl-pro">Are you a service provider? <a href="/pro/login">Provider sign in →</a></p>
+        </div>
+      </div>
+    </div>
+
+<style is:global>
+  .fl-body{margin:0;min-height:100vh;font-family:'Inter Variable','Inter',system-ui,sans-serif;background:linear-gradient(150deg,#2E1065,#6D28D9 70%,#8B5CF6);display:grid;place-items:center;padding:24px;box-sizing:border-box}
+  .fl-body *{box-sizing:border-box}
+  .fl-wrap{width:100%;max-width:400px}
+  .fl-brand{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;margin-bottom:20px}
+  .fl-brand img{height:38px;width:auto}
+  .fl-brand span b{color:#fff;font-size:1.05rem}
+  .fl-brand span i{font-style:normal;font-size:.62rem;font-weight:800;letter-spacing:.24em;color:#DDD6FE;display:block}
+  .fl-card{background:#fff;border-radius:22px;padding:30px 28px;box-shadow:0 30px 70px rgba(24,10,61,.45)}
+  .fl-card h1{font-size:1.3rem;font-weight:800;color:#221B36;margin:0 0 4px}
+  .fl-sub{font-size:.82rem;color:#6A6478;margin:0 0 20px}
+  .fl-field{display:block;margin-bottom:13px}
+  .fl-field span{display:block;font-size:.72rem;font-weight:700;color:#3D3654;margin-bottom:5px}
+  .fl-field input{width:100%;padding:11px 14px;border:1px solid #D9D4E8;border-radius:12px;font-size:.9rem;font-family:inherit;color:#221B36;outline:none}
+  .fl-field input:focus{border-color:#C4B5FD;box-shadow:0 0 0 3px rgba(109,40,217,.16)}
+  .fl-err{font-size:.8rem;line-height:1.5;border-radius:12px;padding:11px 14px;margin:0 0 13px;background:#F9EDF1;color:#B14A66;font-weight:600}
+  .fl-btn{width:100%;border:none;border-radius:12px;background:#6D28D9;color:#fff;font-size:.95rem;font-weight:800;font-family:inherit;padding:13px;cursor:pointer;transition:filter .15s}
+  .fl-btn:hover{filter:brightness(1.1)}
+  .fl-btn:disabled{opacity:.6;cursor:default}
+  .fl-alt{margin-top:18px;text-align:center}
+  .fl-alt p{font-size:.78rem;color:#6A6478;margin:7px 0}
+  .fl-alt a{color:#6D28D9;font-weight:700;text-decoration:none}
+  .fl-alt a:hover{text-decoration:underline}
+  .fl-pro{border-top:1px solid #EFECF6;padding-top:12px;margin-top:12px !important}
+  .fl-pro a{color:#0E8C82}
+</style>
 
 <script is:inline>
   var UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
   var UA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
 
-  // Show "Email confirmed" banner if arriving from a confirmation link
   (function(){
     var params = new URLSearchParams(window.location.search);
     if(params.get("confirmed") === "1"){
@@ -70,7 +97,7 @@ import Layout from "@/layouts/Layout.astro";
     return s;
   }
   function getSession() {
-    try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch { return null; }
+    try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch (e) { return null; }
   }
 
   var existing = getSession();
@@ -86,7 +113,7 @@ import Layout from "@/layouts/Layout.astro";
 
     if (!email || !password) { errMsg.style.display="block"; errMsg.textContent="Please enter your email and password."; return; }
 
-    btn.disabled = true; btn.textContent = "Signing in...";
+    btn.disabled = true; btn.textContent = "Signing in…";
     errMsg.style.display = "none";
 
     fetch(UA_URL + "/auth/v1/token?grant_type=password", {
@@ -101,11 +128,11 @@ import Layout from "@/layouts/Layout.astro";
       } else {
         errMsg.style.display = "block";
         errMsg.textContent = res.data.error_description || res.data.msg || "Invalid email or password.";
-        btn.disabled = false; btn.textContent = "Sign In";
+        btn.disabled = false; btn.textContent = "Sign in";
       }
     }).catch(function() {
       errMsg.style.display = "block"; errMsg.textContent = "Something went wrong. Please try again.";
-      btn.disabled = false; btn.textContent = "Sign In";
+      btn.disabled = false; btn.textContent = "Sign in";
     });
   });
 
@@ -113,3 +140,5 @@ import Layout from "@/layouts/Layout.astro";
     if (e.key === "Enter") document.getElementById("signin-btn").click();
   });
 </script>
+  </body>
+</html>

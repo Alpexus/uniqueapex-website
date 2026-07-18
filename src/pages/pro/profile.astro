@@ -1,0 +1,138 @@
+---
+/* PRO-PROFILE-V1 — the provider's public card, editable. This is
+   also where the FUTURE MATCHING FACTORS live: accepting new
+   clients, waitlist weeks, booking on/off — exactly the data the
+   family-side matching will use beyond distance.
+   Preview: saves to localStorage (ua_pro_profile); TODO-LIVE:
+   providers table columns (see provider_portal_setup.sql). */
+import ProviderLayout from "@/layouts/ProviderLayout.astro";
+---
+<ProviderLayout title="Profile — UniqueApex Pro" active="profile">
+  <div class="pro-prof">
+
+    <div class="pc">
+      <div class="pc-h"><b>Clinic profile</b><span>one profile per practice — your <a href="/pro/team" style="color:var(--p-teal);font-weight:700;text-decoration:none">team</a> appears on it. Solo practice? You're a clinic of one.</span></div>
+
+      <label class="pfield"><span>Clinic / practice name</span><input class="pin" id="pf-name" type="text" placeholder="e.g. Clinique Orthophonie Plateau" /></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <label class="pfield"><span>Service</span>
+          <select class="pin" id="pf-service">
+            <option>Speech-language therapy</option>
+            <option>Occupational therapy</option>
+            <option>Behaviour support</option>
+            <option>Child psychology</option>
+            <option>Social skills groups</option>
+          </select>
+        </label>
+        <label class="pfield"><span>Languages</span><input class="pin" id="pf-langs" type="text" placeholder="FR, EN" /></label>
+        <label class="pfield"><span>Borough / area</span><input class="pin" id="pf-borough" type="text" placeholder="Le Plateau-Mont-Royal" /></label>
+        <label class="pfield"><span>Phone</span><input class="pin" id="pf-phone" type="text" placeholder="(514) 555-0123" /></label>
+        <label class="pfield"><span>Website</span><input class="pin" id="pf-web" type="text" placeholder="https://…" /></label>
+        <label class="pfield"><span>Session fee (range)</span><input class="pin" id="pf-fees" type="text" placeholder="e.g. 120–150 $ / session" /></label>
+      </div>
+      <label class="pfield"><span>About your practice</span><textarea class="pin" id="pf-bio" rows="4" placeholder="Two or three warm sentences — who you help, how you work, what a first visit looks like."></textarea></label>
+
+      <div class="pc-h" style="margin-top:6px"><b>Matching & booking</b><span>families see this — and matching will use it</span></div>
+      <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:center">
+        <label class="pswitch"><input type="checkbox" id="pf-accepting" checked /> Accepting new clients</label>
+        <label class="pswitch" style="gap:7px">Waitlist&nbsp;
+          <select class="pin" id="pf-wait" style="width:auto;padding:6px 10px">
+            <option value="0">none</option><option value="2">~2 weeks</option><option value="4">~4 weeks</option><option value="8">~8 weeks</option><option value="12">3+ months</option>
+          </select>
+        </label>
+        <label class="pswitch"><input type="checkbox" id="pf-booking" /> Let families book my open slots (when booking launches)</label>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-top:16px">
+        <button class="pbtn" id="pf-save" type="button">Save profile</button>
+        <span id="pf-saved" style="font-size:.76rem;color:var(--p-green);font-weight:700;display:none">Saved ✓</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="pc" style="position:sticky;top:52px">
+        <div class="pc-h"><b>Live preview</b><span>the family's view</span></div>
+        <div class="pf-card">
+          <div class="pf-card-top">
+            <span class="pf-av" id="pv-av">C</span>
+            <span class="pf-id"><b id="pv-name">Your clinic name</b><span id="pv-meta">Service · Borough</span></span>
+            <span class="ppill teal" id="pv-accept">accepting</span>
+          </div>
+          <p class="pf-bio" id="pv-bio">Your description appears here — warm, short, human.</p>
+          <div class="pf-tags" id="pv-tags"></div>
+          <button class="pbtn sm" style="width:100%;justify-content:center" type="button" disabled>Request a spot (families see this)</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</ProviderLayout>
+
+<style is:global>
+  .pro-prof{display:grid;grid-template-columns:3fr 2fr;gap:14px;align-items:start}
+  @media (max-width:880px){.pro-prof{grid-template-columns:1fr}}
+  .pf-card{border:1px solid var(--p-line);border-radius:16px;padding:16px;background:linear-gradient(160deg,#FDFFFE,#F4FAF9)}
+  .pf-card-top{display:flex;align-items:center;gap:11px;margin-bottom:10px}
+  .pf-av{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#5EEAD4,#0E8C82);color:#fff;display:grid;place-items:center;font-size:1rem;font-weight:800;flex-shrink:0}
+  .pf-id{flex:1;min-width:0}
+  .pf-id b{display:block;font-size:.92rem;color:var(--p-ink)}
+  .pf-id span{display:block;font-size:.7rem;color:var(--p-mut)}
+  .pf-bio{font-size:.8rem;color:var(--p-ink2);line-height:1.6;margin:0 0 10px}
+  .pf-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+</style>
+
+<script is:inline>
+  (function () {
+    var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    var F = ["name", "service", "langs", "borough", "phone", "web", "fees", "bio"];
+    var $f = function (k) { return document.getElementById("pf-" + k); };
+
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem("ua_pro_profile") || "null"); } catch (e) {}
+    if (saved) {
+      F.forEach(function (k) { if (saved[k] != null && $f(k)) $f(k).value = saved[k]; });
+      $f("accepting").checked = saved.accepting !== false;
+      $f("booking").checked = !!saved.booking;
+      if (saved.wait != null) $f("wait").value = String(saved.wait);
+    }
+
+    function preview() {
+      var name = $f("name").value.trim() || "Your clinic name";
+      document.getElementById("pv-name").textContent = name;
+      document.getElementById("pv-av").textContent = name[0].toUpperCase();
+      document.getElementById("pv-meta").textContent = $f("service").value + ($f("borough").value.trim() ? " · " + $f("borough").value.trim() : "");
+      document.getElementById("pv-bio").textContent = $f("bio").value.trim() || "Your description appears here — warm, short, human.";
+      var acc = $f("accepting").checked;
+      var wait = +$f("wait").value;
+      var pvA = document.getElementById("pv-accept");
+      pvA.textContent = acc ? (wait ? "waitlist ~" + wait + " wk" : "accepting") : "full";
+      pvA.className = "ppill " + (acc ? (wait ? "amber" : "teal") : "grey");
+      var tags = [];
+      var teamN = 0;
+      try { var tm = JSON.parse(localStorage.getItem("ua_pro_team") || "null"); if (tm) teamN = tm.length; } catch (e) {}
+      if (teamN > 1) tags.push("👥 team of " + teamN);
+      if ($f("langs").value.trim()) tags.push("🗣 " + esc($f("langs").value.trim()));
+      if ($f("fees").value.trim()) tags.push("💳 " + esc($f("fees").value.trim()));
+      if ($f("booking").checked) tags.push("📅 online booking");
+      document.getElementById("pv-tags").innerHTML = tags.map(function (t) { return "<span class='ppill grey' style='text-transform:none;letter-spacing:0'>" + t + "</span>"; }).join("");
+    }
+
+    ["input", "change"].forEach(function (ev) {
+      document.querySelectorAll(".pin, .pswitch input").forEach(function (el) { el.addEventListener(ev, preview); });
+    });
+
+    document.getElementById("pf-save").addEventListener("click", function () {
+      var out = {};
+      F.forEach(function (k) { out[k] = $f(k).value.trim(); });
+      out.accepting = $f("accepting").checked;
+      out.booking = $f("booking").checked;
+      out.wait = +$f("wait").value;
+      localStorage.setItem("ua_pro_profile", JSON.stringify(out));
+      var ok = document.getElementById("pf-saved");
+      ok.style.display = "inline";
+      setTimeout(function () { ok.style.display = "none"; }, 2200);
+    });
+
+    preview();
+  })();
+</script>

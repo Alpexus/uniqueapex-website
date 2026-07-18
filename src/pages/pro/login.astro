@@ -1,0 +1,138 @@
+---
+/* PRO-LOGIN-V1 — the provider portal's front door. Future-proof:
+   it really signs in against Supabase, then checks provider_accounts
+   for a clinic link. Today no links exist (onboarding hasn't opened),
+   so a valid login sees a friendly "not linked yet" note; when
+   provider_portal_setup.sql runs and links are created, this page
+   starts letting clinics straight in (ua_pro_session → /pro). */
+import "@fontsource-variable/inter/index.css";
+import "../../styles/global.css";
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Provider sign in — UniqueApex Pro</title>
+  </head>
+  <body class="pl-body">
+    <div class="pl-wrap">
+      <a class="pl-brand" href="/">
+        <img src="/Logo.png" alt="UniqueApex" />
+        <span><b>UniqueApex</b><i>PRO</i></span>
+      </a>
+
+      <div class="pl-card">
+        <h1>Provider sign in</h1>
+        <p class="pl-sub">For clinics and professionals on UniqueApex.</p>
+
+        <label class="pl-field"><span>Email</span><input id="pl-email" type="email" autocomplete="email" placeholder="you@yourclinic.com" /></label>
+        <label class="pl-field"><span>Password</span><input id="pl-pass" type="password" autocomplete="current-password" placeholder="Your password" /></label>
+
+        <div id="pl-msg" class="pl-msg" hidden></div>
+
+        <button class="pl-btn" id="pl-btn" type="button">Sign in</button>
+
+        <div class="pl-alt">
+          <p>Not onboarded yet? <a href="/pro/onboarding">Request onboarding</a> — pilot clinics start free.</p>
+          <p><a href="/pro">Peek at the portal preview →</a></p>
+          <p class="pl-parent">Are you a parent? <a href="/login">Family sign in</a></p>
+        </div>
+      </div>
+    </div>
+
+<style is:global>
+  .pl-body{margin:0;min-height:100vh;font-family:'Inter Variable','Inter',system-ui,sans-serif;background:linear-gradient(150deg,#0B3F3A,#0E8C82 70%,#14B8A6);display:grid;place-items:center;padding:24px;box-sizing:border-box}
+  .pl-body *{box-sizing:border-box}
+  .pl-wrap{width:100%;max-width:400px}
+  .pl-brand{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;margin-bottom:20px}
+  .pl-brand img{height:38px;width:auto}
+  .pl-brand span b{color:#fff;font-size:1.05rem}
+  .pl-brand span i{font-style:normal;font-size:.62rem;font-weight:800;letter-spacing:.24em;color:#99F6E4;display:block}
+  .pl-card{background:#fff;border-radius:22px;padding:30px 28px;box-shadow:0 30px 70px rgba(4,47,43,.4)}
+  .pl-card h1{font-size:1.3rem;font-weight:800;color:#152523;margin:0 0 4px}
+  .pl-sub{font-size:.82rem;color:#5D7370;margin:0 0 20px}
+  .pl-field{display:block;margin-bottom:13px}
+  .pl-field span{display:block;font-size:.72rem;font-weight:700;color:#2E4441;margin-bottom:5px}
+  .pl-field input{width:100%;padding:11px 14px;border:1px solid #CFDEDB;border-radius:12px;font-size:.9rem;font-family:inherit;color:#152523;outline:none}
+  .pl-field input:focus{border-color:#7BD5CC;box-shadow:0 0 0 3px rgba(14,140,130,.16)}
+  .pl-msg{font-size:.8rem;line-height:1.55;border-radius:12px;padding:11px 14px;margin-bottom:13px}
+  .pl-msg.err{background:#F9EDF1;color:#B14A66;font-weight:600}
+  .pl-msg.info{background:#E6F4F2;color:#0B6E66;font-weight:600}
+  .pl-msg[hidden]{display:none}
+  .pl-btn{width:100%;border:none;border-radius:12px;background:#0E8C82;color:#fff;font-size:.95rem;font-weight:800;font-family:inherit;padding:13px;cursor:pointer;transition:filter .15s}
+  .pl-btn:hover{filter:brightness(1.08)}
+  .pl-btn:disabled{opacity:.6;cursor:default}
+  .pl-alt{margin-top:18px;text-align:center}
+  .pl-alt p{font-size:.78rem;color:#5D7370;margin:7px 0}
+  .pl-alt a{color:#0E8C82;font-weight:700;text-decoration:none}
+  .pl-alt a:hover{text-decoration:underline}
+  .pl-parent{border-top:1px solid #E2ECEA;padding-top:12px;margin-top:12px !important}
+  .pl-parent a{color:#6D28D9}
+</style>
+
+<script is:inline>
+  (function () {
+    var URL0 = "https://eghqufgiudxjkbsddtnx.supabase.co";
+    var KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+    var $ = function (id) { return document.getElementById(id); };
+
+    function msg(kind, text) {
+      var m = $("pl-msg");
+      m.className = "pl-msg " + kind;
+      m.textContent = text;
+      m.hidden = false;
+    }
+
+    function go() {
+      var email = $("pl-email").value.trim();
+      var pass = $("pl-pass").value;
+      if (!email || !pass) { msg("err", "Enter your email and password."); return; }
+      var btn = $("pl-btn");
+      btn.disabled = true;
+      btn.textContent = "Signing in…";
+
+      fetch(URL0 + "/auth/v1/token?grant_type=password", {
+        method: "POST",
+        headers: { apikey: KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, password: pass })
+      })
+        .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+        .then(function (res) {
+          if (!res.ok || !res.d || !res.d.access_token) {
+            msg("err", "That email and password don't match an account.");
+            btn.disabled = false; btn.textContent = "Sign in";
+            return;
+          }
+          var s = res.d;
+          s.expires_at = Math.floor(Date.now() / 1000) + (s.expires_in || 3600);
+          /* Is this login linked to a clinic? */
+          return fetch(URL0 + "/rest/v1/provider_accounts?select=provider_id&user_id=eq." + s.user.id, {
+            headers: { apikey: KEY, Authorization: "Bearer " + s.access_token }
+          })
+            .then(function (r2) { return r2.ok ? r2.json() : []; })
+            .catch(function () { return []; })
+            .then(function (rows) {
+              if (Array.isArray(rows) && rows.length) {
+                localStorage.setItem("ua_pro_session", JSON.stringify(s));
+                location.href = "/pro";
+              } else {
+                msg("info", "Your login works, but it isn't linked to a clinic yet — provider onboarding opens soon. Want in early? Send us an onboarding request from the link below.");
+                btn.disabled = false; btn.textContent = "Sign in";
+              }
+            });
+        })
+        .catch(function () {
+          msg("err", "Couldn't reach the sign-in service — try again in a moment.");
+          btn.disabled = false; btn.textContent = "Sign in";
+        });
+    }
+
+    $("pl-btn").addEventListener("click", go);
+    $("pl-pass").addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+  })();
+</script>
+  </body>
+</html>

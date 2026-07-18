@@ -1,0 +1,101 @@
+---
+/* PRO-DASHBOARD-V1 — the provider's morning view: today's sessions,
+   booking requests to accept/decline, what needs an answer.
+   Preview data; TODO-LIVE: load from bookings/questions/documents. */
+import ProviderLayout from "@/layouts/ProviderLayout.astro";
+---
+<ProviderLayout title="Dashboard — UniqueApex Pro" active="dashboard">
+  <div class="pgrid">
+
+    <div class="pkpis">
+      <div class="pkpi teal"><b id="k-today">·</b><span>sessions today</span></div>
+      <div class="pkpi"><b id="k-week">·</b><span>sessions this week</span></div>
+      <div class="pkpi amber"><b id="k-req">·</b><span>booking requests</span></div>
+      <div class="pkpi rose"><b id="k-q">·</b><span>questions waiting</span></div>
+      <div class="pkpi"><b id="k-docs">·</b><span>new documents</span></div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-h"><b>Today</b><span id="today-date"></span></div>
+      <div id="today-list"></div>
+      <p class="pnote">Sessions come from your Schedule — families will book the open slots directly once booking launches in the family portal.</p>
+    </div>
+
+    <div class="pc">
+      <div class="pc-h"><b>Booking requests</b><span>accept or decline — the family is notified either way</span></div>
+      <div id="req-list"></div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-h"><b>Needs your attention</b></div>
+      <div id="attn-list"></div>
+    </div>
+
+  </div>
+</ProviderLayout>
+
+<script is:inline>
+  (function () {
+    var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    var COLORS = ["#0E8C82", "#6D28D9", "#A8650A", "#B14A66", "#2F9E63", "#2563EB"];
+    var col = function (i) { return COLORS[i % COLORS.length]; };
+
+    var today = [
+      { t: "9:00", child: "Liam", age: 4, kind: "Speech session · 45 min", status: "confirmed" },
+      { t: "10:30", child: "Noor", age: 6, kind: "Speech session · 45 min", status: "confirmed" },
+      { t: "13:00", child: "Éloi", age: 5, kind: "Parent check-in · 30 min", status: "confirmed" },
+      { t: "15:00", child: "Maya", age: 7, kind: "Assessment · 60 min", status: "confirmed" },
+    ];
+    var reqs = [
+      { child: "Zoé", age: 3, want: "Tue 10:00 or Thu 9:00 · initial consultation", note: "Referred through UniqueApex matching" },
+      { child: "Adam", age: 8, want: "Any weekday after 15:30", note: "Sibling of an existing client" },
+    ];
+    var attn = [
+      { icon: "❓", txt: "2 family questions are waiting for an answer", href: "/pro/questions", pill: "reply", cls: "rose" },
+      { icon: "📄", txt: "Liam's parents sent a new evaluation report", href: "/pro/documents", pill: "review", cls: "amber" },
+      { icon: "👤", txt: "Your public profile is 80% complete — add fees to finish", href: "/pro/profile", pill: "finish", cls: "teal" },
+    ];
+
+    document.getElementById("today-date").textContent = new Date().toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" });
+    document.getElementById("k-today").textContent = today.length;
+    document.getElementById("k-week").textContent = 17;
+    document.getElementById("k-req").textContent = reqs.length;
+    document.getElementById("k-q").textContent = 2;
+    document.getElementById("k-docs").textContent = 1;
+
+    document.getElementById("today-list").innerHTML = today.map(function (s, i) {
+      return "<div class='prow'>" +
+        "<span class='av' style='background:" + col(i) + "'>" + esc(s.child[0]) + "</span>" +
+        "<span class='tx'><b>" + s.t + " · " + esc(s.child) + ", " + s.age + "</b><span>" + esc(s.kind) + "</span></span>" +
+        "<span class='ppill green'>confirmed</span></div>";
+    }).join("");
+
+    function renderReqs() {
+      var host = document.getElementById("req-list");
+      host.innerHTML = reqs.length ? reqs.map(function (r, i) {
+        return "<div class='prow' data-i='" + i + "'>" +
+          "<span class='av' style='background:" + col(i + 4) + "'>" + esc(r.child[0]) + "</span>" +
+          "<span class='tx'><b>" + esc(r.child) + ", " + r.age + " — " + esc(r.want) + "</b><span>" + esc(r.note) + "</span></span>" +
+          "<button class='pbtn sm' data-act='ok'>Accept</button>" +
+          "<button class='pbtn sm ghost' data-act='no'>Decline</button></div>";
+      }).join("") : "<p class='pempty'>No pending requests — new ones appear here the moment a family asks.</p>";
+      host.querySelectorAll("button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var row = b.closest(".prow");
+          var i = +row.getAttribute("data-i");
+          var ok = b.getAttribute("data-act") === "ok";
+          row.innerHTML = "<span class='tx'><b>" + esc(reqs[i].child) + "'s request " + (ok ? "accepted ✓ — added to your schedule (preview)" : "declined — the family was notified (preview)") + "</b></span>";
+          document.getElementById("k-req").textContent = Math.max(0, +document.getElementById("k-req").textContent - 1);
+        });
+      });
+    }
+    renderReqs();
+
+    document.getElementById("attn-list").innerHTML = attn.map(function (a) {
+      return "<a class='prow' style='text-decoration:none' href='" + a.href + "'>" +
+        "<span style='font-size:1.1rem'>" + a.icon + "</span>" +
+        "<span class='tx'><b style='font-weight:600'>" + esc(a.txt) + "</b></span>" +
+        "<span class='ppill " + a.cls + "'>" + a.pill + "</span></a>";
+    }).join("");
+  })();
+</script>

@@ -1,0 +1,84 @@
+---
+/* PRO-TEAM-V1 — the clinic model: ONE clinic profile, several people
+   on it. Owners manage the practice; staff see their own schedule and
+   clients. Team members appear on the public clinic card.
+   Preview: saved on-device (ua_pro_team); TODO-LIVE: provider_accounts
+   (role owner|staff) + provider_staff rows. */
+import ProviderLayout from "@/layouts/ProviderLayout.astro";
+---
+<ProviderLayout title="Team — UniqueApex Pro" active="team">
+  <div class="pgrid" style="max-width:760px">
+
+    <div class="pc">
+      <div class="pc-h"><b>Your team</b><span>everyone here appears on your public clinic profile</span></div>
+      <div id="tm-list"></div>
+      <p class="pnote">Owners manage the clinic profile, schedule and billing. Staff members see their own calendar, their clients' documents and questions — nothing else. Staff logins arrive with onboarding.</p>
+    </div>
+
+    <div class="pc">
+      <div class="pc-h"><b>Add a team member</b></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <label class="pfield" style="margin:0"><span>Full name</span><input class="pin" id="tm-name" type="text" placeholder="e.g. Camille Roy" /></label>
+        <label class="pfield" style="margin:0"><span>Title</span><input class="pin" id="tm-title" type="text" placeholder="e.g. Orthophoniste, M.P.O." /></label>
+        <label class="pfield" style="margin:0"><span>Languages</span><input class="pin" id="tm-langs" type="text" placeholder="FR, EN" /></label>
+        <label class="pfield" style="margin:0"><span>Role</span>
+          <select class="pin" id="tm-role"><option value="staff">Staff</option><option value="owner">Owner</option></select>
+        </label>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+        <button class="pbtn" id="tm-add" type="button">+ Add to team</button>
+        <span style="font-size:.72rem;color:var(--p-faint)">Invitation emails go out when onboarding opens.</span>
+      </div>
+    </div>
+
+  </div>
+</ProviderLayout>
+
+<script is:inline>
+  (function () {
+    var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    var COLORS = ["#0E8C82", "#6D28D9", "#A8650A", "#B14A66", "#2F9E63", "#2563EB"];
+
+    var team = [
+      { name: "Camille Roy", title: "Orthophoniste, M.P.O.", langs: "FR, EN", role: "owner" },
+      { name: "Sarah Nguyen", title: "Orthophoniste", langs: "FR, EN, VI", role: "staff" },
+      { name: "Marc Tremblay", title: "Aide-thérapeute", langs: "FR", role: "staff" },
+    ];
+    try { var saved = JSON.parse(localStorage.getItem("ua_pro_team") || "null"); if (saved && saved.length) team = saved; } catch (e) {}
+    function persist() { localStorage.setItem("ua_pro_team", JSON.stringify(team)); }
+
+    function render() {
+      var host = document.getElementById("tm-list");
+      host.innerHTML = team.map(function (m, i) {
+        return "<div class='prow'>" +
+          "<span class='av' style='background:" + COLORS[i % COLORS.length] + "'>" + esc(m.name[0]) + "</span>" +
+          "<span class='tx'><b>" + esc(m.name) + "</b><span>" + esc(m.title || "") + (m.langs ? " · 🗣 " + esc(m.langs) : "") + "</span></span>" +
+          "<span class='ppill " + (m.role === "owner" ? "teal" : "grey") + "'>" + m.role + "</span>" +
+          (m.role === "owner" ? "" : "<button class='pbtn sm ghost' data-rm='" + i + "' type='button'>Remove</button>") +
+          "</div>";
+      }).join("");
+      host.querySelectorAll("[data-rm]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          team.splice(+b.getAttribute("data-rm"), 1);
+          persist();
+          render();
+        });
+      });
+    }
+    render();
+
+    document.getElementById("tm-add").addEventListener("click", function () {
+      var name = document.getElementById("tm-name").value.trim();
+      if (!name) { document.getElementById("tm-name").focus(); return; }
+      team.push({
+        name: name,
+        title: document.getElementById("tm-title").value.trim(),
+        langs: document.getElementById("tm-langs").value.trim(),
+        role: document.getElementById("tm-role").value
+      });
+      persist();
+      ["tm-name", "tm-title", "tm-langs"].forEach(function (id) { document.getElementById(id).value = ""; });
+      render();
+    });
+  })();
+</script>

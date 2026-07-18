@@ -1,0 +1,103 @@
+---
+/* PRO-SCHEDULE-V1 — weekly grid + availability. Open slots are what
+   families will one day book straight from the client portal, so this
+   screen doubles as the future booking engine's data source.
+   Preview: state lives in localStorage (ua_pro_schedule). */
+import ProviderLayout from "@/layouts/ProviderLayout.astro";
+---
+<ProviderLayout title="Schedule — UniqueApex Pro" active="schedule">
+  <div class="pgrid">
+
+    <div class="pc">
+      <div class="pc-h"><b>Working days</b><span>untick a day and its slots close instantly</span></div>
+      <div id="day-toggles" style="display:flex;gap:14px;flex-wrap:wrap"></div>
+    </div>
+
+    <div class="pc" style="padding-bottom:10px">
+      <div class="pc-h">
+        <b>This week</b>
+        <span>tap a slot to cycle: open → blocked → open · booked slots are set by accepted requests</span>
+      </div>
+      <div class="sch-legend">
+        <span><i class="sq open"></i>open — bookable by families (soon)</span>
+        <span><i class="sq booked"></i>booked</span>
+        <span><i class="sq blocked"></i>blocked</span>
+      </div>
+      <div class="sch-grid" id="sch-grid"></div>
+      <p class="pnote">When booking launches, families you work with see the green slots inside their own portal and book directly — every booking lands on your Dashboard for approval.</p>
+    </div>
+
+  </div>
+</ProviderLayout>
+
+<style is:global>
+  .sch-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.7rem;color:var(--p-mut);margin-bottom:12px}
+  .sch-legend .sq{display:inline-block;width:11px;height:11px;border-radius:4px;margin-right:5px;vertical-align:-1px}
+  .sq.open{background:var(--p-teal-50);border:1px solid var(--p-teal-100)}
+  .sq.booked{background:var(--p-teal)}
+  .sq.blocked{background:#EBEFEE}
+  .sch-grid{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px;overflow-x:auto;padding-bottom:8px}
+  .sch-day{min-width:120px}
+  .sch-day h4{font-size:.74rem;font-weight:800;color:var(--p-ink);margin:0 0 8px;text-align:center}
+  .sch-day h4 span{display:block;font-size:.62rem;font-weight:700;color:var(--p-faint)}
+  .sch-day.off{opacity:.35;pointer-events:none}
+  .slot{width:100%;border:1px solid var(--p-teal-100);background:var(--p-teal-50);color:var(--p-teal-d);font-size:.72rem;font-weight:700;font-family:inherit;border-radius:9px;padding:8px 6px;margin-bottom:6px;cursor:pointer;transition:transform .1s}
+  .slot:hover{transform:scale(1.03)}
+  .slot.booked{background:var(--p-teal);border-color:var(--p-teal);color:#fff;cursor:default}
+  .slot.blocked{background:#EBEFEE;border-color:#E0E7E5;color:#9DAeAA;color:var(--p-faint)}
+</style>
+
+<script is:inline>
+  (function () {
+    var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    var DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    var HOURS = ["9:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
+    var BOOKED = { "Mon-9:00": "Liam", "Mon-10:00": "Noor", "Tue-13:00": "Éloi", "Wed-9:00": "Maya", "Thu-15:00": "Zoé", "Fri-10:00": "Adam" };
+
+    var state = { days: { Mon: true, Tue: true, Wed: true, Thu: true, Fri: true, Sat: false }, blocked: {} };
+    try { var saved = JSON.parse(localStorage.getItem("ua_pro_schedule") || "null"); if (saved) state = saved; } catch (e) {}
+    function persist() { localStorage.setItem("ua_pro_schedule", JSON.stringify(state)); }
+
+    function renderToggles() {
+      var host = document.getElementById("day-toggles");
+      host.innerHTML = DAYS.map(function (d) {
+        return "<label class='pswitch'><input type='checkbox' data-day='" + d + "'" + (state.days[d] ? " checked" : "") + " /> " + d + "</label>";
+      }).join("");
+      host.querySelectorAll("input").forEach(function (cb) {
+        cb.addEventListener("change", function () {
+          state.days[cb.getAttribute("data-day")] = cb.checked;
+          persist();
+          renderGrid();
+        });
+      });
+    }
+
+    function renderGrid() {
+      var host = document.getElementById("sch-grid");
+      var monday = new Date();
+      monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+      host.innerHTML = DAYS.map(function (d, di) {
+        var date = new Date(monday);
+        date.setDate(monday.getDate() + di);
+        var slots = HOURS.map(function (h) {
+          var key = d + "-" + h;
+          var cls = BOOKED[key] ? "booked" : state.blocked[key] ? "blocked" : "";
+          var label = BOOKED[key] ? h + " · " + esc(BOOKED[key]) : state.blocked[key] ? h + " · blocked" : h + " · open";
+          return "<button type='button' class='slot " + cls + "' data-key='" + key + "'" + (BOOKED[key] ? " disabled" : "") + ">" + label + "</button>";
+        }).join("");
+        return "<div class='sch-day" + (state.days[d] ? "" : " off") + "'><h4>" + d + "<span>" + date.toLocaleDateString("en-CA", { month: "short", day: "numeric" }) + "</span></h4>" + slots + "</div>";
+      }).join("");
+      host.querySelectorAll(".slot:not(.booked)").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var key = b.getAttribute("data-key");
+          if (state.blocked[key]) delete state.blocked[key]; else state.blocked[key] = 1;
+          persist();
+          renderGrid();
+        });
+      });
+    }
+
+    renderToggles();
+    renderGrid();
+  })();
+</script>

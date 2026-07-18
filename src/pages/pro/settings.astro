@@ -1,0 +1,84 @@
+---
+/* PRO-SETTINGS-V2 — a real account area: practice, team & access,
+   plan & billing, security, notifications, data & privacy.
+   Preview; live pieces arrive with provider accounts. */
+import ProviderLayout from "@/layouts/ProviderLayout.astro";
+---
+<ProviderLayout title="Settings — UniqueApex Pro" active="settings">
+  <div class="pgrid" style="max-width:720px">
+
+    <div class="pc">
+      <div class="pc-h"><b>Practice</b></div>
+      <div class="st-row">
+        <span class="st-tx"><b>Clinic profile</b><span>Name, services, fees, availability status — what families see.</span></span>
+        <a class="pbtn sm ghost" href="/pro/profile">Edit profile</a>
+      </div>
+      <div class="st-row">
+        <span class="st-tx"><b>Team &amp; access</b><span>Who works here and what they can see. Owners manage, staff see their own clients.</span></span>
+        <a class="pbtn sm ghost" href="/pro/team">Manage team</a>
+      </div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-h"><b>Account &amp; security</b></div>
+      <label class="pfield"><span>Login email</span><input class="pin" type="email" placeholder="you@yourclinic.com" disabled /></label>
+      <div class="st-row">
+        <span class="st-tx"><b>Password</b><span>Set with your invitation when onboarding opens.</span></span>
+        <button class="pbtn sm ghost" type="button" disabled>Change</button>
+      </div>
+      <div class="st-row">
+        <span class="st-tx"><b>Two-factor authentication</b><span>Strongly recommended — you'll handle family information.</span></span>
+        <span class="ppill amber">with onboarding</span>
+      </div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-h"><b>Plan &amp; billing</b></div>
+      <div class="st-row">
+        <span class="st-tx"><b>UniqueApex Pro listing</b><span>Featured placement in matching, booking, document exchange and Q&amp;A. Pricing announced at onboarding — pilot clinics start free.</span></span>
+        <span class="ppill teal">pilot · free</span>
+      </div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-h"><b>Services on your portal</b><span>switch off anything you don't want to offer</span></div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <label class="pswitch"><input type="checkbox" checked /> Family questions (async Q&amp;A between sessions)</label>
+        <label class="pswitch"><input type="checkbox" checked /> Document exchange (receive &amp; share)</label>
+        <label class="pswitch"><input type="checkbox" /> Online booking of open slots (launches with the family portal)</label>
+      </div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-h"><b>Notifications</b></div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <label class="pswitch"><input type="checkbox" checked /> Email me when a family sends a document</label>
+        <label class="pswitch"><input type="checkbox" checked /> Email me when a question arrives</label>
+        <label class="pswitch"><input type="checkbox" checked /> Email me booking requests immediately</label>
+        <label class="pswitch"><input type="checkbox" /> Weekly summary instead of instant emails</label>
+      </div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-h"><b>Data &amp; privacy</b></div>
+      <div class="st-row">
+        <span class="st-tx"><b>Export your data</b><span>Clients, sessions, documents log — yours anytime.</span></span>
+        <button class="pbtn sm ghost" type="button" disabled>Export</button>
+      </div>
+      <div class="st-row">
+        <span class="st-tx"><b>Close the clinic account</b><span>Families keep their own records; your access ends.</span></span>
+        <button class="pbtn sm ghost" style="color:var(--p-rose);border-color:#EFD5DC" type="button" disabled>Close account</button>
+      </div>
+      <p class="pnote">Both actions activate with provider accounts. Family data always belongs to families — closing a clinic account never deletes a child's records.</p>
+    </div>
+
+  </div>
+</ProviderLayout>
+
+<style is:global>
+  .st-row{display:flex;align-items:center;gap:14px;padding:11px 0;border-top:1px solid var(--p-line)}
+  .st-row:first-of-type{border-top:none}
+  .st-tx{flex:1;min-width:0}
+  .st-tx b{display:block;font-size:.85rem;color:var(--p-ink)}
+  .st-tx span{display:block;font-size:.74rem;color:var(--p-mut);margin-top:2px;line-height:1.5}
+</style>

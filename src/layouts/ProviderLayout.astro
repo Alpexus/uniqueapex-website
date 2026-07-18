@@ -1,0 +1,254 @@
+---
+/* PROVIDER-SHELL-V1 — "UniqueApex Pro", the portal clinics get when
+   they onboard. Mirrors the family app's design language but with a
+   TEAL professional identity so the two sides are never confused.
+   Currently runs in PREVIEW mode (sample data, no provider accounts
+   yet) — the banner says so honestly. When onboarding starts:
+   run provider_portal_setup.sql, add provider auth, and swap each
+   page's demo loader for real queries (marked with TODO-LIVE). */
+import "@fontsource-variable/inter/index.css";
+import "../styles/global.css";
+const { title = "UniqueApex Pro", active = "" } = Astro.props;
+const NAV = [
+  { key: "dashboard", label: "Dashboard", href: "/pro" },
+  { key: "schedule",  label: "Schedule",  href: "/pro/schedule" },
+  { key: "clients",   label: "Clients",   href: "/pro/clients" },
+  { key: "documents", label: "Documents", href: "/pro/documents" },
+  { key: "questions", label: "Questions", href: "/pro/questions" },
+  { key: "team",      label: "Team",      href: "/pro/team" },
+  { key: "profile",   label: "Clinic profile", href: "/pro/profile" },
+  { key: "settings",  label: "Settings",  href: "/pro/settings" },
+];
+const ICONS: Record<string, string> = {
+  dashboard: `<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>`,
+  schedule: `<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/>`,
+  clients: `<circle cx="9" cy="8" r="3"/><path d="M3 19c0-3.3 2.7-5 6-5s6 1.7 6 5"/><circle cx="17" cy="8.5" r="2.2"/><path d="M16.5 14c2.6.2 4.5 1.7 4.5 5"/>`,
+  documents: `<path d="M6 2.5h8L19 7.5v14H6z"/><path d="M14 2.5v5h5M9.5 12h5M9.5 15.5h5"/>`,
+  questions: `<path d="M20 4.5H4v12h4.5v4l5-4H20z"/><path d="M9.5 9.5h5"/>`,
+  team: `<circle cx="8" cy="9" r="3"/><circle cx="16.5" cy="9.5" r="2.4"/><path d="M2.5 19.5c0-3.2 2.5-5 5.5-5s5.5 1.8 5.5 5"/><path d="M15 15c2.8 0 5 1.6 5 4.5"/>`,
+  profile: `<path d="M3 21V8l7-5 7 5v13"/><path d="M3 21h18M13 21v-4a3 3 0 0 0-6 0v4"/>`,
+  settings: `<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>`,
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="pro-body">
+
+    <div class="pro-preview">
+      <span>✦ Provider preview — sample data. Clinic onboarding opens soon.</span>
+      <a href="/pro/onboarding">Join as a provider →</a>
+    </div>
+
+    <div class="pro-shell">
+      <div class="pro-scrim" id="pro-scrim"></div>
+
+      <aside class="pro-side" id="pro-side">
+        <a class="pro-brand" href="/pro">
+          <img class="pro-logo-img" src="/Logo.png" alt="UniqueApex" />
+          <span class="pro-brand-tx"><b>UniqueApex</b><i>PRO</i></span>
+        </a>
+
+        <div class="pro-me">
+          <span class="pro-me-av" id="pro-me-av">C</span>
+          <span class="pro-me-tx"><b id="pro-me-name">Your clinic</b><span id="pro-me-svc">Provider portal</span></span>
+        </div>
+
+        <nav class="pro-nav">
+          {NAV.map((n) => (
+            <a class={active === n.key ? "pro-link on" : "pro-link"} href={n.href}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={ICONS[n.key]} />
+              {n.label}
+              {n.key === "questions" && <em class="pro-dot" id="pro-nav-qdot" hidden></em>}
+            </a>
+          ))}
+        </nav>
+
+        <div class="pro-side-foot">
+          <a class="pro-backsite" href="/">← uniqueapex.com</a>
+        </div>
+      </aside>
+
+      <div class="pro-mainwrap">
+        <header class="pro-top">
+          <button class="pro-burger" id="pro-burger" type="button" aria-label="Menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          </button>
+          <h1 class="pro-title">{title.replace("— UniqueApex Pro", "").replace("UniqueApex Pro", "Dashboard")}</h1>
+
+          <div class="pro-acct" id="pro-acct">
+            <button class="pro-acct-btn" id="pro-acct-btn" type="button">
+              <span class="pro-acct-av" id="pro-acct-av">C</span>
+              <span class="pro-acct-nm" id="pro-acct-nm">Your clinic</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="pro-acct-menu" id="pro-acct-menu">
+              <span class="pro-acct-role">Owner account · preview</span>
+              <a href="/pro/profile">Clinic profile</a>
+              <a href="/pro/team">Team &amp; access</a>
+              <a href="/pro/settings">Settings</a>
+              <button type="button" id="pro-signout">Sign out (preview)</button>
+            </div>
+          </div>
+        </header>
+        <main class="pro-main">
+          <slot />
+        </main>
+      </div>
+    </div>
+
+<style is:global>
+  :root{
+    --p-ink:#152523; --p-ink2:#2E4441; --p-mut:#5D7370; --p-faint:#93A6A3;
+    --p-bg:#F4F8F7; --p-card:#FFFFFF; --p-line:#E2ECEA; --p-line2:#CFDEDB;
+    --p-teal:#0E8C82; --p-teal-d:#0B6E66; --p-teal-50:#E6F4F2; --p-teal-100:#C9E7E3;
+    --p-violet:#6D28D9; --p-violet-50:#EDE9FE;
+    --p-amber:#A8650A; --p-amber-bg:#FBF2E2;
+    --p-green:#2F9E63; --p-green-bg:#EAF6EF;
+    --p-rose:#B14A66; --p-rose-bg:#F9EDF1;
+    --p-shadow:0 1px 3px rgba(21,37,35,.06);
+  }
+  html{background:var(--p-bg)}
+  body.pro-body{margin:0;font-family:'Inter Variable','Inter',system-ui,sans-serif;color:var(--p-ink);background:var(--p-bg)}
+  .pro-body *{box-sizing:border-box}
+
+  .pro-preview{position:sticky;top:0;z-index:60;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;background:linear-gradient(90deg,#0B6E66,#0E8C82 60%,#11A196);color:#fff;font-size:.76rem;font-weight:600;padding:8px 14px}
+  .pro-preview a{color:#fff;font-weight:800;text-decoration:none;background:rgba(255,255,255,.16);border-radius:9999px;padding:4px 12px}
+  .pro-preview a:hover{background:rgba(255,255,255,.28)}
+
+  .pro-shell{display:grid;grid-template-columns:236px 1fr;min-height:calc(100vh - 36px)}
+  @media (max-width:880px){.pro-shell{grid-template-columns:1fr}}
+
+  .pro-side{background:var(--p-card);border-right:1px solid var(--p-line);display:flex;flex-direction:column;padding:18px 14px;gap:16px;position:sticky;top:36px;height:calc(100vh - 36px)}
+  @media (max-width:880px){
+    .pro-side{position:fixed;left:0;top:0;bottom:0;height:auto;width:250px;z-index:70;transform:translateX(-105%);transition:transform .25s}
+    .pro-side.open{transform:none;box-shadow:0 0 60px rgba(21,37,35,.3)}
+  }
+  .pro-scrim{display:none}
+  @media (max-width:880px){
+    .pro-scrim.open{display:block;position:fixed;inset:0;background:rgba(21,37,35,.35);z-index:65}
+  }
+
+  .pro-brand{display:flex;align-items:center;gap:10px;text-decoration:none;padding:2px 6px}
+  .pro-logo-img{height:34px;width:auto;flex-shrink:0}
+  .pro-brand-tx b{display:block;font-size:.92rem;color:var(--p-ink);letter-spacing:-.01em}
+  .pro-brand-tx i{font-style:normal;font-size:.6rem;font-weight:800;letter-spacing:.22em;color:var(--p-teal)}
+
+  .pro-me{display:flex;align-items:center;gap:10px;background:var(--p-teal-50);border:1px solid var(--p-teal-100);border-radius:14px;padding:10px 12px}
+  .pro-me-av{width:32px;height:32px;border-radius:50%;background:var(--p-teal);color:#fff;display:grid;place-items:center;font-size:.82rem;font-weight:800;flex-shrink:0}
+  .pro-me-tx{min-width:0}
+  .pro-me-tx b{display:block;font-size:.8rem;color:var(--p-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pro-me-tx span{display:block;font-size:.66rem;color:var(--p-teal);font-weight:700}
+
+  .pro-nav{display:flex;flex-direction:column;gap:3px}
+  .pro-link{position:relative;display:flex;align-items:center;gap:11px;font-size:.85rem;font-weight:600;color:var(--p-mut);text-decoration:none;padding:10px 12px;border-radius:11px;transition:background .15s,color .15s}
+  .pro-link:hover{background:var(--p-bg);color:var(--p-ink)}
+  .pro-link.on{background:var(--p-teal);color:#fff}
+  .pro-link.on svg{color:#B9EFE9}
+  .pro-dot{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;background:var(--p-rose)}
+  .pro-dot[hidden]{display:none}
+
+  .pro-side-foot{margin-top:auto}
+  .pro-backsite{font-size:.74rem;font-weight:600;color:var(--p-faint);text-decoration:none;padding:6px}
+  .pro-backsite:hover{color:var(--p-teal)}
+
+  .pro-mainwrap{min-width:0;display:flex;flex-direction:column}
+  .pro-top{display:flex;align-items:center;gap:12px;padding:16px 26px 0}
+  .pro-burger{display:none;border:1px solid var(--p-line2);background:var(--p-card);border-radius:10px;padding:7px;cursor:pointer;color:var(--p-ink2)}
+  @media (max-width:880px){.pro-burger{display:grid;place-items:center}}
+  .pro-title{font-size:1.3rem;font-weight:800;letter-spacing:-.01em;color:var(--p-ink);margin:0}
+  .pro-acct{margin-left:auto;position:relative}
+  .pro-acct-btn{display:flex;align-items:center;gap:9px;background:var(--p-card);border:1px solid var(--p-line2);border-radius:9999px;padding:5px 12px 5px 5px;cursor:pointer;font-family:inherit;color:var(--p-ink2);transition:box-shadow .15s}
+  .pro-acct-btn:hover{box-shadow:var(--p-shadow)}
+  .pro-acct-av{width:28px;height:28px;border-radius:50%;background:var(--p-teal);color:#fff;display:grid;place-items:center;font-size:.74rem;font-weight:800}
+  .pro-acct-nm{font-size:.8rem;font-weight:700;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  @media (max-width:660px){.pro-acct-nm{display:none}}
+  .pro-acct-menu{display:none;position:absolute;right:0;top:calc(100% + 8px);background:var(--p-card);border:1px solid var(--p-line);border-radius:14px;box-shadow:0 14px 40px rgba(21,37,35,.16);min-width:210px;padding:8px;z-index:40}
+  .pro-acct-menu.open{display:block}
+  .pro-acct-role{display:block;font-size:.62rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--p-faint);padding:6px 10px 8px}
+  .pro-acct-menu a,.pro-acct-menu button{display:block;width:100%;text-align:left;background:none;border:none;font-family:inherit;font-size:.82rem;font-weight:600;color:var(--p-ink2);padding:9px 10px;border-radius:9px;cursor:pointer;text-decoration:none}
+  .pro-acct-menu a:hover,.pro-acct-menu button:hover{background:var(--p-bg);color:var(--p-ink)}
+  .pro-acct-menu button{color:var(--p-rose)}
+  .pro-main{padding:18px 26px 44px;max-width:1080px;width:100%}
+  @media (max-width:880px){.pro-main{padding:16px 14px 36px}}
+
+  /* ---- shared "Pro" components used by every page ---- */
+  .pc{background:var(--p-card);border:1px solid var(--p-line);border-radius:16px;padding:16px 18px;box-shadow:var(--p-shadow)}
+  .pc-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .pc-h b{font-size:.95rem;font-weight:800;color:var(--p-ink)}
+  .pc-h span{font-size:.72rem;color:var(--p-faint)}
+  .pgrid{display:grid;gap:12px}
+  .pkpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .pkpi{background:var(--p-card);border:1px solid var(--p-line);border-radius:14px;padding:13px 16px;box-shadow:var(--p-shadow)}
+  .pkpi b{display:block;font-size:1.4rem;font-weight:800;color:var(--p-ink);line-height:1.1}
+  .pkpi span{display:block;font-size:.66rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--p-faint);margin-top:4px}
+  .pkpi.teal b{color:var(--p-teal)}
+  .pkpi.amber b{color:var(--p-amber)}
+  .pkpi.rose b{color:var(--p-rose)}
+  .pbtn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:9999px;padding:9px 17px;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:none;background:var(--p-teal);color:#fff;font-family:inherit;transition:filter .15s}
+  .pbtn:hover{filter:brightness(1.08)}
+  .pbtn:disabled{opacity:.5;cursor:default}
+  .pbtn.ghost{background:var(--p-card);color:var(--p-ink2);border:1px solid var(--p-line2)}
+  .pbtn.sm{padding:6px 13px;font-size:.74rem}
+  .ppill{font-size:.64rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;border-radius:9999px;padding:3px 10px;white-space:nowrap}
+  .ppill.teal{background:var(--p-teal-50);color:var(--p-teal)}
+  .ppill.amber{background:var(--p-amber-bg);color:var(--p-amber)}
+  .ppill.green{background:var(--p-green-bg);color:var(--p-green)}
+  .ppill.rose{background:var(--p-rose-bg);color:var(--p-rose)}
+  .ppill.grey{background:var(--p-bg);color:var(--p-faint)}
+  .prow{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--p-line)}
+  .prow:first-of-type{border-top:none}
+  .prow .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:800;color:#fff;flex-shrink:0}
+  .prow .tx{flex:1;min-width:0}
+  .prow .tx b{display:block;font-size:.85rem;color:var(--p-ink)}
+  .prow .tx span{display:block;font-size:.72rem;color:var(--p-mut);margin-top:1px}
+  .pnote{font-size:.72rem;color:var(--p-faint);line-height:1.55;margin:10px 0 0}
+  .pfield{display:block;margin-bottom:13px}
+  .pfield > span{display:block;font-size:.72rem;font-weight:700;color:var(--p-ink2);margin-bottom:5px}
+  .pin{width:100%;padding:9px 13px;border:1px solid var(--p-line2);border-radius:11px;font-size:.85rem;font-family:inherit;color:var(--p-ink);background:var(--p-card);outline:none}
+  .pin:focus{border-color:#7BD5CC;box-shadow:0 0 0 3px rgba(14,140,130,.14)}
+  textarea.pin{resize:vertical}
+  .pswitch{display:inline-flex;align-items:center;gap:9px;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--p-ink2)}
+  .pswitch input{width:17px;height:17px;accent-color:var(--p-teal);cursor:pointer}
+  .pempty{text-align:center;padding:36px 16px;font-size:.82rem;color:var(--p-faint)}
+</style>
+
+<script is:inline>
+  (function () {
+    var side = document.getElementById("pro-side");
+    var scrim = document.getElementById("pro-scrim");
+    var burger = document.getElementById("pro-burger");
+    if (burger) burger.addEventListener("click", function () { side.classList.add("open"); scrim.classList.add("open"); });
+    if (scrim) scrim.addEventListener("click", function () { side.classList.remove("open"); scrim.classList.remove("open"); });
+
+    /* profile (saved on this device during preview) drives the identity chips */
+    var prof = null;
+    try { prof = JSON.parse(localStorage.getItem("ua_pro_profile") || "null"); } catch (e) {}
+    if (prof && prof.name) {
+      document.getElementById("pro-me-name").textContent = prof.name;
+      document.getElementById("pro-me-av").textContent = prof.name[0].toUpperCase();
+      if (prof.service) document.getElementById("pro-me-svc").textContent = prof.service;
+      document.getElementById("pro-acct-nm").textContent = prof.name;
+      document.getElementById("pro-acct-av").textContent = prof.name[0].toUpperCase();
+    }
+
+    /* account menu */
+    var acctBtn = document.getElementById("pro-acct-btn");
+    var acctMenu = document.getElementById("pro-acct-menu");
+    acctBtn.addEventListener("click", function (e) { e.stopPropagation(); acctMenu.classList.toggle("open"); });
+    document.addEventListener("click", function (e) { if (!e.target.closest("#pro-acct")) acctMenu.classList.remove("open"); });
+    document.getElementById("pro-signout").addEventListener("click", function () {
+      if (!confirm("Preview sign-out: this clears the demo data saved on this device (profile, schedule, team). Continue?")) return;
+      ["ua_pro_profile", "ua_pro_schedule", "ua_pro_team"].forEach(function (k) { localStorage.removeItem(k); });
+      location.href = "/pro";
+    });
+  })();
+</script>
+  </body>
+</html>

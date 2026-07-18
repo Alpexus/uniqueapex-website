@@ -1,0 +1,81 @@
+---
+/* PRO-DOCUMENTS-V1 — two-way document exchange:
+   RECEIVED  = what parents shared with this provider (child profiles,
+               past evaluations) — read access granted by the family.
+   SHARED    = reports the provider sends back to a family's vault.
+   Preview only; TODO-LIVE: Supabase storage + share-grants table. */
+import ProviderLayout from "@/layouts/ProviderLayout.astro";
+---
+<ProviderLayout title="Documents — UniqueApex Pro" active="documents">
+  <div class="pgrid">
+
+    <div class="pc">
+      <div class="pc-h"><b>Received from families</b><span>each family controls what you can see — access can be revoked anytime</span></div>
+      <div id="doc-in"></div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-h"><b>Share a report with a family</b><span>it lands straight in their secure vault — no email attachments</span></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+        <label class="pfield" style="flex:1;min-width:180px;margin:0">
+          <span>Family</span>
+          <select class="pin" id="sh-fam">
+            <option>Liam, 4</option><option>Noor, 6</option><option>Éloi, 5</option><option>Maya, 7</option>
+          </select>
+        </label>
+        <label class="pfield" style="flex:2;min-width:220px;margin:0">
+          <span>Document title</span>
+          <input class="pin" id="sh-title" type="text" placeholder="e.g. Progress report — spring block" />
+        </label>
+        <button class="pbtn" id="sh-btn" type="button">↑ Share (preview)</button>
+      </div>
+      <div class="pc-h" style="margin-top:18px"><b>Shared with families</b></div>
+      <div id="doc-out"></div>
+      <p class="pnote">Families get a notification and see exactly who shared what, when. Every share is logged.</p>
+    </div>
+
+  </div>
+</ProviderLayout>
+
+<script is:inline>
+  (function () {
+    var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    var inbox = [
+      { fam: "Liam, 4", title: "Psychoeducational evaluation (2025)", when: "Yesterday", isnew: true },
+      { fam: "Maya, 7", title: "Shared child profile — strengths & needs", when: "3 days ago", isnew: false },
+      { fam: "Éloi, 5", title: "School plan d'intervention (excerpt)", when: "Last week", isnew: false },
+      { fam: "Noor, 6", title: "Shared child profile — strengths & needs", when: "Mar 12", isnew: false },
+    ];
+    var outbox = [
+      { fam: "Éloi, 5", title: "Progress report — winter block", when: "Feb 28" },
+      { fam: "Noor, 6", title: "Home practice plan — /r/ sounds", when: "Mar 20" },
+    ];
+
+    function rowIn(d) {
+      return "<div class='prow'>" +
+        "<span style='font-size:1.15rem'>📄</span>" +
+        "<span class='tx'><b>" + esc(d.title) + "</b><span>from " + esc(d.fam) + " · " + esc(d.when) + "</span></span>" +
+        (d.isnew ? "<span class='ppill rose'>new</span>" : "") +
+        "<button class='pbtn sm ghost' type='button'>Open (preview)</button></div>";
+    }
+    function rowOut(d) {
+      return "<div class='prow'>" +
+        "<span style='font-size:1.15rem'>📤</span>" +
+        "<span class='tx'><b>" + esc(d.title) + "</b><span>to " + esc(d.fam) + " · " + esc(d.when) + "</span></span>" +
+        "<span class='ppill green'>delivered</span></div>";
+    }
+    function render() {
+      document.getElementById("doc-in").innerHTML = inbox.map(rowIn).join("");
+      document.getElementById("doc-out").innerHTML = outbox.length ? outbox.map(rowOut).join("") : "<p class='pempty'>Nothing shared yet.</p>";
+    }
+    render();
+
+    document.getElementById("sh-btn").addEventListener("click", function () {
+      var t = document.getElementById("sh-title").value.trim();
+      if (!t) { document.getElementById("sh-title").focus(); return; }
+      outbox.unshift({ fam: document.getElementById("sh-fam").value, title: t, when: "Just now" });
+      document.getElementById("sh-title").value = "";
+      render();
+    });
+  })();
+</script>

@@ -1,0 +1,66 @@
+---
+/* SIGN-IN CHOOSER — one front door, two portals.
+   The navbar's "Sign in" points here; visitors pick their side:
+   parents → /login (violet) · providers → /pro/login (teal). */
+import Layout from "@/layouts/Layout.astro";
+---
+<Layout title="Sign in — UniqueApex">
+  <div class="si-wrap">
+    <div class="si-head">
+      <h1>Welcome back</h1>
+      <p>Choose how you use UniqueApex. <span class="si-fr">Choisissez votre portail.</span></p>
+    </div>
+
+    <div class="si-grid">
+      <a class="si-card parent" href="/login">
+        <span class="si-ic">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><path d="M3 19c0-3.5 2.7-5.5 6-5.5s6 2 6 5.5"/><circle cx="16.5" cy="10.5" r="2"/><path d="M16 14.6c2.4.3 4 1.8 4 4.4"/></svg>
+        </span>
+        <b>I'm a parent</b>
+        <p>Your child's passport, matching, documents and journey.</p>
+        <span class="si-fr">Je suis un parent</span>
+        <span class="si-go">Sign in →</span>
+      </a>
+
+      <a class="si-card pro" href="/pro/login">
+        <span class="si-ic">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l7-5 7 5v13"/><path d="M3 21h18M13 21v-4a3 3 0 0 0-6 0v4"/></svg>
+        </span>
+        <b>I'm a service provider</b>
+        <p>Your clinic's schedule, clients, documents and profile.</p>
+        <span class="si-fr">Je suis un professionnel</span>
+        <span class="si-go">Sign in →</span>
+      </a>
+    </div>
+
+    <p class="si-foot">
+      New here? Parents can <a href="/signup">create an account</a> · clinics can <a href="/pro/onboarding">request onboarding</a>.
+    </p>
+  </div>
+</Layout>
+
+<style is:global>
+  .si-wrap{max-width:820px;margin:0 auto;padding:70px 24px 90px}
+  .si-head{text-align:center;margin-bottom:34px}
+  .si-head h1{font-size:2.1rem;font-weight:800;color:#1E293B;letter-spacing:-.02em;margin:0 0 8px}
+  .si-head p{font-size:.95rem;color:#64748B;margin:0}
+  .si-fr{color:#94A3B8;font-size:.85em}
+  .si-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.si-grid{grid-template-columns:1fr}}
+  .si-card{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:6px;border:2px solid #E2E8F0;border-radius:22px;padding:28px 26px 24px;text-decoration:none;background:#fff;transition:transform .18s,box-shadow .18s,border-color .18s}
+  .si-card:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(30,41,59,.12)}
+  .si-card.parent:hover{border-color:#A78BFA}
+  .si-card.pro:hover{border-color:#5EEAD4}
+  .si-ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;margin-bottom:8px}
+  .si-card.parent .si-ic{background:#EDE9FE;color:#6D28D9}
+  .si-card.pro .si-ic{background:#E6F4F2;color:#0E8C82}
+  .si-card b{font-size:1.12rem;font-weight:800;color:#1E293B}
+  .si-card p{font-size:.85rem;color:#64748B;line-height:1.55;margin:0}
+  .si-card .si-fr{margin-top:2px}
+  .si-go{margin-top:14px;font-size:.86rem;font-weight:800}
+  .si-card.parent .si-go{color:#6D28D9}
+  .si-card.pro .si-go{color:#0E8C82}
+  .si-foot{text-align:center;font-size:.82rem;color:#94A3B8;margin-top:30px}
+  .si-foot a{color:#6D28D9;font-weight:700;text-decoration:none}
+  .si-foot a:hover{text-decoration:underline}
+</style>
