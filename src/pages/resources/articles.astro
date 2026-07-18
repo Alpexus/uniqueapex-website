@@ -1,108 +1,16 @@
 ---
-/* RESOURCES-ARTICLES-V1 — designed article library with topic filters.
-   ══════════════════════════════════════════════════════════════════
-   EDIT HERE (Pelin): the ARTICLES list below is the whole content.
-   Each item: title, summary, topic (must match a TOPIC), minutes,
-   href ("" = shows a "Coming soon" badge instead of linking).
-   ══════════════════════════════════════════════════════════════════ */
-import AppFormLayout from "@/layouts/AppFormLayout.astro";
-import SectionTabs from "@/components/SectionTabs.astro";
-
-const TOPICS = ["All", "Diagnosis", "School", "Funding", "Daily life", "Sensory", "Communication"];
-const ARTICLES = [
-  { title: "You just got the diagnosis. Now what?", summary: "The first 30 days: what matters, what can wait, and why you don't have to figure it all out this week.", topic: "Diagnosis", minutes: 6, href: "" },
-  { title: "How to actually read an evaluation report", summary: "Percentiles, standard scores and clinical language — decoded into plain parent language.", topic: "Diagnosis", minutes: 8, href: "" },
-  { title: "The plan d'intervention, explained", summary: "What Québec schools must offer, how the meeting works, and the questions that get results.", topic: "School", minutes: 7, href: "" },
-  { title: "Every funding source for Québec families, in one list", summary: "Federal credits, provincial allowances and foundation grants — who qualifies and how to apply.", topic: "Funding", minutes: 10, href: "" },
-  { title: "Mornings without meltdowns", summary: "Visual schedules, choice points and transition warnings — small routine changes that add up.", topic: "Daily life", minutes: 5, href: "" },
-  { title: "Making sense of sensory-seeking and sensory-avoiding", summary: "Why the same child can crave spinning and hate loud rooms — and what helps with each.", topic: "Sensory", minutes: 6, href: "" },
-  { title: "AAC myths that hold families back", summary: "Devices and picture cards don't stop speech from developing — the research says the opposite.", topic: "Communication", minutes: 5, href: "" },
-  { title: "Waiting lists: making the wait time count", summary: "What you can start at home while you wait for services — and how to stay on top of every list.", topic: "Daily life", minutes: 6, href: "" },
-];
+/* Merged into /resources/learn — this stub keeps old links working. */
 ---
-<AppFormLayout title="Resources" activeNav="resources">
-  <SectionTabs section="resources" active="articles" />
-
-  <div class="c3-ribbon rib-amber cu-rev" style="max-width:920px">
-    <span class="c3-spark" style="top:12px;right:120px">✦</span>
-    <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
-    <span class="c3-rib-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2.5h8L19 7.5v14H6z"/><path d="M14 2.5v5h5M9.5 12h5M9.5 15.5h5"/></svg></span>
-    <div class="c3-rib-id">
-      <h1>Articles</h1>
-      <p>Short, practical reads written for parents — no jargon, no overwhelm. New pieces monthly.</p>
-    </div>
-    <div class="c3-rib-stats">
-      <span class="c3-rstat"><b>{ARTICLES.length}</b><span>reads</span></span>
-      <span class="c3-rstat"><b>{TOPICS.length - 1}</b><span>topics</span></span>
-    </div>
-  </div>
-
-  <div class="ra-filters cu-rev" id="ra-filters">
-    {TOPICS.map((t) => <button class={t === "All" ? "ra-f on" : "ra-f"} data-t={t}>{t}</button>)}
-  </div>
-
-  <div class="ra-grid" id="ra-grid">
-    {ARTICLES.map((a, i) => (
-      <article class="ra-card cu-rev cu-lift" data-topic={a.topic} style={`--d:${(0.06 + i * 0.05).toFixed(2)}s`}>
-        <div class="ra-top">
-          <span class="ra-topic">{a.topic}</span>
-          {a.href
-            ? <span class="ra-min">{a.minutes} min read</span>
-            : <span class="ra-soon">Coming soon</span>}
-        </div>
-        <h3>{a.title}</h3>
-        <p>{a.summary}</p>
-        {a.href && <a class="ra-link" href={a.href}>Read article <span class="arr">→</span></a>}
-      </article>
-    ))}
-  </div>
-
-  <div class="ra-cta cu-rev" style="--d:.4s">
-    <p><b>What should we write about next?</b> The topics come straight from families' questions.</p>
-    <a href="mailto:contact@uniqueapex.com?subject=Article%20topic%20suggestion">Suggest a topic</a>
-  </div>
-</AppFormLayout>
-
-<style is:global>
-  .ra-filters{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 16px;max-width:920px}
-  .ra-f{font-size:.78rem;font-weight:600;padding:5px 13px;border-radius:9999px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;transition:border-color .15s,transform .15s;font-family:inherit}
-  .ra-f:hover{border-color:var(--line-2);transform:translateY(-1px)}
-  .ra-f.on{background:var(--violet-700);color:#fff;border-color:var(--violet-700)}
-  .ra-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;max-width:920px}
-  .ra-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column}
-  .ra-card.hide{display:none}
-  .ra-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
-  .ra-topic{font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:9999px;background:var(--violet-50);color:var(--violet-700)}
-  .ra-min{font-size:.72rem;color:var(--faint)}
-  .ra-soon{font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:9999px;background:var(--amber-bg);color:var(--amber)}
-  .ra-card h3{font-family:var(--display);font-size:.98rem;font-weight:700;color:var(--ink);margin:0 0 6px;line-height:1.35}
-  .ra-card p{font-size:.83rem;color:var(--muted);line-height:1.55;margin:0;flex:1}
-  .ra-link{margin-top:10px;font-size:.8rem;font-weight:600;color:var(--violet-700);text-decoration:none}
-  .ra-link .arr{display:inline-block;transition:transform .18s}
-  .ra-link:hover .arr{transform:translateX(3px)}
-  .ra-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;max-width:920px;background:linear-gradient(135deg,var(--violet-50),#F9F7FE 60%,var(--violet-50));border:1px solid var(--violet-100);border-radius:18px;padding:16px 20px;margin-top:14px}
-  .ra-cta p{font-size:.88rem;color:#5b21b6;margin:0}
-  .ra-cta p b{color:var(--violet-700)}
-  .ra-cta a{background:var(--violet-700);color:#fff;font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;text-decoration:none;white-space:nowrap;transition:filter .15s}
-  .ra-cta a:hover{filter:brightness(1.1)}
-</style>
-
-<script is:inline>
-  (function () {
-    var raw = localStorage.getItem("ua_session"), s = null;
-    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
-    if (!s || !s.access_token) { location.href = "/login"; return; }
-
-    var btns = document.querySelectorAll(".ra-f");
-    btns.forEach(function (b) {
-      b.addEventListener("click", function () {
-        btns.forEach(function (x) { x.classList.remove("on"); });
-        b.classList.add("on");
-        var t = b.dataset.t;
-        document.querySelectorAll(".ra-card").forEach(function (c) {
-          c.classList.toggle("hide", t !== "All" && c.dataset.topic !== t);
-        });
-      });
-    });
-  })();
-</script>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content="0;url=/resources/learn" />
+    <link rel="canonical" href="/resources/learn" />
+    <title>Moved to the Library</title>
+    <script is:inline>location.replace("/resources/learn");</script>
+  </head>
+  <body>
+    <p>Articles now live in the Library — <a href="/resources/learn">continue</a>.</p>
+  </body>
+</html>

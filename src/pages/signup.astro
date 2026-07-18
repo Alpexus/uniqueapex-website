@@ -152,8 +152,19 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
       </div>
 
       <p class="text-xs text-slate-400 text-center leading-relaxed">
-        Your information is stored securely and only accessible by you. We never share personal data with third parties.
+        Your information is stored securely and shared only as described in our Privacy Policy — never sold, never used for advertising.
       </p>
+
+      <!-- Terms consent -->
+      <div>
+        <label class="flex items-start gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer">
+          <input type="checkbox" id="agree-terms" class="accent-violet-700 w-4 h-4 mt-0.5 flex-shrink-0" />
+          <span class="text-sm text-slate-600 leading-relaxed">
+            I agree to the <a href="/terms" target="_blank" rel="noopener" class="text-violet-700 font-semibold hover:underline">Terms of Service</a> and the <a href="/privacy" target="_blank" rel="noopener" class="text-violet-700 font-semibold hover:underline">Privacy Policy</a>, and I confirm I am this child's parent or legal guardian.
+          </span>
+        </label>
+        <p id="err-agree" style="display:none;color:#ef4444;font-size:12px;margin-top:6px;text-align:center">Please accept the terms to create your account.</p>
+      </div>
 
       <!-- General warning banner (shown when fields are missing) -->
       <div id="err-general" style="display:none" class="bg-red-50 border border-red-200 text-red-600 text-sm font-medium rounded-xl px-4 py-3 text-center"></div>
@@ -222,7 +233,7 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
   var REQUIRED_FIELDS=["parentFirst","parentLast","email","password","confirm","childFirst","city"];
 
   function clearErrors(){
-    ["err-parentFirst","err-parentLast","err-email","err-password","err-confirm","err-childFirst","err-city","err-general"].forEach(hideErr);
+    ["err-parentFirst","err-parentLast","err-email","err-password","err-confirm","err-childFirst","err-city","err-agree","err-general"].forEach(hideErr);
     // reset red borders
     REQUIRED_FIELDS.forEach(function(n){
       var el=document.querySelector('[name="'+n+'"]');
@@ -254,6 +265,12 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
     if(!childFirst){showErr("err-childFirst","Required.");markInvalid("childFirst");if(!firstBad)firstBad="childFirst";ok=false;}
     if(!city){showErr("err-city","Required for matching.");markInvalid("city");if(!firstBad)firstBad="city";ok=false;}
 
+    var agreeBad=false;
+    if(!document.getElementById("agree-terms").checked){
+      showErr("err-agree","Please accept the terms to create your account.");
+      agreeBad=true; ok=false;
+    }
+
     if(!ok){
       showErr("err-general","Please fill in the required fields highlighted in red.");
       if(firstBad){
@@ -262,6 +279,8 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
           f.scrollIntoView({behavior:"smooth",block:"center"});
           try{ f.focus({preventScroll:true}); }catch(e){ f.focus(); }
         }
+      } else if(agreeBad){
+        document.getElementById("agree-terms").scrollIntoView({behavior:"smooth",block:"center"});
       }
       return;
     }

@@ -87,6 +87,11 @@ const { title = "UniqueApex", activeNav = "dashboard" } = Astro.props;
       var session = null;
       try { session = raw ? JSON.parse(raw) : null; } catch (e) {}
       if (!session || !session.access_token) {
+        // /admin has its own password gate — keep it reachable without a
+        // family login (the desk is for the coordinator, not families).
+        // Early return also skips the account/child-switcher code below,
+        // which needs a session.
+        if (location.pathname.replace(/\/+$/, "") === "/admin") return;
         location.href = "/login";
         return;
       }

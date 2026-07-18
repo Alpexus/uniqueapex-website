@@ -1,284 +1,720 @@
 ---
+/* ADMIN-V3 — "Coordinator Console": a real admin shell, separate from
+   the family app (that sidebar didn't belong here).
+   · Own dark left rail: Waitlist / Providers / Quick links + Lock
+   · Waitlist: KPI cards, filters, expandable rows, CSV export,
+     instant status saves (same RLS mechanics as before)
+   · Providers: reads the directory with YOUR app session (RLS =
+     signed-in only) — flags clinics missing an email
+   · Quick links: Supabase, Resend, Vercel, webmail, function logs
+   Self-contained styles + is:inline JS (lessons learned: no Tailwind
+   CDN, no `all:initial`). Password gate unchanged. */
 import Layout from "@/layouts/AdminLayout.astro";
 ---
+<Layout title="UniqueApex — Coordinator Console">
 
-<Layout title="UniqueApex Admin">
-
-  <!-- Password Gate -->
-  <div id="password-gate" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl p-10 w-full max-w-sm shadow-2xl text-center">
-      <div class="w-14 h-14 bg-violet-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-        <svg class="w-7 h-7 text-violet-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-        </svg>
+  <!-- ============ GATE ============ -->
+  <div id="gate" class="adx-gate">
+    <div class="adx-gate-card">
+      <div class="adx-gate-ic">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10.5" width="16" height="9.5" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/><path d="M12 14.5v2"/></svg>
       </div>
-      <h2 class="text-xl font-bold text-slate-800 mb-1">Admin Access</h2>
-      <p class="text-slate-500 text-sm mb-6">UniqueApex coordinator portal</p>
-      <input
-        type="password"
-        id="admin-password"
-        placeholder="Enter password"
-        class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 mb-3 text-center text-slate-700"
-      />
-      <div id="password-error" class="text-red-500 text-sm mb-3 hidden">Incorrect password</div>
-      <button
-        id="unlock-btn"
-        class="w-full bg-violet-700 hover:bg-violet-800 text-white font-semibold py-3 px-6 rounded-xl transition-colors">
-        Enter Dashboard
-      </button>
+      <h2>Coordinator Console</h2>
+      <p>UniqueApex team only.</p>
+      <input type="password" id="gate-pass" placeholder="Password" autocomplete="current-password" />
+      <p id="gate-err" hidden>That's not it — try again.</p>
+      <button id="gate-btn" type="button">Open the console</button>
     </div>
   </div>
 
-  <!-- Admin Dashboard -->
-  <div id="admin-dashboard" class="hidden min-h-screen bg-slate-50">
+  <!-- ============ CONSOLE ============ -->
+  <div id="console" class="adx" hidden>
 
-    <!-- Header -->
-    <div class="bg-white border-b border-slate-200 sticky top-0 z-10">
-      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-violet-700 rounded-lg flex items-center justify-center">
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-            </svg>
-          </div>
-          <div>
-            <h1 class="text-base font-bold text-slate-800">UniqueApex Admin</h1>
-            <p class="text-xs text-slate-500">Waitlist Dashboard</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-3">
-          <div id="stats-bar" class="flex gap-4 text-sm"></div>
-          <button id="refresh-btn" class="text-slate-400 hover:text-violet-700 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
-          </button>
-        </div>
+    <!-- rail -->
+    <aside class="adx-rail">
+      <div class="adx-brand">
+        <span class="adx-logo">✦</span>
+        <span class="adx-brand-tx"><b>UniqueApex</b><span>Coordinator</span></span>
       </div>
-    </div>
-
-    <!-- Filters -->
-    <div class="max-w-7xl mx-auto px-6 py-5">
-      <div class="flex flex-wrap gap-3 items-center">
-        <select id="filter-status" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 outline-none focus:ring-2 focus:ring-violet-300">
-          <option value="">All Statuses</option>
-          <option value="New">New</option>
-          <option value="Contacted">Contacted</option>
-          <option value="Matched">Matched</option>
-          <option value="Waitlisted">Waitlisted</option>
-          <option value="Closed">Closed</option>
-        </select>
-        <select id="filter-service" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 outline-none focus:ring-2 focus:ring-violet-300">
-          <option value="">All Services</option>
-          <option value="Speech-Language Therapy">Speech-Language Therapy</option>
-          <option value="Occupational Therapy">Occupational Therapy</option>
-          <option value="Behavioural Therapy">Behavioural Therapy</option>
-        </select>
-        <select id="filter-language" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 outline-none focus:ring-2 focus:ring-violet-300">
-          <option value="">All Languages</option>
-          <option value="English">English</option>
-          <option value="French">French</option>
-          <option value="Both">Both</option>
-        </select>
-        <input
-          type="text"
-          id="filter-search"
-          placeholder="Search by name or email..."
-          class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 outline-none focus:ring-2 focus:ring-violet-300 w-64"
-        />
-        <button id="clear-filters" class="px-4 py-2 text-sm text-slate-500 hover:text-violet-700 transition-colors">
-          Clear filters
+      <nav class="adx-nav">
+        <button class="adx-nav-btn on" data-panel="overview" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+          Overview
+        </button>
+        <button class="adx-nav-btn" data-panel="waitlist" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3.3 2.7-5 6-5s6 1.7 6 5"/><circle cx="17" cy="8.5" r="2.2"/><path d="M16.5 14c2.6.2 4.5 1.7 4.5 5"/></svg>
+          Waitlist
+        </button>
+        <button class="adx-nav-btn" data-panel="providers" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V8l7-5 7 5v13"/><path d="M3 21h18M13 21v-4a3 3 0 0 0-6 0v4"/></svg>
+          Providers
+        </button>
+        <button class="adx-nav-btn" data-panel="links" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          Quick links
+        </button>
+      </nav>
+      <div class="adx-rail-foot">
+        <button class="adx-lock" id="btn-lock" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10.5" width="16" height="9.5" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+          Lock console
         </button>
       </div>
-    </div>
+    </aside>
 
-    <!-- Table -->
-    <div class="max-w-7xl mx-auto px-6 pb-12">
-      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-        <div id="loading" class="text-center py-16 text-slate-400">
-          Loading families...
+    <!-- main -->
+    <main class="adx-main">
+
+      <!-- ====== OVERVIEW ====== -->
+      <section class="adx-panel" id="panel-overview">
+        <header class="adx-head">
+          <div>
+            <h1>Overview</h1>
+            <p>The numbers behind the waitlist — live from the database.</p>
+          </div>
+          <div class="adx-head-actions">
+            <button class="adx-btn ghost" id="btn-refresh2" type="button">↻ Refresh</button>
+          </div>
+        </header>
+        <div class="adx-kpis" id="ov-kpis"></div>
+        <div class="adx-anagrid">
+          <div class="adx-ana"><h3>Signups · last 8 weeks</h3><div class="adx-cols" id="ov-weeks"></div></div>
+          <div class="adx-ana"><h3>Status funnel</h3><div id="ov-funnel"></div></div>
+          <div class="adx-ana"><h3>Service demand vs supply</h3><div id="ov-svc"></div><p class="adx-ana-note" id="ov-svc-note">Demand = families asking · supply = contactable clinics.</p></div>
+          <div class="adx-ana"><h3>Languages</h3><div id="ov-lang"></div></div>
+          <div class="adx-ana"><h3>Child ages</h3><div class="adx-cols" id="ov-ages"></div></div>
+          <div class="adx-ana"><h3>Top locations</h3><div id="ov-loc"></div></div>
         </div>
-        <div id="empty-state" class="text-center py-16 text-slate-400 hidden">
-          No families match your filters.
+      </section>
+
+      <!-- ====== WAITLIST ====== -->
+      <section class="adx-panel" id="panel-waitlist" hidden>
+        <header class="adx-head">
+          <div>
+            <h1>Waitlist</h1>
+            <p>Every family who signed up — statuses save the moment you change them.</p>
+          </div>
+          <div class="adx-head-actions">
+            <button class="adx-btn ghost" id="btn-csv" type="button">↓ Export CSV</button>
+            <button class="adx-btn ghost" id="btn-refresh" type="button">↻ Refresh</button>
+          </div>
+        </header>
+
+        <div class="adx-kpis" id="kpis"></div>
+
+        <div class="adx-toolbar">
+          <select id="f-status" class="adx-sel">
+            <option value="">All statuses</option>
+            <option>New</option><option>Contacted</option><option>Matched</option><option>Waitlisted</option><option>Closed</option>
+          </select>
+          <select id="f-service" class="adx-sel">
+            <option value="">All services</option>
+            <option>Speech-Language Therapy</option>
+            <option>Occupational Therapy</option>
+            <option>Behavioural Therapy</option>
+          </select>
+          <select id="f-lang" class="adx-sel">
+            <option value="">All languages</option>
+            <option>English</option><option>French</option><option>Both</option>
+          </select>
+          <input id="f-q" class="adx-input" type="text" placeholder="Search name or email…" autocomplete="off" />
+          <button class="adx-clear" id="f-clear" type="button">Clear</button>
         </div>
-        <div id="table-container" class="hidden overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead class="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Family</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Contact</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Child</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Services</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Location</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Signed Up</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
-              </tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-          </table>
+
+        <div class="adx-card">
+          <div id="wl-loading" class="adx-blank">Loading families…</div>
+          <div id="wl-empty" class="adx-blank" hidden>No families match those filters.</div>
+          <div id="wl-wrap" class="adx-scroll" hidden>
+            <table class="adx-table">
+              <thead><tr>
+                <th>Family</th><th>Contact</th><th>Child</th><th>Services</th><th>Location</th><th>Signed up</th><th>Status</th>
+              </tr></thead>
+              <tbody id="wl-body"></tbody>
+            </table>
+          </div>
         </div>
-      </div>
-      <p class="text-center text-slate-400 text-xs mt-4" id="record-count"></p>
-    </div>
+        <p class="adx-count" id="wl-count"></p>
+      </section>
+
+      <!-- ====== PROVIDERS ====== -->
+      <section class="adx-panel" id="panel-providers" hidden>
+        <header class="adx-head">
+          <div>
+            <h1>Provider directory</h1>
+            <p>Read-only view of the matching pool — edit rows in the Supabase Table Editor.</p>
+          </div>
+          <div class="adx-head-actions">
+            <a class="adx-btn ghost" href="https://supabase.com/dashboard/project/eghqufgiudxjkbsddtnx/editor" target="_blank" rel="noopener">Open Table Editor ↗</a>
+          </div>
+        </header>
+
+        <div class="adx-kpis" id="pv-kpis"></div>
+
+        <div class="adx-toolbar">
+          <div class="adx-chips" id="pv-svc-chips">
+            <button class="on" data-svc="" type="button">All services</button>
+            <button data-svc="slp" type="button">Speech</button>
+            <button data-svc="ot" type="button">OT</button>
+            <button data-svc="aba" type="button">Behaviour</button>
+            <button data-svc="psych" type="button">Psych</button>
+            <button data-svc="social" type="button">Social</button>
+          </div>
+          <label class="adx-toggle"><input type="checkbox" id="pv-missing" /> Missing email only</label>
+          <input id="pv-q" class="adx-input" type="text" placeholder="Search clinic or borough…" autocomplete="off" />
+        </div>
+
+        <div class="adx-card">
+          <div id="pv-note" class="adx-blank">Checking your session…</div>
+          <div id="pv-wrap" class="adx-scroll" hidden>
+            <table class="adx-table">
+              <thead><tr>
+                <th>Clinic</th><th>Service</th><th>Borough</th><th>Phone</th><th>Email</th>
+              </tr></thead>
+              <tbody id="pv-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <p class="adx-count" id="pv-count"></p>
+      </section>
+
+      <!-- ====== LINKS ====== -->
+      <section class="adx-panel" id="panel-links" hidden>
+        <header class="adx-head">
+          <div>
+            <h1>Quick links</h1>
+            <p>Everything that runs UniqueApex, one click away.</p>
+          </div>
+        </header>
+        <div class="adx-links">
+          <a class="adx-link" href="https://supabase.com/dashboard/project/eghqufgiudxjkbsddtnx" target="_blank" rel="noopener"><b>Supabase</b><span>Database, auth, edge functions</span></a>
+          <a class="adx-link" href="https://supabase.com/dashboard/project/eghqufgiudxjkbsddtnx/functions/send-outreach/logs" target="_blank" rel="noopener"><b>Outreach logs</b><span>Did the batch send? Check here</span></a>
+          <a class="adx-link" href="https://resend.com/emails" target="_blank" rel="noopener"><b>Resend</b><span>Every email we sent, delivery status</span></a>
+          <a class="adx-link" href="https://vercel.com" target="_blank" rel="noopener"><b>Vercel</b><span>Deployments — is the site green?</span></a>
+          <a class="adx-link" href="https://uniqu953.mywhc.ca:2096" target="_blank" rel="noopener"><b>Webmail</b><span>contact@ and admin@ inboxes</span></a>
+          <a class="adx-link" href="/waitlist" target="_blank" rel="noopener"><b>Live waitlist form</b><span>What families see when they sign up</span></a>
+        </div>
+      </section>
+
+    </main>
   </div>
 
+<style is:inline>
+  :root{
+    --adx-ink:#221B36; --adx-ink2:#3D3654; --adx-mut:#6A6478; --adx-faint:#9B95AC;
+    --adx-bg:#F5F4F9; --adx-card:#FFFFFF; --adx-line:#E9E6F2; --adx-line2:#D9D4E8;
+    --adx-violet:#6D28D9; --adx-v50:#EDE9FE; --adx-v100:#DDD6FE;
+    --adx-teal:#0E8C82; --adx-tealbg:#E6F4F2;
+    --adx-green:#2F9E63; --adx-greenbg:#EAF6EF;
+    --adx-amber:#A8650A; --adx-amberbg:#FBF2E2;
+    --adx-rose:#B14A66; --adx-rosebg:#F9EDF1;
+    --adx-blue:#2563EB; --adx-bluebg:#EAF0FE;
+  }
+  html,body{margin:0;padding:0;background:var(--adx-bg)}
+  .adx *, .adx-gate *{box-sizing:border-box;font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif}
+
+  /* gate */
+  .adx-gate{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:linear-gradient(150deg,#221B36,#3A2B63);padding:20px}
+  .adx-gate-card{background:#fff;border-radius:22px;padding:36px 32px;width:100%;max-width:370px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+  .adx-gate-ic{width:54px;height:54px;border-radius:18px;background:var(--adx-v50);color:var(--adx-violet);display:grid;place-items:center;margin:0 auto 14px}
+  .adx-gate-card h2{font-size:1.2rem;font-weight:800;color:var(--adx-ink);margin:0 0 4px}
+  .adx-gate-card p{font-size:.8rem;color:var(--adx-mut);margin:0 0 18px}
+  .adx-gate-card input{width:100%;padding:12px 14px;border:1px solid var(--adx-line2);border-radius:12px;font-size:.92rem;text-align:center;color:var(--adx-ink);outline:none;margin-bottom:10px}
+  .adx-gate-card input:focus{border-color:#C4B5FD;box-shadow:0 0 0 3px rgba(109,40,217,.15)}
+  #gate-err{color:var(--adx-rose);font-size:.78rem;font-weight:600;margin:0 0 10px}
+  #gate-err[hidden]{display:none}
+  #gate-btn{width:100%;background:var(--adx-violet);color:#fff;border:none;border-radius:12px;padding:12px;font-size:.92rem;font-weight:700;cursor:pointer;transition:filter .15s}
+  #gate-btn:hover{filter:brightness(1.1)}
+
+  /* shell */
+  .adx{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+  .adx[hidden]{display:none}
+  @media (max-width:840px){.adx{grid-template-columns:1fr}.adx-rail{position:sticky;top:0;z-index:20;flex-direction:row;align-items:center;padding:10px 14px}.adx-nav{flex-direction:row;flex:1;overflow-x:auto}.adx-rail-foot{margin:0}.adx-brand-tx{display:none}}
+  .adx-rail{background:var(--adx-ink);color:#fff;display:flex;flex-direction:column;padding:20px 14px;gap:18px}
+  .adx-brand{display:flex;align-items:center;gap:10px;padding:0 6px}
+  .adx-logo{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#A78BFA,#6D28D9);display:grid;place-items:center;font-size:1rem;flex-shrink:0}
+  .adx-brand-tx b{display:block;font-size:.9rem;letter-spacing:.01em}
+  .adx-brand-tx span{display:block;font-size:.66rem;color:#B9B0D6;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  .adx-nav{display:flex;flex-direction:column;gap:4px}
+  .adx-nav-btn{display:flex;align-items:center;gap:10px;background:none;border:none;color:#CFC8E6;font-size:.84rem;font-weight:600;padding:10px 12px;border-radius:11px;cursor:pointer;text-align:left;white-space:nowrap;transition:background .15s,color .15s}
+  .adx-nav-btn:hover{background:rgba(255,255,255,.07);color:#fff}
+  .adx-nav-btn.on{background:rgba(167,139,250,.18);color:#fff}
+  .adx-nav-btn.on svg{color:#C4B5FD}
+  .adx-rail-foot{margin-top:auto}
+  .adx-lock{display:flex;align-items:center;gap:8px;width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#CFC8E6;font-size:.76rem;font-weight:600;padding:9px 12px;border-radius:10px;cursor:pointer;transition:background .15s}
+  .adx-lock:hover{background:rgba(255,255,255,.12);color:#fff}
+
+  /* main */
+  .adx-main{padding:26px 30px 40px;min-width:0}
+  @media (max-width:840px){.adx-main{padding:18px 14px 30px}}
+  .adx-panel[hidden]{display:none}
+  .adx-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+  .adx-head h1{font-size:1.35rem;font-weight:800;color:var(--adx-ink);margin:0 0 3px;letter-spacing:-.01em}
+  .adx-head p{font-size:.82rem;color:var(--adx-mut);margin:0}
+  .adx-head-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .adx-btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:10px;padding:9px 15px;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:none;background:var(--adx-violet);color:#fff;transition:filter .15s}
+  .adx-btn:hover{filter:brightness(1.08)}
+  .adx-btn.ghost{background:var(--adx-card);color:var(--adx-ink2);border:1px solid var(--adx-line2)}
+
+  /* KPIs */
+  .adx-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+  .adx-kpi{background:var(--adx-card);border:1px solid var(--adx-line);border-radius:14px;padding:14px 16px;box-shadow:0 1px 2px rgba(34,27,54,.04)}
+  .adx-kpi b{display:block;font-size:1.45rem;font-weight:800;color:var(--adx-ink);line-height:1.1}
+  .adx-kpi span{display:block;font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--adx-faint);margin-top:4px}
+  .adx-kpi.hl b{color:var(--adx-violet)}
+  .adx-kpi.teal b{color:var(--adx-teal)}
+  .adx-kpi.amber b{color:var(--adx-amber)}
+
+  /* toolbar */
+  .adx-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .adx-sel,.adx-input{padding:9px 12px;border:1px solid var(--adx-line2);border-radius:10px;font-size:.8rem;color:var(--adx-ink);background:var(--adx-card);outline:none}
+  .adx-sel{cursor:pointer}
+  .adx-sel:focus,.adx-input:focus{border-color:#C4B5FD;box-shadow:0 0 0 3px rgba(109,40,217,.12)}
+  .adx-input{flex:1;min-width:170px;max-width:290px}
+  .adx-clear{border:none;background:none;font-size:.76rem;font-weight:700;color:var(--adx-mut);cursor:pointer;padding:9px 8px}
+  .adx-clear:hover{color:var(--adx-violet)}
+  .adx-chips{display:flex;gap:5px;flex-wrap:wrap}
+  .adx-chips button{border:1px solid var(--adx-line2);background:var(--adx-card);font-size:.76rem;font-weight:600;color:var(--adx-mut);padding:7px 13px;border-radius:9999px;cursor:pointer;transition:all .15s}
+  .adx-chips button.on{background:var(--adx-ink);border-color:var(--adx-ink);color:#fff}
+  .adx-toggle{display:inline-flex;align-items:center;gap:7px;font-size:.78rem;font-weight:600;color:var(--adx-ink2);cursor:pointer;white-space:nowrap}
+  .adx-toggle input{width:15px;height:15px;accent-color:var(--adx-violet);cursor:pointer}
+
+  /* table */
+  .adx-card{background:var(--adx-card);border:1px solid var(--adx-line);border-radius:16px;box-shadow:0 1px 3px rgba(34,27,54,.05);overflow:hidden}
+  .adx-blank{text-align:center;padding:54px 20px;font-size:.84rem;color:var(--adx-faint)}
+  .adx-blank[hidden],.adx-scroll[hidden]{display:none}
+  .adx-blank a{color:var(--adx-violet);font-weight:700;text-decoration:none}
+  .adx-scroll{overflow-x:auto}
+  .adx-table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:780px}
+  .adx-table thead th{position:sticky;top:0;text-align:left;font-size:.63rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--adx-faint);background:#FAF9FD;border-bottom:1px solid var(--adx-line);padding:11px 16px;white-space:nowrap}
+  .adx-table td{padding:12px 16px;border-bottom:1px solid var(--adx-line);vertical-align:top}
+  .adx-table tbody tr.adx-row{cursor:pointer;transition:background .12s}
+  .adx-table tbody tr.adx-row:hover{background:#FAF9FD}
+  .adx-b{font-weight:700;color:var(--adx-ink)}
+  .adx-sub{display:block;font-size:.7rem;color:var(--adx-faint);margin-top:2px}
+  .adx-t{color:var(--adx-ink2)}
+  .adx-svccell{font-size:.72rem;color:var(--adx-ink2);line-height:1.5;max-width:190px;display:block}
+  .adx-date{color:var(--adx-mut);white-space:nowrap}
+  .adx-misspill{font-size:.68rem;font-weight:700;background:var(--adx-rosebg);color:var(--adx-rose);border-radius:9999px;padding:3px 10px;white-space:nowrap}
+  .adx-svcpill{font-size:.68rem;font-weight:700;border-radius:9999px;padding:3px 10px;white-space:nowrap;background:var(--adx-v50);color:var(--adx-violet)}
+
+  /* status select */
+  .adx-status{border:none;font-size:.72rem;font-weight:700;padding:6px 10px;border-radius:9999px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none}
+  .adx-status[data-status="New"]{background:var(--adx-v50);color:var(--adx-violet)}
+  .adx-status[data-status="Contacted"]{background:var(--adx-bluebg);color:var(--adx-blue)}
+  .adx-status[data-status="Matched"]{background:var(--adx-greenbg);color:var(--adx-green)}
+  .adx-status[data-status="Waitlisted"]{background:var(--adx-amberbg);color:var(--adx-amber)}
+  .adx-status[data-status="Closed"]{background:var(--adx-bg);color:var(--adx-faint)}
+
+  /* expanded row */
+  .adx-detail td{background:#FAF9FD;padding:14px 16px 16px}
+  .adx-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 22px}
+  .adx-detail-grid p{margin:0;font-size:.78rem;color:var(--adx-ink2);line-height:1.55}
+  .adx-detail-grid p b{display:block;font-size:.62rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--adx-faint);margin-bottom:2px}
+  .adx-mail{display:inline-flex;margin-top:10px;background:var(--adx-violet);color:#fff;font-size:.74rem;font-weight:700;padding:7px 14px;border-radius:9999px;text-decoration:none}
+
+  .adx-count{text-align:center;font-size:.72rem;color:var(--adx-faint);margin:12px 0 0}
+
+  /* analytics */
+  .adx-anagrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+  .adx-ana{background:var(--adx-card);border:1px solid var(--adx-line);border-radius:16px;padding:16px 18px;box-shadow:0 1px 3px rgba(34,27,54,.05)}
+  .adx-ana h3{font-size:.8rem;font-weight:800;color:var(--adx-ink);margin:0 0 14px;letter-spacing:.02em}
+  .adx-cols{display:flex;align-items:flex-end;gap:6px;height:130px}
+  .adx-col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;height:100%;min-width:0}
+  .adx-col i{width:100%;background:linear-gradient(180deg,#A78BFA,#6D28D9);border-radius:6px 6px 3px 3px;min-height:3px}
+  .adx-col b{font-size:.68rem;color:var(--adx-ink)}
+  .adx-col span{font-size:.58rem;color:var(--adx-faint);white-space:nowrap;overflow:hidden;max-width:100%}
+  .adx-hrow{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+  .adx-hrow:last-child{margin-bottom:0}
+  .adx-hrow .lb{width:96px;font-size:.72rem;font-weight:700;color:var(--adx-ink2);flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .adx-hbar{flex:1;height:10px;background:var(--adx-bg);border-radius:9999px;overflow:hidden}
+  .adx-hbar i{display:block;height:100%;background:linear-gradient(90deg,#A78BFA,#6D28D9);border-radius:9999px}
+  .adx-hbar i.teal{background:linear-gradient(90deg,#5EEAD4,#0E8C82)}
+  .adx-hbar i.amber{background:linear-gradient(90deg,#FCD34D,#D98324)}
+  .adx-hrow .vl{width:84px;font-size:.68rem;color:var(--adx-mut);text-align:right;flex-shrink:0;white-space:nowrap}
+  .adx-ana-note{font-size:.66rem;color:var(--adx-faint);margin:12px 0 0;line-height:1.45}
+  .adx-ana-empty{font-size:.76rem;color:var(--adx-faint)}
+
+  /* links panel */
+  .adx-links{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+  .adx-link{background:var(--adx-card);border:1px solid var(--adx-line);border-radius:16px;padding:17px 18px;text-decoration:none;box-shadow:0 1px 3px rgba(34,27,54,.05);transition:transform .15s,box-shadow .15s}
+  .adx-link:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(34,27,54,.1)}
+  .adx-link b{display:block;font-size:.92rem;font-weight:800;color:var(--adx-ink);margin-bottom:3px}
+  .adx-link span{font-size:.76rem;color:var(--adx-mut);line-height:1.45}
+</style>
+
 <script is:inline>
-  const SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
-  const ADMIN_PASSWORD = "qPL!gVM$#Wpj&n";
+  var SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+  var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+  var ADMIN_PASSWORD = "qPL!gVM$#Wpj&n";
 
-  let allFamilies = [];
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  var $id = function (i) { return document.getElementById(i); };
 
-  const gate = document.getElementById("password-gate");
-  const dashboard = document.getElementById("admin-dashboard");
-  const passwordInput = document.getElementById("admin-password");
-  const unlockBtn = document.getElementById("unlock-btn");
-  const passwordError = document.getElementById("password-error");
-
+  /* ---------- gate ---------- */
   function unlock() {
-    if (passwordInput.value === ADMIN_PASSWORD) {
-      gate.classList.add("hidden");
-      dashboard.classList.remove("hidden");
-      loadFamilies();
+    if ($id("gate-pass").value === ADMIN_PASSWORD) {
+      $id("gate").style.display = "none";
+      $id("console").hidden = false;
+      loadWaitlist();
+      loadProviders();
     } else {
-      passwordError.classList.remove("hidden");
-      passwordInput.value = "";
-      passwordInput.focus();
+      $id("gate-err").hidden = false;
+      $id("gate-pass").value = "";
+      $id("gate-pass").focus();
     }
   }
+  $id("gate-btn").addEventListener("click", unlock);
+  $id("gate-pass").addEventListener("keydown", function (e) { if (e.key === "Enter") unlock(); });
+  $id("btn-lock").addEventListener("click", function () { location.reload(); });
 
-  unlockBtn.addEventListener("click", unlock);
-  passwordInput.addEventListener("keydown", function(e) {
-    if (e.key === "Enter") unlock();
+  /* ---------- rail panels ---------- */
+  document.querySelectorAll(".adx-nav-btn").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll(".adx-nav-btn").forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on");
+      ["overview", "waitlist", "providers", "links"].forEach(function (p) {
+        $id("panel-" + p).hidden = p !== b.getAttribute("data-panel");
+      });
+      if (b.getAttribute("data-panel") === "providers" && !pvLoaded) loadProviders();
+    });
   });
 
-  async function loadFamilies() {
-    document.getElementById("loading").classList.remove("hidden");
-    document.getElementById("table-container").classList.add("hidden");
-    document.getElementById("empty-state").classList.add("hidden");
+  /* ================= WAITLIST ================= */
+  var families = [];
+  var STATUSES = ["New", "Contacted", "Matched", "Waitlisted", "Closed"];
 
+  async function loadWaitlist() {
+    $id("wl-loading").hidden = false;
+    $id("wl-wrap").hidden = true;
+    $id("wl-empty").hidden = true;
     try {
-      const response = await fetch(
-        SUPABASE_URL + "/rest/v1/waitlist?select=*&order=created_at.desc",
-        { headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY } }
-      );
-      allFamilies = await response.json();
-      updateStats();
-      renderTable(allFamilies);
-    } catch (error) {
-      console.error("Error loading families:", error);
+      var r = await fetch(SUPABASE_URL + "/rest/v1/waitlist?select=*&order=created_at.desc",
+        { headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY } });
+      families = await r.json();
+      if (!Array.isArray(families)) families = [];
+      renderKpis();
+      buildAnalytics();
+      renderWaitlist(filtered());
+    } catch (e) {
+      $id("wl-loading").textContent = "Couldn't load — check the connection and refresh.";
     }
   }
 
-  function updateStats() {
-    const stats = {
-      total: allFamilies.length,
-      new: allFamilies.filter(function(f) { return f.status === "New" || !f.status; }).length,
-      matched: allFamilies.filter(function(f) { return f.status === "Matched"; }).length,
-    };
-    document.getElementById("stats-bar").innerHTML =
-      "<span class='text-slate-500'><span class='font-bold text-slate-800'>" + stats.total + "</span> total</span>" +
-      "<span class='text-violet-600'><span class='font-bold'>" + stats.new + "</span> new</span>" +
-      "<span class='text-teal-600'><span class='font-bold'>" + stats.matched + "</span> matched</span>";
+  function renderKpis() {
+    var wk = Date.now() - 7 * 864e5;
+    var n = function (st) { return families.filter(function (f) { return (f.status || "New") === st; }).length; };
+    $id("kpis").innerHTML =
+      "<div class='adx-kpi'><b>" + families.length + "</b><span>families total</span></div>" +
+      "<div class='adx-kpi hl'><b>" + n("New") + "</b><span>new — need contact</span></div>" +
+      "<div class='adx-kpi'><b>" + n("Contacted") + "</b><span>contacted</span></div>" +
+      "<div class='adx-kpi teal'><b>" + n("Matched") + "</b><span>matched</span></div>" +
+      "<div class='adx-kpi amber'><b>" + families.filter(function (f) { return new Date(f.created_at).getTime() > wk; }).length + "</b><span>this week</span></div>";
   }
 
-  function statusColors(status) {
-    var map = {
-      "New": "bg-violet-100 text-violet-700",
-      "Contacted": "bg-blue-100 text-blue-700",
-      "Matched": "bg-green-100 text-green-700",
-      "Waitlisted": "bg-yellow-100 text-yellow-700",
-      "Closed": "bg-slate-100 text-slate-500"
-    };
-    return map[status] || "bg-violet-100 text-violet-700";
+  function filtered() {
+    var st = $id("f-status").value, sv = $id("f-service").value, lg = $id("f-lang").value, q = $id("f-q").value.toLowerCase();
+    return families.filter(function (f) {
+      if (st && (f.status || "New") !== st) return false;
+      if (lg && f.language !== lg) return false;
+      if (sv && [f.service_slp, f.service_ot, f.service_aba, f.service_other].indexOf(sv) === -1) return false;
+      if (q && (f.full_name || "").toLowerCase().indexOf(q) === -1 && (f.email || "").toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
   }
 
-  function renderTable(families) {
-    document.getElementById("loading").classList.add("hidden");
-
-    if (families.length === 0) {
-      document.getElementById("empty-state").classList.remove("hidden");
-      document.getElementById("table-container").classList.add("hidden");
-      document.getElementById("record-count").textContent = "";
+  function renderWaitlist(rows) {
+    $id("wl-loading").hidden = true;
+    if (!rows.length) {
+      $id("wl-empty").hidden = false;
+      $id("wl-wrap").hidden = true;
+      $id("wl-count").textContent = "";
       return;
     }
+    $id("wl-empty").hidden = true;
+    $id("wl-wrap").hidden = false;
 
-    document.getElementById("empty-state").classList.add("hidden");
-    document.getElementById("table-container").classList.remove("hidden");
-
-    var tbody = document.getElementById("table-body");
-    tbody.innerHTML = families.map(function(f) {
+    $id("wl-body").innerHTML = rows.map(function (f) {
       var services = [f.service_slp, f.service_ot, f.service_aba, f.service_other].filter(Boolean).join(", ") || "—";
       var date = new Date(f.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" });
       var status = f.status || "New";
-      var sc = statusColors(status);
-
-      return "<tr class='border-b border-slate-100 hover:bg-slate-50 transition-colors'>" +
-        "<td class='px-5 py-4'><div class='font-semibold text-slate-800'>" + (f.full_name || "—") + "</div><div class='text-xs text-slate-400 mt-0.5'>" + (f.language || "—") + "</div></td>" +
-        "<td class='px-5 py-4'><div class='text-slate-700'>" + (f.email || "—") + "</div><div class='text-xs text-slate-400 mt-0.5'>" + (f.phone || "—") + "</div></td>" +
-        "<td class='px-5 py-4'><div class='text-slate-700'>" + (f.diagnosis || "—") + "</div><div class='text-xs text-slate-400 mt-0.5'>" + (f.child_age ? f.child_age + " yrs" : "—") + "</div></td>" +
-        "<td class='px-5 py-4 max-w-[180px]'><div class='text-slate-700 text-xs leading-relaxed'>" + services + "</div></td>" +
-        "<td class='px-5 py-4'><div class='text-slate-700'>" + (f.location || "—") + "</div><div class='text-xs text-slate-400 mt-0.5'>" + (f.referral || "—") + "</div></td>" +
-        "<td class='px-5 py-4 text-slate-500 whitespace-nowrap'>" + date + "</td>" +
-        "<td class='px-5 py-4'><select class='px-3 py-1.5 rounded-lg text-xs font-semibold border-0 outline-none cursor-pointer " + sc + "' data-id='" + f.id + "' onchange=\"updateStatus(" + f.id + ", this.value, this)\">" +
-        "<option value='New'" + (status === "New" ? " selected" : "") + ">New</option>" +
-        "<option value='Contacted'" + (status === "Contacted" ? " selected" : "") + ">Contacted</option>" +
-        "<option value='Matched'" + (status === "Matched" ? " selected" : "") + ">Matched</option>" +
-        "<option value='Waitlisted'" + (status === "Waitlisted" ? " selected" : "") + ">Waitlisted</option>" +
-        "<option value='Closed'" + (status === "Closed" ? " selected" : "") + ">Closed</option>" +
-        "</select></td>" +
-        "</tr>";
+      var opts = STATUSES.map(function (s) { return "<option value='" + s + "'" + (status === s ? " selected" : "") + ">" + s + "</option>"; }).join("");
+      return "<tr class='adx-row' data-id='" + f.id + "'>" +
+        "<td><span class='adx-b'>" + esc(f.full_name) + "</span><span class='adx-sub'>" + esc(f.language || "—") + "</span></td>" +
+        "<td><span class='adx-t'>" + esc(f.email) + "</span><span class='adx-sub'>" + esc(f.phone || "—") + "</span></td>" +
+        "<td><span class='adx-t'>" + esc(f.diagnosis || "—") + "</span><span class='adx-sub'>" + (f.child_age ? esc(f.child_age) + " yrs" : "—") + "</span></td>" +
+        "<td><span class='adx-svccell'>" + esc(services) + "</span></td>" +
+        "<td><span class='adx-t'>" + esc(f.location || "—") + "</span></td>" +
+        "<td><span class='adx-date'>" + date + "</span></td>" +
+        "<td><select class='adx-status' data-status='" + esc(status) + "' data-id='" + f.id + "'>" + opts + "</select></td>" +
+        "</tr>" +
+        "<tr class='adx-detail' data-detail='" + f.id + "' hidden><td colspan='7'>" +
+          "<div class='adx-detail-grid'>" +
+            "<p><b>Referral</b>" + esc(f.referral || "—") + "</p>" +
+            "<p><b>Phone</b>" + esc(f.phone || "—") + "</p>" +
+            "<p><b>Additional info</b>" + esc(f.additional_info || "—") + "</p>" +
+          "</div>" +
+          "<a class='adx-mail' href='mailto:" + esc(f.email) + "?subject=" + encodeURIComponent("UniqueApex — about " + (f.full_name || "your signup")) + "'>✉ Email " + esc((f.full_name || "family").split(" ")[0]) + "</a>" +
+        "</td></tr>";
     }).join("");
 
-    document.getElementById("record-count").textContent = "Showing " + families.length + " of " + allFamilies.length + " families";
-  }
-
-  function updateStatus(id, newStatus, selectEl) {
-    fetch(SUPABASE_URL + "/rest/v1/waitlist?id=eq." + id, {
-      method: "PATCH",
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": "Bearer " + SUPABASE_KEY,
-        "Content-Type": "application/json",
-        "Prefer": "return=minimal"
-      },
-      body: JSON.stringify({ status: newStatus })
+    /* row expand */
+    document.querySelectorAll("#wl-body .adx-row").forEach(function (tr) {
+      tr.addEventListener("click", function (e) {
+        if (e.target.closest(".adx-status")) return;
+        var d = document.querySelector("[data-detail='" + tr.getAttribute("data-id") + "']");
+        if (d) d.hidden = !d.hidden;
+      });
     });
-    var family = allFamilies.find(function(f) { return f.id === id; });
-    if (family) family.status = newStatus;
-    selectEl.className = "px-3 py-1.5 rounded-lg text-xs font-semibold border-0 outline-none cursor-pointer " + statusColors(newStatus);
-    updateStats();
+
+    /* status saves */
+    document.querySelectorAll("#wl-body .adx-status").forEach(function (sel) {
+      sel.addEventListener("change", function () {
+        var id = +sel.getAttribute("data-id");
+        fetch(SUPABASE_URL + "/rest/v1/waitlist?id=eq." + id, {
+          method: "PATCH",
+          headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
+          body: JSON.stringify({ status: sel.value })
+        });
+        var fam = families.find(function (f) { return f.id === id; });
+        if (fam) fam.status = sel.value;
+        sel.setAttribute("data-status", sel.value);
+        renderKpis();
+        buildAnalytics();
+      });
+    });
+
+    $id("wl-count").textContent = "Showing " + rows.length + " of " + families.length + " families · click a row for details";
   }
-  window.updateStatus = updateStatus;
 
-  function applyFilters() {
-    var status = document.getElementById("filter-status").value;
-    var service = document.getElementById("filter-service").value;
-    var language = document.getElementById("filter-language").value;
-    var search = document.getElementById("filter-search").value.toLowerCase();
+  ["f-status", "f-service", "f-lang"].forEach(function (i) { $id(i).addEventListener("change", function () { renderWaitlist(filtered()); }); });
+  $id("f-q").addEventListener("input", function () { renderWaitlist(filtered()); });
+  $id("f-clear").addEventListener("click", function () {
+    ["f-status", "f-service", "f-lang", "f-q"].forEach(function (i) { $id(i).value = ""; });
+    renderWaitlist(families);
+  });
+  $id("btn-refresh").addEventListener("click", loadWaitlist);
 
-    var filtered = allFamilies.filter(function(f) {
-      if (status && (f.status || "New") !== status) return false;
-      if (language && f.language !== language) return false;
-      if (service && [f.service_slp, f.service_ot, f.service_aba, f.service_other].indexOf(service) === -1) return false;
-      if (search && (f.full_name || "").toLowerCase().indexOf(search) === -1 && (f.email || "").toLowerCase().indexOf(search) === -1) return false;
+  /* CSV export (respects current filters) */
+  $id("btn-csv").addEventListener("click", function () {
+    var rows = filtered();
+    var cols = ["full_name", "email", "phone", "language", "child_age", "diagnosis", "service_slp", "service_ot", "service_aba", "service_other", "location", "referral", "additional_info", "status", "created_at"];
+    var csv = [cols.join(",")].concat(rows.map(function (f) {
+      return cols.map(function (c) {
+        var v = String(f[c] == null ? "" : f[c]).replace(/"/g, '""');
+        return '"' + v + '"';
+      }).join(",");
+    })).join("\n");
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
+    a.download = "uniqueapex-waitlist-" + new Date().toISOString().slice(0, 10) + ".csv";
+    a.click();
+  });
+
+  /* ================= PROVIDERS ================= */
+  var provs = [], pvSvc = "", pvLoaded = false, SVCNICE = { slp: "Speech", ot: "OT", aba: "Behaviour", psych: "Psych", social: "Social" };
+
+  /* refresh the app token if it's stale — same trick the app itself uses,
+     otherwise an hour-old session silently reads as an empty directory */
+  async function freshAppToken() {
+    var sess = null;
+    try { sess = JSON.parse(localStorage.getItem("ua_session") || "null"); } catch (e) {}
+    if (!sess || !sess.access_token) return null;
+    var now = Math.floor(Date.now() / 1000);
+    if (sess.expires_at && now < sess.expires_at - 60) return sess.access_token;
+    if (!sess.refresh_token) return sess.access_token;
+    try {
+      var r = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=refresh_token", {
+        method: "POST",
+        headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: sess.refresh_token })
+      });
+      if (r.ok) {
+        var d = await r.json();
+        if (d && d.access_token) {
+          d.expires_at = Math.floor(Date.now() / 1000) + (d.expires_in || 3600);
+          localStorage.setItem("ua_session", JSON.stringify(d));
+          return d.access_token;
+        }
+      }
+    } catch (e) {}
+    return sess.access_token;
+  }
+
+  async function loadProviders() {
+    var tok = await freshAppToken();
+    if (!tok) {
+      $id("pv-note").hidden = false;
+      $id("pv-wrap").hidden = true;
+      $id("pv-note").innerHTML = "The directory is protected — it needs a signed-in app session.<br><br><a href='/login' target='_blank' rel='noopener'>Log in to the app</a> in another tab, then come back and press Providers again.";
+      $id("pv-kpis").innerHTML = "";
+      return;
+    }
+    try {
+      var r = await fetch(SUPABASE_URL + "/rest/v1/providers?select=id,name,service_type,borough,city,phone,email,active&order=name.asc",
+        { headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + tok } });
+      if (!r.ok) {
+        $id("pv-note").hidden = false;
+        $id("pv-wrap").hidden = true;
+        $id("pv-note").innerHTML = "Couldn't read the directory (session may have expired).<br><br><a href='/login' target='_blank' rel='noopener'>Log in again</a>, then press Providers.";
+        return;
+      }
+      provs = await r.json();
+      if (!Array.isArray(provs)) provs = [];
+      pvLoaded = true;
+      var withEmail = provs.filter(function (p) { return p.email; }).length;
+      $id("pv-kpis").innerHTML =
+        "<div class='adx-kpi'><b>" + provs.length + "</b><span>clinics</span></div>" +
+        "<div class='adx-kpi teal'><b>" + withEmail + "</b><span>contactable</span></div>" +
+        "<div class='adx-kpi amber'><b>" + (provs.length - withEmail) + "</b><span>missing email</span></div>";
+      renderProviders();
+      buildAnalytics();
+    } catch (e) {
+      $id("pv-note").hidden = false;
+      $id("pv-note").textContent = "Couldn't load the directory — check the connection.";
+    }
+  }
+
+  function renderProviders() {
+    if (!pvLoaded) return;
+    var q = $id("pv-q").value.toLowerCase();
+    var missOnly = $id("pv-missing").checked;
+    var rows = provs.filter(function (p) {
+      if (pvSvc && p.service_type !== pvSvc) return false;
+      if (missOnly && p.email) return false;
+      if (q && (p.name || "").toLowerCase().indexOf(q) === -1 && (p.borough || "").toLowerCase().indexOf(q) === -1) return false;
       return true;
     });
-    renderTable(filtered);
+    $id("pv-note").hidden = true;
+    $id("pv-wrap").hidden = false;
+    $id("pv-body").innerHTML = rows.length ? rows.map(function (p) {
+      return "<tr>" +
+        "<td><span class='adx-b'>" + esc(p.name) + "</span></td>" +
+        "<td><span class='adx-svcpill'>" + esc(SVCNICE[p.service_type] || p.service_type) + "</span></td>" +
+        "<td><span class='adx-t'>" + esc(p.borough || p.city || "—") + "</span></td>" +
+        "<td><span class='adx-t'>" + esc(p.phone || "—") + "</span></td>" +
+        "<td>" + (p.email ? "<span class='adx-t'>" + esc(p.email) + "</span>" : "<span class='adx-misspill'>missing — add in Supabase</span>") + "</td>" +
+        "</tr>";
+    }).join("") : "<tr><td colspan='5' style='text-align:center;color:var(--adx-faint);padding:40px'>Nothing matches.</td></tr>";
+    $id("pv-count").textContent = "Showing " + rows.length + " of " + provs.length + " clinics";
   }
 
-  document.getElementById("filter-status").addEventListener("change", applyFilters);
-  document.getElementById("filter-service").addEventListener("change", applyFilters);
-  document.getElementById("filter-language").addEventListener("change", applyFilters);
-  document.getElementById("filter-search").addEventListener("input", applyFilters);
-  document.getElementById("clear-filters").addEventListener("click", function() {
-    document.getElementById("filter-status").value = "";
-    document.getElementById("filter-service").value = "";
-    document.getElementById("filter-language").value = "";
-    document.getElementById("filter-search").value = "";
-    renderTable(allFamilies);
+  document.querySelectorAll("#pv-svc-chips button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll("#pv-svc-chips button").forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on");
+      pvSvc = b.getAttribute("data-svc");
+      renderProviders();
+    });
   });
-  document.getElementById("refresh-btn").addEventListener("click", loadFamilies);
-</script>
+  $id("pv-q").addEventListener("input", renderProviders);
+  $id("pv-missing").addEventListener("change", renderProviders);
 
+  /* ================= OVERVIEW ANALYTICS ================= */
+  function hrow(label, val, max, valueText, cls) {
+    var w = max > 0 ? Math.round((val / max) * 100) : 0;
+    return "<div class='adx-hrow'><span class='lb' title='" + esc(label) + "'>" + esc(label) + "</span>" +
+      "<span class='adx-hbar'><i class='" + (cls || "") + "' style='width:" + w + "%'></i></span>" +
+      "<span class='vl'>" + valueText + "</span></div>";
+  }
+
+  function buildAnalytics() {
+    if (!$id("ov-kpis")) return;
+    var total = families.length;
+    var wk = Date.now() - 7 * 864e5;
+    var nSt = function (st) { return families.filter(function (f) { return (f.status || "New") === st; }).length; };
+    var thisWeek = families.filter(function (f) { return new Date(f.created_at).getTime() > wk; }).length;
+    var matched = nSt("Matched");
+    var firstTs = total ? Math.min.apply(null, families.map(function (f) { return new Date(f.created_at).getTime(); })) : Date.now();
+    var weeksLive = Math.max(1, (Date.now() - firstTs) / (7 * 864e5));
+    $id("ov-kpis").innerHTML =
+      "<div class='adx-kpi'><b>" + total + "</b><span>families total</span></div>" +
+      "<div class='adx-kpi hl'><b>" + nSt("New") + "</b><span>waiting for contact</span></div>" +
+      "<div class='adx-kpi amber'><b>" + thisWeek + "</b><span>new this week</span></div>" +
+      "<div class='adx-kpi teal'><b>" + (total ? Math.round((matched / total) * 100) : 0) + "%</b><span>matched rate</span></div>" +
+      "<div class='adx-kpi'><b>" + (total ? (total / weeksLive).toFixed(1) : "0") + "</b><span>avg signups / week</span></div>";
+
+    /* signups by week (8 buckets, oldest → newest) */
+    var buckets = [], labels = [];
+    for (var i = 7; i >= 0; i--) {
+      var end = Date.now() - i * 7 * 864e5;
+      var start = end - 7 * 864e5;
+      buckets.push(families.filter(function (f) { var t = new Date(f.created_at).getTime(); return t > start && t <= end; }).length);
+      labels.push(new Date(start).toLocaleDateString("en-CA", { month: "short", day: "numeric" }));
+    }
+    var maxB = Math.max.apply(null, buckets.concat([1]));
+    $id("ov-weeks").innerHTML = buckets.map(function (v, j) {
+      return "<div class='adx-col'><b>" + (v || "") + "</b><i style='height:" + Math.max(3, Math.round((v / maxB) * 100)) + "%'></i><span>" + labels[j] + "</span></div>";
+    }).join("");
+
+    /* status funnel */
+    var funnelSteps = [
+      ["Signed up", total, ""],
+      ["Contacted", nSt("Contacted") + nSt("Matched") + nSt("Waitlisted"), ""],
+      ["Matched", matched, "teal"]
+    ];
+    $id("ov-funnel").innerHTML = total
+      ? funnelSteps.map(function (s) { return hrow(s[0], s[1], total, s[1] + " · " + Math.round((s[1] / total) * 100) + "%", s[2]); }).join("")
+        + "<div class='adx-hrow'><span class='lb'>Closed</span><span class='adx-hbar'><i class='amber' style='width:" + Math.round((nSt("Closed") / total) * 100) + "%'></i></span><span class='vl'>" + nSt("Closed") + "</span></div>"
+      : "<p class='adx-ana-empty'>No signups yet.</p>";
+
+    /* service demand vs supply */
+    var demand = {
+      slp: families.filter(function (f) { return f.service_slp; }).length,
+      ot: families.filter(function (f) { return f.service_ot; }).length,
+      aba: families.filter(function (f) { return f.service_aba; }).length,
+      other: families.filter(function (f) { return f.service_other; }).length
+    };
+    var supply = { slp: 0, ot: 0, aba: 0 };
+    provs.forEach(function (p) { if (p.email && supply[p.service_type] != null) supply[p.service_type]++; });
+    var maxD = Math.max(demand.slp, demand.ot, demand.aba, demand.other, 1);
+    $id("ov-svc").innerHTML =
+      hrow("Speech", demand.slp, maxD, demand.slp + " fam · " + (pvLoaded ? supply.slp + " cl" : "—")) +
+      hrow("OT", demand.ot, maxD, demand.ot + " fam · " + (pvLoaded ? supply.ot + " cl" : "—")) +
+      hrow("Behaviour", demand.aba, maxD, demand.aba + " fam · " + (pvLoaded ? supply.aba + " cl" : "—")) +
+      hrow("Other", demand.other, maxD, demand.other + " fam");
+    $id("ov-svc-note").textContent = pvLoaded
+      ? "Demand = families asking · supply = contactable clinics in the directory."
+      : "Demand = families asking · open the Providers tab once (logged in) to load supply.";
+
+    /* languages */
+    var langs = ["English", "French", "Both"];
+    var maxL = Math.max.apply(null, langs.map(function (l) { return families.filter(function (f) { return f.language === l; }).length; }).concat([1]));
+    $id("ov-lang").innerHTML = total
+      ? langs.map(function (l) {
+          var c = families.filter(function (f) { return f.language === l; }).length;
+          return hrow(l, c, maxL, c + " · " + Math.round((c / total) * 100) + "%");
+        }).join("")
+      : "<p class='adx-ana-empty'>No signups yet.</p>";
+
+    /* ages */
+    var AGE_BUCKETS = [["0–3", 0, 3], ["4–6", 4, 6], ["7–9", 7, 9], ["10–12", 10, 12], ["13+", 13, 99]];
+    var ages = AGE_BUCKETS.map(function (b) {
+      return families.filter(function (f) {
+        var a = parseInt(f.child_age, 10);
+        return !isNaN(a) && a >= b[1] && a <= b[2];
+      }).length;
+    });
+    var maxA = Math.max.apply(null, ages.concat([1]));
+    $id("ov-ages").innerHTML = ages.map(function (v, j) {
+      return "<div class='adx-col'><b>" + (v || "") + "</b><i style='height:" + Math.max(3, Math.round((v / maxA) * 100)) + "%'></i><span>" + AGE_BUCKETS[j][0] + "</span></div>";
+    }).join("");
+
+    /* top locations */
+    var locCount = {};
+    families.forEach(function (f) {
+      var key = String(f.location || "").trim();
+      if (!key) return;
+      var norm = key.toLowerCase();
+      locCount[norm] = locCount[norm] || { label: key, n: 0 };
+      locCount[norm].n++;
+    });
+    var locs = Object.keys(locCount).map(function (k) { return locCount[k]; }).sort(function (a, b) { return b.n - a.n; }).slice(0, 6);
+    var maxLoc = locs.length ? locs[0].n : 1;
+    $id("ov-loc").innerHTML = locs.length
+      ? locs.map(function (l) { return hrow(l.label, l.n, maxLoc, String(l.n)); }).join("")
+      : "<p class='adx-ana-empty'>No locations yet.</p>";
+  }
+
+  $id("btn-refresh2").addEventListener("click", loadWaitlist);
+</script>
 </Layout>

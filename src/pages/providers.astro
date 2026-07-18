@@ -1,15 +1,14 @@
 ---
 /* PROVIDERS-MATCHES-V3 — staged matching flow with Google Maps.
    Screen 1 · pick service + distance → "Find matches"
-   (searching animation — the platform's magic moment)
-   Screen 2 · THE 5 MATCHES revealed: ranked cards + Google map,
-              clickable pins with full clinic info + directions.
-              Family unticks any clinic they don't want.
+   Screen 2 · the 5 matches revealed: ranked cards + Google map,
+              clickable pins with clinic info + directions.
    Screen 3 · review & edit the email → send → success state.
-   Sent-batch log lives at the bottom of every screen.
-   Matching = distance for now; acceptance/waitlist/schedule factors
-   slot into candidatesFor() once providers onboard.
-   Server (send-outreach) still enforces quotas + 90-day protection. */
+   Sent-batch log at the bottom. Matching = distance for now;
+   acceptance/waitlist/schedule factors slot into candidatesFor()
+   once providers onboard. Server (send-outreach) still enforces
+   quotas + 90-day protection. NOTE: no literal curly braces in the
+   template markup — Astro parses them as expressions. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
@@ -42,22 +41,18 @@ import SectionTabs from "@/components/SectionTabs.astro";
     <!-- ============ SCREEN 1 · SEARCH ============ -->
     <section class="pv-scr on" id="scr-1">
       <div class="pv-card cu-rev" style="--d:.08s">
-        <h2 class="pv-h">What are you looking for?</h2>
+        <h2 class="pv-h">Select a service below</h2>
         <div class="pv-svcs" id="pv-svcs"></div>
         <h2 class="pv-h" style="margin-top:18px">How far would you travel?</h2>
         <div class="pv-loc">
           <input class="pv-postal" id="pv-postal" maxlength="7" placeholder="H2V 2K3" autocomplete="postal-code" />
-          <div class="pv-radius" id="pv-radius">
-            <button type="button" data-km="5">5 km</button>
-            <button type="button" data-km="10">10 km</button>
-            <button type="button" data-km="20">20 km</button>
-            <button type="button" data-km="30">30 km</button>
-            <button type="button" data-km="50">50 km</button>
-            <button type="button" data-km="0" class="on">Anywhere</button>
+          <div class="pv-kmwrap">
+            <input type="range" id="pv-km" min="0" max="4" step="1" value="2" />
+            <div class="pv-kmticks"><span>5</span><span>10</span><span>20</span><span>30</span><span>50</span></div>
           </div>
+          <span class="pv-kmval" id="pv-kmval">20 km</span>
         </div>
-        <p class="pv-loc-hint" id="pv-loc-hint">Distances are approximate (postal-code area), private, and never shared with providers.</p>
-        <div id="pv-nopostal"></div>
+        <p class="pv-loc-hint" id="pv-loc-hint"></p>
         <div class="pv-findrow">
           <span class="pv-findnote" id="pv-findnote"></span>
           <button type="button" class="btn btn-primary" id="pv-find">✦ Find matches</button>
@@ -79,6 +74,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
             <h2 class="pv-h" id="pv-res-title" style="margin:0">Your matches</h2>
             <span class="pv-res-sub" id="pv-res-sub"></span>
           </div>
+          <div id="pv-cap" class="pv-cap"></div>
           <div class="pv-results-grid">
             <div class="pv-mlist" id="pv-mlist"></div>
             <div class="pv-mapcol">
@@ -103,7 +99,11 @@ import SectionTabs from "@/components/SectionTabs.astro";
           <div class="pv-recap" id="pv-recap"></div>
           <p class="pv-subject" id="pv-subject"></p>
           <textarea class="pv-msg" id="pv-msg" maxlength="2000" rows="11"></textarea>
-          <p class="pv-footpeek">Added automatically: "Hello {clinic name}," on top · a short UniqueApex footer with the 90-day no-repeat promise · Reply-To set to your email, so answers land in your inbox.</p>
+          <p class="pv-footpeek">Added automatically: a personal "Hello" with each clinic's name on top · a short UniqueApex footer with the 90-day no-repeat promise · Reply-To set to your email, so answers land in your inbox.</p>
+          <label class="pv-consent">
+            <input type="checkbox" id="pv-consent" />
+            <span>I am this child's parent or legal guardian, and I consent to sharing their first name, age and diagnosis with the clinics selected above so they can respond about services. <a href="/privacy" target="_blank" rel="noopener">Privacy policy</a></span>
+          </label>
           <div class="pv-navrow">
             <button type="button" class="btn btn-ghost" id="pv-back2">← Back to matches</button>
             <span class="pv-quota" id="pv-quota"></span>
@@ -115,83 +115,78 @@ import SectionTabs from "@/components/SectionTabs.astro";
       </div>
     </section>
 
-    <!-- ============ LOG ============ -->
-    <div class="pv-card cu-rev" style="--d:.12s">
-      <div class="pv-log-head"><h2 class="pv-h" style="margin:0">Sent batches</h2><span class="pv-res-sub">every outreach is logged — also in Providers → Applications</span></div>
-      <div id="pv-log"><p class="pv-empty2">Nothing sent yet.</p></div>
-    </div>
   </div>
 </AppFormLayout>
 
 <style is:global>
   .pv-wrap{display:flex;flex-direction:column;gap:14px;max-width:1020px}
+  .pv-wrap .rib-rose{background:linear-gradient(120deg,#F6F2FE,#ECE4FC 60%,#FDFCFF) !important;border-color:#E6DDF8 !important}
+  .pv-wrap .rib-rose .c3-rib-av{background:#EDE9FE !important;color:#6D28D9 !important}
   .pv-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow)}
   .pv-h{font-family:var(--display);font-size:1rem;color:var(--ink);margin:0 0 12px}
   .pv-empty2{font-size:.83rem;color:var(--faint);margin:0;line-height:1.55}
 
-  /* crumbs */
   .pv-crumbs{display:flex;align-items:center;gap:10px;padding:2px 6px}
-  .pv-crumb{display:inline-flex;align-items:center;gap:7px;font-size:.74rem;font-weight:700;color:var(--faint);white-space:nowrap}
-  .pv-crumb i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--bg);border:1.5px solid var(--line);display:grid;place-items:center;font-size:.66rem;transition:all .25s}
+  .pv-crumb{display:inline-flex;align-items:center;gap:10px;font-size:.94rem;font-weight:800;color:var(--faint);white-space:nowrap}
+  .pv-crumb i{font-style:normal;width:32px;height:32px;border-radius:50%;background:var(--bg);border:2px solid var(--line);display:grid;place-items:center;font-size:.84rem;transition:all .25s}
   .pv-crumb.cur{color:var(--ink)}
-  .pv-crumb.cur i{background:var(--rose);border-color:var(--rose);color:#fff}
+  .pv-crumb.cur i{background:#6D28D9;border-color:#6D28D9;color:#fff}
   .pv-crumb.done{color:var(--teal)}
   .pv-crumb.done i{background:var(--teal-bg);border-color:var(--teal);color:var(--teal)}
   .pv-cline{flex:1;height:1.5px;background:var(--line);border-radius:1px;min-width:18px}
 
-  /* screens */
   .pv-scr{display:none}
   .pv-scr.on{display:block;animation:pvIn .3s ease both}
   @keyframes pvIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-  /* screen 1 */
-  .pv-svcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
-  .pv-svc{position:relative;border:1.5px solid var(--line);border-radius:14px;padding:11px 13px;background:var(--card);cursor:pointer;text-align:left;font-family:inherit;transition:border-color .15s,transform .15s,box-shadow .15s}
-  .pv-svc:hover{transform:translateY(-1px);border-color:#F3D8E1}
-  .pv-svc.on{border-color:var(--rose);box-shadow:0 6px 18px rgba(177,74,102,.14);background:linear-gradient(135deg,#FFFDFD,#fff 60%)}
-  .pv-svc .nm{display:block;font-size:.84rem;font-weight:700;color:var(--ink)}
-  .pv-svc .fr{display:block;font-size:.68rem;color:var(--muted);margin-top:2px}
-  .pv-svc .sug{display:inline-flex;align-items:center;gap:4px;font-size:.62rem;font-weight:700;background:var(--violet-50);border:1px solid var(--violet-100);color:#7c6bab;border-radius:9999px;padding:2px 8px;margin-top:7px}
-  .pv-svc .cnt{position:absolute;top:9px;right:11px;font-size:.64rem;font-weight:700;color:var(--faint)}
-  .pv-svc.on .cnt{color:var(--rose)}
+  .pv-svcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:12px}
+  .pv-svc{position:relative;display:flex;flex-direction:column;align-items:flex-start;border:2px solid var(--line);border-radius:18px;padding:20px 18px 16px;background:var(--card);cursor:pointer;text-align:left;font-family:inherit;min-height:152px;box-shadow:0 2px 0 rgba(34,27,54,.05),0 8px 18px rgba(34,27,54,.05);transition:border-color .18s,transform .18s,box-shadow .18s,background .18s}
+  .pv-svc:hover{transform:translateY(-3px);border-color:#C9B8F5;box-shadow:0 4px 0 rgba(34,27,54,.06),0 16px 30px rgba(34,27,54,.12)}
+  .pv-svc:active{transform:translateY(0);box-shadow:0 1px 0 rgba(34,27,54,.06),0 6px 12px rgba(34,27,54,.1)}
+  .pv-svc.on{border-color:#6D28D9;background:#fff;background:color-mix(in srgb,#6D28D9 7%,#fff);box-shadow:0 4px 0 #6D28D9,0 16px 32px rgba(34,27,54,.16);transform:translateY(-2px)}
+  .pv-svc.on::after{content:"✓";position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;background:#6D28D9;color:#fff;font-size:.82rem;font-weight:800;display:grid;place-items:center}
+  .pv-svc .nm{display:block;font-size:1.08rem;font-weight:800;color:var(--ink);line-height:1.25;padding-right:30px}
+  .pv-svc .fr{display:block;font-size:.78rem;color:var(--muted);margin-top:4px}
+  .pv-svc .sug{display:inline-flex;align-items:center;gap:4px;font-size:.66rem;font-weight:700;background:var(--violet-50);border:1px solid var(--violet-100);color:#7c6bab;border-radius:9999px;padding:4px 10px;margin-top:auto}
   .pv-loc{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .pv-postal{width:104px;padding:8px 11px;border:1px solid var(--line-2);border-radius:10px;font-size:.86rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);background:var(--card);outline:none;font-family:inherit}
-  .pv-postal:focus{border-color:#F9A8D4;box-shadow:0 0 0 3px rgba(177,74,102,.12)}
-  .pv-radius{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:9999px;padding:3px;flex-wrap:wrap}
-  .pv-radius button{border:none;background:none;font-size:.72rem;font-weight:700;color:var(--muted);padding:5px 12px;border-radius:9999px;cursor:pointer;font-family:inherit;transition:background .15s,color .15s;white-space:nowrap}
-  .pv-radius button:hover{color:var(--ink)}
-  .pv-radius button.on{background:var(--rose);color:#fff}
+  .pv-postal:focus{border-color:#C4B5FD;box-shadow:0 0 0 3px rgba(109,40,217,.14)}
+  .pv-kmwrap{flex:1;min-width:220px;max-width:360px;padding-top:6px}
+  #pv-km{width:100%;accent-color:#6D28D9;cursor:pointer;height:6px}
+  .pv-kmticks{display:flex;justify-content:space-between;font-size:.68rem;color:var(--faint);font-weight:700;padding:3px 2px 0}
+  .pv-kmval{font-family:var(--display);font-size:1.1rem;font-weight:800;color:#6D28D9;min-width:66px}
   .pv-loc-hint{font-size:.66rem;color:var(--faint);margin:8px 0 0}
-  .pv-warn{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--amber-bg);border:1px solid #EBDCC3;border-radius:14px;padding:12px 16px;margin-top:10px}
-  .pv-warn p{flex:1;font-size:.82rem;color:var(--amber);line-height:1.5;margin:0;min-width:220px}
-  #pv-nopostal:empty{display:none}
+  .pv-loc-hint:empty{display:none}
   .pv-findrow{display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap}
   .pv-findnote{flex:1;font-size:.72rem;color:var(--muted);min-width:180px}
+  .pv-cap{display:none;align-items:center;gap:10px;background:var(--amber-bg);border:2px solid var(--amber);color:var(--amber);font-size:.94rem;font-weight:800;border-radius:14px;padding:13px 17px;margin-bottom:12px}
+  .pv-cap.show{display:flex;animation:pvShake .4s ease}
+  @keyframes pvShake{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
-  /* searching moment */
   .pv-searching{text-align:center;padding:38px 20px}
-  .pv-orb{width:46px;height:46px;margin:0 auto 16px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;background:linear-gradient(135deg,#F9A8D4,#B14A66);animation:pvOrb 1.1s ease-in-out infinite}
+  .pv-orb{width:46px;height:46px;margin:0 auto 16px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;background:linear-gradient(135deg,#C4B5FD,#6D28D9);animation:pvOrb 1.1s ease-in-out infinite}
   @keyframes pvOrb{0%,100%{transform:scale(1) rotate(0deg)}50%{transform:scale(1.14) rotate(8deg)}}
   .pv-s-line{font-size:.84rem;color:var(--muted);margin:5px 0;opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s}
   .pv-s-line.show{opacity:1;transform:none}
 
-  /* screen 2 · results */
   .pv-res-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
   .pv-res-sub{font-size:.72rem;color:var(--muted)}
   .pv-results-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
   @media (max-width:860px){.pv-results-grid{grid-template-columns:1fr}}
   .pv-mlist{display:flex;flex-direction:column;gap:8px}
-  .pv-m{display:flex;align-items:center;gap:11px;border:1.5px solid var(--line);border-radius:14px;padding:10px 13px;cursor:pointer;transition:border-color .15s,background .15s;opacity:0;animation:pvCard .4s ease forwards;animation-delay:var(--cd,0s)}
+  .pv-m{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:15px;padding:13px 15px;cursor:pointer;transition:border-color .15s,background .15s;opacity:0;animation:pvCard .4s ease forwards;animation-delay:var(--cd,0s)}
   @keyframes pvCard{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-  .pv-m:hover{border-color:#F3D8E1}
-  .pv-m.on{border-color:var(--rose);background:linear-gradient(135deg,#FFFDFD,#fff 65%)}
-  .pv-m input{width:17px;height:17px;accent-color:#B14A66;flex-shrink:0;cursor:pointer}
-  .pv-m .rk{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:.7rem;font-weight:800;flex-shrink:0}
+  .pv-m:hover{border-color:#DDD2F5}
+  .pv-m.on{border-color:#6D28D9;background:linear-gradient(135deg,#FBFAFF,#fff 65%)}
+  .pv-m input{width:19px;height:19px;accent-color:#6D28D9;flex-shrink:0;cursor:pointer}
+  .pv-m .rk{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:.8rem;font-weight:800;flex-shrink:0;background:#C6C0D4;transition:background .15s}
+  .pv-m.on .rk{background:#6D28D9}
   .pv-m .bd{flex:1;min-width:0}
-  .pv-m .nm{display:block;font-size:.86rem;font-weight:700;color:var(--ink);line-height:1.3}
-  .pv-m .mt{display:block;font-size:.7rem;color:var(--muted);margin-top:2px}
-  .pv-m .dist{flex-shrink:0;font-family:var(--display);font-size:.78rem;font-weight:700;color:var(--teal);background:var(--teal-bg);border-radius:9999px;padding:4px 11px;white-space:nowrap}
-  .pv-m .dist.far{color:var(--muted);background:var(--bg)}
+  .pv-m .nm{display:block;font-size:.94rem;font-weight:700;color:var(--ink);line-height:1.3}
+  .pv-m .mt{display:block;font-size:.76rem;color:var(--muted);margin-top:2px}
+  .pv-m .dist{flex-shrink:0;font-family:var(--display);font-size:.85rem;font-weight:700;color:var(--muted);background:var(--bg);border-radius:9999px;padding:5px 13px;white-space:nowrap;transition:color .15s,background .15s}
+  .pv-m.on .dist{color:var(--teal);background:var(--teal-bg)}
+  .pv-m.on .dist.far,.pv-m .dist.far{color:var(--muted);background:var(--bg)}
   .pv-protected{font-size:.7rem;color:var(--amber);background:var(--amber-bg);border:1px solid #EBDCC3;border-radius:10px;padding:7px 11px;margin-top:12px;line-height:1.45}
   .pv-mnote{font-size:.72rem;color:var(--faint);margin:12px 0 0;line-height:1.5}
   .pv-mapcol{position:sticky;top:12px}
@@ -200,7 +195,6 @@ import SectionTabs from "@/components/SectionTabs.astro";
   .pv-mapmiss{display:grid;place-items:center;height:100%;padding:20px;text-align:center;font-size:.78rem;color:var(--muted);line-height:1.6}
   .pv-navrow{display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap;justify-content:space-between}
 
-  /* google infowindow card */
   .pv-iw{font-family:'Inter',sans-serif;font-size:.8rem;line-height:1.5;max-width:240px;color:#221B36}
   .pv-iw b{display:block;font-size:.86rem;margin-bottom:2px}
   .pv-iw .svc{font-weight:700;text-transform:uppercase;font-size:.62rem;letter-spacing:.05em}
@@ -208,15 +202,25 @@ import SectionTabs from "@/components/SectionTabs.astro";
   .pv-iw a{color:#B14A66;font-weight:700;text-decoration:none}
   .pv-iw .dir{display:inline-block;margin-top:7px}
 
-  /* screen 3 */
-  .pv-recap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-  .pv-chip{font-size:.68rem;font-weight:700;background:var(--bg);border:1px solid var(--line);color:var(--muted);border-radius:9999px;padding:4px 11px}
-  .pv-chip.hl{background:var(--teal-bg);border-color:transparent;color:var(--teal)}
+  .pv-recap{margin-bottom:14px}
+  .pv-tohead{display:flex;align-items:baseline;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+  .pv-tohead span{font-size:.64rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .pv-tohead b{font-family:var(--display);font-size:.94rem;color:var(--ink)}
+  .pv-tohead em{font-style:normal;font-size:.74rem;color:var(--muted)}
+  .pv-tolist{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:7px}
+  .pv-to{display:flex;align-items:center;gap:9px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px 11px;min-width:0}
+  .pv-to i{font-style:normal;width:20px;height:20px;border-radius:50%;background:#6D28D9;color:#fff;font-size:.64rem;font-weight:800;display:grid;place-items:center;flex-shrink:0}
+  .pv-to .tn{font-size:.78rem;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pv-to .tm{margin-left:auto;font-size:.68rem;color:var(--muted);white-space:nowrap;flex-shrink:0;padding-left:8px}
   .pv-subject{font-size:.78rem;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:0 0 8px}
   .pv-subject b{color:var(--ink)}
   .pv-msg{width:100%;border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;font-size:.86rem;line-height:1.6;color:var(--ink);background:var(--card);outline:none;font-family:inherit;resize:vertical}
-  .pv-msg:focus{border-color:#F9A8D4;box-shadow:0 0 0 3px rgba(177,74,102,.12)}
+  .pv-msg:focus{border-color:#C4B5FD;box-shadow:0 0 0 3px rgba(109,40,217,.14)}
   .pv-footpeek{font-size:.68rem;color:var(--faint);font-style:italic;margin:7px 0 0;line-height:1.5}
+  .pv-consent{display:flex;align-items:flex-start;gap:10px;margin-top:12px;background:var(--bg);border:1.5px dashed var(--line-2);border-radius:12px;padding:11px 14px;cursor:pointer}
+  .pv-consent input{width:18px;height:18px;accent-color:#6D28D9;flex-shrink:0;margin-top:1px;cursor:pointer}
+  .pv-consent span{font-size:.76rem;color:var(--ink-2);line-height:1.55}
+  .pv-consent a{color:var(--violet-700);font-weight:700;text-decoration:none}
   .pv-quota{flex:1;font-size:.72rem;color:var(--muted);text-align:right;min-width:160px}
   #pv-send:disabled,#pv-find:disabled{opacity:.55;cursor:default}
   #pv-upsell{margin-top:10px}
@@ -227,19 +231,6 @@ import SectionTabs from "@/components/SectionTabs.astro";
   .pv-sentbox p{font-size:.82rem;color:var(--muted);line-height:1.6;margin:0 auto 6px;max-width:460px}
   .pv-sentbox .names{font-size:.74rem;color:var(--teal);font-weight:700}
 
-  /* log */
-  .pv-log-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-  .pv-lrow{border-top:1px solid var(--line);padding:10px 0}
-  .pv-lrow:first-child{border-top:none;padding-top:2px}
-  .pv-ltop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.82rem}
-  .pv-ltop .sv{font-weight:700;color:var(--ink)}
-  .pv-ltop .dt{font-size:.72rem;color:var(--faint)}
-  .pv-lpill{margin-left:auto;font-size:.62rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:9999px}
-  .pv-lpill.sent{background:var(--green-bg);color:var(--green)}
-  .pv-lpill.partial{background:var(--amber-bg);color:var(--amber)}
-  .pv-lpill.failed{background:#F9EDF1;color:var(--rose)}
-  .pv-lpill.queued{background:var(--violet-50);color:var(--violet-700)}
-  .pv-lnames{font-size:.74rem;color:var(--muted);margin-top:4px;line-height:1.5}
 </style>
 
 <script is:inline>
@@ -252,15 +243,13 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
 <script>
   import * as UA from "../lib/ua-data.js";
-  import { scoreWheel, DOMAINS, scoreToBand } from "../lib/wheelScore.js";
+  import { scoreWheel, scoreToBand } from "../lib/wheelScore.js";
   import { notify } from "../lib/notify.js";
-  import { getPlan, PLANS, upsellHTML } from "../lib/plan.js";
+  import { getPlan, upsellHTML } from "../lib/plan.js";
   import { coordsForPostal, haversineKm } from "../lib/geo.js";
 
-  /* ── Google Maps key ─────────────────────────────────────────────
-     Paste your key between the quotes. Full setup guide:
-     GOOGLE_MAPS_SETUP.md (repo root). Restrict the key to your
-     domains + the Maps JavaScript API before going live. */
+  /* Google Maps key — paste yours between the quotes.
+     Full setup guide: GOOGLE_MAPS_SETUP.md in the repo root. */
   const GMAPS_KEY = "PASTE_YOUR_GOOGLE_MAPS_KEY_HERE";
 
   const $ = (id) => document.getElementById(id);
@@ -297,7 +286,6 @@ import SectionTabs from "@/components/SectionTabs.astro";
     $("rb-av").textContent = (id.first || id.name || "·")[0].toUpperCase();
     if (id.first) $("rb-title").textContent = "Find Providers for " + id.first;
 
-    /* ---------- data ---------- */
     const sess = await UA.getValidSession();
     const H = sess ? UA.authHeaders(sess.access_token) : null;
     const j = async (path) => { try { const r = await fetch(BASE + "/rest/v1/" + path, { headers: H }); return r.ok ? await r.json() : []; } catch (e) { return []; } };
@@ -310,12 +298,10 @@ import SectionTabs from "@/components/SectionTabs.astro";
     const protectedIds = new Set(contacts.filter((c) => Date.now() - new Date(c.sent_at).getTime() < 90 * 864e5).map((c) => c.provider_id));
 
     $("rb-stats").innerHTML = [
-      `<span class="c3-rstat"><b>${providers.filter((x) => x.email).length}</b><span>contactable clinics</span></span>`,
       `<span class="c3-rstat"><b>${requests.length}</b><span>batches sent</span></span>`,
       `<a class="c3-rstat" href="/providers/waitlists"><b>${wl.length}</b><span>waitlist${wl.length === 1 ? "" : "s"}</span></a>`,
     ].join("");
 
-    /* ---------- home ---------- */
     const GEO_KEY = "ua_home_geo_" + ((sess || {}).user || {}).id;
     let home = { postal: "", km: 0 };
     try { home = Object.assign(home, JSON.parse(localStorage.getItem(GEO_KEY) || "{}")); } catch (e) {}
@@ -336,18 +322,11 @@ import SectionTabs from "@/components/SectionTabs.astro";
         if (r2.ok) {
           passportPostal = postal;
           data.household = newData.household;
-          renderWarn();
           notify("ok", "Postal code saved to " + first + "'s passport ✓");
         }
       } catch (e) {}
     }
-    function renderWarn() {
-      $("pv-nopostal").innerHTML = passportPostal ? "" :
-        `<div class="pv-warn cu-rev"><p><b>No address on file for ${esc(first)}.</b> Type your postal code above — we'll save it to the passport so matching knows where home is.</p></div>`;
-    }
-    renderWarn();
 
-    /* ---------- crumbs + screens ---------- */
     let step = 1;
     function goStep(n) {
       step = n;
@@ -360,7 +339,6 @@ import SectionTabs from "@/components/SectionTabs.astro";
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    /* ---------- screen 1 · service + distance ---------- */
     let svc = null;
     const suggestions = {};
     SVCS.forEach((s) => {
@@ -378,10 +356,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
     }
     function renderSvcs() {
       $("pv-svcs").innerHTML = SVCS.map((s) => {
-        const n = providers.filter((x) => x.service_type === s.code && x.email).length;
         const sug = suggestions[s.code];
         return `<button type="button" class="pv-svc${svc === s.code ? " on" : ""}" data-svc="${s.code}">
-          <span class="cnt">${n} clinic${n === 1 ? "" : "s"}</span>
           <span class="nm">${s.name}</span>
           <span class="fr">${s.fr}</span>
           ${sug ? `<span class="sug">✦ ${esc(sug === "No diagnosis on file yet" ? sug : sug + " flagged on the wheel")}</span>` : ""}
@@ -398,12 +374,9 @@ import SectionTabs from "@/components/SectionTabs.astro";
       if (!svc) { btn.disabled = true; $("pv-findnote").textContent = "Pick a service to start matching."; return; }
       btn.disabled = false;
       const q = quotaFor(svc);
-      $("pv-findnote").textContent = q.ok
-        ? "We'll show the " + BATCH + " closest clinics — you approve everything before anything is sent."
-        : q.note + " You can still view your matches.";
+      $("pv-findnote").textContent = q.ok ? "" : q.note + " You can still view your matches.";
     }
 
-    /* ---------- matching ---------- */
     let matches = [], selection = new Set();
     function candidatesFor(code) {
       const hc = homeCoords();
@@ -416,7 +389,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     $("pv-find").addEventListener("click", () => {
       if (!svc) return;
       if (home.km > 0 && !homeCoords()) {
-        notify("warn", "Add a valid postal code for distance matching — or choose Anywhere.");
+        notify("warn", "Add a valid postal code so we can match by distance.");
         $("pv-postal").focus();
         return;
       }
@@ -437,15 +410,15 @@ import SectionTabs from "@/components/SectionTabs.astro";
     function renderMatches() {
       const meta = SVCS.find((s) => s.code === svc);
       const all = candidatesFor(svc);
-      matches = all.slice(0, BATCH);
-      selection = new Set(matches.map((x) => x.id));
+      matches = home.km > 0 ? all : all.slice(0, 15);
+      selection = new Set(matches.slice(0, BATCH).map((x) => x.id));
       const nProt = providers.filter((x) => x.service_type === svc && x.email && protectedIds.has(x.id)).length;
       $("pv-res-title").textContent = matches.length
-        ? matches.length + " match" + (matches.length === 1 ? "" : "es") + " for " + meta.name.toLowerCase()
+        ? matches.length + " clinic" + (matches.length === 1 ? "" : "s") + (home.km > 0 ? " within " + home.km + " km" : " found") + " · " + meta.name.toLowerCase()
         : "No matches " + (home.km > 0 ? "within " + home.km + " km" : "yet");
-      $("pv-res-sub").textContent = matches.length ? (home.km > 0 ? "within " + home.km + " km of home · nearest first" : "nearest first") : "";
+      $("pv-res-sub").textContent = matches.length ? "nearest first · the closest " + Math.min(BATCH, matches.length) + " are preselected — swap any you like" : "";
       if (!matches.length) {
-        $("pv-mlist").innerHTML = `<p class="pv-empty2">${home.km > 0 ? "Try a wider radius or Anywhere — the directory is still growing." : "No contactable clinics for this service yet — the directory is filling."}</p>`;
+        $("pv-mlist").innerHTML = `<p class="pv-empty2">${home.km > 0 ? "Try a wider distance — the directory is still growing." : "No contactable clinics for this service yet — the directory is filling."}</p>`;
         $("pv-res-notes").innerHTML = nProt ? `<p class="pv-protected">${nProt} nearby clinic${nProt === 1 ? " was" : "s were"} contacted for ${esc(first)} in the last 90 days — they're excluded to protect the relationship.</p>` : "";
         $("pv-to3").style.display = "none";
         drawMap();
@@ -453,9 +426,9 @@ import SectionTabs from "@/components/SectionTabs.astro";
       }
       $("pv-to3").style.display = "";
       $("pv-mlist").innerHTML = matches.map((x, i) => `
-        <label class="pv-m on" data-id="${x.id}" style="--cd:${i * 0.09}s">
-          <input type="checkbox" checked />
-          <span class="rk" style="background:${SVCCOLOR[svc]}">${i + 1}</span>
+        <label class="pv-m${i < BATCH ? " on" : ""}" data-id="${x.id}" style="--cd:${Math.min(i, 8) * 0.07}s">
+          <input type="checkbox" ${i < BATCH ? "checked" : ""} />
+          <span class="rk">${i + 1}</span>
           <span class="bd">
             <span class="nm">${esc(x.name)}</span>
             <span class="mt">${esc(x.borough || x.city || "")}${x.languages ? " · " + esc(x.languages) : ""}${x.phone ? " · " + esc(x.phone) : ""}</span>
@@ -463,23 +436,39 @@ import SectionTabs from "@/components/SectionTabs.astro";
           <span class="dist${x._d == null ? " far" : ""}">${x._d == null ? "distance n/a" : x._d < 1 ? "< 1 km" : x._d.toFixed(1) + " km"}</span>
         </label>`).join("");
       $("pv-res-notes").innerHTML =
-        `<p class="pv-mnote">${all.length > BATCH ? all.length + " clinics matched — these are the closest " + BATCH + ". " : ""}Matched by distance today ✦ acceptance &amp; waitlist data refine this as clinics join. Untick any clinic you'd rather skip.</p>`
+        `<p class="pv-mnote">You can contact up to ${BATCH} clinics per batch — tick and untick to build your five. ${home.km === 0 && all.length > 15 ? "Showing the nearest 15 — pick a radius to browse your area. " : ""}Matched by distance today ✦ acceptance &amp; waitlist data refine this as clinics join.</p>`
         + (nProt ? `<p class="pv-protected">${nProt} clinic${nProt === 1 ? "" : "s"} contacted in the last 90 days ${nProt === 1 ? "is" : "are"} excluded — providers stay protected from repeat emails.</p>` : "");
+      const relabel = () => { $("pv-to3").textContent = "Review the email →"; };
       $("pv-mlist").querySelectorAll(".pv-m").forEach((row) => {
         const cb = row.querySelector("input");
         cb.addEventListener("change", () => {
           const pid = row.dataset.id;
-          if (cb.checked) { selection.add(pid); row.classList.add("on"); }
-          else { selection.delete(pid); row.classList.remove("on"); }
-          $("pv-to3").textContent = "Review the email → (" + selection.size + ")";
+          if (cb.checked) {
+            if (selection.size >= BATCH) {
+              cb.checked = false;
+              const cap = $("pv-cap");
+              cap.textContent = "✋ Five clinics max per batch — untick one to swap this one in.";
+              cap.classList.remove("show");
+              void cap.offsetWidth;
+              cap.classList.add("show");
+              clearTimeout(cap._t);
+              cap._t = setTimeout(() => cap.classList.remove("show"), 3500);
+              return;
+            }
+            selection.add(pid);
+            row.classList.add("on");
+          } else {
+            selection.delete(pid);
+            row.classList.remove("on");
+          }
+          relabel();
           if (gmap) syncPins();
         });
       });
-      $("pv-to3").textContent = "Review the email → (" + selection.size + ")";
+      relabel();
       drawMap();
     }
 
-    /* ---------- Google Map ---------- */
     let gmap = null, gInfo = null, gPins = [], gHome = [], gm = null;
     function loadGoogle() {
       return new Promise((res, rej) => {
@@ -517,7 +506,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
         if (typeof x.lat !== "number" || typeof x.lng !== "number") return;
         const mk = new gm.Marker({
           map: gmap, position: { lat: x.lat, lng: x.lng },
-          icon: { path: gm.SymbolPath.CIRCLE, scale: 13, fillColor: SVCCOLOR[svc] || "#6D28D9", fillOpacity: 1, strokeColor: "#fff", strokeWeight: 2.5 },
+          icon: { path: gm.SymbolPath.CIRCLE, scale: 13, fillColor: "#6D28D9", fillOpacity: 1, strokeColor: "#fff", strokeWeight: 2.5 },
           label: { text: String(i + 1), color: "#fff", fontSize: "12px", fontWeight: "800" },
           title: x.name,
         });
@@ -537,7 +526,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
         gHome.push(star);
         bounds.extend(star.getPosition());
         if (home.km > 0) {
-          const circ = new gm.Circle({ map: gmap, center: { lat: hc[0], lng: hc[1] }, radius: home.km * 1000, strokeColor: "#B14A66", strokeOpacity: 0.4, strokeWeight: 1.5, fillColor: "#B14A66", fillOpacity: 0.05 });
+          const circ = new gm.Circle({ map: gmap, center: { lat: hc[0], lng: hc[1] }, radius: home.km * 1000, strokeColor: "#6D28D9", strokeOpacity: 0.4, strokeWeight: 1.5, fillColor: "#6D28D9", fillOpacity: 0.05 });
           gHome.push({ setMap: (v) => circ.setMap(v) });
         }
       }
@@ -567,37 +556,40 @@ import SectionTabs from "@/components/SectionTabs.astro";
       }
     }
 
-    /* ---------- screen 3 · review & send ---------- */
     function svcNice() { const m = SVCS.find((s) => s.code === svc); return m ? m.name.toLowerCase() : "services"; }
     let seededFor = null;
     function seedEmail() {
-      if (seededFor === svc && $("pv-msg").value.trim()) return; /* keep the parent's edits */
+      if (seededFor === svc && $("pv-msg").value.trim()) return;
       seededFor = svc;
-      $("pv-msg").value = `${parent ? parent + " here — " : ""}I'm looking for ${svcNice()} for my ${id.age != null ? id.age + "-year-old " : ""}child, ${first}${dxTxt ? " (" + dxTxt + ")" : ""}, in the Montréal area.
+      $("pv-msg").value = `My name is ${parent || "…"}, and I'm looking for ${svcNice()} for my ${id.age != null ? id.age + "-year-old " : ""}child, ${first}${dxTxt ? " (" + dxTxt + ")" : ""}. We're in Montréal${home.km > 0 ? " and can travel up to " + home.km + " km" : ""}.
 
-Could you tell me:
-• whether you're accepting new clients (or how long the waitlist is),
-• your availability and rates,
-• what you'd need from us for an intake.
+A few questions to help us get started:
+• Are you currently accepting new clients — or is there a waitlist we could join?
+• What does your availability look like (days and times), and what are your rates?
+• What would you need from us to book an intake?
 
-I can share a one-page family profile with ${first}'s strengths, needs and history right away — it answers most intake questions.
-
-Thank you so much,
+Warm thanks,
 ${parent || ""}`;
     }
     function renderReview() {
-      const names = matches.filter((x) => selection.has(x.id)).map((x) => x.name);
+      const sel = matches.map((x, i2) => ({ x, rank: i2 + 1 })).filter((o) => selection.has(o.x.id));
+      const names = sel.map((o) => o.x.name);
       $("pv-recap").innerHTML =
-        `<span class="pv-chip hl">${esc(svcNice())}</span>`
-        + `<span class="pv-chip hl">${names.length} clinic${names.length === 1 ? "" : "s"}</span>`
-        + names.map((n) => `<span class="pv-chip">${esc(n)}</span>`).join("");
+        `<div class="pv-tohead"><span>Sending to</span><b>${names.length} clinic${names.length === 1 ? "" : "s"}</b><em>${esc(svcNice())} · one personalized email each</em></div>`
+        + `<div class="pv-tolist">`
+        + sel.map((o) => `<div class="pv-to"><i>${o.rank}</i><span class="tn">${esc(o.x.name)}</span><span class="tm">${o.x._d != null ? (o.x._d < 1 ? "&lt; 1 km" : o.x._d.toFixed(1) + " km") : ""}${o.x.borough ? (o.x._d != null ? " · " : "") + esc(o.x.borough) : ""}</span></div>`).join("")
+        + `</div>`;
       $("pv-subject").innerHTML = `Subject: <b>Family seeking ${esc(svcNice())} — ${esc(first)}${id.age != null ? ", " + id.age + " y/o" : ""} (Montréal)</b> <span style="color:var(--faint)">· set automatically</span>`;
       seedEmail();
       const q = quotaFor(svc);
       const btn = $("pv-send");
-      btn.textContent = "✦ Send to " + names.length + " clinic" + (names.length === 1 ? "" : "s");
-      btn.disabled = !q.ok || names.length === 0;
-      $("pv-quota").textContent = !q.ok ? q.note : (names.length === 0 ? "Go back and select at least one clinic." : "One personalized email per clinic · replies come straight to you.");
+      const consent = $("pv-consent").checked;
+      btn.textContent = "✦ Send";
+      btn.disabled = !q.ok || names.length === 0 || !consent;
+      $("pv-quota").textContent = !q.ok ? q.note
+        : names.length === 0 ? "Go back and select at least one clinic."
+        : !consent ? "Tick the consent box to enable sending."
+        : "One personalized email per clinic · replies come straight to you.";
       $("pv-upsell").innerHTML = (!q.ok && planKey === "free")
         ? upsellHTML("That was the free batch ✦", "Monthly plans send a fresh batch per service every 30 days — and the concierge follows up for you.", "See the plans")
         : "";
@@ -611,6 +603,7 @@ ${parent || ""}`;
     });
     $("pv-back1").addEventListener("click", () => goStep(1));
     $("pv-back2").addEventListener("click", () => goStep(2));
+    $("pv-consent").addEventListener("change", renderReview);
 
     $("pv-send").addEventListener("click", async () => {
       if ($("pv-send").disabled || !svc || !selection.size) return;
@@ -631,9 +624,7 @@ ${parent || ""}`;
         if (r.ok && out.ok) {
           const names = matches.filter((x) => selection.has(x.id)).map((x) => x.name);
           requests.unshift({ id: out.request_id, service_type: svc, status: "sent", sent_count: out.sent, created_at: new Date().toISOString() });
-          if (out.request_id) logNames[out.request_id] = names;
           [...selection].forEach((pid) => protectedIds.add(pid));
-          renderLog();
           $("pv-review").style.display = "none";
           $("pv-sent").style.display = "block";
           $("pv-sent").innerHTML = `<div class="pv-sentbox">
@@ -641,9 +632,10 @@ ${parent || ""}`;
             <h3>Sent to ${out.sent} clinic${out.sent === 1 ? "" : "s"}</h3>
             <p class="names">${names.map(esc).join(" · ")}</p>
             <p>Replies land straight in your inbox. Clinics move fastest when you answer within a day — and the Family Passport PDF covers most intake questions.</p>
-            <p style="font-size:.7rem;color:var(--faint)">Logged ${new Date().toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} · these clinics are now protected from repeat emails for 90 days.</p>
+            <p style="font-size:.7rem;color:var(--faint)">Logged ${new Date().toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} in Providers → Applications · these clinics are now protected from repeat emails for 90 days.</p>
             <button type="button" class="btn btn-primary btn-sm" id="pv-again">Start a new search</button>
           </div>`;
+          $("pv-consent").checked = false;
           $("pv-again").addEventListener("click", () => { seededFor = null; renderSvcs(); updateFind(); goStep(1); });
           notify("ok", "Sent ✦ replies go straight to your inbox.");
         } else if (r.status === 402) {
@@ -663,58 +655,31 @@ ${parent || ""}`;
       btn.textContent = old;
     });
 
-    /* ---------- log ---------- */
-    const nameOf = {};
-    providers.forEach((x) => { nameOf[x.id] = x.name; });
-    let logNames = {};
-    async function loadLogNames() {
-      const ids = requests.slice(0, 10).map((r) => r.id).filter(Boolean);
-      if (!ids.length) return;
-      const rows = await j("outreach_contacts?select=request_id,provider_id&request_id=in.(" + ids.join(",") + ")");
-      rows.forEach((c) => { (logNames[c.request_id] = logNames[c.request_id] || []).push(nameOf[c.provider_id] || "clinic"); });
-    }
-    function renderLog() {
-      const host = $("pv-log");
-      if (!requests.length) { host.innerHTML = `<p class="pv-empty2">Nothing sent yet — every batch is logged here with its date and clinics.</p>`; return; }
-      host.innerHTML = requests.slice(0, 10).map((r) => {
-        const meta = SVCS.find((s) => s.code === r.service_type);
-        const names = logNames[r.id] || [];
-        return `<div class="pv-lrow">
-          <div class="pv-ltop"><span class="sv">${esc(meta ? meta.name : r.service_type)}</span><span class="dt">${new Date(r.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })} · ${r.sent_count} clinic${r.sent_count === 1 ? "" : "s"}</span><span class="pv-lpill ${r.status}">${r.status}</span></div>
-          ${names.length ? `<p class="pv-lnames">${names.map(esc).join(" · ")}</p>` : ""}
-        </div>`;
-      }).join("");
-    }
-
-    /* ---------- location wiring ---------- */
     $("pv-postal").value = home.postal;
-    document.querySelectorAll("#pv-radius button").forEach((b) => {
-      b.classList.toggle("on", +b.dataset.km === home.km);
-      b.addEventListener("click", () => {
-        document.querySelectorAll("#pv-radius button").forEach((x) => x.classList.remove("on"));
-        b.classList.add("on");
-        home.km = +b.dataset.km;
-        localStorage.setItem(GEO_KEY, JSON.stringify(home));
-      });
+    const KMSTEPS = [5, 10, 20, 30, 50];
+    if (KMSTEPS.indexOf(home.km) < 0) home.km = 20;
+    $("pv-km").value = String(KMSTEPS.indexOf(home.km));
+    $("pv-kmval").textContent = home.km + " km";
+    $("pv-km").addEventListener("input", () => {
+      home.km = KMSTEPS[+$("pv-km").value] || 20;
+      $("pv-kmval").textContent = home.km + " km";
+      localStorage.setItem(GEO_KEY, JSON.stringify(home));
     });
     $("pv-postal").addEventListener("input", () => {
       home.postal = $("pv-postal").value.trim().toUpperCase();
       localStorage.setItem(GEO_KEY, JSON.stringify(home));
       $("pv-loc-hint").textContent = home.postal && !homeCoords()
         ? "That postal code isn't in our map yet — matches will show without distances until it is."
-        : "Distances are approximate (postal-code area), private, and never shared with providers.";
+        : "";
     });
     $("pv-postal").addEventListener("change", () => {
       const v = $("pv-postal").value.trim().toUpperCase();
       if (coordsForPostal(v) && v !== passportPostal) savePostalToPassport(v);
     });
 
-    /* ---------- boot ---------- */
     const topSug = SVCS.find((s) => suggestions[s.code]);
     svc = topSug ? topSug.code : null;
     renderSvcs();
     updateFind();
-    await loadLogNames();
-    renderLog();
   })().catch((e) => console.error("[providers] hydrate failed", e));
 </script>

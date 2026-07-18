@@ -9,10 +9,8 @@ import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 
 const SECTIONS = [
+  { href: "/resources/learn", title: "Learn", desc: "Practical reads and short videos in one searchable library — playbooks for the big moments, no jargon.", hue: "#A8650A", bg: "#FBF2E2", icon: "map" },
   { href: "/resources/workshops", title: "Workshops", desc: "Live sessions and Q&As with experts — diagnosis, school, funding and daily life.", hue: "#6D28D9", bg: "#EDE9FE", icon: "cal" },
-  { href: "/resources/guides", title: "Guides", desc: "Step-by-step playbooks for the big moments: evaluations, IEPs, funding applications.", hue: "#0E8C82", bg: "#E6F4F2", icon: "map" },
-  { href: "/resources/articles", title: "Articles", desc: "Short, practical reads written for parents — no jargon, no overwhelm.", hue: "#A8650A", bg: "#FBF2E2", icon: "doc" },
-  { href: "/resources/videos", title: "Videos", desc: "Workshop recordings and bite-size explainers you can watch anytime.", hue: "#B14A66", bg: "#F9EDF1", icon: "play" },
   { href: "/resources/community", title: "Community resources", desc: "The organizations, helplines and programs every Québec family should know.", hue: "#4C9A2A", bg: "#EAF3DE", icon: "users" },
 ];
 const ICONS: Record<string, string> = {
@@ -36,19 +34,19 @@ const ICONS: Record<string, string> = {
         <p>Everything we've gathered to make the journey lighter — sessions, playbooks, reads and the wider community.</p>
       </div>
       <div class="c3-rib-stats" id="rb-stats">
-        <span class="c3-rstat"><b>5</b><span>collections</span></span>
+        <span class="c3-rstat"><b>3</b><span>collections</span></span>
       </div>
     </div>
 
     <!-- start here + next workshop -->
     <div class="rh-toprow">
-      <a class="rh-start cu-rev cu-sparkle-host" href="/resources/guides" style="--d:.05s">
+      <a class="rh-start cu-rev cu-sparkle-host" href="/resources/learn" style="--d:.05s">
         <span class="cu-spark" style="top:12px;right:22px">✦</span>
         <span class="cu-spark s2" style="top:30px;right:44px">✦</span>
         <span class="rh-start-k">START HERE</span>
         <b>New to all of this? The first-90-days playbook.</b>
         <p>What to do after "we think it might be autism" — diagnosis, first services, and who to call, in order.</p>
-        <span class="rh-start-go">Open the guides →</span>
+        <span class="rh-start-go">Open the library →</span>
       </a>
       <div class="rh-next cu-rev" style="--d:.1s">
         <p class="rh-next-k">NEXT LIVE WORKSHOP</p>
@@ -143,6 +141,6 @@ const ICONS: Record<string, string> = {
     const ws = await UA.getNextWorkshop().catch(() => null);
     $("rh-ws").innerHTML = ws
       ? (() => { const d = new Date(ws.starts_at); return `<div class="rh-ws"><span class="rh-ws-date"><b>${d.getDate()}</b><span>${d.toLocaleDateString("en-CA", { month: "short" })}</span></span><span class="rh-ws-meta"><b>${esc(ws.title)}</b><span>${d.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit" })} · ${esc(ws.location_type || "Online")}</span></span></div><a class="btn btn-primary btn-sm" href="/resources/workshops" style="margin-top:10px">Save a seat</a>`; })()
-      : `<p class="rh-ws-empty">Nothing scheduled right now — recordings live in <a href="/resources/videos" style="color:var(--violet-700);font-weight:600">Videos</a>.</p>`;
+      : `<p class="rh-ws-empty">Nothing scheduled right now — recordings live in <a href="/resources/learn" style="color:var(--violet-700);font-weight:600">the Library</a>.</p>`;
   })().catch(() => {});
 </script>

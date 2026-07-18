@@ -1,0 +1,303 @@
+---
+/* RESOURCES-LEARN-V2 — two clean shelves: READ and WATCH.
+   The guide/article split is gone (it confused everyone, including us):
+   everything written is simply a "read"; videos stay visually distinct.
+   ══════════════════════════════════════════════════════════════════
+   EDIT HERE (Pelin):
+     READS  — every written piece: topic, title, blurb, minutes, href
+     VIDEOS — every video: topic, title, blurb, length, href
+     href "" = Coming soon; a URL makes it clickable.
+   FEATURED is the big card on top.
+   ══════════════════════════════════════════════════════════════════ */
+import AppFormLayout from "@/layouts/AppFormLayout.astro";
+import SectionTabs from "@/components/SectionTabs.astro";
+
+const T: Record<string, { label: string; dot: string; a: string; b: string }> = {
+  start:     { label: "Getting started", dot: "#7C3AED", a: "#C4B5FD", b: "#7C3AED" },
+  diagnosis: { label: "Diagnosis",       dot: "#0D9488", a: "#2DD4BF", b: "#0D9488" },
+  school:    { label: "School & IEP",    dot: "#6D28D9", a: "#A78BFA", b: "#6D28D9" },
+  funding:   { label: "Funding",         dot: "#2F9E63", a: "#4ADE80", b: "#2F9E63" },
+  therapy:   { label: "Therapy",         dot: "#C2740F", a: "#FBBF6B", b: "#D98324" },
+  daily:     { label: "Daily life",      dot: "#D65A7A", a: "#F9A8C4", b: "#D65A7A" },
+  sensory:   { label: "Sensory",         dot: "#0284C7", a: "#7DD3FC", b: "#0284C7" },
+  comm:      { label: "Communication",   dot: "#3B82F6", a: "#93C5FD", b: "#3B82F6" },
+};
+
+const FEATURED = {
+  topic: "diagnosis",
+  title: "Getting an autism or ADHD diagnosis in Québec",
+  blurb: "Public vs private evaluation, realistic wait times, and exactly what to gather before your first appointment — so the process moves as fast as it can.",
+  minutes: 8, href: "",
+};
+const READS = [
+  { topic: "diagnosis", title: "You just got the diagnosis. Now what?", blurb: "The first 30 days: what matters, what can wait, and why you don't have to figure it all out this week.", minutes: 6, href: "" },
+  { topic: "diagnosis", title: "How to actually read an evaluation report", blurb: "Percentiles, standard scores and clinical language — decoded into plain parent language.", minutes: 8, href: "" },
+  { topic: "school", title: "Building your child's plan d'intervention", blurb: "How the school's intervention plan works, the rights you have, and how to walk into the meeting prepared.", minutes: 6, href: "" },
+  { topic: "school", title: "The plan d'intervention, explained", blurb: "What Québec schools must offer, how the meeting works, and the questions that get results.", minutes: 7, href: "" },
+  { topic: "school", title: "Switching schools or changing grades", blurb: "Keeping support in place when your child moves classrooms, schools, or into a new stage.", minutes: 5, href: "" },
+  { topic: "funding", title: "Funding therapy: allowances, credits & grants", blurb: "The Supplement for Handicapped Children, the disability tax credit, and where to look when those run out.", minutes: 7, href: "" },
+  { topic: "funding", title: "Every funding source for Québec families, in one list", blurb: "Federal credits, provincial allowances and foundation grants — who qualifies and how to apply.", minutes: 10, href: "" },
+  { topic: "therapy", title: "Managing SLP and OT waitlists", blurb: "How CLSC and private waitlists differ, and how to run several in parallel without losing track of any.", minutes: 5, href: "" },
+  { topic: "therapy", title: "Your first therapy sessions", blurb: "What to bring, what to ask, and how to set goals you'll actually come back to a month later.", minutes: 4, href: "" },
+  { topic: "daily", title: "Calmer routines at home", blurb: "Small sensory and structure changes that make mornings, meals, and bedtime noticeably easier.", minutes: 6, href: "" },
+  { topic: "daily", title: "Mornings without meltdowns", blurb: "Visual schedules, choice points and transition warnings — small routine changes that add up.", minutes: 5, href: "" },
+  { topic: "daily", title: "Waiting lists: making the wait time count", blurb: "What you can start at home while you wait for services — and how to stay on top of every list.", minutes: 6, href: "" },
+  { topic: "sensory", title: "Making sense of sensory-seeking and sensory-avoiding", blurb: "Why the same child can crave spinning and hate loud rooms — and what helps with each.", minutes: 6, href: "" },
+  { topic: "comm", title: "AAC myths that hold families back", blurb: "Devices and picture cards don't stop speech from developing — the research says the opposite.", minutes: 5, href: "" },
+];
+const VIDEOS = [
+  { topic: "start", title: "Welcome to UniqueApex — your family's home base", blurb: "A 4-minute tour: the passport, the Support Wheel, and how families use them day to day.", length: "4 min", href: "" },
+  { topic: "diagnosis", title: "Understanding your child's evaluation report", blurb: "Recording of our live workshop — what the scores mean and the questions to ask.", length: "58 min", href: "" },
+  { topic: "start", title: "The Support Wheel in 3 minutes", blurb: "How petals, rings and confidence work — and why there are no alarming red zones.", length: "3 min", href: "" },
+  { topic: "daily", title: "Visual schedules that actually get used", blurb: "Building a morning routine board with your child, step by step.", length: "9 min", href: "" },
+];
+const TOPICKEYS = Object.keys(T);
+---
+<AppFormLayout title="Resources" activeNav="resources">
+  <SectionTabs section="resources" active="learn" />
+
+  <div class="rl-wrap">
+    <div class="c3-ribbon rib-amber cu-rev">
+      <span class="c3-spark" style="top:12px;right:120px">✦</span>
+      <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
+      <span class="c3-rib-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span>
+      <div class="c3-rib-id">
+        <h1>Learn</h1>
+        <p>Practical reads and short videos for the Québec journey — searchable by what you're facing. EN / FR.</p>
+      </div>
+      <div class="c3-rib-stats">
+        <span class="c3-rstat"><b>{READS.length + 1}</b><span>reads</span></span>
+        <span class="c3-rstat"><b>{VIDEOS.length}</b><span>videos</span></span>
+        <span class="c3-rstat"><b>{TOPICKEYS.length}</b><span>topics</span></span>
+      </div>
+    </div>
+
+    <div class="rl-samplenote cu-rev">
+      <span class="rl-pill">Sample library</span>
+      <span>Previews of what we're writing and recording now — full versions on the way.</span>
+    </div>
+
+    <!-- toolbar -->
+    <div class="rl-bar cu-rev" style="--d:.05s">
+      <div class="rl-topics" id="rl-topics">
+        <button class="on" data-topic="all" type="button">All topics</button>
+        {TOPICKEYS.map((k) => <button data-topic={k} type="button"><i style={`background:${T[k].dot}`}></i>{T[k].label}</button>)}
+      </div>
+      <input class="rl-q" id="rl-q" type="search" placeholder="Search the library…" autocomplete="off" />
+    </div>
+
+    <!-- featured -->
+    <a class="rl-featured cu-rev" href="#0" data-read data-topic={FEATURED.topic} data-q={(FEATURED.title + " " + FEATURED.blurb).toLowerCase()} style="--d:.08s">
+      <div class="rl-fart" style={`background:linear-gradient(135deg,${T[FEATURED.topic].a},${T[FEATURED.topic].b})`}>
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 0 1 1 1a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2a1 1 0 0 1 1-1Z"/><path d="M8 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2"/><path d="m9 14 2 2 4-4"/></svg>
+        <span class="rl-fk">START HERE</span>
+      </div>
+      <div class="rl-fbody">
+        <span class="rl-eyebrow" style={`--dot:${T[FEATURED.topic].dot}`}>{T[FEATURED.topic].label}</span>
+        <h2>{FEATURED.title}</h2>
+        <p>{FEATURED.blurb}</p>
+        <div class="rl-foot">
+          <span class="rl-meta">{FEATURED.minutes} min read</span>
+          <span class="rl-go">Read&nbsp;→</span>
+        </div>
+        <p class="rl-note" hidden>Coming soon — we're writing this now.</p>
+      </div>
+    </a>
+
+    <!-- READ shelf -->
+    <div class="rl-shelf cu-rev" id="rl-readhead" style="--d:.1s">
+      <span class="rl-shelf-ic">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2z"/><path d="M20 5a2 2 0 0 0-2-2h-5v18h5a2 2 0 0 0 2-2z"/></svg>
+      </span>
+      <b>To read</b>
+      <span class="rl-shelf-sub">quick answers and full playbooks, 4–10 minutes each</span>
+    </div>
+    <div class="rl-grid" id="rl-reads">
+      {READS.map((a, i) => (
+        <a class="rl-read cu-rev" href={a.href || "#0"} data-read data-topic={a.topic}
+           data-q={(a.title + " " + a.blurb + " " + T[a.topic].label).toLowerCase()}
+           style={`--d:${(0.12 + Math.min(i, 9) * 0.04).toFixed(2)}s;--edge:${T[a.topic].dot}`}>
+          <span class="rl-eyebrow" style={`--dot:${T[a.topic].dot}`}>{T[a.topic].label}</span>
+          <h3>{a.title}</h3>
+          <p>{a.blurb}</p>
+          <div class="rl-foot">
+            <span class="rl-meta">{a.minutes} min read</span>
+            {a.href ? <span class="rl-go">Read&nbsp;→</span> : <span class="rl-soontag">Coming soon</span>}
+          </div>
+          <p class="rl-note" hidden>Coming soon — we're writing this now.</p>
+        </a>
+      ))}
+    </div>
+
+    <!-- WATCH shelf -->
+    <div class="rl-shelf cu-rev" id="rl-watchhead" style="--d:.14s">
+      <span class="rl-shelf-ic">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M10 9.5l5 2.5-5 2.5z"/></svg>
+      </span>
+      <b>To watch</b>
+      <span class="rl-shelf-sub">workshop recordings and bite-size explainers</span>
+    </div>
+    <div class="rl-vgrid" id="rl-videos">
+      {VIDEOS.map((v, i) => (
+        <a class="rl-video cu-rev" href={v.href || "#0"} data-read data-topic={v.topic}
+           data-q={(v.title + " " + v.blurb + " " + T[v.topic].label).toLowerCase()}
+           style={`--d:${(0.16 + i * 0.05).toFixed(2)}s`}
+           target={v.href ? "_blank" : undefined} rel={v.href ? "noopener" : undefined}>
+          <div class="rl-thumb" style={`background:linear-gradient(135deg,${T[v.topic].a}33,${T[v.topic].b}22)`}>
+            <span class="rl-play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5l11 6.5-11 6.5z"/></svg></span>
+            {v.href ? <span class="rl-len">{v.length}</span> : <span class="rl-len soon">Coming soon</span>}
+          </div>
+          <div class="rl-vbody">
+            <span class="rl-eyebrow" style={`--dot:${T[v.topic].dot}`}>{T[v.topic].label}</span>
+            <h3>{v.title}</h3>
+            <p>{v.blurb}</p>
+            <p class="rl-note" hidden>Coming soon — recording lands here after the session.</p>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <div class="rl-empty" id="rl-empty" hidden>
+      <p>Nothing matches that yet — try another topic, or tell us what's missing below.</p>
+    </div>
+
+    <div class="rl-cta cu-rev" style="--d:.28s">
+      <p><b>What should we cover next?</b> Every topic here started as a family's question.</p>
+      <div class="rl-cta-btns">
+        <a class="ghost" href="/resources/workshops">Live workshops →</a>
+        <a href="mailto:contact@uniqueapex.com?subject=Library%20topic%20suggestion">Suggest a topic</a>
+      </div>
+    </div>
+  </div>
+</AppFormLayout>
+
+<style is:global>
+  .rl-wrap{display:flex;flex-direction:column;gap:14px;max-width:960px}
+
+  .rl-samplenote{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.78rem;color:var(--muted)}
+  .rl-pill{font-size:.66rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:var(--amber-bg);color:var(--amber);border-radius:9999px;padding:4px 11px}
+
+  /* toolbar */
+  .rl-bar{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+  .rl-topics{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
+  .rl-topics button{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--card);font-family:inherit;font-size:.78rem;font-weight:600;color:var(--muted);padding:6px 14px;border-radius:9999px;cursor:pointer;transition:border-color .15s,transform .15s,background .15s,color .15s}
+  .rl-topics button i{width:7px;height:7px;border-radius:50%;display:inline-block}
+  .rl-topics button:hover{border-color:var(--line-2);transform:translateY(-1px)}
+  .rl-topics button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .rl-q{min-width:200px;max-width:300px;border:1px solid var(--line-2);border-radius:9999px;padding:9px 16px;font-size:.84rem;font-family:inherit;color:var(--ink);background:var(--card);outline:none}
+  .rl-q:focus{border-color:#C4B5FD;box-shadow:0 0 0 3px rgba(109,40,217,.12)}
+
+  /* featured */
+  .rl-featured{display:grid;grid-template-columns:minmax(200px,2fr) 3fr;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;text-decoration:none;box-shadow:var(--shadow);transition:transform .18s,box-shadow .18s}
+  .rl-featured:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(34,27,54,.12)}
+  @media (max-width:720px){.rl-featured{grid-template-columns:1fr}}
+  .rl-fart{position:relative;display:grid;place-items:center;min-height:190px}
+  @media (max-width:720px){.rl-fart{min-height:140px}}
+  .rl-fk{position:absolute;top:12px;left:14px;font-size:.62rem;font-weight:800;letter-spacing:.09em;background:rgba(255,255,255,.93);color:#221B36;border-radius:9999px;padding:4px 11px}
+  .rl-fbody{padding:20px 22px;display:flex;flex-direction:column}
+  .rl-fbody h2{font-family:var(--display);font-size:1.28rem;color:var(--ink);margin:7px 0 8px;line-height:1.3}
+  .rl-fbody p{font-size:.88rem;color:var(--muted);line-height:1.6;margin:0}
+
+  /* shelf headers */
+  .rl-shelf{display:flex;align-items:baseline;gap:10px;margin-top:6px}
+  .rl-shelf-ic{width:28px;height:28px;border-radius:9px;background:var(--amber-bg);color:var(--amber);display:grid;place-items:center;align-self:center;flex-shrink:0}
+  .rl-shelf b{font-family:var(--display);font-size:1.05rem;color:var(--ink)}
+  .rl-shelf-sub{font-size:.74rem;color:var(--faint)}
+
+  /* READ cards — clean, no art, colored edge */
+  .rl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+  .rl-read{position:relative;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px 14px;text-decoration:none;box-shadow:var(--shadow);overflow:hidden;transition:transform .18s,box-shadow .18s}
+  .rl-read::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--edge,#6D28D9);opacity:.85}
+  .rl-read:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(34,27,54,.12)}
+  .rl-read h3{font-family:var(--display);font-size:.96rem;font-weight:700;color:var(--ink);margin:8px 0 5px;line-height:1.35}
+  .rl-read p{font-size:.81rem;color:var(--muted);line-height:1.52;margin:0;flex:1}
+  .rl-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:.66rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .rl-eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--dot,#6D28D9)}
+  .rl-foot{display:flex;align-items:center;justify-content:space-between;margin-top:11px}
+  .rl-meta{font-size:.72rem;color:var(--faint);font-weight:600}
+  .rl-go{font-size:.78rem;font-weight:700;color:var(--violet-700);opacity:0;transform:translateX(-3px);transition:opacity .18s,transform .18s}
+  .rl-read:hover .rl-go,.rl-featured:hover .rl-go,.rl-video:hover .rl-go{opacity:1;transform:none}
+  .rl-featured .rl-go{font-size:.82rem}
+  .rl-soontag{font-size:.68rem;font-weight:700;background:var(--amber-bg);color:var(--amber);border-radius:9999px;padding:3px 10px}
+  .rl-note{font-size:.74rem;color:var(--amber);font-weight:600;margin:8px 0 0}
+  .rl-note[hidden]{display:none}
+  .hide{display:none !important}
+
+  /* WATCH cards — thumbnails */
+  .rl-vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+  .rl-video{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;text-decoration:none;box-shadow:var(--shadow);transition:transform .18s,box-shadow .18s}
+  .rl-video:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(34,27,54,.12)}
+  .rl-thumb{position:relative;height:116px;display:grid;place-items:center}
+  .rl-play{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.94);color:var(--violet-700);display:grid;place-items:center;box-shadow:0 4px 14px rgba(34,27,54,.2);transition:transform .2s}
+  .rl-video:hover .rl-play{transform:scale(1.12)}
+  .rl-len{position:absolute;bottom:9px;right:11px;font-size:.66rem;font-weight:800;background:rgba(34,27,54,.75);color:#fff;border-radius:7px;padding:2px 8px}
+  .rl-len.soon{background:var(--amber-bg);color:var(--amber)}
+  .rl-vbody{padding:12px 16px 15px;display:flex;flex-direction:column;flex:1}
+  .rl-video h3{font-family:var(--display);font-size:.93rem;font-weight:700;color:var(--ink);margin:7px 0 5px;line-height:1.35}
+  .rl-video .rl-vbody p{font-size:.8rem;color:var(--muted);line-height:1.5;margin:0;flex:1}
+
+  .rl-empty{background:var(--card);border:1px dashed var(--line-2);border-radius:16px;padding:26px;text-align:center}
+  .rl-empty p{font-size:.84rem;color:var(--faint);margin:0}
+
+  .rl-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,var(--violet-50),#F9F7FE 60%,var(--violet-50));border:1px solid var(--violet-100);border-radius:18px;padding:16px 20px}
+  .rl-cta p{font-size:.88rem;color:#5b21b6;margin:0;line-height:1.5}
+  .rl-cta p b{color:var(--violet-700)}
+  .rl-cta-btns{display:flex;gap:8px;flex-wrap:wrap}
+  .rl-cta a{background:var(--violet-700);color:#fff;font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:9999px;text-decoration:none;white-space:nowrap;transition:filter .15s}
+  .rl-cta a:hover{filter:brightness(1.1)}
+  .rl-cta a.ghost{background:var(--card);color:var(--violet-700);border:1px solid var(--violet-100)}
+</style>
+
+<script is:inline>
+  (function () {
+    var raw = localStorage.getItem("ua_session"), s = null;
+    try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
+    if (!s || !s.access_token) { location.href = "/login"; return; }
+
+    var topic = "all", q = "";
+    var featured = document.querySelector(".rl-featured");
+    var reads = document.querySelectorAll("#rl-reads .rl-read");
+    var vids = document.querySelectorAll("#rl-videos .rl-video");
+
+    function ok(el) {
+      if (topic !== "all" && el.getAttribute("data-topic") !== topic) return false;
+      if (q && (el.getAttribute("data-q") || "").indexOf(q) < 0) return false;
+      return true;
+    }
+    function apply() {
+      var nR = 0, nV = 0;
+      reads.forEach(function (c) { var m = ok(c); c.classList.toggle("hide", !m); if (m) nR++; });
+      vids.forEach(function (c) { var m = ok(c); c.classList.toggle("hide", !m); if (m) nV++; });
+      var fOk = ok(featured);
+      featured.classList.toggle("hide", !fOk);
+      document.getElementById("rl-readhead").classList.toggle("hide", nR === 0);
+      document.getElementById("rl-reads").classList.toggle("hide", nR === 0);
+      document.getElementById("rl-watchhead").classList.toggle("hide", nV === 0);
+      document.getElementById("rl-videos").classList.toggle("hide", nV === 0);
+      document.getElementById("rl-empty").hidden = (nR + nV + (fOk ? 1 : 0)) !== 0;
+    }
+    document.querySelectorAll("#rl-topics button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        document.querySelectorAll("#rl-topics button").forEach(function (x) { x.classList.remove("on"); });
+        b.classList.add("on");
+        topic = b.getAttribute("data-topic");
+        apply();
+      });
+    });
+    document.getElementById("rl-q").addEventListener("input", function (e) {
+      q = String(e.target.value || "").trim().toLowerCase();
+      apply();
+    });
+
+    /* coming-soon toggles */
+    document.querySelectorAll("[data-read]").forEach(function (el) {
+      el.addEventListener("click", function (e) {
+        if (el.getAttribute("href") === "#0") {
+          e.preventDefault();
+          var note = el.querySelector(".rl-note");
+          if (note) note.hidden = !note.hidden;
+        }
+      });
+    });
+  })();
+</script>

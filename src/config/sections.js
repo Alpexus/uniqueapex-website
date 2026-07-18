@@ -45,12 +45,13 @@ export const SECTIONS = {
     { key: "contacts",     label: "Contacts",    href: "/providers/contacts" },
     { key: "notes",        label: "Notes",       href: "/providers/notes" },
   ],
+  // RESOURCES-IA-V2: Guides + Articles + Videos merged into one "Learn"
+  // library (format splits confuse parents — they search by problem).
+  // Old routes /resources/guides, /articles, /videos redirect to /learn.
   resources: [
     { key: "hub",       label: "Overview",            href: "/resources" },
+    { key: "learn",     label: "Learn",               href: "/resources/learn" },
     { key: "workshops", label: "Workshops",           href: "/resources/workshops" },
-    { key: "guides",    label: "Guides",              href: "/resources/guides" },
-    { key: "articles",  label: "Articles",            href: "/resources/articles" },
-    { key: "videos",    label: "Videos",              href: "/resources/videos" },
     { key: "community", label: "Community Resources", href: "/resources/community" },
   ],
   settings: [

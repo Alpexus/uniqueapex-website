@@ -1,0 +1,151 @@
+---
+/* PRIVACY POLICY — plain-language, Law 25 / PIPEDA / GDPR-aware working
+   version. Written to be honest and protective for the pilot stage;
+   get a Québec privacy lawyer to review once revenue allows. */
+import Layout from "@/layouts/Layout.astro";
+---
+<Layout title="Privacy Policy — UniqueApex">
+  <div class="legal">
+    <div class="lg-toggle">
+      <button class="on" data-lang="en" type="button">English</button>
+      <button data-lang="fr" type="button">Français</button>
+    </div>
+
+    <!-- ================= ENGLISH ================= -->
+    <article id="doc-en">
+      <h1>Privacy Policy</h1>
+      <p class="lg-date">Effective July 17, 2026 · UniqueApex is operated by Alpexus OÜ (Estonia). For Québec residents, the French version prevails in case of any difference.</p>
+
+      <h2>The short version</h2>
+      <p>You trust us with sensitive information about your child. We use it for one purpose only: helping your family find and coordinate support. We never sell it, we never use it for advertising, and nothing about your child is shared with any clinic unless you explicitly approve that specific send.</p>
+
+      <h2>1 · Who is responsible</h2>
+      <p>UniqueApex is operated by Alpexus OÜ, an Estonian company, serving families in Québec, Canada. The person in charge of the protection of personal information (as required by Québec's Law 25) is <b>Pelin İpek Temurcan</b> — reachable at <a href="mailto:contact@uniqueapex.com">contact@uniqueapex.com</a>. Contact her for any privacy question, request, or complaint.</p>
+
+      <h2>2 · What we collect</h2>
+      <p><b>Account information:</b> your email address and password (stored in hashed form by our authentication provider).</p>
+      <p><b>The Family Passport:</b> information you choose to enter about your child — name, date of birth, diagnoses, development, strengths, needs, care history — and your household details (parent/guardian name, contact information, postal code). This is sensitive information about a minor; it is entered by you, the parent or legal guardian, and only you decide what to include.</p>
+      <p><b>Documents:</b> files you upload to your private vault (for example evaluation reports).</p>
+      <p><b>Waitlist form:</b> the information you submit when joining the waitlist (name, email, phone, child's age, diagnosis, services sought, location, referral source).</p>
+      <p><b>Outreach records:</b> which clinics were contacted on your behalf and when.</p>
+      <p><b>Technical basics:</b> a login session stored in your browser's local storage. We do not use advertising trackers or analytics cookies.</p>
+
+      <h2>3 · Why we use it</h2>
+      <p>To provide the service: keeping your child's profile in one place, computing the Support Wheel, suggesting next steps, matching you with nearby clinics, sending outreach emails you approve, and managing your account and plan. We also use aggregate, de-identified numbers (for example "how many families signed up this month") to run the service. We do not sell personal information and we do not use it for advertising.</p>
+
+      <h2>4 · When information is shared</h2>
+      <p><b>With clinics — only when you send outreach.</b> When you approve an outreach batch, the selected clinics receive your child's first name, age, diagnosis (as you entered it), your message, and your email address for replies. You choose the clinics, you review the email, and you confirm consent before anything is sent. Your postal code and distances are never shared with providers.</p>
+      <p><b>With service providers that run our infrastructure</b> (they process data on our instructions and cannot use it for their own purposes):</p>
+      <ul>
+        <li><b>Supabase</b> — database, login and file storage. Your data is stored in <b>Canada (Canada Central region)</b>.</li>
+        <li><b>Resend</b> — email delivery (United States). Emails we send — including outreach emails containing your child's first name, age and diagnosis — are processed by Resend to be delivered.</li>
+        <li><b>Vercel</b> — website hosting (United States).</li>
+        <li><b>Google Maps</b> — displays the provider map; when the map loads, your browser communicates with Google.</li>
+        <li><b>Stripe</b> — payment processing, once paid plans launch (we never see your full card number).</li>
+      </ul>
+      <p><b>When the law requires it</b> — for example a court order. That is the complete list. No data brokers, no advertisers, no "partners."</p>
+
+      <h2>5 · Where data lives and cross-border transfers</h2>
+      <p>Your database records and uploaded documents are stored in Canada. Some processing (email delivery, website hosting) happens in the United States through the providers listed above, under their contractual data-protection commitments. Before relying on providers outside Québec we assess whether the information would receive adequate protection, as Law 25 requires.</p>
+
+      <h2>6 · How long we keep it</h2>
+      <p>For as long as your account is active. If you delete your account, or ask us to, we delete your personal information — including your child's passport, its version history and vault documents — within 30 days, except the minimum we must keep for legal or accounting reasons. Waitlist entries are deleted on request at any time.</p>
+
+      <h2>7 · Your rights</h2>
+      <p>You can access the information we hold about you, correct it, receive a copy, withdraw a consent you gave, and ask for deletion. Write to <a href="mailto:contact@uniqueapex.com">contact@uniqueapex.com</a> — we respond within 30 days. If you are not satisfied, you can complain to the Commission d'accès à l'information du Québec, the Office of the Privacy Commissioner of Canada, or (regarding Alpexus OÜ) the Estonian Data Protection Inspectorate.</p>
+
+      <h2>8 · Children</h2>
+      <p>UniqueApex accounts are for adults (18+). Information about children is entered and controlled by their parent or legal guardian. We never collect information directly from children and never contact them.</p>
+
+      <h2>9 · Security</h2>
+      <p>Data is encrypted in transit, access is restricted by row-level security (each family can only ever read its own records), and provider outreach is rate-limited and logged. No system is perfectly secure; if a breach ever creates a risk of serious injury, we will notify you and the authorities as the law requires, and we keep a register of any incidents.</p>
+
+      <h2>10 · Changes</h2>
+      <p>If we change this policy in a meaningful way, we will post the new version here with a new effective date and tell you in the app or by email before it takes effect.</p>
+    </article>
+
+    <!-- ================= FRANÇAIS ================= -->
+    <article id="doc-fr" hidden>
+      <h1>Politique de confidentialité</h1>
+      <p class="lg-date">En vigueur le 17 juillet 2026 · UniqueApex est exploité par Alpexus OÜ (Estonie). Pour les résidents du Québec, la version française prévaut en cas de divergence.</p>
+
+      <h2>La version courte</h2>
+      <p>Vous nous confiez des renseignements sensibles au sujet de votre enfant. Nous les utilisons pour une seule chose : aider votre famille à trouver et à coordonner du soutien. Nous ne les vendons jamais, nous ne les utilisons jamais à des fins publicitaires, et rien au sujet de votre enfant n'est transmis à une clinique sans votre approbation explicite pour cet envoi précis.</p>
+
+      <h2>1 · Qui est responsable</h2>
+      <p>UniqueApex est exploité par Alpexus OÜ, une société estonienne, au service des familles du Québec. La personne responsable de la protection des renseignements personnels (Loi 25) est <b>Pelin İpek Temurcan</b> — <a href="mailto:contact@uniqueapex.com">contact@uniqueapex.com</a>. Écrivez-lui pour toute question, demande ou plainte relative à la vie privée.</p>
+
+      <h2>2 · Ce que nous recueillons</h2>
+      <p><b>Compte :</b> votre courriel et votre mot de passe (conservé sous forme hachée par notre fournisseur d'authentification).</p>
+      <p><b>Le Passeport familial :</b> les renseignements que vous choisissez d'inscrire au sujet de votre enfant — nom, date de naissance, diagnostics, développement, forces, besoins, historique de soins — et les coordonnées du foyer (nom du parent ou tuteur, contact, code postal). Il s'agit de renseignements sensibles concernant un mineur; c'est vous, parent ou tuteur légal, qui les saisissez et qui décidez de leur contenu.</p>
+      <p><b>Documents :</b> les fichiers que vous téléversez dans votre coffre privé (rapports d'évaluation, par exemple).</p>
+      <p><b>Formulaire de liste d'attente :</b> les renseignements soumis à l'inscription (nom, courriel, téléphone, âge de l'enfant, diagnostic, services recherchés, localisation, source de référence).</p>
+      <p><b>Registres de démarches :</b> quelles cliniques ont été contactées en votre nom et quand.</p>
+      <p><b>Éléments techniques :</b> une session de connexion dans le stockage local de votre navigateur. Nous n'utilisons ni traceurs publicitaires ni témoins d'analyse.</p>
+
+      <h2>3 · Pourquoi nous les utilisons</h2>
+      <p>Pour fournir le service : garder le profil de votre enfant au même endroit, calculer la Roue de soutien, proposer les prochaines étapes, vous jumeler avec des cliniques à proximité, envoyer les courriels de démarche que vous approuvez, et gérer votre compte et votre forfait. Nous utilisons aussi des chiffres agrégés et dépersonnalisés (par exemple « combien de familles se sont inscrites ce mois-ci »). Nous ne vendons pas de renseignements personnels et ne faisons aucune publicité avec.</p>
+
+      <h2>4 · Quand des renseignements sont communiqués</h2>
+      <p><b>Aux cliniques — seulement lorsque vous envoyez une démarche.</b> Lorsque vous approuvez un envoi, les cliniques sélectionnées reçoivent le prénom de votre enfant, son âge, le diagnostic tel que vous l'avez inscrit, votre message et votre courriel pour les réponses. Vous choisissez les cliniques, vous relisez le courriel et vous confirmez votre consentement avant tout envoi. Votre code postal et les distances ne sont jamais communiqués aux fournisseurs.</p>
+      <p><b>Aux prestataires qui font fonctionner notre infrastructure</b> (ils traitent les données selon nos instructions et ne peuvent pas les utiliser à leurs propres fins) :</p>
+      <ul>
+        <li><b>Supabase</b> — base de données, connexion et stockage de fichiers. Vos données sont hébergées au <b>Canada (région Canada Central)</b>.</li>
+        <li><b>Resend</b> — livraison des courriels (États-Unis), y compris les courriels de démarche contenant le prénom, l'âge et le diagnostic de votre enfant.</li>
+        <li><b>Vercel</b> — hébergement du site (États-Unis).</li>
+        <li><b>Google Maps</b> — affichage de la carte des fournisseurs; au chargement de la carte, votre navigateur communique avec Google.</li>
+        <li><b>Stripe</b> — traitement des paiements, lorsque les forfaits payants seront lancés (nous ne voyons jamais votre numéro de carte complet).</li>
+      </ul>
+      <p><b>Lorsque la loi l'exige</b> — par exemple une ordonnance d'un tribunal. C'est la liste complète. Aucun courtier en données, aucun annonceur, aucun « partenaire ».</p>
+
+      <h2>5 · Où les données résident et transferts hors Québec</h2>
+      <p>Vos dossiers et documents sont hébergés au Canada. Certains traitements (livraison de courriels, hébergement du site) ont lieu aux États-Unis par l'entremise des prestataires ci-dessus, selon leurs engagements contractuels de protection des données. Avant de recourir à des prestataires hors Québec, nous évaluons si les renseignements bénéficieraient d'une protection adéquate, comme l'exige la Loi 25.</p>
+
+      <h2>6 · Durée de conservation</h2>
+      <p>Tant que votre compte est actif. Si vous supprimez votre compte, ou nous le demandez, nous supprimons vos renseignements personnels — y compris le passeport de votre enfant, son historique et les documents du coffre — dans les 30 jours, sauf le minimum requis à des fins légales ou comptables. Les inscriptions à la liste d'attente sont supprimées sur demande, en tout temps.</p>
+
+      <h2>7 · Vos droits</h2>
+      <p>Vous pouvez consulter les renseignements que nous détenons, les corriger, en recevoir copie, retirer un consentement et demander la suppression. Écrivez à <a href="mailto:contact@uniqueapex.com">contact@uniqueapex.com</a> — réponse sous 30 jours. En cas d'insatisfaction, vous pouvez vous adresser à la Commission d'accès à l'information du Québec, au Commissariat à la protection de la vie privée du Canada ou, concernant Alpexus OÜ, à l'autorité estonienne de protection des données.</p>
+
+      <h2>8 · Enfants</h2>
+      <p>Les comptes UniqueApex sont réservés aux adultes (18 ans et plus). Les renseignements concernant un enfant sont saisis et contrôlés par son parent ou tuteur légal. Nous ne recueillons jamais de renseignements directement auprès d'enfants et ne les contactons jamais.</p>
+
+      <h2>9 · Sécurité</h2>
+      <p>Les données sont chiffrées en transit, l'accès est restreint par une sécurité au niveau des lignes (chaque famille ne peut lire que ses propres dossiers), et les démarches vers les fournisseurs sont limitées et journalisées. Aucun système n'est parfaitement sûr; si un incident présentait un risque de préjudice sérieux, nous vous aviserions ainsi que les autorités, comme la loi l'exige, et nous tenons un registre des incidents.</p>
+
+      <h2>10 · Modifications</h2>
+      <p>Si nous modifions cette politique de façon importante, la nouvelle version sera publiée ici avec une nouvelle date d'entrée en vigueur, et nous vous en informerons dans l'application ou par courriel avant sa prise d'effet.</p>
+    </article>
+  </div>
+</Layout>
+
+<style is:global>
+  .legal{max-width:760px;margin:0 auto;padding:64px 24px 80px}
+  .lg-toggle{display:flex;gap:6px;margin-bottom:28px}
+  .lg-toggle button{border:1px solid #E2E8F0;background:#fff;font-size:.82rem;font-weight:700;color:#64748B;padding:7px 18px;border-radius:9999px;cursor:pointer;font-family:inherit}
+  .lg-toggle button.on{background:#6D28D9;border-color:#6D28D9;color:#fff}
+  .legal h1{font-size:2rem;font-weight:800;color:#1E293B;margin:0 0 8px;letter-spacing:-.02em}
+  .lg-date{font-size:.82rem;color:#94A3B8;margin:0 0 28px;line-height:1.6}
+  .legal h2{font-size:1.05rem;font-weight:800;color:#1E293B;margin:30px 0 8px}
+  .legal p{font-size:.94rem;color:#475569;line-height:1.75;margin:0 0 12px}
+  .legal ul{margin:0 0 12px;padding-left:22px}
+  .legal li{font-size:.94rem;color:#475569;line-height:1.75;margin-bottom:6px}
+  .legal b{color:#1E293B}
+  .legal a{color:#6D28D9;font-weight:600;text-decoration:none}
+  .legal a:hover{text-decoration:underline}
+  .legal article[hidden]{display:none}
+</style>
+
+<script is:inline>
+  (function () {
+    document.querySelectorAll(".lg-toggle button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        document.querySelectorAll(".lg-toggle button").forEach(function (x) { x.classList.remove("on"); });
+        b.classList.add("on");
+        var fr = b.getAttribute("data-lang") === "fr";
+        document.getElementById("doc-en").hidden = fr;
+        document.getElementById("doc-fr").hidden = !fr;
+      });
+    });
+  })();
+</script>
