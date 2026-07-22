@@ -4,11 +4,12 @@
    uploads and to the child Assessments tab for manual records. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
+import DICT from "../../i18n/documents.js";
 ---
-<AppFormLayout title="Documents" activeNav="documents">
+<AppFormLayout title="Documents" titleFr="Documents" activeNav="documents">
   <SectionTabs section="documents" active="ai-summaries" />
-  <h1 class="page-title">AI Summaries</h1>
-  <p class="page-sub">Dense clinical reports, translated into plain parent language — what was found, what's recommended, what to do next.</p>
+  <h1 class="page-title" data-i18n="summaries_title">AI Summaries</h1>
+  <p class="page-sub" data-i18n="summaries_sub">Dense clinical reports, translated into plain parent language — what was found, what's recommended, what to do next.</p>
 
   <div class="da2-hero cu-rev cu-sparkle-host">
     <span class="cu-spark" style="top:14px;right:80px">✦</span>
@@ -17,35 +18,35 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/><path d="M12 11l.9 2.1L15 14l-2.1.9L12 17l-.9-2.1L9 14l2.1-.9z"/></svg>
     </div>
     <div class="da2-hero-tx">
-      <b>AI Report Reader</b>
-      <p>A 20-page evaluation becomes a one-page summary in minutes. Your report never leaves your private vault — the summary is saved right beside it.</p>
+      <b data-i18n="summaries_readerTitle">AI Report Reader</b>
+      <p data-i18n="summaries_readerDesc">A 20-page evaluation becomes a one-page summary in minutes. Your report never leaves your private vault — the summary is saved right beside it.</p>
     </div>
-    <a class="da2-btn" href="/documents">Upload a report</a>
+    <a class="da2-btn" href="/documents" data-i18n="summaries_uploadReport">Upload a report</a>
   </div>
 
   <div class="da2-steps">
     <div class="da2-step cu-rev" style="--d:.08s">
       <span class="n">1</span>
-      <b>Upload the report</b>
-      <p>Any evaluation PDF — speech, OT, psychoeducational, developmental — into your private vault.</p>
+      <b data-i18n="summaries_step1Title">Upload the report</b>
+      <p data-i18n="summaries_step1Desc">Any evaluation PDF — speech, OT, psychoeducational, developmental — into your private vault.</p>
     </div>
     <div class="da2-step cu-rev" style="--d:.14s">
       <span class="n">2</span>
-      <b>AI reads it for you</b>
-      <p>Key findings, recommendations and dates are pulled out and rewritten without the jargon.</p>
+      <b data-i18n="summaries_step2Title">AI reads it for you</b>
+      <p data-i18n="summaries_step2Desc">Key findings, recommendations and dates are pulled out and rewritten without the jargon.</p>
     </div>
     <div class="da2-step cu-rev" style="--d:.2s">
       <span class="n">3</span>
-      <b>Use it everywhere</b>
-      <p>The summary lands here and feeds your recommendations hub — ready for IEP meetings and funding forms.</p>
+      <b data-i18n="summaries_step3Title">Use it everywhere</b>
+      <p data-i18n="summaries_step3Desc">The summary lands here and feeds your recommendations hub — ready for IEP meetings and funding forms.</p>
     </div>
   </div>
 
   <div class="da2-status cu-rev" style="--d:.26s">
-    <p><strong>Rolling out now.</strong> The Report Reader is in final testing with pilot families. Until it reaches your account, you can capture findings by hand in <a href="/child/assessments">Assessments</a> — everything you save there carries over.</p>
+    <p><strong data-i18n="summaries_statusBold">Rolling out now.</strong> <span data-i18n="summaries_statusText">The Report Reader is in final testing with pilot families. Until it reaches your account, you can capture findings by hand in</span> <a href="/child/assessments" data-i18n="summaries_statusLink">Assessments</a> <span data-i18n="summaries_statusTail">— everything you save there carries over.</span></p>
   </div>
 
-  <p class="da2-note cu-rev" style="--d:.3s">AI can make mistakes and never replaces professional advice — always check the summary against the original report.</p>
+  <p class="da2-note cu-rev" style="--d:.3s" data-i18n="summaries_note">AI can make mistakes and never replaces professional advice — always check the summary against the original report.</p>
 </AppFormLayout>
 
 <style is:global>
@@ -69,7 +70,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
   .da2-note{max-width:920px;font-size:.74rem;color:var(--faint);margin-top:12px}
 </style>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
+  window.uaI18n(DICT); /* register + swap this page's data-i18n markup */
   (function () {
     var raw = localStorage.getItem("ua_session"), s = null;
     try { s = raw ? JSON.parse(raw) : null; } catch (e) {}

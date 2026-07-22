@@ -3,11 +3,12 @@
    The JSON export works today (same engine as Privacy & Data). */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
+import DICT from "../../i18n/documents.js";
 ---
-<AppFormLayout title="Documents" activeNav="documents">
+<AppFormLayout title="Documents" titleFr="Documents" activeNav="documents">
   <SectionTabs section="documents" active="exports" />
-  <h1 class="page-title">Exports</h1>
-  <p class="page-sub">Your data belongs to you. Take it with you anytime — no questions, no lock-in.</p>
+  <h1 class="page-title" data-i18n="exports_title">Exports</h1>
+  <p class="page-sub" data-i18n="exports_sub">Your data belongs to you. Take it with you anytime — no questions, no lock-in.</p>
 
   <div class="dx-grid">
 
@@ -16,9 +17,9 @@ import SectionTabs from "@/components/SectionTabs.astro";
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M8 11l4 4 4-4"/><path d="M4 19h16"/></svg>
       </span>
       <div class="dx-tx">
-        <div class="dx-head"><b>Everything, as JSON</b><span class="dx-pill ready">Ready</span></div>
-        <p>Every child profile you've saved, in a single machine-readable file. Perfect for backups or moving to another tool.</p>
-        <button class="dx-btn" id="dx-json">Download my data</button>
+        <div class="dx-head"><b data-i18n="exports_jsonTitle">Everything, as JSON</b><span class="dx-pill ready" data-i18n="pillReady">Ready</span></div>
+        <p data-i18n="exports_jsonDesc">Every child profile you've saved, in a single machine-readable file. Perfect for backups or moving to another tool.</p>
+        <button class="dx-btn" id="dx-json" data-i18n="exports_downloadBtn">Download my data</button>
         <span class="dx-msg" id="dx-msg"></span>
       </div>
     </div>
@@ -28,8 +29,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 4v16"/></svg>
       </span>
       <div class="dx-tx">
-        <div class="dx-head"><b>Timeline &amp; wins as a spreadsheet</b><span class="dx-pill soon">Coming soon</span></div>
-        <p>Events, milestones and wins as CSV — for your own charts, or for a professional who asks for the history.</p>
+        <div class="dx-head"><b data-i18n="exports_csvTitle">Timeline &amp; wins as a spreadsheet</b><span class="dx-pill soon" data-i18n="pillSoon">Coming soon</span></div>
+        <p data-i18n="exports_csvDesc">Events, milestones and wins as CSV — for your own charts, or for a professional who asks for the history.</p>
       </div>
     </div>
 
@@ -38,8 +39,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
       </span>
       <div class="dx-tx">
-        <div class="dx-head"><b>Delete instead?</b></div>
-        <p>Downloading isn't the same as leaving. If you want your data gone, that lives in <a href="/settings/privacy" style="color:var(--violet-700);font-weight:600">Privacy &amp; Data</a> — deletion is just as easy as export.</p>
+        <div class="dx-head"><b data-i18n="exports_deleteTitle">Delete instead?</b></div>
+        <p><span data-i18n="exports_deleteText">Downloading isn't the same as leaving. If you want your data gone, that lives in</span> <a href="/settings/privacy" style="color:var(--violet-700);font-weight:600" data-i18n="exports_deleteLink">Privacy &amp; Data</a> <span data-i18n="exports_deleteTail">— deletion is just as easy as export.</span></p>
       </div>
     </div>
 
@@ -61,8 +62,12 @@ import SectionTabs from "@/components/SectionTabs.astro";
   .dx-msg{font-size:.76rem;color:var(--muted);margin-left:10px}
 </style>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
   (function () {
+    /* i18n: catalog dict injected at build time (registers + swaps markup) */
+    var PT = window.uaI18n(DICT);
+    var tpl = function (str, v) { return String(str).replace(/\{(\w+)\}/g, function (m, k) { return v && v[k] != null ? v[k] : ""; }); };
+
     var UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
     var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
     var s = null;
@@ -71,7 +76,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
     document.getElementById("dx-json").addEventListener("click", function () {
       var msg = document.getElementById("dx-msg");
-      msg.textContent = "Preparing your export…";
+      msg.textContent = PT.exports_preparing;
       fetch(UA_URL + "/rest/v1/passports?select=id,created_at,data", {
         headers: { apikey: ANON, Authorization: "Bearer " + s.access_token }
       })
@@ -83,10 +88,11 @@ import SectionTabs from "@/components/SectionTabs.astro";
           a.href = URL.createObjectURL(blob);
           a.download = "uniqueapex-data-export.json";
           document.body.appendChild(a); a.click(); a.remove();
-          msg.textContent = "Export downloaded (" + (rows ? rows.length : 0) + " profile" + (rows && rows.length === 1 ? "" : "s") + ").";
+          var n = rows ? rows.length : 0;
+          msg.textContent = tpl(n === 1 ? PT.exports_doneOne : PT.exports_doneMany, { n: n });
           msg.style.color = "#15803D";
         })
-        .catch(function () { msg.textContent = "Couldn't export — try again."; msg.style.color = "#B42318"; });
+        .catch(function () { msg.textContent = PT.exports_fail; msg.style.color = "#B42318"; });
     });
   })();
 </script>

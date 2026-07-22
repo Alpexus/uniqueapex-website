@@ -10,7 +10,7 @@
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
-<AppFormLayout title="Support Wheel" activeNav="child">
+<AppFormLayout title="Support Wheel" titleFr="Roue de soutien" activeNav="child">
   <div class="c3-tabs"><SectionTabs section="child" active="support-wheel" /></div>
 
   <div class="sw-wrap">
@@ -21,7 +21,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <span class="c3-rib-av" id="rb-av">·</span>
       <div class="c3-rib-id">
         <h1 id="rb-title">Support Wheel</h1>
-        <p id="rb-sub">The full instrument — three views, a guided tour, and the story behind every petal.</p>
+        <p id="rb-sub" data-i18n="ribSub">The full instrument — three views, a guided tour, and the story behind every petal.</p>
       </div>
       <div class="c3-rib-stats" id="rb-stats"></div>
     </div>
@@ -33,7 +33,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <div class="sw-tophead">
         <div id="sw-toggle" class="c3-seg" role="tablist"></div>
         <button class="sw-tourbtn" id="sw-tour" type="button" title="Auto-walk through all eight areas">
-          <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5l9 5.5-9 5.5z"/></svg> Tour
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5l9 5.5-9 5.5z"/></svg> <span data-i18n="tourBtn">Tour</span>
         </button>
       </div>
       <p id="sw-caption" class="sw-caption"></p>
@@ -49,9 +49,9 @@ import SectionTabs from "@/components/SectionTabs.astro";
       </div>
 
       <div class="sw-compare c3-stage" id="sw-compare" style="display:none">
-        <div class="sw-cmp-col"><p class="sw-cmp-lab" style="color:var(--violet-700)">Support needs</p><div id="sw-cmp-needs" class="c3-anim"></div></div>
+        <div class="sw-cmp-col"><p class="sw-cmp-lab" style="color:var(--violet-700)" data-i18n="needsBtn">Support needs</p><div id="sw-cmp-needs" class="c3-anim"></div></div>
         <div class="sw-cmp-mid" aria-hidden="true"><span>⇄</span></div>
-        <div class="sw-cmp-col"><p class="sw-cmp-lab" style="color:var(--green)">Strengths</p><div id="sw-cmp-str" class="c3-anim"></div></div>
+        <div class="sw-cmp-col"><p class="sw-cmp-lab" style="color:var(--green)" data-i18n="strengthsBtn">Strengths</p><div id="sw-cmp-str" class="c3-anim"></div></div>
       </div>
 
       <div class="sw-domnav" id="sw-domnav"></div>
@@ -61,7 +61,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
           <i style="width:5px;height:5px"></i><i style="width:7px;height:7px"></i><i style="width:9px;height:9px"></i><i style="width:11px;height:11px"></i><i style="width:13px;height:13px"></i>
         </span>
         <span id="sw-leg-text">1 ring = minimal · 5 rings = intensive</span>
-        <span class="sw-kbd">· ← → to walk the wheel</span>
+        <span class="sw-kbd" data-i18n="kbdHint">· ← → to walk the wheel</span>
       </div>
     </div>
 
@@ -69,7 +69,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     <div id="sw-detail" class="sw-detail cu-rev" style="--d:.1s"></div>
 
     <div class="sw-card sw-disc cu-rev" style="--d:.14s">
-      <p><strong>Preliminary profile — not a diagnosis.</strong> Generated from your passport answers. Confidence reflects how many related questions you've completed. For any concerns, speak with a qualified professional.</p>
+      <p><strong data-i18n="disclaimerTitle">Preliminary profile — not a diagnosis.</strong> <span data-i18n="disclaimerBody">Generated from your passport answers. Confidence reflects how many related questions you've completed. For any concerns, speak with a qualified professional.</span></p>
     </div>
   </div>
 </AppFormLayout>
@@ -179,11 +179,24 @@ import SectionTabs from "@/components/SectionTabs.astro";
   import { generateWheelSVG, domainColor } from "../../lib/wheelSvg.js";
   import { domainDetail } from "../../lib/domainInsights.js";
   import { getSnapshots } from "../../lib/history.js";
+  import DICT from "../../i18n/child-wheel.js";
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const tintOf = (nm, a) => { const i = DOMAINS.indexOf(nm); return i === -1 ? "rgba(109,40,217," + a + ")" : "hsla(" + HUES[i] + ",70%,45%," + a + ")"; };
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- i18n (string codes from src/i18n/child-wheel.js) ---------- */
+  const T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+  const tpl = (s, v) => String(s).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? v[k] : ""));
+  const ofName = (n) => (window.uaLang === "fr"
+    ? (/^[aeiouyàâäéèêëìîïòôöùûüh]/i.test(String(n || "")) ? "d'" : "de ")
+    : "");
+  /* Script-owned labels (JS fills these with data later — translate the
+     fallbacks here, never via data-i18n, to avoid overwrite races). */
+  $("rb-title").textContent = T.pageTitle;
+  $("sw-leg-text").textContent = T.legDefault;
+  $("sw-tour").title = T.tourTitle;
 
   const icCheck = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
   const icBang = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M8 3.2v6M8 12.3v.2"/></svg>';
@@ -191,7 +204,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
   const SHORTD = { "Communication": "Communication", "Social Connection": "Social", "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility", "Emotional Regulation": "Emotional", "Executive Function": "Executive", "Daily Living Skills": "Daily living", "Learning & Play": "Learning & play" };
 
   function levelInfo(score) {
-    if (score == null) return { label: "Not enough data", bg: "#F4F3F8", fg: "#7B7491", seg: "#D8D3E6" };
+    if (score == null) return { label: T.notEnoughData, bg: "#F4F3F8", fg: "#7B7491", seg: "#D8D3E6" };
     const b = scoreToBand(score);
     if (b.key === "minimal" || b.key === "low") return { label: b.label, bg: "#E8F6F0", fg: "#0E8F66", seg: "#0E8F66" };
     if (b.key === "high" || b.key === "intensive") return { label: b.label, bg: "#EDE9FE", fg: "#6D28D9", seg: "#7C3AED" };
@@ -203,7 +216,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     const p = UA.pickActivePassport(passports);
     const data = (p && p.data) || {};
     const id = UA.childIdentity(data);
-    const first = id.first || "your child";
+    const first = id.first || T.yourChild;
     const scored = scoreWheel(data);
     const n = DOMAINS.length;
     const scoredCount = DOMAINS.filter((nm) => scored[nm].score != null).length;
@@ -219,20 +232,20 @@ import SectionTabs from "@/components/SectionTabs.astro";
     }
 
     $("rb-av").textContent = (id.first || id.name || "·")[0].toUpperCase();
-    if (id.first) $("rb-title").textContent = id.first + "'s Support Wheel";
+    if (id.first) $("rb-title").textContent = tpl(T.wheelTitleNamed, { name: id.first, of: ofName(id.first) });
     const wc = wheelCompleteness(data);
     const topNeed = DOMAINS.filter((nm) => scored[nm].score != null).sort((a, b) => scored[b].score - scored[a].score)[0];
     $("rb-stats").innerHTML = [
-      `<span class="c3-rstat"><b>${wc.pct}%</b><span>wheel complete</span></span>`,
-      `<span class="c3-rstat"><b>${scoredCount}/8</b><span>areas scored</span></span>`,
-      topNeed ? `<span class="c3-rstat"><b style="font-size:.82rem">${esc(SHORTD[topNeed] || topNeed)}</b><span>most support</span></span>` : "",
+      `<span class="c3-rstat"><b>${wc.pct}%</b><span>${esc(T.statWheelComplete)}</span></span>`,
+      `<span class="c3-rstat"><b>${scoredCount}/8</b><span>${esc(T.statAreasScored)}</span></span>`,
+      topNeed ? `<span class="c3-rstat"><b style="font-size:.82rem">${esc(SHORTD[topNeed] || topNeed)}</b><span>${esc(T.statMostSupport)}</span></span>` : "",
     ].join("");
 
     if (scoredCount < 3) {
       $("sw-toggle").innerHTML = "";
       $("sw-tour").style.display = "none";
       $("sw-caption").textContent = "";
-      $("sw-wheel").innerHTML = `<div class="sw-prompt"><p>Fill in more of the passport (communication, sensory, behaviour, daily living) to generate ${esc(first)}'s support wheel.</p><a href="${passportLink}">Continue passport →</a></div>`;
+      $("sw-wheel").innerHTML = `<div class="sw-prompt"><p>${tpl(esc(T.promptFill), { of: ofName(first), name: esc(first) })}</p><a href="${passportLink}">${esc(T.continuePassportArrow)}</a></div>`;
       $("sw-detail").style.display = "none";
       $("sw-domnav").style.display = "none";
       document.querySelector(".sw-legend").style.display = "none";
@@ -241,7 +254,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
     const lowConf = DOMAINS.filter((nm) => scored[nm].confidence === "low");
     $("sw-warning").innerHTML = (wc.pct < 70)
-      ? `<div class="sw-warn cu-rev"><p><strong>Wheel is ${wc.pct}% complete</strong> — ${wc.answered} of ${wc.total} contributing questions answered.${lowConf.length ? " Lower confidence in: " + esc(lowConf.join(", ")) + "." : ""} <a href="${passportLink}">Complete more →</a></p></div>`
+      ? `<div class="sw-warn cu-rev"><p>${tpl(T.wheelWarn, { p: wc.pct, a: wc.answered, t: wc.total })}${lowConf.length ? tpl(esc(T.lowerConf), { list: esc(lowConf.join(", ")) }) : ""} <a href="${passportLink}">${esc(T.completeMore)}</a></p></div>`
       : "";
 
     let sel = 0;
@@ -251,25 +264,25 @@ import SectionTabs from "@/components/SectionTabs.astro";
     let mode = "needs";
     let touring = false, tourTimer = null;
 
-    const MODES = [["needs", "Support needs"], ["strengths", "Strengths"], ["compare", "⇄ Compare"]];
+    const MODES = [["needs", T.needsBtn], ["strengths", T.strengthsBtn], ["compare", T.compareBtn]];
     function renderToggle() {
       const seg = $("sw-toggle");
       seg.innerHTML = `<span class="thumb"></span>` + MODES.map(([m, lbl]) =>
-        `<button data-mode="${m}" class="${m === mode ? "on" : ""}" role="tab" aria-selected="${m === mode}">${lbl}</button>`).join("");
+        `<button data-mode="${m}" class="${m === mode ? "on" : ""}" role="tab" aria-selected="${m === mode}">${esc(lbl)}</button>`).join("");
       const onBtn = seg.querySelector("button.on"), thumb = seg.querySelector(".thumb");
       requestAnimationFrame(() => { thumb.style.left = onBtn.offsetLeft + "px"; thumb.style.width = onBtn.offsetWidth + "px"; });
       seg.querySelectorAll("button").forEach((b) =>
         b.addEventListener("click", () => { mode = b.dataset.mode; stopTour(); renderToggle(); renderWheel(); renderDetail(); }));
       $("sw-caption").innerHTML = mode === "strengths"
-        ? "Fuller petals mean <strong>stronger</strong> areas."
+        ? T.captionStrengths
         : mode === "compare"
-          ? "Needs and strengths, <strong>side by side</strong> — tap either wheel or the chips below."
-          : "Fuller petals mean <strong>more support</strong> is helpful.";
+          ? T.captionCompare
+          : T.captionNeeds;
       $("sw-leg-text").textContent = mode === "strengths"
-        ? "1 ring = emerging · 5 rings = shining"
+        ? T.legStrengths
         : mode === "compare"
-          ? "Left: support needs · Right: strengths — selection stays in sync"
-          : "1 ring = minimal support · 5 rings = intensive support";
+          ? T.legCompare
+          : T.legNeeds;
     }
 
     /* domain chip nav */
@@ -355,15 +368,15 @@ import SectionTabs from "@/components/SectionTabs.astro";
       if (!ob || !nb || ob.key === nb.key) return "";
       const better = nb.rings < ob.rings;
       const when = new Date(baseline.at);
-      const whenTxt = isNaN(when) ? "your first check-in" : when.toLocaleDateString("en-CA", { month: "short", year: "numeric" });
-      return `<span class="swd-trend">Since ${esc(whenTxt)}: ${esc(ob.label)} → <span class="${better ? "up" : "dn"}">${esc(nb.label)} ${better ? "✦" : ""}</span></span>`;
+      const whenTxt = isNaN(when) ? T.firstCheckin : when.toLocaleDateString(window.uaLocale || "en-CA", { month: "short", year: "numeric" });
+      return `<span class="swd-trend">${tpl(esc(T.trendSince), { when: esc(whenTxt) })} ${esc(ob.label)} → <span class="${better ? "up" : "dn"}">${esc(nb.label)} ${better ? "✦" : ""}</span></span>`;
     }
     function block(title, items, cls, dBase, copyBtn) {
       const icon = cls === "str" ? icCheck : cls === "sup" ? icBang : icStar;
       const inner = items.length
         ? items.map((t, i) => `<span class="swd-chip ${cls} cu-pop" style="--d:${(dBase + i * 0.045).toFixed(2)}s">${icon}${esc(t)}</span>`).join("")
-        : `<span class="swd-none">${cls === "sup" ? "Nothing flagged right now" : "Add details in the passport to see this"}</span>`;
-      return `<div class="swd-group"><p class="swd-lab"><span>${title}</span>${copyBtn && items.length ? `<button class="swd-copy" id="swd-copy" type="button">Copy</button>` : ""}</p><div class="swd-chips">${inner}</div></div>`;
+        : `<span class="swd-none">${cls === "sup" ? esc(T.noneFlagged) : esc(T.noneAdd)}</span>`;
+      return `<div class="swd-group"><p class="swd-lab"><span>${esc(title)}</span>${copyBtn && items.length ? `<button class="swd-copy" id="swd-copy" type="button">${esc(T.copy)}</button>` : ""}</p><div class="swd-chips">${inner}</div></div>`;
     }
     function renderDetail() {
       const name = DOMAINS[sel], dm = scored[name];
@@ -374,31 +387,31 @@ import SectionTabs from "@/components/SectionTabs.astro";
       let segs = ""; for (let k = 1; k <= 5; k++) segs += `<span class="swd-seg">${k <= segCount ? `<b style="background:${L.seg};--d:${(k * 0.07).toFixed(2)}s"></b>` : ""}</span>`;
       let ssegs = ""; for (let k = 1; k <= 5; k++) ssegs += `<span class="swd-seg">${k <= strCount ? `<b style="background:#0E8F66;--d:${(k * 0.07).toFixed(2)}s"></b>` : ""}</span>`;
       const confPct = dm.coverage != null ? Math.round(dm.coverage * 100) : 0;
-      const confLbl = dm.confidence === "high" ? "High" : dm.confidence === "medium" ? "Medium" : dm.confidence === "low" ? "Low" : "No data";
+      const confLbl = dm.confidence === "high" ? T.confHigh : dm.confidence === "medium" ? T.confMedium : dm.confidence === "low" ? T.confLow : T.confNone;
       $("sw-detail").style.borderTopColor = dc;
       $("sw-detail").innerHTML = `<div class="swd-in"><div class="swd-cols">
         <div>
           <div class="swd-head"><span class="swd-dot" style="background:${tintOf(name, 0.14)}"><i style="background:${dc}"></i></span><span class="swd-name">${esc(name)}</span><span class="swd-pill" style="background:${L.bg};color:${L.fg}">${L.label}</span></div>
           ${trendPill(name)}
-          ${dm.score == null ? `<p class="swd-none">Add more in the passport to build this part of the profile.</p>` :
-            `<div class="swd-meta"><span class="l">Support level</span><span class="swd-segs">${segs}</span></div>`
-            + (dm.strength != null ? `<div class="swd-meta"><span class="l">Strengths</span><span class="swd-segs">${ssegs}</span></div>` : "")
-            + `<div class="swd-meta"><span class="l">Confidence</span><span class="swd-confbar"><b style="--w:${confPct}%"></b></span><span style="font-size:.72rem;color:var(--muted);white-space:nowrap">${confLbl} · ${dm.answered}/${dm.total}</span></div>`}
+          ${dm.score == null ? `<p class="swd-none">${esc(T.addMorePassport)}</p>` :
+            `<div class="swd-meta"><span class="l">${esc(T.supportLevel)}</span><span class="swd-segs">${segs}</span></div>`
+            + (dm.strength != null ? `<div class="swd-meta"><span class="l">${esc(T.strengthsLabel)}</span><span class="swd-segs">${ssegs}</span></div>` : "")
+            + `<div class="swd-meta"><span class="l">${esc(T.confidence)}</span><span class="swd-confbar"><b style="--w:${confPct}%"></b></span><span style="font-size:.72rem;color:var(--muted);white-space:nowrap">${esc(confLbl)} · ${dm.answered}/${dm.total}</span></div>`}
           ${det.context ? `<p class="swd-ctx">${esc(det.context)}</p>` : ""}
         </div>
         <div>
-          ${block("Strengths", det.strengths, "str", 0.08)}
-          ${block("Areas we're supporting", det.support, "sup", 0.16)}
-          ${block("Strategies that help", det.strategies, "tip", 0.24, true)}
+          ${block(T.strengthsLabel, det.strengths, "str", 0.08)}
+          ${block(T.groupSupporting, det.support, "sup", 0.16)}
+          ${block(T.groupStrategies, det.strategies, "tip", 0.24, true)}
         </div>
       </div></div>`;
       const cbtn = document.getElementById("swd-copy");
       if (cbtn) cbtn.addEventListener("click", () => {
-        const txt = "Strategies that help — " + name + (id.first ? " (" + id.first + ")" : "") + ":\n"
+        const txt = tpl(T.copyStrategiesHead, { domain: name, who: id.first ? " (" + id.first + ")" : "" }) + "\n"
           + det.strategies.map((s2) => "• " + s2).join("\n");
         navigator.clipboard && navigator.clipboard.writeText(txt).then(() => {
-          cbtn.textContent = "Copied ✓";
-          setTimeout(() => { cbtn.textContent = "Copy"; }, 1600);
+          cbtn.textContent = T.copied;
+          setTimeout(() => { cbtn.textContent = T.copy; }, 1600);
         }).catch(() => {});
       });
     }
@@ -411,7 +424,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       if (reduceMotion) { stepTour(); return; }
       touring = true;
       $("sw-tour").classList.add("on");
-      $("sw-tour").innerHTML = `<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M4 3h3v10H4zM9 3h3v10H9z"/></svg> Stop`;
+      $("sw-tour").innerHTML = `<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M4 3h3v10H4zM9 3h3v10H9z"/></svg> ${esc(T.stopBtn)}`;
       onSelect();
       tourTimer = setInterval(stepTour, 2800);
     }
@@ -420,7 +433,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       touring = false;
       clearInterval(tourTimer);
       $("sw-tour").classList.remove("on");
-      $("sw-tour").innerHTML = `<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5l9 5.5-9 5.5z"/></svg> Tour`;
+      $("sw-tour").innerHTML = `<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5l9 5.5-9 5.5z"/></svg> ${esc(T.tourBtn)}`;
     }
     $("sw-tour").addEventListener("click", () => { touring ? stopTour() : startTour(); });
 

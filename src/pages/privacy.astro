@@ -1,18 +1,23 @@
 ---
 /* PRIVACY POLICY — plain-language, Law 25 / PIPEDA / GDPR-aware working
    version. Written to be honest and protective for the pilot stage;
-   get a Québec privacy lawyer to review once revenue allows. */
+   get a Québec privacy lawyer to review once revenue allows.
+   Bilingual in one page: /privacy opens in English, /fr/privacy opens
+   in French (lang prop) — the pill toggle switches either way. */
 import Layout from "@/layouts/Layout.astro";
+
+const { lang = "en" } = Astro.props;
+const isFr = lang === "fr";
 ---
-<Layout title="Privacy Policy — UniqueApex">
+<Layout title={isFr ? "Politique de confidentialité — UniqueApex" : "Privacy Policy — UniqueApex"} lang={lang}>
   <div class="legal">
     <div class="lg-toggle">
-      <button class="on" data-lang="en" type="button">English</button>
-      <button data-lang="fr" type="button">Français</button>
+      <button class={isFr ? "" : "on"} data-lang="en" type="button">English</button>
+      <button class={isFr ? "on" : ""} data-lang="fr" type="button">Français</button>
     </div>
 
     <!-- ================= ENGLISH ================= -->
-    <article id="doc-en">
+    <article id="doc-en" hidden={isFr}>
       <h1>Privacy Policy</h1>
       <p class="lg-date">Effective July 17, 2026 · UniqueApex is operated by Alpexus Teknoloji Ltd. Şti. (Türkiye). For Québec residents, the French version prevails in case of any difference.</p>
 
@@ -65,7 +70,7 @@ import Layout from "@/layouts/Layout.astro";
     </article>
 
     <!-- ================= FRANÇAIS ================= -->
-    <article id="doc-fr" hidden>
+    <article id="doc-fr" hidden={!isFr}>
       <h1>Politique de confidentialité</h1>
       <p class="lg-date">En vigueur le 17 juillet 2026 · UniqueApex est exploité par Alpexus Teknoloji Ltd. Şti. (Turquie). Pour les résidents du Québec, la version française prévaut en cas de divergence.</p>
 

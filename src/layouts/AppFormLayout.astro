@@ -13,12 +13,14 @@ import "../styles/child-ui.css";  // CHILD-UI-V1 — shared motion + blob/sparkl
 import Sidebar from "../components/Sidebar.astro";
 import BottomBar from "../components/BottomBar.astro";
 import HeaderActions from "../components/HeaderActions.astro";
+import I18nBoot from "../components/I18nBoot.astro";
 
 export interface Props {
   title?: string;
+  titleFr?: string;  // optional French page title (swapped client-side)
   activeNav?: string;
 }
-const { title = "UniqueApex", activeNav = "dashboard" } = Astro.props;
+const { title = "UniqueApex", titleFr, activeNav = "dashboard" } = Astro.props;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -30,6 +32,7 @@ const { title = "UniqueApex", activeNav = "dashboard" } = Astro.props;
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <I18nBoot />
 </head>
 <body>
   <div class="scrim" id="ua-scrim"></div>
@@ -41,7 +44,7 @@ const { title = "UniqueApex", activeNav = "dashboard" } = Astro.props;
     <!-- ============ MAIN ============ -->
     <div class="main">
       <header class="header">
-        <button class="burger" id="ua-burger" aria-label="Open menu">
+        <button class="burger" id="ua-burger" aria-label="Open menu" data-i18n-aria="openMenu">
           <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="#494060" stroke-width="1.6"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/></svg>
         </button>
 
@@ -53,13 +56,13 @@ const { title = "UniqueApex", activeNav = "dashboard" } = Astro.props;
           </button>
           <div class="child-menu" id="ua-child-menu" role="menu">
             <!-- populated from Supabase; this is the fallback -->
-            <div style="padding:10px;font-size:.82rem;color:var(--muted)" id="ua-child-empty">No children yet.</div>
+            <div style="padding:10px;font-size:.82rem;color:var(--muted)" id="ua-child-empty" data-i18n="noChildren">No children yet.</div>
             <hr />
-            <a class="row add" href="/passport">+ Add a child</a>
+            <a class="row add" href="/passport" data-i18n="addChild">+ Add a child</a>
           </div>
         </div>
 
-        <div class="form-pagetitle">{title}</div>
+        <div class="form-pagetitle" data-label-fr={titleFr || undefined}>{title}</div>
         <div style="flex:1"></div>
 
         <HeaderActions />
@@ -94,6 +97,15 @@ const { title = "UniqueApex", activeNav = "dashboard" } = Astro.props;
         if (location.pathname.replace(/\/+$/, "") === "/admin") return;
         location.href = "/login";
         return;
+      }
+
+      // --- Shell language (dictionary from I18nBoot in <head>) ---
+      var ST = window.uaShellT || {};
+      // Script-owned label (never data-i18n — a fetch below replaces it
+      // with the real child name, so we translate the fallback here).
+      if (window.uaLang !== "en" && ST.selectChild) {
+        var cn = document.getElementById("ua-child-name");
+        if (cn) cn.textContent = ST.selectChild;
       }
 
       // --- Sidebar drawer (mobile) ---
@@ -163,7 +175,7 @@ const { title = "UniqueApex", activeNav = "dashboard" } = Astro.props;
           var frag = "";
           rows.forEach(function (row, i) {
             var cp = (row.data && row.data.childProfile) || {};
-            var name = [cp.firstName, cp.lastName].filter(Boolean).join(" ") || "Child";
+            var name = [cp.firstName, cp.lastName].filter(Boolean).join(" ") || ST.childFallback || "Child";
             var dx = (row.data && row.data.diagnosis && row.data.diagnosis.summary) || cp.city || "";
             var grad = colorFor(i);
             var sel = row.id === active ? " sel" : "";
@@ -199,7 +211,7 @@ const { title = "UniqueApex", activeNav = "dashboard" } = Astro.props;
               var okPeriod = sub && (!sub.current_period_end || new Date(sub.current_period_end) > new Date());
               var plan = okPeriod && sub ? sub.plan : "free";
               if (plan === "family" && rows.length < 4) { location.href = "/passport"; return; }
-              if (window.uaNotify) window.uaNotify("info", plan === "family" ? "The Family plan includes up to 4 children." : "Adding another child is part of the Family plan ✦");
+              if (window.uaNotify) window.uaNotify("info", plan === "family" ? (ST.famPlanFull || "The Family plan includes up to 4 children.") : (ST.famPlanUpsell || "Adding another child is part of the Family plan ✦"));
               setTimeout(function () { location.href = "/pricing"; }, 1100);
             }).catch(function () { location.href = "/passport"; });
           });

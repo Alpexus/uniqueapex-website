@@ -39,7 +39,7 @@ import AppLayout from "../layouts/AppLayout.astro";
         <p class="d3-date" id="g-date"></p>
       </div>
       <div class="d3-hero-side">
-        <a class="d3-chip" id="h-chip" href="/child" aria-label="Open the child profile">
+        <a class="d3-chip" id="h-chip" href="/child" aria-label="Open the child profile" data-i18n-aria="openProfile">
           <span class="d3-chip-av" id="h-avatar">·</span>
           <span class="d3-chip-meta">
             <b id="h-name">Loading…</b>
@@ -55,10 +55,10 @@ import AppLayout from "../layouts/AppLayout.astro";
             </svg>
             <span class="pctw" id="d-pct">—</span>
           </span>
-          <span class="d3-ring-label"><b>Passport</b><span id="d-remaining">—</span></span>
+          <span class="d3-ring-label"><b data-i18n="passportLabel">Passport</b><span id="d-remaining">—</span></span>
           <div class="d3-hero-btns">
-            <a class="d3-btn-solid" id="d-edit" href="/passport">Continue passport</a>
-            <a class="d3-btn-line" id="d-export" href="/passport?export=1">Export PDF</a>
+            <a class="d3-btn-solid" id="d-edit" href="/passport" data-i18n="continuePassport">Continue passport</a>
+            <a class="d3-btn-line" id="d-export" href="/passport?export=1" data-i18n="exportPdf">Export PDF</a>
           </div>
         </div>
       </div>
@@ -66,7 +66,7 @@ import AppLayout from "../layouts/AppLayout.astro";
     <div class="d3-guide" id="g-guide" style="display:none">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="#5EEAD4" style="flex-shrink:0;margin-top:3px"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg>
       <p id="g-guide-text"></p>
-      <a href="/child" class="d3-guide-link">More →</a>
+      <a href="/child" class="d3-guide-link" data-i18n="more">More →</a>
     </div>
   </section>
 
@@ -77,14 +77,14 @@ import AppLayout from "../layouts/AppLayout.astro";
     <div class="card t3 cu-rev cu-lift" style="--d:.06s">
       <div class="t3-head">
         <span class="cu-blob t3-blob" style="--blob:#EDE9FE;color:#6D28D9"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg></span>
-        <span class="t3-title">Today's tip</span>
+        <span class="t3-title" data-i18n="todaysTip">Today's tip</span>
         <span class="t3-pill" id="tip-tag" style="display:none"></span>
       </div>
       <p class="t3-body" id="tip-text">Loading…</p>
       <p class="t3-src" id="tip-src"></p>
       <div class="t3-foot">
-        <button class="t3-mini" id="tip-copy" type="button" style="display:none">Copy</button>
-        <button class="t3-mini" id="tip-next" type="button" style="display:none">Another tip</button>
+        <button class="t3-mini" id="tip-copy" type="button" style="display:none" data-i18n="copy">Copy</button>
+        <button class="t3-mini" id="tip-next" type="button" style="display:none" data-i18n="anotherTip">Another tip</button>
         <span class="t3-note" id="tip-note"></span>
       </div>
     </div>
@@ -93,7 +93,7 @@ import AppLayout from "../layouts/AppLayout.astro";
     <div class="card t3 cu-rev cu-lift" style="--d:.1s">
       <div class="t3-head">
         <span class="cu-blob t3-blob" style="--blob:#E6F4F2;color:#0E8C82"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8h9M8 4.5L11.5 8 8 11.5"/></svg></span>
-        <span class="t3-title">Suggested next step</span>
+        <span class="t3-title" data-i18n="suggestedStep">Suggested next step</span>
         <span class="t3-pill" id="step-pill" style="display:none"></span>
       </div>
       <p class="t3-body" id="step-title" style="font-weight:600">Loading…</p>
@@ -108,13 +108,13 @@ import AppLayout from "../layouts/AppLayout.astro";
     <div class="card t3 t3-win cu-rev cu-lift" style="--d:.14s">
       <div class="t3-head">
         <span class="cu-blob t3-blob" style="--blob:#E8F6F0;color:#0E8F66"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg></span>
-        <span class="t3-title">Log today's win</span>
+        <span class="t3-title" data-i18n="logWin">Log today's win</span>
       </div>
       <div class="t3-winrow">
-        <input id="win-input" type="text" maxlength="200" placeholder="Even tiny ones count…" autocomplete="off" />
+        <input id="win-input" type="text" maxlength="200" placeholder="Even tiny ones count…" autocomplete="off" data-i18n-ph="winPh" />
         <button id="win-save" type="button" class="d3-winbtn">
           <span class="d3-burst" id="win-burst" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i></span>
-          Save
+          <span data-i18n="winSave">Save</span>
         </button>
       </div>
       <p class="t3-src" id="win-msg">It lands in the Progress journal, dated today.</p>
@@ -123,9 +123,9 @@ import AppLayout from "../layouts/AppLayout.astro";
 
   <!-- ================= KPI ROW ================= -->
   <div class="d3-kpis">
-    <a class="card d3-kpi cu-rev cu-lift" href="/child" style="--d:.16s"><span class="cu-blob d3-kpi-blob" style="--blob:#EDE9FE;color:#6D28D9"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 1.5l2 4.2 4.5.5-3.3 3.1.9 4.5L8 11.7 3.9 13.8l.9-4.5L1.5 6.2 6 5.7z"/></svg></span><span><span class="d3-kpi-num" id="kpi-focus">—</span><span class="d3-kpi-lab">Focus areas</span></span></a>
-    <a class="card d3-kpi cu-rev cu-lift" href="/child/growth" style="--d:.19s"><span class="cu-blob d3-kpi-blob" style="--blob:#E8F6F0;color:#0E8F66"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg></span><span><span class="d3-kpi-num" id="kpi-wins">—</span><span class="d3-kpi-lab">Wins this month</span></span></a>
-    <a class="card d3-kpi cu-rev cu-lift" href="/documents" style="--d:.22s"><span class="cu-blob d3-kpi-blob" style="--blob:#E6F4F2;color:#0E8C82"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg></span><span><span class="d3-kpi-num" id="kpi-docs">—</span><span class="d3-kpi-lab">Documents</span></span></a>
+    <a class="card d3-kpi cu-rev cu-lift" href="/child" style="--d:.16s"><span class="cu-blob d3-kpi-blob" style="--blob:#EDE9FE;color:#6D28D9"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 1.5l2 4.2 4.5.5-3.3 3.1.9 4.5L8 11.7 3.9 13.8l.9-4.5L1.5 6.2 6 5.7z"/></svg></span><span><span class="d3-kpi-num" id="kpi-focus">—</span><span class="d3-kpi-lab" data-i18n="kpiFocus">Focus areas</span></span></a>
+    <a class="card d3-kpi cu-rev cu-lift" href="/child/growth" style="--d:.19s"><span class="cu-blob d3-kpi-blob" style="--blob:#E8F6F0;color:#0E8F66"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg></span><span><span class="d3-kpi-num" id="kpi-wins">—</span><span class="d3-kpi-lab" data-i18n="kpiWins">Wins this month</span></span></a>
+    <a class="card d3-kpi cu-rev cu-lift" href="/documents" style="--d:.22s"><span class="cu-blob d3-kpi-blob" style="--blob:#E6F4F2;color:#0E8C82"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg></span><span><span class="d3-kpi-num" id="kpi-docs">—</span><span class="d3-kpi-lab" data-i18n="kpiDocs">Documents</span></span></a>
     <a class="card d3-kpi cu-rev cu-lift" href="/providers/waitlists" style="--d:.25s"><span class="cu-blob d3-kpi-blob" style="--blob:#FBF2E2;color:#A8650A"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 2.3"/></svg></span><span><span class="d3-kpi-num" id="kpi-waitlist">—</span><span class="d3-kpi-lab" id="kpi-waitlist-sub">Waitlists</span></span></a>
     <a class="card d3-kpi cu-rev cu-lift" href="/funding" style="--d:.28s"><span class="cu-blob d3-kpi-blob" style="--blob:#F9EDF1;color:#B14A66"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M6.5 6.7L8 5l1.5 1.7"/></svg></span><span><span class="d3-kpi-num" id="kpi-funding-num">$0</span><span class="d3-kpi-lab" id="kpi-funding-sub">Funding approved</span></span></a>
   </div>
@@ -138,7 +138,7 @@ import AppLayout from "../layouts/AppLayout.astro";
       <div class="card cu-rev" style="--d:.2s">
         <div class="card-head">
           <span class="card-title" id="wheel-title">Support wheel</span>
-          <a class="card-link" href="/child/support-wheel">Full wheel →</a>
+          <a class="card-link" href="/child/support-wheel" data-i18n="fullWheel">Full wheel →</a>
         </div>
         <div id="wheel-warning" style="padding:10px 20px 0"></div>
         <div class="d3-seg-wrap"><div id="wheel-toggle" class="d3-seg" role="tablist"></div></div>
@@ -155,24 +155,24 @@ import AppLayout from "../layouts/AppLayout.astro";
         <div id="wheel-detail" class="d3-detail" style="display:none"></div>
         <div style="padding:4px 20px 18px">
           <div style="background:var(--amber-bg);border:1px solid #f3e2c0;border-radius:12px;padding:10px 12px">
-            <p style="color:var(--amber);font-size:11px;line-height:1.45;margin:0"><strong>Preliminary profile — not a diagnosis.</strong> Generated from your passport answers. Confidence reflects how many related questions you've completed. For any concerns, speak with a qualified professional.</p>
+            <p style="color:var(--amber);font-size:11px;line-height:1.45;margin:0"><strong data-i18n="disclaimerTitle">Preliminary profile — not a diagnosis.</strong> <span data-i18n="disclaimerBody">Generated from your passport answers. Confidence reflects how many related questions you've completed. For any concerns, speak with a qualified professional.</span></p>
           </div>
         </div>
       </div>
 
       <!-- Recent reports -->
       <div class="card cu-rev" style="--d:.26s">
-        <div class="card-head"><span class="card-title">Recent reports</span><a class="card-link" href="/documents">View all →</a></div>
+        <div class="card-head"><span class="card-title" data-i18n="recentReports">Recent reports</span><a class="card-link" href="/documents" data-i18n="viewAll">View all →</a></div>
         <div id="d-docs"><div style="color:var(--muted);font-size:.82rem;padding:14px 20px">Loading…</div></div>
         <div class="card-foot">
-          <a class="btn btn-primary btn-sm" href="/documents">Upload document</a>
-          <a class="btn btn-ghost btn-sm" href="/documents">Open vault</a>
+          <a class="btn btn-primary btn-sm" href="/documents" data-i18n="uploadDoc">Upload document</a>
+          <a class="btn btn-ghost btn-sm" href="/documents" data-i18n="openVault">Open vault</a>
         </div>
       </div>
 
       <!-- Activity -->
       <div class="card cu-rev" style="--d:.32s">
-        <div class="card-head"><span class="card-title">Recent activity</span></div>
+        <div class="card-head"><span class="card-title" data-i18n="recentActivity">Recent activity</span></div>
         <div class="timeline" id="d-activity"><div style="color:var(--muted);font-size:.82rem;padding:6px 0">Loading…</div></div>
       </div>
     </div>
@@ -182,39 +182,39 @@ import AppLayout from "../layouts/AppLayout.astro";
 
       <!-- Momentum -->
       <div class="card cu-rev" style="--d:.22s">
-        <div class="card-head"><span class="card-title">This week</span><a class="card-link" href="/child/growth">Open growth →</a></div>
+        <div class="card-head"><span class="card-title" data-i18n="thisWeek">This week</span><a class="card-link" href="/child/growth" data-i18n="openGrowth">Open growth →</a></div>
         <div class="d3-mo">
           <div class="d3-mo-big">
             <span class="cu-blob" style="--blob:#E8F6F0;color:#0E8F66;width:40px;height:40px"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg></span>
             <div><div class="d3-mo-num" id="mo-count">—</div><div class="d3-mo-lab" id="mo-lab">wins this week</div></div>
           </div>
-          <div class="d3-days" id="mo-days" aria-label="Wins over the last 7 days"></div>
+          <div class="d3-days" id="mo-days" aria-label="Wins over the last 7 days" data-i18n-aria="winsAria"></div>
           <p class="d3-streak" id="mo-streak"></p>
         </div>
         <div id="d-wins" style="padding:0 20px 8px"><div style="color:var(--muted);font-size:.82rem;padding:8px 0">Loading…</div></div>
         <div class="card-foot">
-          <a class="btn btn-ghost btn-sm" href="/child/growth">Add a moment</a>
-          <a class="btn btn-ghost btn-sm" href="/child/growth">All wins</a>
+          <a class="btn btn-ghost btn-sm" href="/child/growth" data-i18n="addMoment">Add a moment</a>
+          <a class="btn btn-ghost btn-sm" href="/child/growth" data-i18n="allWins">All wins</a>
         </div>
       </div>
 
       <!-- Next steps -->
       <div class="card cu-rev" style="--d:.26s">
-        <div class="card-head"><span class="card-title">Next steps</span><span class="ai-badge"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--violet-700)"><path d="M8 1.5l1.5 4.2L14 7.2l-4.5 1.5L8 13l-1.5-4.3L2 7.2l4.5-1.5z"/></svg>Personalized</span></div>
+        <div class="card-head"><span class="card-title" data-i18n="nextSteps">Next steps</span><span class="ai-badge"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--violet-700)"><path d="M8 1.5l1.5 4.2L14 7.2l-4.5 1.5L8 13l-1.5-4.3L2 7.2l4.5-1.5z"/></svg><span data-i18n="personalized">Personalized</span></span></div>
         <div id="d-steps" style="padding:6px 20px 8px"></div>
         <div class="ai-foot"><span style="font-size:.68rem;color:var(--faint)" id="steps-note">Based on this profile — the list updates as you go.</span></div>
       </div>
 
       <!-- Funding overview -->
       <div class="card cu-rev" style="--d:.3s">
-        <div class="card-head"><span class="card-title">Funding overview</span><a class="card-link" href="/funding">Open navigator →</a></div>
+        <div class="card-head"><span class="card-title" data-i18n="fundingOverview">Funding overview</span><a class="card-link" href="/funding" data-i18n="openNavigator">Open navigator →</a></div>
         <div class="fund-stats" id="d-fund-stats"></div>
         <div id="d-fund-rows"></div>
       </div>
 
       <!-- Next workshop -->
       <div class="card cu-rev" style="--d:.34s">
-        <div class="card-head"><span class="card-title">Next workshop</span><a class="card-link" href="/resources/workshops">All workshops →</a></div>
+        <div class="card-head"><span class="card-title" data-i18n="nextWorkshop">Next workshop</span><a class="card-link" href="/resources/workshops" data-i18n="allWorkshops">All workshops →</a></div>
         <div id="d-workshop"><div style="color:var(--muted);font-size:.82rem;padding:14px 20px">Loading…</div></div>
       </div>
 
@@ -222,11 +222,11 @@ import AppLayout from "../layouts/AppLayout.astro";
       <div class="card cu-rev" style="--d:.38s">
         <div class="card-head"><span class="card-title" id="d-explore-title">Explore the profile</span></div>
         <div class="d3-explore">
-          <a href="/child"><span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="5.2" r="2.6"/><path d="M2.8 13.5c.6-2.8 2.6-4.2 5.2-4.2s4.6 1.4 5.2 4.2"/></svg></span>Overview</a>
-          <a href="/child/journey"><span class="cu-blob" style="--blob:#FBF2E2;color:#A8650A;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 13.5c3.5 0 3.5-4 7-4s3.5-4 3-7"/><circle cx="3" cy="13.5" r="1.3" fill="currentColor" stroke="none"/><path d="M10.6 2.5H13v2.4"/></svg></span>Journey</a>
-          <a href="/child/support-wheel"><span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.6"/><path d="M8 2.4v11.2M2.4 8h11.2M4.2 4.2l7.6 7.6M11.8 4.2l-7.6 7.6"/></svg></span>Wheel</a>
-          <a href="/child/growth"><span class="cu-blob" style="--blob:#E8F6F0;color:#0E8F66;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 13V3M2.5 13h11M5.5 10l2-2.6 2 1.4 2.7-4"/></svg></span>Growth</a>
-          <a href="/child/assessments"><span class="cu-blob" style="--blob:#E6F4F2;color:#0E8C82;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg></span>Records</a>
+          <a href="/child"><span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="5.2" r="2.6"/><path d="M2.8 13.5c.6-2.8 2.6-4.2 5.2-4.2s4.6 1.4 5.2 4.2"/></svg></span><span data-i18n="exOverview">Overview</span></a>
+          <a href="/child/journey"><span class="cu-blob" style="--blob:#FBF2E2;color:#A8650A;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 13.5c3.5 0 3.5-4 7-4s3.5-4 3-7"/><circle cx="3" cy="13.5" r="1.3" fill="currentColor" stroke="none"/><path d="M10.6 2.5H13v2.4"/></svg></span><span data-i18n="exJourney">Journey</span></a>
+          <a href="/child/support-wheel"><span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.6"/><path d="M8 2.4v11.2M2.4 8h11.2M4.2 4.2l7.6 7.6M11.8 4.2l-7.6 7.6"/></svg></span><span data-i18n="exWheel">Wheel</span></a>
+          <a href="/child/growth"><span class="cu-blob" style="--blob:#E8F6F0;color:#0E8F66;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 13V3M2.5 13h11M5.5 10l2-2.6 2 1.4 2.7-4"/></svg></span><span data-i18n="exGrowth">Growth</span></a>
+          <a href="/child/assessments"><span class="cu-blob" style="--blob:#E6F4F2;color:#0E8C82;width:34px;height:34px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg></span><span data-i18n="exRecords">Records</span></a>
         </div>
       </div>
     </div>
@@ -418,10 +418,38 @@ import AppLayout from "../layouts/AppLayout.astro";
     import { domainDetail, buildFamilyGuidance } from "../lib/domainInsights.js";
     import { matchAdvice } from "../lib/adviceLibrary.js";
     import { getRecommendations } from "../lib/recommendations.js";
+    import DICT from "../i18n/dashboard.js";
 
     const $ = (id) => document.getElementById(id);
     const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
     const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* ---------- i18n (string codes from src/i18n/dashboard.js) ---------- */
+    const T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+    const LOCALE = window.uaLocale || "en-CA";
+    const tpl = (s, v) => String(s).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? v[k] : ""));
+    /* French possessive particle with elision: "de Léa" / "d'Émile".
+       English templates don't use {of}, so it resolves to "" there. */
+    const ofName = (n) => (window.uaLang === "fr"
+      ? (/^[aeiouyàâäéèêëìîïòôöùûüh]/i.test(String(n || "")) ? "d'" : "de ")
+      : "");
+
+    /* Script-owned labels (JS fills these with data later — translate the
+       fallbacks here, never via data-i18n, to avoid overwrite races). */
+    $("h-name").textContent = T.loading;
+    $("tip-text").textContent = T.loading;
+    $("step-title").textContent = T.loading;
+    $("wheel-title").textContent = T.supportWheel;
+    $("wheel-leg-text").textContent = T.legDefault;
+    $("steps-note").textContent = T.basedOnProfile;
+    $("d-explore-title").textContent = T.exploreProfile;
+    $("kpi-waitlist-sub").textContent = T.kpiWaitlists;
+    $("kpi-funding-sub").textContent = T.fundingApproved;
+    $("win-msg").textContent = T.winHome;
+    $("d-docs").innerHTML = `<div style="color:var(--muted);font-size:.82rem;padding:14px 20px">${esc(T.loading)}</div>`;
+    $("d-activity").innerHTML = `<div style="color:var(--muted);font-size:.82rem;padding:6px 0">${esc(T.loading)}</div>`;
+    $("d-wins").innerHTML = `<div style="color:var(--muted);font-size:.82rem;padding:8px 0">${esc(T.loading)}</div>`;
+    $("d-workshop").innerHTML = `<div style="color:var(--muted);font-size:.82rem;padding:14px 20px">${esc(T.loading)}</div>`;
     const countUp = (el, target, dur = 800) => {
       const n = Number(target);
       if (reduceMotion || !n) { el.textContent = target; return; }
@@ -447,23 +475,14 @@ import AppLayout from "../layouts/AppLayout.astro";
     }
 
     /* ---------- greeting: time of day + day-aware subline ---------- */
-    const SUBLINES = [
-      "A calm look at the week ahead.",              /* Sun */
-      "Fresh week, small steps — they add up.",      /* Mon */
-      "Here's how things are looking today.",        /* Tue */
-      "Midweek check-in — you're doing the work.",   /* Wed */
-      "Steady progress beats big leaps.",            /* Thu */
-      "Almost the weekend — here's today's picture.",/* Fri */
-      "Weekends count too — at your pace.",          /* Sat */
-    ];
     function setGreeting(name) {
       const now = new Date(), h = now.getHours();
-      const part = h < 5 ? "Good night" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+      const part = h < 5 ? T.greetNight : h < 12 ? T.greetMorning : h < 18 ? T.greetAfternoon : T.greetEvening;
       const emoji = h >= 5 && h < 18 ? "☀️" : "🌙";
       const n = String(name || "").trim().split(/\s+/)[0];
       $("g-hello").textContent = part + (n ? ", " + (n.charAt(0).toUpperCase() + n.slice(1)) : "") + " " + emoji;
-      $("g-sub").textContent = SUBLINES[now.getDay()];
-      $("g-date").textContent = now.toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" });
+      $("g-sub").textContent = T.sublines[now.getDay()];
+      $("g-date").textContent = now.toLocaleDateString(LOCALE, { weekday: "long", month: "long", day: "numeric" });
     }
     (function () {
       const meta = ((getRawSession() || {}).user || {}).user_metadata || {};
@@ -482,11 +501,11 @@ import AppLayout from "../layouts/AppLayout.astro";
       const g1 = String((data.household && data.household.g1name) || "").replace(/\s*\([^)]*\)\s*$/, "").trim();
       if (g1) setGreeting(g1);
       $("h-avatar").textContent = (first || id.name || "·")[0].toUpperCase();
-      $("h-name").textContent = p ? id.name : "Set up the passport";
+      $("h-name").textContent = p ? id.name : T.setupPassport;
       const subBits = [];
-      if (id.age != null) subBits.push("Age " + id.age);
+      if (id.age != null) subBits.push(tpl(T.ageLabel, { n: id.age }));
       if (id.dx) subBits.push(id.dx);
-      $("h-sub").textContent = p ? (subBits.join(" · ") || "Open profile") : "A few minutes to start";
+      $("h-sub").textContent = p ? (subBits.join(" · ") || T.openProfile) : T.fewMinutes;
       if (!p) $("h-chip").href = "/passport";
       $("d-edit").href = passportLink;
       if (p) $("d-export").href = "/passport?id=" + p.id + "&export=1";
@@ -499,8 +518,8 @@ import AppLayout from "../layouts/AppLayout.astro";
       if (reduceMotion) $("d-pct").textContent = comp.pct + "%";
       else { let t0 = null; const tick = (ts) => { if (!t0) t0 = ts; const pr = Math.min(1, (ts - t0) / 900), e = 1 - Math.pow(1 - pr, 3); $("d-pct").textContent = Math.round(comp.pct * e) + "%"; if (pr < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); }
       const left = comp.total - comp.done;
-      $("d-remaining").textContent = left === 0 ? "Complete ✦" : left + " section" + (left === 1 ? "" : "s") + " left";
-      if (left === 0) $("d-edit").textContent = "Edit passport";
+      $("d-remaining").textContent = left === 0 ? T.complete : tpl(left === 1 ? T.sectionsLeft1 : T.sectionsLeftN, { n: left });
+      if (left === 0) $("d-edit").textContent = T.editPassport;
 
       /* ---------- GUIDANCE LINE (in the hero) ---------- */
       const scored = scoreWheel(data);
@@ -513,13 +532,13 @@ import AppLayout from "../layouts/AppLayout.astro";
       /* ================= SUPPORT WHEEL — support-wheel-tab logic ================= */
       const scoredCount = DOMAINS.filter((n) => scored[n].score != null).length;
       const wheelDeep = (nm) => "/child/support-wheel?domain=" + encodeURIComponent(nm);
-      if (first) $("wheel-title").textContent = first + "'s support wheel";
+      if (first) $("wheel-title").textContent = tpl(T.wheelTitleNamed, { name: first, of: ofName(first) });
       let mode = "needs";
       let sel = 0;
       for (let i = 0; i < DOMAINS.length; i++) { if (scored[DOMAINS[i]].score != null) { sel = i; break; } }
 
       function levelInfo(score) {
-        if (score == null) return { label: "Not enough data", bg: "#F4F3F8", fg: "#7B7491", seg: "#D8D3E6" };
+        if (score == null) return { label: T.notEnoughData, bg: "#F4F3F8", fg: "#7B7491", seg: "#D8D3E6" };
         const b = scoreToBand(score);
         if (b.key === "minimal" || b.key === "low") return { label: b.label, bg: "#E8F6F0", fg: "#0E8F66", seg: "#0E8F66" };
         if (b.key === "high" || b.key === "intensive") return { label: b.label, bg: "#EDE9FE", fg: "#6D28D9", seg: "#7C3AED" };
@@ -529,17 +548,13 @@ import AppLayout from "../layouts/AppLayout.astro";
       function renderToggle() {
         const seg = $("wheel-toggle");
         seg.innerHTML = `<span class="thumb"></span>` + ["needs", "strengths"].map((m) =>
-          `<button data-mode="${m}" class="${m === mode ? "on" : ""}" role="tab" aria-selected="${m === mode}">${m === "needs" ? "Support needs" : "Strengths"}</button>`).join("");
+          `<button data-mode="${m}" class="${m === mode ? "on" : ""}" role="tab" aria-selected="${m === mode}">${m === "needs" ? esc(T.needsBtn) : esc(T.strengthsBtn)}</button>`).join("");
         const onBtn = seg.querySelector("button.on"), thumb = seg.querySelector(".thumb");
         requestAnimationFrame(() => { thumb.style.left = onBtn.offsetLeft + "px"; thumb.style.width = onBtn.offsetWidth + "px"; });
         seg.querySelectorAll("button").forEach((b) =>
           b.addEventListener("click", () => { mode = b.dataset.mode; renderToggle(); renderWheel(); renderDetail(); }));
-        $("wheel-caption").innerHTML = mode === "strengths"
-          ? "Fuller petals mean <strong>stronger</strong> areas — tap one for detail."
-          : "Fuller petals mean <strong>more support</strong> is helpful — tap one for detail.";
-        $("wheel-leg-text").textContent = mode === "strengths"
-          ? "1 ring = emerging · 5 rings = shining"
-          : "1 ring = minimal support · 5 rings = intensive support";
+        $("wheel-caption").innerHTML = mode === "strengths" ? T.captionStrengths : T.captionNeeds;
+        $("wheel-leg-text").textContent = mode === "strengths" ? T.legStrengths : T.legNeeds;
       }
 
       function renderWheel() {
@@ -589,19 +604,19 @@ import AppLayout from "../layouts/AppLayout.astro";
         const strCount = dm.strength == null ? 0 : (dm.strength === 0 ? 0 : scoreToBand(dm.strength, "strength").rings);
         let segs = ""; for (let k = 1; k <= 5; k++) segs += `<span class="d3d-seg">${k <= segCount ? `<b style="background:${L.seg};--d:${(k * 0.07).toFixed(2)}s"></b>` : ""}</span>`;
         let ssegs = ""; for (let k = 1; k <= 5; k++) ssegs += `<span class="d3d-seg">${k <= strCount ? `<b style="background:#0E8F66;--d:${(k * 0.07).toFixed(2)}s"></b>` : ""}</span>`;
-        const confLbl = dm.confidence === "high" ? "High" : dm.confidence === "medium" ? "Medium" : dm.confidence === "low" ? "Low" : "No data";
+        const confLbl = dm.confidence === "high" ? T.confHigh : dm.confidence === "medium" ? T.confMedium : dm.confidence === "low" ? T.confLow : T.confNone;
         const chips = det.support.slice(0, 2).map((t, i) => `<span class="d3d-chip sup cu-pop" style="--d:${(0.08 + i * 0.05).toFixed(2)}s">${esc(t)}</span>`).join("")
           + det.strategies.slice(0, 2).map((t, i) => `<span class="d3d-chip tip cu-pop" style="--d:${(0.18 + i * 0.05).toFixed(2)}s">${esc(t)}</span>`).join("");
         box.style.borderTopColor = dc;
         box.innerHTML = `<div class="d3d-in">`
           + `<div class="d3d-head"><span class="d3d-dot" style="background:${tintOf(name, 0.14)}"><i style="background:${dc}"></i></span><span class="d3d-name">${esc(name)}</span><span class="d3d-pill" style="background:${L.bg};color:${L.fg}">${L.label}</span></div>`
           + (dm.score == null
-              ? `<p style="font-size:.8rem;color:var(--faint);margin:0">Add more in the passport to build this part of the profile.</p>`
-              : `<div class="d3d-meta"><span class="l">Support level</span><span class="d3d-segs">${segs}</span></div>`
-                + (dm.strength != null ? `<div class="d3d-meta"><span class="l">Strengths</span><span class="d3d-segs">${ssegs}</span></div>` : "")
-                + `<div class="d3d-meta"><span class="l">Confidence</span><span class="d3d-conf">${confLbl} — ${dm.answered} of ${dm.total} related questions</span></div>`)
+              ? `<p style="font-size:.8rem;color:var(--faint);margin:0">${esc(T.addMorePassport)}</p>`
+              : `<div class="d3d-meta"><span class="l">${esc(T.supportLevel)}</span><span class="d3d-segs">${segs}</span></div>`
+                + (dm.strength != null ? `<div class="d3d-meta"><span class="l">${esc(T.strengthsLabel)}</span><span class="d3d-segs">${ssegs}</span></div>` : "")
+                + `<div class="d3d-meta"><span class="l">${esc(T.confidence)}</span><span class="d3d-conf">${confLbl} — ${tpl(T.ofQuestions, { a: dm.answered, t: dm.total })}</span></div>`)
           + (chips ? `<div class="d3d-chips">${chips}</div>` : "")
-          + `<div class="d3d-foot"><a href="${wheelDeep(name)}">Full detail →</a></div>`
+          + `<div class="d3d-foot"><a href="${wheelDeep(name)}">${esc(T.fullDetail)}</a></div>`
           + `</div>`;
       }
 
@@ -610,8 +625,8 @@ import AppLayout from "../layouts/AppLayout.astro";
         const needTop = DOMAINS.filter((n) => scored[n].score != null).sort((a, b) => scored[b].score - scored[a].score).slice(0, 2);
         const strTop = DOMAINS.filter((n) => scored[n].strength != null && scored[n].strength >= 45).sort((a, b) => scored[b].strength - scored[a].strength).slice(0, 2);
         let html = "";
-        if (needTop.length) html += `<div class="d3-tops-row"><span class="lbl">Most support</span>` + needTop.map((n) => `<a class="d3-topchip" style="background:${tintOf(n, 0.1)};color:${domainColor(n)}" href="${wheelDeep(n)}"><i style="background:${domainColor(n)}"></i>${esc(n)}</a>`).join("") + `</div>`;
-        if (strTop.length) html += `<div class="d3-tops-row"><span class="lbl">Going strong</span>` + strTop.map((n) => `<a class="d3-topchip" style="background:var(--green-bg);color:var(--green)" href="${wheelDeep(n)}"><i style="background:var(--green)"></i>${esc(n)}</a>`).join("") + `</div>`;
+        if (needTop.length) html += `<div class="d3-tops-row"><span class="lbl">${esc(T.mostSupport)}</span>` + needTop.map((n) => `<a class="d3-topchip" style="background:${tintOf(n, 0.1)};color:${domainColor(n)}" href="${wheelDeep(n)}"><i style="background:${domainColor(n)}"></i>${esc(n)}</a>`).join("") + `</div>`;
+        if (strTop.length) html += `<div class="d3-tops-row"><span class="lbl">${esc(T.goingStrong)}</span>` + strTop.map((n) => `<a class="d3-topchip" style="background:var(--green-bg);color:var(--green)" href="${wheelDeep(n)}"><i style="background:var(--green)"></i>${esc(n)}</a>`).join("") + `</div>`;
         host.innerHTML = html;
       }
 
@@ -619,12 +634,12 @@ import AppLayout from "../layouts/AppLayout.astro";
         $("wheel-toggle").parentElement.style.display = "none";
         $("wheel-caption").textContent = "";
         document.querySelector(".d3-ringleg").style.display = "none";
-        $("wheel-host").innerHTML = `<div style="text-align:center;padding:26px 14px"><p style="color:var(--muted);font-size:.85rem;margin:0 0 12px">Fill in more of the passport (communication, sensory, behaviour, daily living) to generate ${esc(first || "your child")}'s support wheel.</p><a class="btn btn-primary btn-sm" href="${passportLink}">Continue passport →</a></div>`;
+        $("wheel-host").innerHTML = `<div style="text-align:center;padding:26px 14px"><p style="color:var(--muted);font-size:.85rem;margin:0 0 12px">${tpl(esc(T.wheelEmpty), { of: ofName(first || T.yourChild), name: esc(first || T.yourChild) })}</p><a class="btn btn-primary btn-sm" href="${passportLink}">${esc(T.continuePassportArrow)}</a></div>`;
       } else {
         const wc = wheelCompleteness(data);
         const lowConf = DOMAINS.filter((n) => scored[n].confidence === "low");
         $("wheel-warning").innerHTML = wc.pct < 70
-          ? `<div style="background:var(--amber-bg);border:1px solid #f3e2c0;border-radius:12px;padding:10px 14px;font-size:12px;color:var(--amber)"><strong>Wheel is ${wc.pct}% complete</strong> — ${wc.answered} of ${wc.total} contributing questions answered.${lowConf.length ? " Lower confidence in: " + esc(lowConf.join(", ")) + "." : ""} <a href="${passportLink}" style="color:var(--amber);font-weight:600;text-decoration:underline">Complete more →</a></div>`
+          ? `<div style="background:var(--amber-bg);border:1px solid #f3e2c0;border-radius:12px;padding:10px 14px;font-size:12px;color:var(--amber)">${tpl(T.wheelWarn, { p: wc.pct, a: wc.answered, t: wc.total })}${lowConf.length ? tpl(esc(T.lowerConf), { list: esc(lowConf.join(", ")) }) : ""} <a href="${passportLink}" style="color:var(--amber);font-weight:600;text-decoration:underline">${esc(T.completeMore)}</a></div>`
           : "";
         renderToggle();
         renderWheel();
@@ -634,15 +649,15 @@ import AppLayout from "../layouts/AppLayout.astro";
       }
 
       /* ================= TIP OF THE DAY ================= */
-      const SECTION_LABEL = { communication: "Communication", sensory: "Sensory", dailyLiving: "Daily living", behaviour: "Behaviour", education: "School", birth: "Development", therapy: "Services", goals: "Goals" };
+      const SECTION_LABEL = { communication: T.secCommunication, sensory: T.secSensory, dailyLiving: T.secDaily, behaviour: T.secBehaviour, education: T.secEducation, birth: T.secBirth, therapy: T.secTherapy, goals: T.secGoals };
       const SECTION_TINT = { communication: ["#EDE9FE", "#6D28D9"], sensory: ["#F9EDF1", "#B14A66"], dailyLiving: ["#E8F6F0", "#0E8F66"], behaviour: ["#FBF2E2", "#A8650A"], education: ["#E6F4F2", "#0E8C82"], birth: ["#EDE9FE", "#6D28D9"], therapy: ["#E6F4F2", "#0E8C82"], goals: ["#EDE9FE", "#6D28D9"] };
       const tips = matchAdvice(data);
       const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 864e5);
       let tipIdx = tips.length ? dayOfYear % tips.length : 0;
       function renderTip() {
         if (!tips.length) {
-          $("tip-text").textContent = "Answer a few more passport questions and a daily tip matched to your answers will appear here.";
-          $("tip-src").innerHTML = `<a href="${passportLink}" style="color:var(--violet-700);font-weight:600;text-decoration:none">Continue the passport →</a>`;
+          $("tip-text").textContent = T.tipEmpty;
+          $("tip-src").innerHTML = `<a href="${passportLink}" style="color:var(--violet-700);font-weight:600;text-decoration:none">${esc(T.tipContinue)}</a>`;
           return;
         }
         const t = tips[tipIdx % tips.length];
@@ -651,17 +666,17 @@ import AppLayout from "../layouts/AppLayout.astro";
         $("tip-tag").style.background = tint[0]; $("tip-tag").style.color = tint[1];
         $("tip-tag").style.display = "inline-block";
         $("tip-text").textContent = t.tip;
-        $("tip-src").textContent = "Because you noted: " + t.label.toLowerCase();
+        $("tip-src").textContent = T.becauseNoted + t.label.toLowerCase();
         $("tip-copy").style.display = "inline-block";
-        $("tip-note").textContent = tips.length > 1 ? "New tip each day · " + tips.length + " matched" : "Matched to the passport";
+        $("tip-note").textContent = tips.length > 1 ? tpl(T.newTipDaily, { n: tips.length }) : T.matchedToPassport;
         if (tips.length > 1) $("tip-next").style.display = "inline-block";
       }
       renderTip();
       $("tip-copy").addEventListener("click", () => {
         const t = tips[tipIdx % tips.length]; if (!t) return;
         navigator.clipboard && navigator.clipboard.writeText(t.tip).then(() => {
-          $("tip-copy").textContent = "Copied ✓";
-          setTimeout(() => { $("tip-copy").textContent = "Copy"; }, 1600);
+          $("tip-copy").textContent = T.copied;
+          setTimeout(() => { $("tip-copy").textContent = T.copy; }, 1600);
         }).catch(() => {});
       });
       $("tip-next").addEventListener("click", () => { tipIdx++; renderTip(); });
@@ -670,38 +685,38 @@ import AppLayout from "../layouts/AppLayout.astro";
       const docs = p ? await UA.getRecentDocuments(p.id).catch(() => []) : [];
       const docIcon = `<svg viewBox="0 0 16 16" fill="none" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4V1.8z"/><path d="M9 1.8V5h3.4"/></svg>`;
       $("d-docs").innerHTML = docs.length
-        ? docs.map((d) => `<div class="doc-row"><span class="doc-ic">${docIcon}</span><span class="doc-meta"><span class="doc-name">${esc(d.file_name)}</span><span class="doc-sub">Uploaded ${UA.fmtDate(d.created_at)}</span></span><span class="doc-status"><span class="pill new">${esc((d.file_type || "file").toUpperCase())}</span></span></div>`).join("")
-        : `<div style="color:var(--muted);font-size:.82rem;padding:14px 20px">No documents yet. Upload a report to get started.</div>`;
+        ? docs.map((d) => `<div class="doc-row"><span class="doc-ic">${docIcon}</span><span class="doc-meta"><span class="doc-name">${esc(d.file_name)}</span><span class="doc-sub">${tpl(esc(T.uploadedOn), { date: UA.fmtDate(d.created_at) })}</span></span><span class="doc-status"><span class="pill new">${esc((d.file_type || "file").toUpperCase())}</span></span></div>`).join("")
+        : `<div style="color:var(--muted);font-size:.82rem;padding:14px 20px">${esc(T.docsEmpty)}</div>`;
 
       /* ================= ACTIVITY ================= */
       const acts = p ? await UA.getActivity(p.id) : [];
       const aIcon = { document: ["t-doc", `<path d="M8 3v8M4.5 7.5L8 11l3.5-3.5M3 13.5h10"/>`], profile: ["t-edit", `<path d="M10.5 2.5l3 3L6 13H3v-3l7.5-7.5z"/>`], funding: ["t-fund", `<circle cx="8" cy="8" r="5.5"/><path d="M8 5.5v5M6.3 7.2L8 5.5l1.7 1.7"/>`], provider: ["t-prov", `<circle cx="8" cy="5.2" r="2.4"/><path d="M3.4 13c.5-2.4 2.3-3.5 4.6-3.5s4.1 1.1 4.6 3.5"/>`] };
       $("d-activity").innerHTML = acts.length
         ? acts.map((a) => { const ic = aIcon[a.type] || aIcon.profile; return `<div class="t-item"><span class="t-ic ${ic[0]}"><svg viewBox="0 0 16 16" fill="none" stroke-width="1.7">${ic[1]}</svg></span><div class="t-meta">${esc(a.label)}<div class="t-time">${UA.relTime(a.created_at)}</div></div></div>`; }).join("")
-        : `<div style="color:var(--muted);font-size:.82rem;padding:6px 0">Your recent uploads, edits and applications will appear here.</div>`;
+        : `<div style="color:var(--muted);font-size:.82rem;padding:6px 0">${esc(T.activityEmpty)}</div>`;
 
       /* ================= FUNDING ================= */
       const apps = p ? await UA.getFundingApplications(p.id) : [];
       const fo = UA.fundingOverview(apps);
       $("d-fund-stats").innerHTML = [
-        [fo.total, "Programs available"],
-        ["$18.4K<span>/yr</span>", "Potential funding"],
-        [fo.started, "Applications started"],
-        [fo.submitted, "Submitted"],
+        [fo.total, esc(T.programsAvailable)],
+        ["$18.4K<span>/yr</span>", esc(T.potentialFunding)],
+        [fo.started, esc(T.applicationsStarted)],
+        [fo.submitted, esc(T.submittedLabel)],
       ].map(([n, l]) => `<div class="fund-stat"><div class="fund-num">${n}</div><div class="fund-label">${l}</div></div>`).join("");
       $("d-fund-rows").innerHTML = fo.rows.filter((r) => r.status !== "not_started").concat(fo.rows.filter((r) => r.status === "not_started")).slice(0, 3)
         .map((r) => { const pl = UA.STATUS_PILL[r.status]; return `<div class="fund-row"><span class="fund-name">${esc(r.name)}<small>${esc(r.level)} · ${esc(r.note)}</small></span><span class="pill ${pl.cls}">${pl.label}</span></div>`; }).join("");
-      $("kpi-funding-num").innerHTML = `$${fo.approvedAmount.toLocaleString("en-CA")}<span style="font-size:.85rem;color:var(--muted)">/yr</span>`;
-      $("kpi-funding-sub").textContent = fo.submitted ? fo.submitted + " program" + (fo.submitted === 1 ? "" : "s") + " active" : "Funding approved";
+      $("kpi-funding-num").innerHTML = `$${fo.approvedAmount.toLocaleString(LOCALE)}<span style="font-size:.85rem;color:var(--muted)">/yr</span>`;
+      $("kpi-funding-sub").textContent = fo.submitted ? tpl(fo.submitted === 1 ? T.programsActive1 : T.programsActiveN, { n: fo.submitted }) : T.fundingApproved;
 
       /* ================= WAITLIST KPI ================= */
       const wl = await UA.getWaitlist();
       if (wl.length) {
         countUp($("kpi-waitlist"), wl.length);
-        $("kpi-waitlist-sub").textContent = "Waitlists · " + esc(wl[0].status || "New");
+        $("kpi-waitlist-sub").textContent = tpl(T.waitlistsStatus, { status: wl[0].status || "New" });
       } else {
         $("kpi-waitlist").textContent = "0";
-        $("kpi-waitlist-sub").textContent = "Waitlists joined";
+        $("kpi-waitlist-sub").textContent = T.waitlistsJoined;
       }
 
       /* ================= NEXT STEPS (recommendations) ================= */
@@ -722,27 +737,27 @@ import AppLayout from "../layouts/AppLayout.astro";
       /* hero-adjacent card: the single top step */
       const top = recs[0];
       if (top) {
-        const pillTxt = top.severity === "warn" ? "Worth doing soon" : top.severity === "todo" ? "Good next step" : "Nice to have";
+        const pillTxt = top.severity === "warn" ? T.pillWarn : top.severity === "todo" ? T.pillTodo : T.pillInfo;
         const tint = SEV[top.severity] || SEV.info;
         $("step-pill").textContent = pillTxt;
         $("step-pill").style.background = tint[0]; $("step-pill").style.color = tint[1];
         $("step-pill").style.display = "inline-block";
         $("step-title").textContent = top.title;
         $("step-why").textContent = top.reason || "";
-        $("step-cta").textContent = top.cta || "Open";
+        $("step-cta").textContent = top.cta || T.open;
         $("step-cta").href = top.href;
         $("step-cta").style.display = "inline-flex";
-        if (recs.length > 1) $("step-more").textContent = (recs.length - 1) + " more below";
+        if (recs.length > 1) $("step-more").textContent = tpl(T.moreBelow, { n: recs.length - 1 });
       } else {
-        $("step-title").textContent = "You're all caught up ✦";
-        $("step-why").textContent = "Nothing urgent on the list right now.";
+        $("step-title").textContent = T.caughtUp;
+        $("step-why").textContent = T.nothingUrgent;
       }
       /* the checklist card: the following three */
       const rest = recs.slice(1, 4);
       $("d-steps").innerHTML = rest.length
         ? rest.map((r) => { const t = SEV[r.severity] || SEV.info; return `<a class="d3-step" href="${r.href}"><span class="ic" style="background:${t[0]};color:${t[1]}">${t[2]}</span><span class="tx"><span class="tt">${esc(r.title)}</span>${r.reason ? `<span class="why">${esc(r.reason)}</span>` : ""}</span><span class="go">→</span></a>`; }).join("")
-        : `<div style="color:var(--muted);font-size:.82rem;padding:8px 0 10px">All caught up — check back after your next passport update.</div>`;
-      if (first) $("steps-note").textContent = "Based on " + first + "'s profile — the list updates as you go.";
+        : `<div style="color:var(--muted);font-size:.82rem;padding:8px 0 10px">${esc(T.stepsEmpty)}</div>`;
+      if (first) $("steps-note").textContent = tpl(T.basedOnNamed, { name: first, of: ofName(first) });
 
       /* ================= KPIs ================= */
       const pri = (data.goals && data.goals.priorities) || [];
@@ -750,7 +765,7 @@ import AppLayout from "../layouts/AppLayout.astro";
       countUp($("kpi-docs"), docs.length);
 
       /* ================= WINS + MOMENTUM ================= */
-      $("d-explore-title").textContent = first ? "Explore " + first + "'s profile" : "Explore the profile";
+      $("d-explore-title").textContent = first ? tpl(T.exploreNamed, { name: first, of: ofName(first) }) : T.exploreProfile;
       const star = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg>';
       let wins = [];
       const dayKey = (d) => { const x = new Date(d); return x.getFullYear() + "-" + (x.getMonth() + 1) + "-" + x.getDate(); };
@@ -761,14 +776,14 @@ import AppLayout from "../layouts/AppLayout.astro";
         const thisWeek = weekStart(now);
         const weekWins = wins.filter((w) => new Date(w.created_at).getTime() >= thisWeek).length;
         countUp($("mo-count"), weekWins);
-        if (!weekWins) { $("mo-count").textContent = "0"; $("mo-lab").textContent = "wins logged this week — tiny ones count"; }
-        else $("mo-lab").textContent = "win" + (weekWins === 1 ? "" : "s") + " this week";
+        if (!weekWins) { $("mo-count").textContent = "0"; $("mo-lab").textContent = T.winsNone; }
+        else $("mo-lab").textContent = weekWins === 1 ? T.winsThisWeek1 : T.winsThisWeekN;
         /* 7-day dots */
         const hitDays = new Set(wins.map((w) => dayKey(w.created_at)));
         let dots = "";
         for (let i = 6; i >= 0; i--) {
           const d = new Date(now); d.setDate(now.getDate() - i);
-          const letter = d.toLocaleDateString("en-CA", { weekday: "narrow" });
+          const letter = d.toLocaleDateString(LOCALE, { weekday: "narrow" });
           dots += `<span class="d3-day${hitDays.has(dayKey(d)) ? " hit" : ""}${i === 0 ? " today" : ""}"><i></i>${letter}</span>`;
         }
         $("mo-days").innerHTML = dots;
@@ -777,11 +792,11 @@ import AppLayout from "../layouts/AppLayout.astro";
         let streak = 0, cursor = thisWeek;
         if (!weeks.has(cursor)) cursor -= 7 * 864e5; /* week just started — count from last week */
         while (weeks.has(cursor)) { streak++; cursor -= 7 * 864e5; }
-        $("mo-streak").textContent = streak >= 2 ? "✦ " + streak + " weeks in a row with a win" : "";
+        $("mo-streak").textContent = streak >= 2 ? tpl(T.streak, { n: streak }) : "";
         /* recent list */
         $("d-wins").innerHTML = wins.length
-          ? wins.slice(0, 3).map((w) => `<div class="dash-win"><span class="st">${star}</span><span>${esc(w.text)}</span><span class="wh">${w.justNow ? "just now" : UA.relTime(w.created_at)}</span></div>`).join("")
-          : `<div style="color:var(--muted);font-size:.82rem;padding:8px 0">No wins yet — the first one is a win itself.</div>`;
+          ? wins.slice(0, 3).map((w) => `<div class="dash-win"><span class="st">${star}</span><span>${esc(w.text)}</span><span class="wh">${w.justNow ? esc(T.justNow) : UA.relTime(w.created_at)}</span></div>`).join("")
+          : `<div style="color:var(--muted);font-size:.82rem;padding:8px 0">${esc(T.winsEmpty)}</div>`;
         /* month KPI */
         const m0 = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
         const monthWins = wins.filter((w) => new Date(w.created_at).getTime() >= m0).length;
@@ -804,7 +819,7 @@ import AppLayout from "../layouts/AppLayout.astro";
         const inp = $("win-input"), btn = $("win-save");
         const v = inp.value.trim();
         if (!v) { inp.focus(); return; }
-        if (!p) { $("win-msg").textContent = "Create the passport first — then wins have a home."; return; }
+        if (!p) { $("win-msg").textContent = T.winNoPassport; return; }
         btn.disabled = true;
         const s = await getValidSession();
         if (!s) { location.href = "/login"; return; }
@@ -814,16 +829,16 @@ import AppLayout from "../layouts/AppLayout.astro";
           const rows = await r.json(), row = rows && rows[0];
           wins.unshift({ id: row ? row.id : Date.now(), text: v, created_at: row ? row.created_at : new Date().toISOString(), justNow: true });
           inp.value = "";
-          $("win-msg").textContent = "Saved" + (first ? " — " + first + " is on a roll." : " — nice one.");
+          $("win-msg").textContent = first ? tpl(T.winSavedNamed, { name: first }) : T.winSavedNice;
           renderMomentum();
           if (!reduceMotion) {
             const burst = $("win-burst");
             burst.classList.remove("go"); void burst.offsetWidth; burst.classList.add("go");
             setTimeout(() => burst.classList.remove("go"), 900);
           }
-          setTimeout(() => { $("win-msg").textContent = "It lands in the Progress journal, dated today."; }, 4000);
+          setTimeout(() => { $("win-msg").textContent = T.winHome; }, 4000);
         } catch (e) {
-          $("win-msg").textContent = "Couldn't save just now — try again in a moment.";
+          $("win-msg").textContent = T.winFail;
         } finally {
           btn.disabled = false;
         }
@@ -834,8 +849,8 @@ import AppLayout from "../layouts/AppLayout.astro";
       /* ================= WORKSHOP ================= */
       const ws = await UA.getNextWorkshop().catch(() => null);
       $("d-workshop").innerHTML = ws
-        ? (() => { const d = new Date(ws.starts_at); const day = d.getDate(); const mon = d.toLocaleDateString("en-CA", { month: "short" }); const time = d.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit" }); return `<div class="ws"><span class="ws-date"><b>${day}</b><span>${mon}</span></span><span class="ws-meta"><b>${esc(ws.title)}</b><span>${time} · ${esc(ws.location_type || "Online")}</span></span><a class="btn btn-ghost btn-sm" href="/resources/workshops" style="margin-left:auto">Register</a></div>`; })()
-        : `<div style="color:var(--muted);font-size:.82rem;padding:14px 20px">No upcoming workshops scheduled.</div>`;
+        ? (() => { const d = new Date(ws.starts_at); const day = d.getDate(); const mon = d.toLocaleDateString(LOCALE, { month: "short" }); const time = d.toLocaleTimeString(LOCALE, { hour: "numeric", minute: "2-digit" }); return `<div class="ws"><span class="ws-date"><b>${day}</b><span>${mon}</span></span><span class="ws-meta"><b>${esc(ws.title)}</b><span>${time} · ${esc(ws.location_type || T.online)}</span></span><a class="btn btn-ghost btn-sm" href="/resources/workshops" style="margin-left:auto">${esc(T.register)}</a></div>`; })()
+        : `<div style="color:var(--muted);font-size:.82rem;padding:14px 20px">${esc(T.noWorkshops)}</div>`;
     })().catch((e) => console.error("[dashboard] hydrate failed", e));
   </script>
 

@@ -9,9 +9,9 @@ import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 
 const SECTIONS = [
-  { href: "/resources/learn", title: "Learn", desc: "Practical reads and short videos in one searchable library — playbooks for the big moments, no jargon.", hue: "#A8650A", bg: "#FBF2E2", icon: "map" },
-  { href: "/resources/workshops", title: "Workshops", desc: "Live sessions and Q&As with experts — diagnosis, school, funding and daily life.", hue: "#6D28D9", bg: "#EDE9FE", icon: "cal" },
-  { href: "/resources/community", title: "Community resources", desc: "The organizations, helplines and programs every Québec family should know.", hue: "#4C9A2A", bg: "#EAF3DE", icon: "users" },
+  { href: "/resources/learn", title: "Learn", frT: "Apprendre", desc: "Practical reads and short videos in one searchable library — playbooks for the big moments, no jargon.", frD: "Lectures pratiques et courtes vidéos dans une seule bibliothèque — des guides pour les grands moments, sans jargon.", hue: "#A8650A", bg: "#FBF2E2", icon: "map" },
+  { href: "/resources/workshops", title: "Workshops", frT: "Ateliers", desc: "Live sessions and Q&As with experts — diagnosis, school, funding and daily life.", frD: "Séances en direct et questions-réponses avec des experts — diagnostic, école, financement et quotidien.", hue: "#6D28D9", bg: "#EDE9FE", icon: "cal" },
+  { href: "/resources/community", title: "Community resources", frT: "Ressources communautaires", desc: "The organizations, helplines and programs every Québec family should know.", frD: "Les organismes, lignes d'aide et programmes que toute famille québécoise devrait connaître.", hue: "#4C9A2A", bg: "#EAF3DE", icon: "users" },
 ];
 const ICONS: Record<string, string> = {
   cal: `<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/>`,
@@ -21,7 +21,7 @@ const ICONS: Record<string, string> = {
   users: `<circle cx="9" cy="8" r="3"/><path d="M3 19c0-3.3 2.7-5 6-5s6 1.7 6 5"/><circle cx="17" cy="8.5" r="2.2"/><path d="M16.5 14c2.6.2 4.5 1.7 4.5 5"/>`,
 };
 ---
-<AppFormLayout title="Resources" activeNav="resources">
+<AppFormLayout title="Resources" titleFr="Ressources" activeNav="resources">
   <SectionTabs section="resources" active="hub" />
 
   <div class="rh-wrap">
@@ -30,8 +30,8 @@ const ICONS: Record<string, string> = {
       <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
       <span class="c3-rib-av">✦</span>
       <div class="c3-rib-id">
-        <h1>The Library</h1>
-        <p>Everything we've gathered to make the journey lighter — sessions, playbooks, reads and the wider community.</p>
+        <h1 data-label-fr="La Bibliothèque">The Library</h1>
+        <p data-label-fr="Tout ce que nous avons rassemblé pour alléger le parcours — séances, guides, lectures et la communauté au sens large.">Everything we've gathered to make the journey lighter — sessions, playbooks, reads and the wider community.</p>
       </div>
       <div class="c3-rib-stats" id="rb-stats">
         <span class="c3-rstat"><b>3</b><span>collections</span></span>
@@ -43,14 +43,14 @@ const ICONS: Record<string, string> = {
       <a class="rh-start cu-rev cu-sparkle-host" href="/resources/learn" style="--d:.05s">
         <span class="cu-spark" style="top:12px;right:22px">✦</span>
         <span class="cu-spark s2" style="top:30px;right:44px">✦</span>
-        <span class="rh-start-k">START HERE</span>
-        <b>New to all of this? The first-90-days playbook.</b>
-        <p>What to do after "we think it might be autism" — diagnosis, first services, and who to call, in order.</p>
-        <span class="rh-start-go">Open the library →</span>
+        <span class="rh-start-k" data-label-fr="POUR COMMENCER">START HERE</span>
+        <b data-label-fr="Nouveau dans tout ça? Le guide des 90 premiers jours.">New to all of this? The first-90-days playbook.</b>
+        <p data-label-fr="Quoi faire après « on pense que c'est peut-être l'autisme » — diagnostic, premiers services et qui appeler, dans l'ordre.">What to do after "we think it might be autism" — diagnosis, first services, and who to call, in order.</p>
+        <span class="rh-start-go" data-label-fr="Ouvrir la bibliothèque →">Open the library →</span>
       </a>
       <div class="rh-next cu-rev" style="--d:.1s">
-        <p class="rh-next-k">NEXT LIVE WORKSHOP</p>
-        <div id="rh-ws"><p class="rh-ws-empty">Checking the calendar…</p></div>
+        <p class="rh-next-k" data-label-fr="PROCHAIN ATELIER EN DIRECT">NEXT LIVE WORKSHOP</p>
+        <div id="rh-ws"><p class="rh-ws-empty" data-label-fr="Vérification du calendrier…">Checking the calendar…</p></div>
       </div>
     </div>
 
@@ -61,8 +61,8 @@ const ICONS: Record<string, string> = {
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={ICONS[s.icon]} />
           </span>
           <span class="rh-tx">
-            <b>{s.title}</b>
-            <span>{s.desc}</span>
+            <b data-label-fr={s.frT}>{s.title}</b>
+            <span data-label-fr={s.frD}>{s.desc}</span>
           </span>
           <span class="rh-go">→</span>
         </a>
@@ -70,14 +70,14 @@ const ICONS: Record<string, string> = {
     </div>
 
     <div class="rh-help cu-rev" style="--d:.4s">
-      <span class="rh-help-t">Need a human right now?</span>
-      <a class="rh-line" href="tel:811"><b>811</b><span>Info-Santé / Info-Social — 24/7 nurse & social worker</span></a>
-      <a class="rh-line" href="tel:211"><b>211</b><span>Community services navigator for Québec</span></a>
+      <span class="rh-help-t" data-label-fr="Besoin d'un humain maintenant?">Need a human right now?</span>
+      <a class="rh-line" href="tel:811"><b>811</b><span data-label-fr="Info-Santé / Info-Social — infirmière et intervenant social 24/7">Info-Santé / Info-Social — 24/7 nurse & social worker</span></a>
+      <a class="rh-line" href="tel:211"><b>211</b><span data-label-fr="Répertoire des services communautaires du Québec">Community services navigator for Québec</span></a>
     </div>
 
     <div class="rh-cta cu-rev" style="--d:.45s">
-      <p><b>Looking for something we don't have yet?</b> Tell us — the library grows from what families actually need.</p>
-      <a href="mailto:contact@uniqueapex.com?subject=Resource%20request">Request a resource</a>
+      <p><b data-label-fr="Vous cherchez quelque chose qu'on n'a pas encore?">Looking for something we don't have yet?</b> <span data-label-fr="Dites-le-nous — la bibliothèque grandit selon les besoins réels des familles.">Tell us — the library grows from what families actually need.</span></p>
+      <a href="mailto:contact@uniqueapex.com?subject=Resource%20request" data-label-fr="Demander une ressource">Request a resource</a>
     </div>
   </div>
 </AppFormLayout>
@@ -139,8 +139,12 @@ const ICONS: Record<string, string> = {
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   (async () => {
     const ws = await UA.getNextWorkshop().catch(() => null);
+    /* Language comes from I18nBoot (APP-I18N-V2) — switching reloads the
+       page, so a single language-aware render is all we need. */
+    const fr = window.uaLang === "fr";
+    const loc = window.uaLocale || "en-CA";
     $("rh-ws").innerHTML = ws
-      ? (() => { const d = new Date(ws.starts_at); return `<div class="rh-ws"><span class="rh-ws-date"><b>${d.getDate()}</b><span>${d.toLocaleDateString("en-CA", { month: "short" })}</span></span><span class="rh-ws-meta"><b>${esc(ws.title)}</b><span>${d.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit" })} · ${esc(ws.location_type || "Online")}</span></span></div><a class="btn btn-primary btn-sm" href="/resources/workshops" style="margin-top:10px">Save a seat</a>`; })()
-      : `<p class="rh-ws-empty">Nothing scheduled right now — recordings live in <a href="/resources/learn" style="color:var(--violet-700);font-weight:600">the Library</a>.</p>`;
+      ? (() => { const d = new Date(ws.starts_at); return `<div class="rh-ws"><span class="rh-ws-date"><b>${d.getDate()}</b><span>${d.toLocaleDateString(loc, { month: "short" })}</span></span><span class="rh-ws-meta"><b>${esc(ws.title)}</b><span>${d.toLocaleTimeString(loc, { hour: "numeric", minute: "2-digit" })} · ${esc(ws.location_type || (fr ? "En ligne" : "Online"))}</span></span></div><a class="btn btn-primary btn-sm" href="/resources/workshops" style="margin-top:10px">${fr ? "Réserver ma place" : "Save a seat"}</a>`; })()
+      : `<p class="rh-ws-empty">${fr ? "Rien au calendrier pour l'instant — les enregistrements vivent dans" : "Nothing scheduled right now — recordings live in"} <a href="/resources/learn" style="color:var(--violet-700);font-weight:600">${fr ? "la Bibliothèque" : "the Library"}</a>.</p>`;
   })().catch(() => {});
 </script>

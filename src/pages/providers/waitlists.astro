@@ -5,7 +5,7 @@
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
-<AppFormLayout title="Providers" activeNav="providers">
+<AppFormLayout title="Providers" titleFr="Professionnels" activeNav="providers">
   <SectionTabs section="providers" active="waitlists" />
 
   <div class="pw-wrap">
@@ -15,7 +15,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <span class="c3-rib-av"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 2.3"/></svg></span>
       <div class="c3-rib-id">
         <h1 id="rb-title">Waitlists</h1>
-        <p>A spot costs nothing to hold — and you can always decline. Here's where you stand.</p>
+        <p data-i18n="waitlists_sub">A spot costs nothing to hold — and you can always decline. Here's where you stand.</p>
       </div>
       <div class="c3-rib-stats" id="rb-stats"></div>
     </div>
@@ -23,11 +23,11 @@ import SectionTabs from "@/components/SectionTabs.astro";
     <div id="pw-list" class="pw-list"><p class="pw-loading">Checking your waitlists…</p></div>
 
     <div class="pw-how cu-rev" style="--d:.15s">
-      <p class="pw-how-t">How it works</p>
+      <p class="pw-how-t" data-i18n="waitlists_howTitle">How it works</p>
       <div class="pw-steps">
-        <div class="pw-step"><span class="n">1</span><p><b>You join once.</b> We keep your place and your child's needs on file — no re-explaining.</p></div>
-        <div class="pw-step"><span class="n">2</span><p><b>We watch the lists.</b> When the directory opens in Montréal, your signup carries over with its original date.</p></div>
-        <div class="pw-step"><span class="n">3</span><p><b>You get first call.</b> A matching spot opens → you hear about it before it's public.</p></div>
+        <div class="pw-step"><span class="n">1</span><p><b data-i18n="waitlists_step1b">You join once.</b> <span data-i18n="waitlists_step1">We keep your place and your child's needs on file — no re-explaining.</span></p></div>
+        <div class="pw-step"><span class="n">2</span><p><b data-i18n="waitlists_step2b">We watch the lists.</b> <span data-i18n="waitlists_step2">When the directory opens in Montréal, your signup carries over with its original date.</span></p></div>
+        <div class="pw-step"><span class="n">3</span><p><b data-i18n="waitlists_step3b">You get first call.</b> <span data-i18n="waitlists_step3">A matching spot opens → you hear about it before it's public.</span></p></div>
       </div>
     </div>
   </div>
@@ -70,43 +70,56 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
 <script>
   import * as UA from "../../lib/ua-data.js";
+  import DICT from "../../i18n/providers-sub.js";
+
+  const T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+  const tpl = (s, v) => String(s).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? v[k] : ""));
+  const ofName = (n) => (window.uaLang === "fr"
+    ? (/^[aeiouyàâäéèêëìîïòôöùûüh]/i.test(String(n || "")) ? "d'" : "de ")
+    : "");
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  /* Script-owned placeholders — translate the fallbacks before data arrives. */
+  $("rb-title").textContent = T.waitlists_title;
+  $("pw-list").innerHTML = `<p class="pw-loading">${esc(T.waitlists_checking)}</p>`;
 
   (async () => {
     const wl = await UA.getWaitlist().catch(() => []);
     const passports = await UA.getPassports().catch(() => []);
     const p = UA.pickActivePassport(passports);
     const id = p ? UA.childIdentity(p.data || {}) : { first: "" };
-    if (id.first) $("rb-title").textContent = id.first + "'s Waitlists";
+    if (id.first) $("rb-title").textContent = tpl(T.waitlists_titleNamed, { name: id.first, of: ofName(id.first) });
 
     $("rb-stats").innerHTML = [
-      `<span class="c3-rstat"><b>${wl.length}</b><span>signup${wl.length === 1 ? "" : "s"}</span></span>`,
-      `<span class="c3-rstat"><b>${wl.filter((w) => (w.status || "").toLowerCase() === "matched").length}</b><span>matched</span></span>`,
+      `<span class="c3-rstat"><b>${wl.length}</b><span>${wl.length === 1 ? esc(T.waitlists_signup1) : esc(T.waitlists_signupN)}</span></span>`,
+      `<span class="c3-rstat"><b>${wl.filter((w) => (w.status || "").toLowerCase() === "matched").length}</b><span>${esc(T.waitlists_matchedLabel)}</span></span>`,
     ].join("");
 
-    const SVC = [["service_slp", "Speech therapy"], ["service_ot", "Occupational therapy"], ["service_aba", "Behaviour / ABA"], ["service_other", "Other services"]];
+    const SVCKEYS = ["service_slp", "service_ot", "service_aba", "service_other"];
     if (!wl.length) {
       $("pw-list").innerHTML = `<div class="pw-empty cu-rev">
         <span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66;width:42px;height:42px"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 2.3"/></svg></span>
-        <p><b>No waitlist signups yet.</b> Québec waitlists run long — joining early is the single highest-leverage move. Two minutes, and your place is held with today's date.</p>
-        <a class="btn btn-primary btn-sm" href="/waitlist">Join the waitlist</a>
+        <p>${T.waitlists_empty}</p>
+        <a class="btn btn-primary btn-sm" href="/waitlist">${esc(T.waitlists_joinCta)}</a>
       </div>`;
       return;
     }
     $("pw-list").innerHTML = wl.map((w, i) => {
       const st = (w.status || "New").toLowerCase();
       const cls = ["new", "contacted", "matched", "waitlisted"].includes(st) ? st : "new";
-      const svcs = SVC.filter(([k]) => w[k]).map(([, lbl]) => `<span class="pw-svc">${lbl}</span>`).join("") || `<span class="pw-svc">General</span>`;
+      const svcs = SVCKEYS.filter((k) => w[k]).map((k) => `<span class="pw-svc">${esc(T.waitlists_svc[k])}</span>`).join("") || `<span class="pw-svc">${esc(T.waitlists_general)}</span>`;
       const d = new Date(w.created_at);
+      const dateStr = isNaN(d) ? "—" : d.toLocaleDateString(window.uaLocale || "en-CA", { month: "long", day: "numeric", year: "numeric" });
+      const stLabel = (T.waitlists_status && T.waitlists_status[w.status || "New"]) || w.status || "New";
       return `<div class="pw-card cu-rev" style="--d:${(0.05 + i * 0.06).toFixed(2)}s">
         <span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66;width:40px;height:40px"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 2.3"/></svg></span>
         <span class="pw-body">
-          <span class="pw-name" style="display:block">Coordination waitlist</span>
-          <span class="pw-when" style="display:block">Place held since ${isNaN(d) ? "—" : d.toLocaleDateString("en-CA", { month: "long", day: "numeric", year: "numeric" })}</span>
+          <span class="pw-name" style="display:block">${esc(T.waitlists_coordName)}</span>
+          <span class="pw-when" style="display:block">${esc(tpl(T.waitlists_placeHeld, { date: dateStr }))}</span>
           <span class="pw-svcs">${svcs}</span>
         </span>
-        <span class="pw-pill ${cls}">${esc(w.status || "New")}</span>
+        <span class="pw-pill ${cls}">${esc(stLabel)}</span>
       </div>`;
     }).join("");
   })().catch((e) => console.error("[waitlists] hydrate failed", e));

@@ -11,7 +11,7 @@
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
-<AppFormLayout title="Journey" activeNav="child">
+<AppFormLayout title="Journey" titleFr="Parcours" activeNav="child">
   <div class="c3-tabs"><SectionTabs section="child" active="journey" /></div>
 
   <div id="jy-gate"></div>
@@ -40,7 +40,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <span class="cu-spark" style="top:12px;right:24px">✦</span>
       <span class="cu-spark s2" style="top:28px;right:46px">✦</span>
       <p id="jy-foot-text">You don't have to do it all today — one step is enough. The path updates itself as the passport grows.</p>
-      <a class="btn btn-ghost btn-sm" href="/child/growth">See how far you've come →</a>
+      <a class="btn btn-ghost btn-sm" href="/child/growth" data-i18n="footCta">See how far you've come →</a>
     </div>
   </div>
 </AppFormLayout>
@@ -128,11 +128,23 @@ import SectionTabs from "@/components/SectionTabs.astro";
   import * as UA from "../../lib/ua-data.js";
   import { scoreWheel } from "../../lib/wheelScore.js";
   import { buildJourney } from "../../lib/journey.js";
+  import DICT from "../../i18n/child-journey.js";
 
   const UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
   const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  /* ---------- i18n (string codes from src/i18n/child-journey.js) ---------- */
+  const T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+  const tpl = (s, v) => String(s).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? v[k] : ""));
+  const ofName = (n) => (window.uaLang === "fr"
+    ? (/^[aeiouyàâäéèêëìîïòôöùûüh]/i.test(String(n || "")) ? "d'" : "de ")
+    : "");
+  /* Script-owned labels — translate the fallbacks before data arrives. */
+  $("rb-title").textContent = T.journeyTitle;
+  $("rb-sub").textContent = T.ribbonSub;
+  $("jy-foot-text").textContent = T.footFallback;
 
   function getSession() { try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch { return null; } }
   function isValid(s) { return s && s.access_token && Math.floor(Date.now() / 1000) < (s.expires_at || 0) - 60; }
@@ -152,7 +164,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     const passports = await UA.getPassports().catch(() => []);
     const p = UA.pickActivePassport(passports);
     if (!p) {
-      $("jy-gate").innerHTML = `<div class="jy-gate-card"><p>The journey starts with the passport — a few minutes about your child, and a personalized path appears here.</p><a href="/passport">Start the passport →</a></div>`;
+      $("jy-gate").innerHTML = `<div class="jy-gate-card"><p>${esc(T.gateText)}</p><a href="/passport">${esc(T.gateCta)}</a></div>`;
       return;
     }
     $("jy-main").style.display = "block";
@@ -163,8 +175,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
     $("rb-av").textContent = (first || id.name || "·")[0].toUpperCase();
     if (first) {
-      $("rb-title").textContent = first + "'s Journey";
-      $("jy-foot-text").textContent = "You don't have to do it all today — one step is enough. The path updates itself as " + first + "'s passport grows.";
+      $("rb-title").textContent = tpl(T.journeyTitleNamed, { name: first, of: ofName(first) });
+      $("jy-foot-text").textContent = tpl(T.footTextNamed, { name: first, of: ofName(first) });
     }
 
     /* ---------- context for the engine ---------- */
@@ -193,11 +205,13 @@ import SectionTabs from "@/components/SectionTabs.astro";
     });
 
     /* ---------- ribbon: personalized, warm ---------- */
-    $("rb-sub").textContent = "Built from " + comp.done + " passport section" + (comp.done === 1 ? "" : "s") + (first ? " about " + first : "") + " — every step below exists because of something you told us.";
+    $("rb-sub").textContent = tpl(comp.done === 1 ? T.builtFrom1 : T.builtFromN, { n: comp.done })
+      + (first ? tpl(T.builtAbout, { name: first }) : "")
+      + T.builtTail;
     $("rb-stats").innerHTML = [
-      `<span class="c3-rstat"><b>${journey.counts.done}</b><span>steps done</span></span>`,
-      `<span class="c3-rstat"><b>${journey.counts.now}</b><span>to do now</span></span>`,
-      `<span class="c3-rstat"><b>${journey.counts.later}</b><span>coming up</span></span>`,
+      `<span class="c3-rstat"><b>${journey.counts.done}</b><span>${esc(T.statsDone)}</span></span>`,
+      `<span class="c3-rstat"><b>${journey.counts.now}</b><span>${esc(T.statsNow)}</span></span>`,
+      `<span class="c3-rstat"><b>${journey.counts.later}</b><span>${esc(T.statsLater)}</span></span>`,
     ].join("");
 
     /* ---------- stepper ---------- */
@@ -207,7 +221,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       const pct = st.total ? Math.round((st.done / st.total) * 100) : 0;
       return `<button type="button" class="jy-tab${cur ? " cur" : ""}${allDone ? " all-done" : ""}" data-stage="${st.key}">
         <span class="n">${allDone ? "✓" : si + 1}</span>
-        <span class="m"><span class="t">${esc(st.title)}</span><span class="p">${st.done}/${st.total} done${cur ? " · you are here" : ""}</span><span class="bar"><b style="--w:${pct}%"></b></span></span>
+        <span class="m"><span class="t">${esc(st.title)}</span><span class="p">${esc(tpl(T.stepperProgress, { done: st.done, total: st.total }))}${cur ? esc(T.youAreHere) : ""}</span><span class="bar"><b style="--w:${pct}%"></b></span></span>
       </button>`;
     }).join("");
     $("jy-stepper").innerHTML = stepperHtml;
@@ -229,13 +243,13 @@ import SectionTabs from "@/components/SectionTabs.astro";
           <div class="bd">
             <div class="tt">${esc(s.title)}</div>
             <div class="why">${esc(s.why)}</div>
-            ${s.because ? `<span class="because">${becauseIc}<span>From the passport: ${esc(s.because)}</span></span>` : ""}
+            ${s.because ? `<span class="because">${becauseIc}<span>${tpl(esc(T.fromPassport), { because: esc(s.because) })}</span></span>` : ""}
             <div class="acts">
               <a class="cta" href="${s.href}">${esc(s.cta)}</a>
               ${s.also ? `<a class="cta2" href="${s.also.href}">${esc(s.also.label)} →</a>` : ""}
             </div>
           </div>
-          <span class="pill2 ${s.status}">${s.status === "done" ? "Done ✓" : s.status === "now" ? "Now" : s.status === "next" ? "Next" : "Later"}</span>
+          <span class="pill2 ${s.status}">${esc(s.status === "done" ? T.pillDone : s.status === "now" ? T.pillNow : s.status === "next" ? T.pillNext : T.pillLater)}</span>
         </div>`).join("");
       return `<div class="jy-stage${open ? " open" : ""}${allDone ? " all-done" : ""}" data-stage="${st.key}">
         <div class="jy-shead" role="button" tabindex="0" aria-expanded="${open ? "true" : "false"}">

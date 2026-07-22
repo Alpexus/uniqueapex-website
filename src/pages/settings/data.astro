@@ -1,13 +1,15 @@
 ---
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
+import DICT from "@/i18n/stubs.js";
+const t = DICT.en;
 ---
-<AppFormLayout title="Settings" activeNav="settings">
+<AppFormLayout title="Settings" titleFr="Paramètres" activeNav="settings">
   <SectionTabs section="settings" active="data" />
-  <h1 class="page-title">Data Management</h1>
-  <p class="page-sub">Part of Settings. This page is scaffolded — content is coming.</p>
+  <h1 class="page-title" data-i18n="dataManagement">{t.dataManagement}</h1>
+  <p class="page-sub" data-i18n="partOfSettings">{t.partOfSettings}</p>
   <div class="ua-stub">
-    <b>Data Management</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+    <b data-i18n="dataManagement">{t.dataManagement}</b> <span data-i18n="bodyTail">{t.bodyTail}</span>
   </div>
+  <script is:inline define:vars={{ DICT }}>window.uaI18n && window.uaI18n(DICT);</script>
 </AppFormLayout>

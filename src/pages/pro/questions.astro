@@ -3,13 +3,14 @@
    between sessions, the provider answers when convenient. Threads,
    not chat — calmer for everyone. Preview; TODO-LIVE: questions table. */
 import ProviderLayout from "@/layouts/ProviderLayout.astro";
+import DICT from "@/i18n/pro-portal.js";
 ---
-<ProviderLayout title="Questions — UniqueApex Pro" active="questions">
+<ProviderLayout title="Questions — UniqueApex Pro" titleFr="Questions" active="questions">
   <div class="pgrid">
     <div class="pc">
-      <div class="pc-h"><b>Family questions</b><span>answer once, it stays in the family's record — fewer repeated emails</span></div>
+      <div class="pc-h"><b data-i18n="questions_title">Family questions</b><span data-i18n="questions_sub">answer once, it stays in the family's record — fewer repeated emails</span></div>
       <div id="q-list"></div>
-      <p class="pnote">Questions are asynchronous by design: families know this isn't a chat or an emergency line, and you answer on your own time. You can switch the service off in Settings.</p>
+      <p class="pnote" data-i18n="questions_note">Questions are asynchronous by design: families know this isn't a chat or an emergency line, and you answer on your own time. You can switch the service off in Settings.</p>
     </div>
   </div>
 </ProviderLayout>
@@ -30,31 +31,37 @@ import ProviderLayout from "@/layouts/ProviderLayout.astro";
   .q-reply textarea{flex:1;min-height:64px}
 </style>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
   (function () {
+    var T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+    var tpl = function (s, v) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return v && v[k] != null ? v[k] : ""; }); };
+    var ofName = function (n) { return window.uaLang === "fr" ? (/^[aeiouyàâäéèêëìîïòôöùûüh]/i.test(String(n || "")) ? "d'" : "de ") : ""; };
     var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
     var COLORS = ["#B14A66", "#6D28D9", "#0E8C82", "#A8650A"];
-    var QS = [
-      { fam: "Liam's parent", when: "2 hours ago", q: "Liam started refusing the picture cards this week — should we pause them at home or push through?", ans: null, open: true },
-      { fam: "Éloi's parent", when: "Yesterday", q: "Can we get a short note for the daycare about his transition strategies?", ans: null, open: false },
-      { fam: "Noor's parent", when: "3 days ago", q: "Which of the /r/ exercises should we prioritise this week?", ans: "Focus on the mirror game 5 minutes a day — skip sheet B for now, we'll do it together Thursday.", open: false },
-    ];
+    var NAMES = ["Liam", "Éloi", "Noor"];
+    var OPEN = [true, false, false];
+    var qrows = T.questions_rows || [];
+    var QS = NAMES.map(function (nm, i) {
+      var r = qrows[i] || {};
+      return { name: nm, when: r.when, q: r.q, ans: r.ans, open: OPEN[i] };
+    });
 
     function render() {
       var host = document.getElementById("q-list");
       host.innerHTML = QS.map(function (x, i) {
+        var fam = tpl(T.questions_parentOf, { name: x.name, of: ofName(x.name) });
         var body = "";
         if (x.open) {
           body = "<div class='q-body'><p class='q-msg'>" + esc(x.q) + "</p>" +
-            (x.ans ? "<div class='q-ans'><b>Your answer</b>" + esc(x.ans) + "</div>"
-                   : "<div class='q-reply'><textarea class='pin' placeholder='Write a short answer…' data-i='" + i + "'></textarea><button class='pbtn' data-send='" + i + "' type='button'>Send</button></div>") +
+            (x.ans ? "<div class='q-ans'><b>" + esc(T.questions_yourAnswer) + "</b>" + esc(x.ans) + "</div>"
+                   : "<div class='q-reply'><textarea class='pin' placeholder='" + esc(T.questions_replyPh) + "' data-i='" + i + "'></textarea><button class='pbtn' data-send='" + i + "' type='button'>" + esc(T.questions_sendBtn) + "</button></div>") +
             "</div>";
         }
         return "<div class='q-item'>" +
           "<div class='q-top' data-open='" + i + "'>" +
-          "<span class='av' style='background:" + COLORS[i % COLORS.length] + "'>" + esc(x.fam[0]) + "</span>" +
-          "<span class='tx'><b>" + esc(x.fam) + "</b><span>" + esc(x.when) + (x.ans ? " · answered" : " · waiting") + "</span></span>" +
-          (x.ans ? "<span class='ppill green'>answered</span>" : "<span class='ppill rose'>waiting</span>") +
+          "<span class='av' style='background:" + COLORS[i % COLORS.length] + "'>" + esc(x.name[0]) + "</span>" +
+          "<span class='tx'><b>" + esc(fam) + "</b><span>" + esc(x.when) + " · " + esc(x.ans ? T.questions_answered : T.questions_waiting) + "</span></span>" +
+          (x.ans ? "<span class='ppill green'>" + esc(T.questions_answered) + "</span>" : "<span class='ppill rose'>" + esc(T.questions_waiting) + "</span>") +
           "</div>" + body + "</div>";
       }).join("");
 

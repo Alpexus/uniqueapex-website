@@ -3,34 +3,38 @@
    for the working view: next session, documents exchanged, questions.
    Preview data; TODO-LIVE: derive from accepted bookings + shares. */
 import ProviderLayout from "@/layouts/ProviderLayout.astro";
+import DICT from "@/i18n/pro-portal.js";
 ---
-<ProviderLayout title="Clients — UniqueApex Pro" active="clients">
+<ProviderLayout title="Clients — UniqueApex Pro" titleFr="Clients" active="clients">
   <div class="pgrid">
     <div class="pkpis">
-      <div class="pkpi teal"><b id="ck-active">·</b><span>active families</span></div>
-      <div class="pkpi"><b id="ck-week">·</b><span>seen this week</span></div>
-      <div class="pkpi amber"><b id="ck-wait">·</b><span>on your waitlist</span></div>
+      <div class="pkpi teal"><b id="ck-active">·</b><span data-i18n="clients_kpiActive">active families</span></div>
+      <div class="pkpi"><b id="ck-week">·</b><span data-i18n="clients_kpiWeek">seen this week</span></div>
+      <div class="pkpi amber"><b id="ck-wait">·</b><span data-i18n="clients_kpiWaitlist">on your waitlist</span></div>
     </div>
 
     <div class="pc">
-      <div class="pc-h"><b>Your families</b><span>click a row for details · families share only what they choose to share</span></div>
+      <div class="pc-h"><b data-i18n="clients_listTitle">Your families</b><span data-i18n="clients_listSub">click a row for details · families share only what they choose to share</span></div>
       <div id="cl-list"></div>
-      <p class="pnote">When a family you serve updates their child's shared profile, you'll see it here first — no more chasing paperwork by email.</p>
+      <p class="pnote" data-i18n="clients_note">When a family you serve updates their child's shared profile, you'll see it here first — no more chasing paperwork by email.</p>
     </div>
   </div>
 </ProviderLayout>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
   (function () {
+    var T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+    var tpl = function (s, v) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return v && v[k] != null ? v[k] : ""; }); };
     var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
     var COLORS = ["#0E8C82", "#6D28D9", "#A8650A", "#B14A66", "#2F9E63", "#2563EB"];
+    var rows = T.clients_rows || [];
     var FAMILIES = [
-      { child: "Liam", age: 4, since: "Feb 2026", next: "Today 9:00", docs: 3, q: 1, status: "active", note: "Working on two-word phrases · parents very engaged" },
-      { child: "Noor", age: 6, since: "Mar 2026", next: "Today 10:30", docs: 2, q: 0, status: "active", note: "School collaboration — plan d'intervention shared" },
-      { child: "Éloi", age: 5, since: "Nov 2025", next: "Today 13:00", docs: 5, q: 1, status: "active", note: "Re-assessment planned for September" },
-      { child: "Maya", age: 7, since: "Jan 2026", next: "Today 15:00", docs: 4, q: 0, status: "active", note: "Assessment phase — report due next week" },
-      { child: "Zoé", age: 3, since: "—", next: "Pending request", docs: 0, q: 0, status: "waitlist", note: "Initial consultation requested" },
-      { child: "Adam", age: 8, since: "—", next: "Pending request", docs: 0, q: 0, status: "waitlist", note: "After-school slot needed" },
+      { child: "Liam", age: 4, docs: 3, q: 1, status: "active" },
+      { child: "Noor", age: 6, docs: 2, q: 0, status: "active" },
+      { child: "Éloi", age: 5, docs: 5, q: 1, status: "active" },
+      { child: "Maya", age: 7, docs: 4, q: 0, status: "active" },
+      { child: "Zoé", age: 3, docs: 0, q: 0, status: "waitlist" },
+      { child: "Adam", age: 8, docs: 0, q: 0, status: "waitlist" },
     ];
 
     document.getElementById("ck-active").textContent = FAMILIES.filter(function (f) { return f.status === "active"; }).length;
@@ -39,13 +43,14 @@ import ProviderLayout from "@/layouts/ProviderLayout.astro";
 
     var host = document.getElementById("cl-list");
     host.innerHTML = FAMILIES.map(function (f, i) {
+      var r = rows[i] || {};
       return "<div class='prow' data-i='" + i + "' style='cursor:pointer;flex-wrap:wrap'>" +
         "<span class='av' style='background:" + COLORS[i % COLORS.length] + "'>" + esc(f.child[0]) + "</span>" +
-        "<span class='tx'><b>" + esc(f.child) + ", " + f.age + "</b><span>Client since " + esc(f.since) + " · next: " + esc(f.next) + "</span></span>" +
-        (f.docs ? "<span class='ppill grey'>" + f.docs + " docs</span>" : "") +
-        (f.q ? "<span class='ppill rose'>" + f.q + " question</span>" : "") +
-        "<span class='ppill " + (f.status === "active" ? "teal" : "amber") + "'>" + f.status + "</span>" +
-        "<span class='cl-detail' style='display:none;flex-basis:100%;font-size:.78rem;color:var(--p-mut);padding:8px 0 2px 46px;line-height:1.5'>" + esc(f.note) + " · <a href='/pro/documents' style='color:var(--p-teal);font-weight:700;text-decoration:none'>documents</a> · <a href='/pro/questions' style='color:var(--p-teal);font-weight:700;text-decoration:none'>questions</a></span>" +
+        "<span class='tx'><b>" + esc(f.child) + ", " + f.age + "</b><span>" + esc(tpl(T.clients_rowMeta, { since: r.since, next: r.next })) + "</span></span>" +
+        (f.docs ? "<span class='ppill grey'>" + esc(tpl(T.clients_docsPill, { n: f.docs })) + "</span>" : "") +
+        (f.q ? "<span class='ppill rose'>" + esc(tpl(T.clients_questionPill, { n: f.q })) + "</span>" : "") +
+        "<span class='ppill " + (f.status === "active" ? "teal" : "amber") + "'>" + esc(f.status === "active" ? T.clients_statusActive : T.clients_statusWaitlist) + "</span>" +
+        "<span class='cl-detail' style='display:none;flex-basis:100%;font-size:.78rem;color:var(--p-mut);padding:8px 0 2px 46px;line-height:1.5'>" + esc(r.note) + " · <a href='/pro/documents' style='color:var(--p-teal);font-weight:700;text-decoration:none'>" + esc(T.clients_linkDocuments) + "</a> · <a href='/pro/questions' style='color:var(--p-teal);font-weight:700;text-decoration:none'>" + esc(T.clients_linkQuestions) + "</a></span>" +
         "</div>";
     }).join("");
     host.querySelectorAll(".prow").forEach(function (row) {

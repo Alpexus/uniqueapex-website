@@ -1,38 +1,78 @@
 ---
+/* SIGNUP — parent account + initial child profile in one form.
+   Submits to the signup-submit edge function (Turnstile verified).
+   Bilingual: /signup (EN) and /fr/signup (FR) render this same page with
+   a lang prop. Form VALUES stay canonical English (they go to the DB);
+   only labels translate. Strings live in the central catalog
+   (src/i18n/signup.js); the page picks its language at build time and
+   injects the JS strings via define:vars. */
 import Layout from "@/layouts/Layout.astro";
+import DICT from "@/i18n/signup.js";
+
+const { lang = "en" } = Astro.props;
+const prefix = lang === "fr" ? "/fr" : "";
+const loginQs = lang === "fr" ? "?lang=fr" : "";
+const t = DICT[lang] || DICT.en;
 
 const inputCls = "w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white";
 const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slate-200 rounded-xl px-4 py-3 hover:border-violet-300 transition-colors text-slate-600 text-sm";
+
+
+const langOptions = ["English", "French", "Both"];
+const concernOptions = ["Autism", "ADHD", "Speech / Language", "Developmental Delay", "Anxiety", "Other"];
+
+/* JS strings for the inline script (injected via define:vars) */
+const jsStrings = {
+  lang,
+  required: t.errRequired,
+  badEmail: t.errEmail,
+  badPassword: t.errPassword,
+  noMatch: t.errConfirm,
+  cityRequired: t.errCity,
+  agree: t.errAgree,
+  fillRed: t.jsFillRed,
+  verify: t.jsVerify,
+  creating: t.jsCreating,
+  submit: t.submit,
+  generic: t.jsGeneric,
+  weak: t.jsWeak,
+  fair: t.jsFair,
+  good: t.jsGood,
+  strong: t.jsStrong,
+  exists: t.jsExists,
+  verifyFailed: t.jsVerifyFailed,
+  weakPassword: t.jsWeakPassword,
+  invalidEmail: t.jsInvalidEmail,
+};
 ---
 
-<Layout title="Create Account">
+<Layout title={t.title} lang={lang}>
   <!-- Cloudflare Turnstile -->
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer is:inline></script>
 
   <div class="max-w-2xl mx-auto px-6 py-12">
 
     <div id="signup-header" class="text-center mb-8">
-      <a href="/" class="inline-flex items-center gap-2 mb-6">
+      <a href={prefix + "/"} class="inline-flex items-center gap-2 mb-6">
         <img src="/Logo.png" alt="UniqueApex" class="h-10 w-auto" />
         <span class="text-lg font-bold text-slate-800">Unique<span class="text-violet-700">Apex</span></span>
       </a>
-      <h1 class="text-3xl font-bold text-slate-800">Create your account</h1>
-      <p class="text-slate-500 mt-2">Tell us about yourself and your child so we can start helping right away.</p>
+      <h1 class="text-3xl font-bold text-slate-800">{t.heading}</h1>
+      <p class="text-slate-500 mt-2">{t.sub}</p>
     </div>
 
     <!-- Success screen (hidden until signup succeeds) -->
     <div id="signup-success" style="display:none" class="p-8 text-center">
       <img src="/signup-illustration.png" alt="" class="mx-auto mb-4 h-auto" style="width:480px" />
-      <h2 class="text-2xl font-bold text-slate-800">Check your email 🎉</h2>
+      <h2 class="text-2xl font-bold text-slate-800">{t.successHeading}</h2>
       <p class="text-slate-600 mt-3">
-        We sent a confirmation link to <span id="success-email" class="font-semibold text-violet-700"></span>.
-        Click it to activate your account, then sign in.
+        {t.successBody1} <span id="success-email" class="font-semibold text-violet-700"></span>{t.successBody2}
       </p>
       <p class="text-sm text-slate-400 mt-4">
-        Don't see it? Check your spam folder. The link can take a minute to arrive.
+        {t.successSpam}
       </p>
-      <a href="/login" class="inline-block mt-6 bg-violet-700 hover:bg-violet-800 text-white font-semibold px-8 py-3 rounded-full transition-colors">
-        Go to sign in →
+      <a href={"/login" + loginQs} class="inline-block mt-6 bg-violet-700 hover:bg-violet-800 text-white font-semibold px-8 py-3 rounded-full transition-colors">
+        {t.successCta}
       </a>
     </div>
 
@@ -40,30 +80,30 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
 
       <!-- Parent info -->
       <div class="bg-slate-50 rounded-2xl p-6 space-y-4">
-        <h2 class="text-base font-bold text-slate-800">About you</h2>
+        <h2 class="text-base font-bold text-slate-800">{t.aboutYou}</h2>
         <div class="grid md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-slate-600 mb-2">First name *</label>
-            <input name="parentFirst" type="text" class={inputCls} placeholder="Your first name" />
-            <p id="err-parentFirst" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">Required.</p>
+            <label class="block text-sm font-medium text-slate-600 mb-2">{t.firstName}</label>
+            <input name="parentFirst" type="text" class={inputCls} placeholder={t.firstNamePh} />
+            <p id="err-parentFirst" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">{t.errRequired}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-600 mb-2">Last name *</label>
-            <input name="parentLast" type="text" class={inputCls} placeholder="Your last name" />
-            <p id="err-parentLast" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">Required.</p>
+            <label class="block text-sm font-medium text-slate-600 mb-2">{t.lastName}</label>
+            <input name="parentLast" type="text" class={inputCls} placeholder={t.lastNamePh} />
+            <p id="err-parentLast" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">{t.errRequired}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-600 mb-2">Email address *</label>
-            <input name="email" type="email" class={inputCls} placeholder="you@example.com" />
-            <p id="err-email" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">Please enter a valid email.</p>
+            <label class="block text-sm font-medium text-slate-600 mb-2">{t.email}</label>
+            <input name="email" type="email" class={inputCls} placeholder={t.emailPh} />
+            <p id="err-email" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">{t.errEmail}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-600 mb-2">Phone (optional)</label>
-            <input name="phone" type="tel" class={inputCls} placeholder="(514) 555-0100" />
+            <label class="block text-sm font-medium text-slate-600 mb-2">{t.phone}</label>
+            <input name="phone" type="tel" class={inputCls} placeholder={t.phonePh} />
           </div>
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-slate-600 mb-2">Password *</label>
-            <input id="pw-input" name="password" type="password" class={inputCls} placeholder="Create a strong password" />
+            <label class="block text-sm font-medium text-slate-600 mb-2">{t.password}</label>
+            <input id="pw-input" name="password" type="password" class={inputCls} placeholder={t.passwordPh} />
             <!-- Strength bar -->
             <div class="mt-2 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
               <div id="pw-bar" class="h-full rounded-full transition-all duration-300" style="width:0%;background:#ef4444"></div>
@@ -71,17 +111,17 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
             <p id="pw-label" class="text-xs mt-1 text-slate-400"></p>
             <!-- Requirements -->
             <ul id="pw-reqs" class="mt-2 grid grid-cols-2 gap-1 text-xs" style="display:none">
-              <li id="req-len" class="text-slate-400">✗ At least 8 characters</li>
-              <li id="req-upper" class="text-slate-400">✗ One uppercase letter</li>
-              <li id="req-lower" class="text-slate-400">✗ One lowercase letter</li>
-              <li id="req-num" class="text-slate-400">✗ One number</li>
+              <li id="req-len" class="text-slate-400">{t.reqLen}</li>
+              <li id="req-upper" class="text-slate-400">{t.reqUpper}</li>
+              <li id="req-lower" class="text-slate-400">{t.reqLower}</li>
+              <li id="req-num" class="text-slate-400">{t.reqNum}</li>
             </ul>
-            <p id="err-password" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">Password doesn't meet requirements.</p>
+            <p id="err-password" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">{t.errPassword}</p>
           </div>
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-slate-600 mb-2">Confirm password *</label>
-            <input name="confirm" type="password" class={inputCls} placeholder="Same password again" />
-            <p id="err-confirm" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">Passwords don't match.</p>
+            <label class="block text-sm font-medium text-slate-600 mb-2">{t.confirm}</label>
+            <input name="confirm" type="password" class={inputCls} placeholder={t.confirmPh} />
+            <p id="err-confirm" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">{t.errConfirm}</p>
           </div>
         </div>
       </div>
@@ -89,54 +129,54 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
       <!-- Child info -->
       <div class="bg-slate-50 rounded-2xl p-6 space-y-4">
         <div>
-          <h2 class="text-base font-bold text-slate-800">About your child</h2>
-          <p class="text-sm text-slate-500 mt-0.5">This creates your child's initial profile. You can complete it in detail later.</p>
+          <h2 class="text-base font-bold text-slate-800">{t.aboutChild}</h2>
+          <p class="text-sm text-slate-500 mt-0.5">{t.aboutChildSub}</p>
         </div>
         <div class="grid md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-slate-600 mb-2">Child's first name *</label>
-            <input name="childFirst" type="text" class={inputCls} placeholder="First name" />
-            <p id="err-childFirst" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">Required.</p>
+            <label class="block text-sm font-medium text-slate-600 mb-2">{t.childFirst}</label>
+            <input name="childFirst" type="text" class={inputCls} placeholder={t.childFirstPh} />
+            <p id="err-childFirst" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">{t.errRequired}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-600 mb-2">Child's last name</label>
-            <input name="childLast" type="text" class={inputCls} placeholder="Last name (optional)" />
+            <label class="block text-sm font-medium text-slate-600 mb-2">{t.childLast}</label>
+            <input name="childLast" type="text" class={inputCls} placeholder={t.childLastPh} />
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-600 mb-2">Date of birth</label>
+            <label class="block text-sm font-medium text-slate-600 mb-2">{t.dob}</label>
             <input name="childDob" type="date" class={inputCls} />
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-600 mb-2">City / region *</label>
-            <input name="city" type="text" class={inputCls} placeholder="e.g. Montréal, QC" />
-            <p id="err-city" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">Required for matching.</p>
+            <label class="block text-sm font-medium text-slate-600 mb-2">{t.city}</label>
+            <input name="city" type="text" class={inputCls} placeholder={t.cityPh} />
+            <p id="err-city" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">{t.errCity}</p>
           </div>
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-slate-600 mb-2">Primary language at home</label>
+            <label class="block text-sm font-medium text-slate-600 mb-2">{t.homeLang}</label>
             <div class="flex gap-3 flex-wrap">
-              {["English","French","Both"].map((o) => (
-                <label class={chip}><input type="radio" name="language" value={o} class="accent-violet-700" /> {o}</label>
+              {langOptions.map((o) => (
+                <label class={chip}><input type="radio" name="language" value={o} class="accent-violet-700" /> {t.langOpts[o]}</label>
               ))}
             </div>
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-slate-600 mb-2">Areas of concern (select any)</label>
+          <label class="block text-sm font-medium text-slate-600 mb-2">{t.concerns}</label>
           <div class="grid sm:grid-cols-3 gap-2">
-            {["Autism","ADHD","Speech / Language","Developmental Delay","Anxiety","Other"].map((o) => (
-              <label class={chip}><input type="checkbox" name="diagnoses" value={o} class="accent-violet-700 w-4 h-4" /> {o}</label>
+            {concernOptions.map((o) => (
+              <label class={chip}><input type="checkbox" name="diagnoses" value={o} class="accent-violet-700 w-4 h-4" /> {t.concernOpts[o]}</label>
             ))}
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-slate-600 mb-2">Services you're looking for (select any)</label>
+          <label class="block text-sm font-medium text-slate-600 mb-2">{t.services}</label>
           <div class="grid sm:grid-cols-2 gap-2">
-            <label class={chip}><input type="checkbox" name="service_slp" value="Speech Therapy" class="accent-violet-700 w-4 h-4" /> Speech therapy (SLP)</label>
-            <label class={chip}><input type="checkbox" name="service_ot" value="Occupational Therapy" class="accent-violet-700 w-4 h-4" /> Occupational therapy (OT)</label>
-            <label class={chip}><input type="checkbox" name="service_aba" value="ABA / Behaviour" class="accent-violet-700 w-4 h-4" /> ABA / Behaviour therapy</label>
-            <label class={chip}><input type="checkbox" name="service_other" value="Other" class="accent-violet-700 w-4 h-4" /> Other</label>
+            <label class={chip}><input type="checkbox" name="service_slp" value="Speech Therapy" class="accent-violet-700 w-4 h-4" /> {t.svcSlp}</label>
+            <label class={chip}><input type="checkbox" name="service_ot" value="Occupational Therapy" class="accent-violet-700 w-4 h-4" /> {t.svcOt}</label>
+            <label class={chip}><input type="checkbox" name="service_aba" value="ABA / Behaviour" class="accent-violet-700 w-4 h-4" /> {t.svcAba}</label>
+            <label class={chip}><input type="checkbox" name="service_other" value="Other" class="accent-violet-700 w-4 h-4" /> {t.svcOther}</label>
           </div>
         </div>
       </div>
@@ -148,11 +188,11 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
 
       <!-- Turnstile widget -->
       <div class="flex justify-center">
-        <div class="cf-turnstile" data-sitekey="0x4AAAAAADlSug3Xc8zF8CaJ"></div>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAADlSug3Xc8zF8CaJ" data-language={lang}></div>
       </div>
 
       <p class="text-xs text-slate-400 text-center leading-relaxed">
-        Your information is stored securely and shared only as described in our Privacy Policy — never sold, never used for advertising.
+        {t.privacyNote}
       </p>
 
       <!-- Terms consent -->
@@ -160,31 +200,31 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
         <label class="flex items-start gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer">
           <input type="checkbox" id="agree-terms" class="accent-violet-700 w-4 h-4 mt-0.5 flex-shrink-0" />
           <span class="text-sm text-slate-600 leading-relaxed">
-            I agree to the <a href="/terms" target="_blank" rel="noopener" class="text-violet-700 font-semibold hover:underline">Terms of Service</a> and the <a href="/privacy" target="_blank" rel="noopener" class="text-violet-700 font-semibold hover:underline">Privacy Policy</a>, and I confirm I am this child's parent or legal guardian.
+            {t.agreePre} <a href={prefix + "/terms"} target="_blank" rel="noopener" class="text-violet-700 font-semibold hover:underline">{t.agreeTerms}</a> {t.agreeAnd} <a href={prefix + "/privacy"} target="_blank" rel="noopener" class="text-violet-700 font-semibold hover:underline">{t.agreePrivacy}</a>{t.agreePost}
           </span>
         </label>
-        <p id="err-agree" style="display:none;color:#ef4444;font-size:12px;margin-top:6px;text-align:center">Please accept the terms to create your account.</p>
+        <p id="err-agree" style="display:none;color:#ef4444;font-size:12px;margin-top:6px;text-align:center">{t.errAgree}</p>
       </div>
 
       <!-- General warning banner (shown when fields are missing) -->
       <div id="err-general" style="display:none" class="bg-red-50 border border-red-200 text-red-600 text-sm font-medium rounded-xl px-4 py-3 text-center"></div>
 
       <button type="submit" id="signup-btn" class="w-full bg-violet-700 hover:bg-violet-800 text-white font-semibold py-3.5 rounded-full transition-colors text-base">
-        Create my account
+        {t.submit}
       </button>
 
       <p class="text-center text-sm text-slate-500">
-        Already have an account?
-        <a href="/login" class="text-violet-700 font-semibold hover:underline">Sign in →</a>
+        {t.haveAccount}
+        <a href={"/login" + loginQs} class="text-violet-700 font-semibold hover:underline">{t.signIn}</a>
       </p>
 
     </form>
   </div>
 </Layout>
 
-<script is:inline>
-  var UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
-  var UA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+<script is:inline define:vars={{ UA_URL: "https://eghqufgiudxjkbsddtnx.supabase.co", UA_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I", J: jsStrings }}>
+  /* i18n: J = this page's JS strings from src/i18n/signup.js (build-time) */
+  var UA_LANG = J.lang;
 
   function getSession(){try{return JSON.parse(localStorage.getItem("ua_session")||"null");}catch{return null;}}
   function isValid(s){return s&&s.access_token&&Math.floor(Date.now()/1000)<(s.expires_at||0)-60;}
@@ -207,7 +247,7 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
       num: /[0-9]/.test(pw)
     };
   }
-  function getStrength(r){ var n=Object.values(r).filter(Boolean).length; if(n<=1)return{label:"Weak",color:"#ef4444",pct:"25%"}; if(n===2)return{label:"Fair",color:"#f59e0b",pct:"50%"}; if(n===3)return{label:"Good",color:"#84cc16",pct:"75%"}; return{label:"Strong",color:"#22c55e",pct:"100%"}; }
+  function getStrength(r){ var n=Object.values(r).filter(Boolean).length; if(n<=1)return{label:J.weak,color:"#ef4444",pct:"25%"}; if(n===2)return{label:J.fair,color:"#f59e0b",pct:"50%"}; if(n===3)return{label:J.good,color:"#84cc16",pct:"75%"}; return{label:J.strong,color:"#22c55e",pct:"100%"}; }
 
   function setReq(id,ok){ var el=document.getElementById(id); if(!el)return; el.textContent=(ok?"✓ ":"✗ ")+el.textContent.slice(2); el.style.color=ok?"#22c55e":"#94a3b8"; }
 
@@ -257,22 +297,22 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
     var email=val("email"), password=val("password"), confirm=val("confirm");
     var childFirst=val("childFirst"), city=val("city");
 
-    if(!parentFirst){showErr("err-parentFirst","Required.");markInvalid("parentFirst");if(!firstBad)firstBad="parentFirst";ok=false;}
-    if(!parentLast){showErr("err-parentLast","Required.");markInvalid("parentLast");if(!firstBad)firstBad="parentLast";ok=false;}
-    if(!email||email.indexOf("@")===-1){showErr("err-email","Please enter a valid email.");markInvalid("email");if(!firstBad)firstBad="email";ok=false;}
-    if(password.length<8||!checkPw(password).upper||!checkPw(password).lower||!checkPw(password).num){showErr("err-password","Password doesn't meet requirements.");markInvalid("password");if(!firstBad)firstBad="password";ok=false;}
-    if(password!==confirm){showErr("err-confirm","Passwords don't match.");markInvalid("confirm");if(!firstBad)firstBad="confirm";ok=false;}
-    if(!childFirst){showErr("err-childFirst","Required.");markInvalid("childFirst");if(!firstBad)firstBad="childFirst";ok=false;}
-    if(!city){showErr("err-city","Required for matching.");markInvalid("city");if(!firstBad)firstBad="city";ok=false;}
+    if(!parentFirst){showErr("err-parentFirst",J.required);markInvalid("parentFirst");if(!firstBad)firstBad="parentFirst";ok=false;}
+    if(!parentLast){showErr("err-parentLast",J.required);markInvalid("parentLast");if(!firstBad)firstBad="parentLast";ok=false;}
+    if(!email||email.indexOf("@")===-1){showErr("err-email",J.badEmail);markInvalid("email");if(!firstBad)firstBad="email";ok=false;}
+    if(password.length<8||!checkPw(password).upper||!checkPw(password).lower||!checkPw(password).num){showErr("err-password",J.badPassword);markInvalid("password");if(!firstBad)firstBad="password";ok=false;}
+    if(password!==confirm){showErr("err-confirm",J.noMatch);markInvalid("confirm");if(!firstBad)firstBad="confirm";ok=false;}
+    if(!childFirst){showErr("err-childFirst",J.required);markInvalid("childFirst");if(!firstBad)firstBad="childFirst";ok=false;}
+    if(!city){showErr("err-city",J.cityRequired);markInvalid("city");if(!firstBad)firstBad="city";ok=false;}
 
     var agreeBad=false;
     if(!document.getElementById("agree-terms").checked){
-      showErr("err-agree","Please accept the terms to create your account.");
+      showErr("err-agree",J.agree);
       agreeBad=true; ok=false;
     }
 
     if(!ok){
-      showErr("err-general","Please fill in the required fields highlighted in red.");
+      showErr("err-general",J.fillRed);
       if(firstBad){
         var f=document.querySelector('[name="'+firstBad+'"]');
         if(f){
@@ -288,14 +328,14 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
     // Turnstile token (the widget must have loaded + verified)
     var token = (window.turnstile ? window.turnstile.getResponse() : "") || "";
     if(!token){
-      showErr("err-general","Please complete the verification below and try again.");
+      showErr("err-general",J.verify);
       var tw=document.querySelector(".cf-turnstile");
       if(tw) tw.scrollIntoView({behavior:"smooth",block:"center"});
       return;
     }
 
     var btn=document.getElementById("signup-btn");
-    btn.disabled=true; btn.textContent="Creating account...";
+    btn.disabled=true; btn.textContent=J.creating;
 
     var body={
       turnstileToken: token,
@@ -331,12 +371,14 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
     .then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d};});})
     .then(function(res){
       if(!res.ok || !res.data || !res.data.ok){
-        var msg=(res.data&&res.data.error)?friendly(res.data.error):"Something went wrong. Please try again.";
+        var msg=(res.data&&res.data.error)?friendly(res.data.error):J.generic;
         showErr("err-general",msg);
-        btn.disabled=false; btn.textContent="Create my account";
+        btn.disabled=false; btn.textContent=J.submit;
         resetTurnstile();
         return;
       }
+      // Remember the language they signed up in — the app reads ua_lang.
+      try{ localStorage.setItem("ua_lang", UA_LANG); }catch(e){}
       // Success -> show "check your email" screen, hide the form + header
       document.getElementById("signup-form").style.display="none";
       document.getElementById("signup-header").style.display="none";
@@ -345,18 +387,18 @@ const chip = "flex items-center gap-3 cursor-pointer bg-white border border-slat
       window.scrollTo({top:0,behavior:"smooth"});
     })
     .catch(function(){
-      showErr("err-general","Something went wrong. Please try again.");
-      btn.disabled=false; btn.textContent="Create my account";
+      showErr("err-general",J.generic);
+      btn.disabled=false; btn.textContent=J.submit;
       resetTurnstile();
     });
   });
 
   function friendly(code){
     var c=String(code).toLowerCase();
-    if(c.indexOf("already")>-1||c.indexOf("registered")>-1) return "An account with this email already exists. Try signing in instead.";
-    if(c==="verification_failed") return "Verification failed. Please complete the check below and try again.";
-    if(c==="weak_password") return "Please choose a stronger password (at least 8 characters).";
-    if(c==="bad_email") return "Please enter a valid email address.";
+    if(c.indexOf("already")>-1||c.indexOf("registered")>-1) return J.exists;
+    if(c==="verification_failed") return J.verifyFailed;
+    if(c==="weak_password") return J.weakPassword;
+    if(c==="bad_email") return J.invalidEmail;
     return code;
   }
 </script>

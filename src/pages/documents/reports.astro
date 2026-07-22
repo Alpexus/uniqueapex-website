@@ -4,11 +4,12 @@
    form); the rest are honestly labeled as coming. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
+import DICT from "../../i18n/documents.js";
 ---
-<AppFormLayout title="Documents" activeNav="documents">
+<AppFormLayout title="Documents" titleFr="Documents" activeNav="documents">
   <SectionTabs section="documents" active="reports" />
-  <h1 class="page-title">Reports</h1>
-  <p class="page-sub">Polished documents generated from your child's profile — made to hand to therapists, schools and agencies.</p>
+  <h1 class="page-title" data-i18n="reports_title">Reports</h1>
+  <p class="page-sub" data-i18n="reports_sub">Polished documents generated from your child's profile — made to hand to therapists, schools and agencies.</p>
 
   <div class="dr-grid">
 
@@ -17,10 +18,10 @@ import SectionTabs from "@/components/SectionTabs.astro";
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8L19 7.5v14H6z"/><path d="M14 2.5v5h5"/><path d="M9.5 12h5M9.5 15.5h5"/></svg>
       </span>
       <div class="dr-tx">
-        <div class="dr-head"><b>Family Passport — intake form</b><span class="dr-pill ready">Ready</span></div>
-        <p>The complete questionnaire as a professional intake form: every answer, checkboxes, the support wheel and a signature block. Fill it once — hand it to any provider.</p>
-        <a class="dr-btn" id="dr-passport" href="/passport">Open &amp; download PDF</a>
-        <p class="dr-hint">Opens your passport — go to step 14 (Review &amp; export), tick the sections to include, and Download PDF.</p>
+        <div class="dr-head"><b data-i18n="reports_passportTitle">Family Passport — intake form</b><span class="dr-pill ready" data-i18n="pillReady">Ready</span></div>
+        <p data-i18n="reports_passportDesc">The complete questionnaire as a professional intake form: every answer, checkboxes, the support wheel and a signature block. Fill it once — hand it to any provider.</p>
+        <a class="dr-btn" id="dr-passport" href="/passport" data-i18n="reports_openDownload">Open &amp; download PDF</a>
+        <p class="dr-hint" data-i18n="reports_passportHint">Opens your passport — go to step 14 (Review &amp; export), tick the sections to include, and Download PDF.</p>
       </div>
     </div>
 
@@ -29,8 +30,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17M4 9.5h16M4 14.5h16"/></svg>
       </span>
       <div class="dr-tx">
-        <div class="dr-head"><b>Family guidance sheet</b><span class="dr-pill soon">Coming soon</span></div>
-        <p>The personalized strategies and guidance from your child's profile, as a warm one-pager for grandparents, babysitters and new caregivers.</p>
+        <div class="dr-head"><b data-i18n="reports_guidanceTitle">Family guidance sheet</b><span class="dr-pill soon" data-i18n="pillSoon">Coming soon</span></div>
+        <p data-i18n="reports_guidanceDesc">The personalized strategies and guidance from your child's profile, as a warm one-pager for grandparents, babysitters and new caregivers.</p>
       </div>
     </div>
 
@@ -39,8 +40,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="M8 15l3-4 3 2 4-6"/></svg>
       </span>
       <div class="dr-tx">
-        <div class="dr-head"><b>Progress report</b><span class="dr-pill soon">Coming soon</span></div>
-        <p>Milestones, wins and the support wheel over time — a progress snapshot for reviews and renewals.</p>
+        <div class="dr-head"><b data-i18n="reports_progressTitle">Progress report</b><span class="dr-pill soon" data-i18n="pillSoon">Coming soon</span></div>
+        <p data-i18n="reports_progressDesc">Milestones, wins and the support wheel over time — a progress snapshot for reviews and renewals.</p>
       </div>
     </div>
 
@@ -62,7 +63,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
   .dr-hint{font-size:.73rem !important;color:var(--faint) !important;margin-top:7px !important}
 </style>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
+  window.uaI18n(DICT); /* register + swap this page's data-i18n markup */
   (function () {
     var raw = localStorage.getItem("ua_session"), s = null;
     try { s = raw ? JSON.parse(raw) : null; } catch (e) {}

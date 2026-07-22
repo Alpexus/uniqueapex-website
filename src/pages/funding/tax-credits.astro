@@ -1,13 +1,15 @@
 ---
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
+import DICT from "@/i18n/stubs.js";
+const t = DICT.en;
 ---
-<AppFormLayout title="Funding" activeNav="funding">
+<AppFormLayout title="Funding" titleFr="Financement" activeNav="funding">
   <SectionTabs section="funding" active="tax-credits" />
-  <h1 class="page-title">Tax Credits</h1>
-  <p class="page-sub">Part of Funding. This page is scaffolded — content is coming.</p>
+  <h1 class="page-title" data-i18n="taxCredits">{t.taxCredits}</h1>
+  <p class="page-sub" data-i18n="partOfFunding">{t.partOfFunding}</p>
   <div class="ua-stub">
-    <b>Tax Credits</b> will live here. The layout, navigation and routing are wired; the
-    detailed content for this tab hasn't been designed yet.
+    <b data-i18n="taxCredits">{t.taxCredits}</b> <span data-i18n="bodyTail">{t.bodyTail}</span>
   </div>
+  <script is:inline define:vars={{ DICT }}>window.uaI18n && window.uaI18n(DICT);</script>
 </AppFormLayout>

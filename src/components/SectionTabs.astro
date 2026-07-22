@@ -24,6 +24,7 @@ const tabs = SECTIONS[section] || [];
         class={t.key === active ? "sectiontab active" : "sectiontab"}
         href={t.href}
         aria-current={t.key === active ? "page" : undefined}
+        data-label-fr={t.fr || t.label}
       >{t.label}</a>
     ))}
   </nav>

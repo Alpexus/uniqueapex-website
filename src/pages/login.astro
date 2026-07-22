@@ -1,10 +1,15 @@
 ---
-/* FAMILY-LOGIN-V2 — the parent portal door, now the violet twin of
-   /pro/login (same layout language, opposite brand color).
-   Sign-in logic unchanged: Supabase password grant → ua_session →
-   /account. Keeps the email-confirmed banner. */
+/* FAMILY-LOGIN-V3 — the parent portal door, violet twin of /pro/login.
+   Sign-in logic unchanged: Supabase password grant → ua_session → /account.
+   Keeps the email-confirmed banner.
+   Bilingual: EN|FR pill toggle (top right). Language resolves from
+   ?lang= → saved ua_lang → referrer /fr/ → en, and the choice is saved
+   to localStorage ua_lang — the same key the app reads.
+   Strings live in the central catalog (src/i18n/login.js); both language
+   blocks are injected because the toggle switches at runtime. */
 import "@fontsource-variable/inter/index.css";
 import "../styles/global.css";
+import DICT from "../i18n/login.js";
 ---
 <!doctype html>
 <html lang="en">
@@ -16,30 +21,36 @@ import "../styles/global.css";
     <title>Family sign in — UniqueApex</title>
   </head>
   <body class="fl-body">
-    <div id="confirmed-banner" style="display:none;position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:50;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 20px;border-radius:9999px;font-size:14px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.2)">
+    <div id="confirmed-banner" style="display:none;position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:50;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 20px;border-radius:9999px;font-size:14px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.2)" data-i18n="confirmed">
       ✓ Email confirmed — you can sign in now
+    </div>
+
+    <div class="fl-lang">
+      <button type="button" id="lang-en" class="on">EN</button>
+      <span>|</span>
+      <button type="button" id="lang-fr">FR</button>
     </div>
 
     <div class="fl-wrap">
       <a class="fl-brand" href="/">
         <img src="/Logo.png" alt="UniqueApex" />
-        <span><b>UniqueApex</b><i>FAMILIES</i></span>
+        <span><b>UniqueApex</b><i data-i18n="brandSub">FAMILIES</i></span>
       </a>
 
       <div class="fl-card">
-        <h1>Welcome back</h1>
-        <p class="fl-sub">Sign in to your child's passport and journey.</p>
+        <h1 data-i18n="heading">Welcome back</h1>
+        <p class="fl-sub" data-i18n="sub">Sign in to your child's passport and journey.</p>
 
-        <label class="fl-field"><span>Email</span><input id="email" type="email" autocomplete="email" placeholder="you@example.com" /></label>
-        <label class="fl-field"><span>Password</span><input id="password" type="password" autocomplete="current-password" placeholder="Your password" /></label>
+        <label class="fl-field"><span data-i18n="email">Email</span><input id="email" type="email" autocomplete="email" placeholder="you@example.com" /></label>
+        <label class="fl-field"><span data-i18n="password">Password</span><input id="password" type="password" autocomplete="current-password" placeholder="Your password" /></label>
 
         <p id="error-msg" class="fl-err" style="display:none"></p>
 
-        <button class="fl-btn" id="signin-btn" type="button">Sign in</button>
+        <button class="fl-btn" id="signin-btn" type="button" data-i18n="signIn">Sign in</button>
 
         <div class="fl-alt">
-          <p>Don't have an account? <a href="/signup">Create one →</a></p>
-          <p class="fl-pro">Are you a service provider? <a href="/pro/login">Provider sign in →</a></p>
+          <p><span data-i18n="noAccount">Don't have an account?</span> <a href="/signup" id="signup-link" data-i18n="create">Create one →</a></p>
+          <p class="fl-pro"><span data-i18n="areProvider">Are you a service provider?</span> <a href="/pro/login" id="pro-link" data-i18n="proSignIn">Provider sign in →</a></p>
         </div>
       </div>
     </div>
@@ -47,6 +58,10 @@ import "../styles/global.css";
 <style is:global>
   .fl-body{margin:0;min-height:100vh;font-family:'Inter Variable','Inter',system-ui,sans-serif;background:linear-gradient(150deg,#2E1065,#6D28D9 70%,#8B5CF6);display:grid;place-items:center;padding:24px;box-sizing:border-box}
   .fl-body *{box-sizing:border-box}
+  .fl-lang{position:fixed;top:18px;right:22px;z-index:40;display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.45);font-size:.82rem;font-weight:700}
+  .fl-lang button{background:none;border:none;padding:2px 4px;cursor:pointer;font:inherit;color:rgba(255,255,255,.55);font-weight:700;letter-spacing:.02em}
+  .fl-lang button:hover{color:#fff}
+  .fl-lang button.on{color:#fff;text-decoration:underline;text-underline-offset:4px}
   .fl-wrap{width:100%;max-width:400px}
   .fl-brand{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;margin-bottom:20px}
   .fl-brand img{height:38px;width:auto}
@@ -71,17 +86,55 @@ import "../styles/global.css";
   .fl-pro a{color:#0E8C82}
 </style>
 
-<script is:inline>
+<script is:inline define:vars={{ I18N: DICT }}>
   var UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
   var UA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+  /* i18n: I18N = both language blocks from src/i18n/login.js (runtime toggle) */
 
+  function resolveLang() {
+    try {
+      var p = new URLSearchParams(window.location.search).get("lang");
+      if (p === "fr" || p === "en") return p;
+      var saved = localStorage.getItem("ua_lang");
+      if (saved === "fr" || saved === "en") return saved;
+      if (document.referrer && document.referrer.indexOf("/fr") > -1) return "fr";
+    } catch (e) {}
+    return "en";
+  }
+
+  var LANG = resolveLang();
+  var L = I18N[LANG];
+
+  function applyLang(lang) {
+    LANG = lang; L = I18N[lang];
+    try { localStorage.setItem("ua_lang", lang); } catch (e) {}
+    document.documentElement.lang = lang;
+    document.title = L.title;
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n");
+      if (L[k]) el.textContent = L[k];
+    });
+    document.getElementById("email").placeholder = L.emailPh;
+    document.getElementById("password").placeholder = L.passwordPh;
+    document.getElementById("lang-en").classList.toggle("on", lang === "en");
+    document.getElementById("lang-fr").classList.toggle("on", lang === "fr");
+    var qs = lang === "fr" ? "?lang=fr" : "";
+    document.getElementById("signup-link").href = (lang === "fr" ? "/fr/signup" : "/signup");
+    document.getElementById("pro-link").href = "/pro/login" + qs;
+  }
+
+  document.getElementById("lang-en").addEventListener("click", function(){ applyLang("en"); });
+  document.getElementById("lang-fr").addEventListener("click", function(){ applyLang("fr"); });
+  applyLang(LANG);
+
+  /* ---------- confirmed banner ---------- */
   (function(){
     var params = new URLSearchParams(window.location.search);
     if(params.get("confirmed") === "1"){
       var b = document.getElementById("confirmed-banner");
       if(b){
         b.style.display = "block";
-        history.replaceState(null, "", "/login");
+        history.replaceState(null, "", "/login" + (LANG === "fr" ? "?lang=fr" : ""));
         setTimeout(function(){
           b.style.transition = "opacity .5s";
           b.style.opacity = "0";
@@ -91,6 +144,7 @@ import "../styles/global.css";
     }
   })();
 
+  /* ---------- session ---------- */
   function setSession(data) {
     var s = Object.assign({}, data, { expires_at: Math.floor(Date.now()/1000) + (data.expires_in || 3600) });
     localStorage.setItem("ua_session", JSON.stringify(s));
@@ -105,15 +159,24 @@ import "../styles/global.css";
     window.location.href = "/account";
   }
 
+  /* ---------- sign in ---------- */
+  function apiMessage(d) {
+    var raw = (d && (d.error_description || d.msg)) || "";
+    var low = String(raw).toLowerCase();
+    if (low.indexOf("invalid login") > -1 || low.indexOf("invalid email") > -1) return L.errInvalid;
+    if (low.indexOf("not confirmed") > -1) return L.errNotConfirmed;
+    return raw || L.errInvalid;
+  }
+
   document.getElementById("signin-btn").addEventListener("click", function () {
     var email = document.getElementById("email").value.trim();
     var password = document.getElementById("password").value;
     var errMsg = document.getElementById("error-msg");
     var btn = document.getElementById("signin-btn");
 
-    if (!email || !password) { errMsg.style.display="block"; errMsg.textContent="Please enter your email and password."; return; }
+    if (!email || !password) { errMsg.style.display="block"; errMsg.textContent=L.errEmpty; return; }
 
-    btn.disabled = true; btn.textContent = "Signing in…";
+    btn.disabled = true; btn.textContent = L.signingIn;
     errMsg.style.display = "none";
 
     fetch(UA_URL + "/auth/v1/token?grant_type=password", {
@@ -127,12 +190,12 @@ import "../styles/global.css";
         window.location.href = "/account";
       } else {
         errMsg.style.display = "block";
-        errMsg.textContent = res.data.error_description || res.data.msg || "Invalid email or password.";
-        btn.disabled = false; btn.textContent = "Sign in";
+        errMsg.textContent = apiMessage(res.data);
+        btn.disabled = false; btn.textContent = L.signIn;
       }
     }).catch(function() {
-      errMsg.style.display = "block"; errMsg.textContent = "Something went wrong. Please try again.";
-      btn.disabled = false; btn.textContent = "Sign in";
+      errMsg.style.display = "block"; errMsg.textContent = L.errGeneric;
+      btn.disabled = false; btn.textContent = L.signIn;
     });
   });
 

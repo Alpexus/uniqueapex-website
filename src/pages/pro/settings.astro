@@ -3,73 +3,74 @@
    plan & billing, security, notifications, data & privacy.
    Preview; live pieces arrive with provider accounts. */
 import ProviderLayout from "@/layouts/ProviderLayout.astro";
+import DICT from "@/i18n/pro-portal.js";
 ---
-<ProviderLayout title="Settings — UniqueApex Pro" active="settings">
+<ProviderLayout title="Settings — UniqueApex Pro" titleFr="Paramètres" active="settings">
   <div class="pgrid" style="max-width:720px">
 
     <div class="pc">
-      <div class="pc-h"><b>Practice</b></div>
+      <div class="pc-h"><b data-i18n="settings_practiceTitle">Practice</b></div>
       <div class="st-row">
-        <span class="st-tx"><b>Clinic profile</b><span>Name, services, fees, availability status — what families see.</span></span>
-        <a class="pbtn sm ghost" href="/pro/profile">Edit profile</a>
+        <span class="st-tx"><b data-i18n="settings_profileB">Clinic profile</b><span data-i18n="settings_profileSub">Name, services, fees, availability status — what families see.</span></span>
+        <a class="pbtn sm ghost" href="/pro/profile" data-i18n="settings_editProfile">Edit profile</a>
       </div>
       <div class="st-row">
-        <span class="st-tx"><b>Team &amp; access</b><span>Who works here and what they can see. Owners manage, staff see their own clients.</span></span>
-        <a class="pbtn sm ghost" href="/pro/team">Manage team</a>
-      </div>
-    </div>
-
-    <div class="pc">
-      <div class="pc-h"><b>Account &amp; security</b></div>
-      <label class="pfield"><span>Login email</span><input class="pin" type="email" placeholder="you@yourclinic.com" disabled /></label>
-      <div class="st-row">
-        <span class="st-tx"><b>Password</b><span>Set with your invitation when onboarding opens.</span></span>
-        <button class="pbtn sm ghost" type="button" disabled>Change</button>
-      </div>
-      <div class="st-row">
-        <span class="st-tx"><b>Two-factor authentication</b><span>Strongly recommended — you'll handle family information.</span></span>
-        <span class="ppill amber">with onboarding</span>
+        <span class="st-tx"><b data-i18n="settings_teamB">Team &amp; access</b><span data-i18n="settings_teamSub">Who works here and what they can see. Owners manage, staff see their own clients.</span></span>
+        <a class="pbtn sm ghost" href="/pro/team" data-i18n="settings_manageTeam">Manage team</a>
       </div>
     </div>
 
     <div class="pc">
-      <div class="pc-h"><b>Plan &amp; billing</b></div>
+      <div class="pc-h"><b data-i18n="settings_accountTitle">Account &amp; security</b></div>
+      <label class="pfield"><span data-i18n="settings_loginEmail">Login email</span><input class="pin" type="email" placeholder="you@yourclinic.com" data-i18n-ph="settings_loginEmailPh" disabled /></label>
       <div class="st-row">
-        <span class="st-tx"><b>UniqueApex Pro listing</b><span>Featured placement in matching, booking, document exchange and Q&amp;A. Pricing announced at onboarding — pilot clinics start free.</span></span>
-        <span class="ppill teal">pilot · free</span>
+        <span class="st-tx"><b data-i18n="settings_pwB">Password</b><span data-i18n="settings_pwSub">Set with your invitation when onboarding opens.</span></span>
+        <button class="pbtn sm ghost" type="button" disabled data-i18n="settings_change">Change</button>
+      </div>
+      <div class="st-row">
+        <span class="st-tx"><b data-i18n="settings_2faB">Two-factor authentication</b><span data-i18n="settings_2faSub">Strongly recommended — you'll handle family information.</span></span>
+        <span class="ppill amber" data-i18n="settings_2faPill">with onboarding</span>
       </div>
     </div>
 
     <div class="pc">
-      <div class="pc-h"><b>Services on your portal</b><span>switch off anything you don't want to offer</span></div>
+      <div class="pc-h"><b data-i18n="settings_planTitle">Plan &amp; billing</b></div>
+      <div class="st-row">
+        <span class="st-tx"><b data-i18n="settings_listingB">UniqueApex Pro listing</b><span data-i18n="settings_listingSub">Featured placement in matching, booking, document exchange and Q&amp;A. Pricing announced at onboarding — pilot clinics start free.</span></span>
+        <span class="ppill teal" data-i18n="settings_pilotPill">pilot · free</span>
+      </div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-h"><b data-i18n="settings_servicesTitle">Services on your portal</b><span data-i18n="settings_servicesSub">switch off anything you don't want to offer</span></div>
       <div style="display:flex;flex-direction:column;gap:12px">
-        <label class="pswitch"><input type="checkbox" checked /> Family questions (async Q&amp;A between sessions)</label>
-        <label class="pswitch"><input type="checkbox" checked /> Document exchange (receive &amp; share)</label>
-        <label class="pswitch"><input type="checkbox" /> Online booking of open slots (launches with the family portal)</label>
+        <label class="pswitch"><input type="checkbox" checked /> <span data-i18n="settings_svcQa">Family questions (async Q&amp;A between sessions)</span></label>
+        <label class="pswitch"><input type="checkbox" checked /> <span data-i18n="settings_svcDocs">Document exchange (receive &amp; share)</span></label>
+        <label class="pswitch"><input type="checkbox" /> <span data-i18n="settings_svcBooking">Online booking of open slots (launches with the family portal)</span></label>
       </div>
     </div>
 
     <div class="pc">
-      <div class="pc-h"><b>Notifications</b></div>
+      <div class="pc-h"><b data-i18n="settings_notifTitle">Notifications</b></div>
       <div style="display:flex;flex-direction:column;gap:12px">
-        <label class="pswitch"><input type="checkbox" checked /> Email me when a family sends a document</label>
-        <label class="pswitch"><input type="checkbox" checked /> Email me when a question arrives</label>
-        <label class="pswitch"><input type="checkbox" checked /> Email me booking requests immediately</label>
-        <label class="pswitch"><input type="checkbox" /> Weekly summary instead of instant emails</label>
+        <label class="pswitch"><input type="checkbox" checked /> <span data-i18n="settings_notifDoc">Email me when a family sends a document</span></label>
+        <label class="pswitch"><input type="checkbox" checked /> <span data-i18n="settings_notifQ">Email me when a question arrives</span></label>
+        <label class="pswitch"><input type="checkbox" checked /> <span data-i18n="settings_notifBooking">Email me booking requests immediately</span></label>
+        <label class="pswitch"><input type="checkbox" /> <span data-i18n="settings_notifWeekly">Weekly summary instead of instant emails</span></label>
       </div>
     </div>
 
     <div class="pc">
-      <div class="pc-h"><b>Data &amp; privacy</b></div>
+      <div class="pc-h"><b data-i18n="settings_dataTitle">Data &amp; privacy</b></div>
       <div class="st-row">
-        <span class="st-tx"><b>Export your data</b><span>Clients, sessions, documents log — yours anytime.</span></span>
-        <button class="pbtn sm ghost" type="button" disabled>Export</button>
+        <span class="st-tx"><b data-i18n="settings_exportB">Export your data</b><span data-i18n="settings_exportSub">Clients, sessions, documents log — yours anytime.</span></span>
+        <button class="pbtn sm ghost" type="button" disabled data-i18n="settings_exportBtn">Export</button>
       </div>
       <div class="st-row">
-        <span class="st-tx"><b>Close the clinic account</b><span>Families keep their own records; your access ends.</span></span>
-        <button class="pbtn sm ghost" style="color:var(--p-rose);border-color:#EFD5DC" type="button" disabled>Close account</button>
+        <span class="st-tx"><b data-i18n="settings_closeB">Close the clinic account</b><span data-i18n="settings_closeSub">Families keep their own records; your access ends.</span></span>
+        <button class="pbtn sm ghost" style="color:var(--p-rose);border-color:#EFD5DC" type="button" disabled data-i18n="settings_closeBtn">Close account</button>
       </div>
-      <p class="pnote">Both actions activate with provider accounts. Family data always belongs to families — closing a clinic account never deletes a child's records.</p>
+      <p class="pnote" data-i18n="settings_note">Both actions activate with provider accounts. Family data always belongs to families — closing a clinic account never deletes a child's records.</p>
     </div>
 
   </div>
@@ -82,3 +83,9 @@ import ProviderLayout from "@/layouts/ProviderLayout.astro";
   .st-tx b{display:block;font-size:.85rem;color:var(--p-ink)}
   .st-tx span{display:block;font-size:.74rem;color:var(--p-mut);margin-top:2px;line-height:1.5}
 </style>
+
+<script is:inline define:vars={{ DICT }}>
+  /* This page is markup-only — register its dictionary so [data-i18n]
+     labels localize in French (the swap runs on DOMContentLoaded). */
+  if (window.uaI18n) window.uaI18n(DICT);
+</script>

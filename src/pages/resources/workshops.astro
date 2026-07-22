@@ -1,10 +1,11 @@
 ---
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
+import DICT from "@/i18n/resources.js";
 import "../../styles/workshops.css"; // imported like app-shell.css — reliably applied
 ---
 
-<AppFormLayout title="Resources" activeNav="resources">
+<AppFormLayout title="Resources" titleFr="Ressources" activeNav="resources">
   <div class="w-page">
     <SectionTabs section="resources" active="workshops" />
     <div class="c3-ribbon rib-amber cu-rev">
@@ -12,22 +13,22 @@ import "../../styles/workshops.css"; // imported like app-shell.css — reliably
       <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
       <span class="c3-rib-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></span>
       <div class="c3-rib-id">
-        <h1>Workshops</h1>
-        <p>Live sessions and Q&amp;As for parents — diagnosis, school, funding and daily life. Reserve a spot and we'll send the join link.</p>
+        <h1 data-i18n="workshops_title">Workshops</h1>
+        <p data-i18n="workshops_intro">Live sessions and Q&amp;As for parents — diagnosis, school, funding and daily life. Reserve a spot and we'll send the join link.</p>
       </div>
     </div>
 
     <div class="w-note" id="wNote" hidden>
-      <span class="pill sample">Sample sessions</span>
-      <span id="wNoteText">These are examples while we schedule the first workshops. You'll be able to reserve once they're published.</span>
+      <span class="pill sample" data-i18n="workshops_samplePill">Sample sessions</span>
+      <span id="wNoteText" data-i18n="workshops_sampleNote">These are examples while we schedule the first workshops. You'll be able to reserve once they're published.</span>
     </div>
 
     <div class="w-cols">
       <!-- Upcoming (left, main) -->
       <div class="w-main-col">
-        <div class="w-up-head">Upcoming</div>
+        <div class="w-up-head" data-i18n="workshops_upcoming">Upcoming</div>
         <div id="wList" class="w-list">
-          <div class="w-loading"><p>Loading workshops…</p></div>
+          <div class="w-loading"><p data-i18n="workshops_loading">Loading workshops…</p></div>
         </div>
       </div>
 
@@ -36,19 +37,19 @@ import "../../styles/workshops.css"; // imported like app-shell.css — reliably
         <div class="w-cal-top">
           <span class="w-cal-month" id="wCalMonth">—</span>
           <div class="w-cal-nav">
-            <button type="button" id="wPrev" aria-label="Previous month">‹</button>
-            <button type="button" id="wNext" aria-label="Next month">›</button>
+            <button type="button" id="wPrev" aria-label="Previous month" data-i18n-aria="workshops_prevMonth">‹</button>
+            <button type="button" id="wNext" aria-label="Next month" data-i18n-aria="workshops_nextMonth">›</button>
           </div>
         </div>
-        <div class="w-dow"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+        <div class="w-dow"><span data-i18n="workshops_dow0">Sun</span><span data-i18n="workshops_dow1">Mon</span><span data-i18n="workshops_dow2">Tue</span><span data-i18n="workshops_dow3">Wed</span><span data-i18n="workshops_dow4">Thu</span><span data-i18n="workshops_dow5">Fri</span><span data-i18n="workshops_dow6">Sat</span></div>
         <div class="w-days" id="wDays"></div>
-        <div class="w-cal-legend"><i></i> Workshop scheduled</div>
+        <div class="w-cal-legend"><i></i> <span data-i18n="workshops_legend">Workshop scheduled</span></div>
       </div>
     </div>
   </div>
 </AppFormLayout>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
   (function () {
     var SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
     var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
@@ -62,6 +63,11 @@ import "../../styles/workshops.css"; // imported like app-shell.css — reliably
     var session = readSession();
     if (!session || !session.access_token) { location.href = "/login"; return; }
     var userId = (session.user && session.user.id) || null;
+
+    // ---- i18n (string codes from src/i18n/resources.js) ----
+    var T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+    var loc = window.uaLocale || "en-CA";
+    var tpl = function (str, v) { return String(str).replace(/\{(\w+)\}/g, function (m, k) { return (v && v[k] != null) ? v[k] : ""; }); };
 
     function refresh() {
       if (!session.refresh_token) return Promise.reject();
@@ -94,20 +100,17 @@ import "../../styles/workshops.css"; // imported like app-shell.css — reliably
       });
     }
 
-    // ---- formatting helpers ----
-    var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    var DOWS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    // ---- formatting helpers (dates via uaLocale) ----
     function fmtWhen(iso, mins) {
       var d = new Date(iso);
-      var date = DOWS[d.getDay()] + ", " + MON[d.getMonth()] + " " + d.getDate();
-      var h = d.getHours(), m = d.getMinutes();
-      var ap = h >= 12 ? "PM" : "AM"; var h12 = h % 12 || 12;
-      var time = h12 + (m ? ":" + (m < 10 ? "0" + m : m) : "") + " " + ap;
-      var dur = mins ? " · " + (mins % 60 === 0 ? mins / 60 + "h" : mins + " min") : "";
+      var date = d.toLocaleDateString(loc, { weekday: "short", month: "short", day: "numeric" });
+      var topts = d.getMinutes() ? { hour: "numeric", minute: "2-digit" } : { hour: "numeric" };
+      var time = d.toLocaleTimeString(loc, topts);
+      var dur = mins ? " · " + (mins % 60 === 0 ? tpl(T.workshops_durH, { n: mins / 60 }) : tpl(T.workshops_durMin, { n: mins })) : "";
       return date + " · " + time + dur;
     }
     function locBadge(type) {
-      var label = type === "meet" ? "Online · Google Meet" : type === "platform" ? "Online · UniqueApex" : "Online · Zoom";
+      var label = type === "meet" ? T.workshops_locMeet : type === "platform" ? T.workshops_locPlatform : T.workshops_locZoom;
       var vid = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="12" height="12" rx="2"/><path d="m15 10 6-3v10l-6-3"/></svg>';
       return '<span class="w-badge">' + vid + esc(label) + "</span>";
     }
@@ -119,9 +122,9 @@ import "../../styles/workshops.css"; // imported like app-shell.css — reliably
       var now = new Date();
       function future(days, hour) { var d = new Date(now); d.setDate(d.getDate() + days); d.setHours(hour, 0, 0, 0); return d.toISOString(); }
       return [
-        { id: "s1", title: "Understanding your child's evaluation report", description: "What the scores mean, the questions to ask, and how to turn a report into a plan.", presenter: "Dr. Camille Roy", presenter_title: "Clinical psychologist", starts_at: future(4, 19), duration_minutes: 60, location_type: "zoom", capacity: 40, _sample: true },
-        { id: "s2", title: "Navigating the school plan d'intervention", description: "A walk-through of the IEP process in Québec and how to prepare for the meeting.", presenter: "Mélanie Tremblay", presenter_title: "Special-education advisor", starts_at: future(11, 18), duration_minutes: 45, location_type: "meet", capacity: 60, _sample: true },
-        { id: "s3", title: "Funding 101: allowances, credits & grants", description: "The main sources of financial support for families, and how to apply for each.", presenter: "UniqueApex team", presenter_title: "Family coordination", starts_at: future(19, 12), duration_minutes: 60, location_type: "platform", capacity: 100, _sample: true }
+        { id: "s1", title: T.workshops_sample1Title, description: T.workshops_sample1Desc, presenter: "Dr. Camille Roy", presenter_title: T.workshops_sample1Role, starts_at: future(4, 19), duration_minutes: 60, location_type: "zoom", capacity: 40, _sample: true },
+        { id: "s2", title: T.workshops_sample2Title, description: T.workshops_sample2Desc, presenter: "Mélanie Tremblay", presenter_title: T.workshops_sample2Role, starts_at: future(11, 18), duration_minutes: 45, location_type: "meet", capacity: 60, _sample: true },
+        { id: "s3", title: T.workshops_sample3Title, description: T.workshops_sample3Desc, presenter: T.workshops_sample3Presenter, presenter_title: T.workshops_sample3Role, starts_at: future(19, 12), duration_minutes: 60, location_type: "platform", capacity: 100, _sample: true }
       ];
     }
 
@@ -140,7 +143,7 @@ import "../../styles/workshops.css"; // imported like app-shell.css — reliably
     }
     function renderCalendar() {
       var y = view.getFullYear(), mo = view.getMonth();
-      document.getElementById("wCalMonth").textContent = MON[mo] + " " + y;
+      document.getElementById("wCalMonth").textContent = new Date(y, mo, 1).toLocaleDateString(loc, { month: "short", year: "numeric" });
       var first = new Date(y, mo, 1).getDay();
       var days = new Date(y, mo + 1, 0).getDate();
       var prevDays = new Date(y, mo, 0).getDate();
@@ -166,22 +169,22 @@ import "../../styles/workshops.css"; // imported like app-shell.css — reliably
       var d = new Date(w.starts_at);
       var grad = "background:linear-gradient(135deg,#a78bfa 0%,#6d28d9 100%)";
       var by = [w.presenter, w.presenter_title].filter(Boolean).map(esc).join(" · ");
-      var cap = w.capacity ? '<span class="w-cap">' + w.capacity + " spots</span>" : "";
+      var cap = w.capacity ? '<span class="w-cap">' + esc(tpl(T.workshops_spots, { n: w.capacity })) + "</span>" : "";
       var isReg = !!registered[w.id];
       var side;
       if (w._sample) {
-        side = '<button class="w-btn ghost" disabled>Sample</button>'
-             + '<div class="w-spill">Reserving opens once published.</div>';
+        side = '<button class="w-btn ghost" disabled>' + esc(T.workshops_sample) + '</button>'
+             + '<div class="w-spill">' + esc(T.workshops_sampleSpill) + '</div>';
       } else if (isReg) {
-        side = '<button class="w-btn ghost" data-act="cancel" data-id="' + esc(w.id) + '">Reserved ✓</button>'
-             + (w.join_url ? '<a class="w-join" href="' + esc(w.join_url) + '" target="_blank" rel="noopener">Join link →</a>' : "")
+        side = '<button class="w-btn ghost" data-act="cancel" data-id="' + esc(w.id) + '">' + esc(T.workshops_reserved) + '</button>'
+             + (w.join_url ? '<a class="w-join" href="' + esc(w.join_url) + '" target="_blank" rel="noopener">' + esc(T.workshops_joinLink) + '</a>' : "")
              + '<div class="w-status" data-status="' + esc(w.id) + '"></div>';
       } else {
-        side = '<button class="w-btn primary" data-act="reserve" data-id="' + esc(w.id) + '">Reserve a spot</button>'
+        side = '<button class="w-btn primary" data-act="reserve" data-id="' + esc(w.id) + '">' + esc(T.workshops_reserve) + '</button>'
              + '<div class="w-status" data-status="' + esc(w.id) + '"></div>';
       }
       return '<div class="w-card">'
-        + '<div class="w-date" style="' + grad + '"><span class="w-mon">' + MON[d.getMonth()].toUpperCase() + '</span><span class="w-dnum">' + d.getDate() + '</span></div>'
+        + '<div class="w-date" style="' + grad + '"><span class="w-mon">' + esc(d.toLocaleDateString(loc, { month: "short" }).toUpperCase()) + '</span><span class="w-dnum">' + d.getDate() + '</span></div>'
         + '<div class="w-body">'
         +   '<div class="w-title">' + esc(w.title) + '</div>'
         +   (by ? '<div class="w-by">' + by + '</div>' : "")
@@ -195,7 +198,7 @@ import "../../styles/workshops.css"; // imported like app-shell.css — reliably
     function renderList() {
       var el = document.getElementById("wList");
       if (!workshops.length) {
-        el.innerHTML = '<div class="w-empty"><div class="w-eic"><svg viewBox="0 0 24 24" fill="none" stroke="#6D28D9" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></div><h3>No workshops scheduled yet</h3><p>We\'re lining up the first sessions. Check back soon — or you\'ll see them here the moment they\'re published.</p></div>';
+        el.innerHTML = '<div class="w-empty"><div class="w-eic"><svg viewBox="0 0 24 24" fill="none" stroke="#6D28D9" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></div><h3>' + esc(T.workshops_emptyTitle) + '</h3><p>' + esc(T.workshops_emptyBody) + '</p></div>';
         return;
       }
       el.innerHTML = workshops.map(cardHTML).join("");
@@ -220,15 +223,15 @@ import "../../styles/workshops.css"; // imported like app-shell.css — reliably
           body: JSON.stringify({ workshop_id: id, user_id: userId })
         }).then(function (r) {
           if (r && (r.ok || r.status === 409)) { registered[id] = true; renderList(); }
-          else { btn.disabled = false; setStatus(id, "Couldn't reserve — try again.", true); }
-        }).catch(function () { btn.disabled = false; setStatus(id, "Couldn't reserve — try again.", true); });
+          else { btn.disabled = false; setStatus(id, T.workshops_reserveFail, true); }
+        }).catch(function () { btn.disabled = false; setStatus(id, T.workshops_reserveFail, true); });
       } else {
         api("/rest/v1/workshop_registrations?workshop_id=eq." + encodeURIComponent(id) + "&user_id=eq." + encodeURIComponent(userId), {
           method: "DELETE", headers: { Prefer: "return=minimal" }
         }).then(function (r) {
           if (r && r.ok) { delete registered[id]; renderList(); }
-          else { btn.disabled = false; setStatus(id, "Couldn't cancel — try again.", true); }
-        }).catch(function () { btn.disabled = false; setStatus(id, "Couldn't cancel — try again.", true); });
+          else { btn.disabled = false; setStatus(id, T.workshops_cancelFail, true); }
+        }).catch(function () { btn.disabled = false; setStatus(id, T.workshops_cancelFail, true); });
       }
     }
 

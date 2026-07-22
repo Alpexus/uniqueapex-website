@@ -5,75 +5,80 @@
    SHARED    = reports the provider sends back to a family's vault.
    Preview only; TODO-LIVE: Supabase storage + share-grants table. */
 import ProviderLayout from "@/layouts/ProviderLayout.astro";
+import DICT from "@/i18n/pro-portal.js";
 ---
-<ProviderLayout title="Documents — UniqueApex Pro" active="documents">
+<ProviderLayout title="Documents — UniqueApex Pro" titleFr="Documents" active="documents">
   <div class="pgrid">
 
     <div class="pc">
-      <div class="pc-h"><b>Received from families</b><span>each family controls what you can see — access can be revoked anytime</span></div>
+      <div class="pc-h"><b data-i18n="documents_inTitle">Received from families</b><span data-i18n="documents_inSub">each family controls what you can see — access can be revoked anytime</span></div>
       <div id="doc-in"></div>
     </div>
 
     <div class="pc">
-      <div class="pc-h"><b>Share a report with a family</b><span>it lands straight in their secure vault — no email attachments</span></div>
+      <div class="pc-h"><b data-i18n="documents_shareTitle">Share a report with a family</b><span data-i18n="documents_shareSub">it lands straight in their secure vault — no email attachments</span></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
         <label class="pfield" style="flex:1;min-width:180px;margin:0">
-          <span>Family</span>
+          <span data-i18n="documents_famLabel">Family</span>
           <select class="pin" id="sh-fam">
             <option>Liam, 4</option><option>Noor, 6</option><option>Éloi, 5</option><option>Maya, 7</option>
           </select>
         </label>
         <label class="pfield" style="flex:2;min-width:220px;margin:0">
-          <span>Document title</span>
-          <input class="pin" id="sh-title" type="text" placeholder="e.g. Progress report — spring block" />
+          <span data-i18n="documents_titleLabel">Document title</span>
+          <input class="pin" id="sh-title" type="text" placeholder="e.g. Progress report — spring block" data-i18n-ph="documents_titlePh" />
         </label>
-        <button class="pbtn" id="sh-btn" type="button">↑ Share (preview)</button>
+        <button class="pbtn" id="sh-btn" type="button" data-i18n="documents_shareBtn">↑ Share (preview)</button>
       </div>
-      <div class="pc-h" style="margin-top:18px"><b>Shared with families</b></div>
+      <div class="pc-h" style="margin-top:18px"><b data-i18n="documents_outTitle">Shared with families</b></div>
       <div id="doc-out"></div>
-      <p class="pnote">Families get a notification and see exactly who shared what, when. Every share is logged.</p>
+      <p class="pnote" data-i18n="documents_note">Families get a notification and see exactly who shared what, when. Every share is logged.</p>
     </div>
 
   </div>
 </ProviderLayout>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
   (function () {
+    var T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+    var tpl = function (s, v) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return v && v[k] != null ? v[k] : ""; }); };
+    var ofName = function (n) { return window.uaLang === "fr" ? (/^[aeiouyàâäéèêëìîïòôöùûüh]/i.test(String(n || "")) ? "d'" : "de ") : ""; };
     var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
-    var inbox = [
-      { fam: "Liam, 4", title: "Psychoeducational evaluation (2025)", when: "Yesterday", isnew: true },
-      { fam: "Maya, 7", title: "Shared child profile — strengths & needs", when: "3 days ago", isnew: false },
-      { fam: "Éloi, 5", title: "School plan d'intervention (excerpt)", when: "Last week", isnew: false },
-      { fam: "Noor, 6", title: "Shared child profile — strengths & needs", when: "Mar 12", isnew: false },
+    var inMeta = [
+      { fam: "Liam, 4", isnew: true },
+      { fam: "Maya, 7", isnew: false },
+      { fam: "Éloi, 5", isnew: false },
+      { fam: "Noor, 6", isnew: false },
     ];
-    var outbox = [
-      { fam: "Éloi, 5", title: "Progress report — winter block", when: "Feb 28" },
-      { fam: "Noor, 6", title: "Home practice plan — /r/ sounds", when: "Mar 20" },
-    ];
+    var outMeta = [{ fam: "Éloi, 5" }, { fam: "Noor, 6" }];
+    var inRows = T.documents_inbox || [];
+    var outRows = T.documents_outbox || [];
+    var inbox = inMeta.map(function (m, i) { return { fam: m.fam, isnew: m.isnew, title: (inRows[i] || {}).title, when: (inRows[i] || {}).when }; });
+    var outbox = outMeta.map(function (m, i) { return { fam: m.fam, title: (outRows[i] || {}).title, when: (outRows[i] || {}).when }; });
 
     function rowIn(d) {
       return "<div class='prow'>" +
         "<span style='font-size:1.15rem'>📄</span>" +
-        "<span class='tx'><b>" + esc(d.title) + "</b><span>from " + esc(d.fam) + " · " + esc(d.when) + "</span></span>" +
-        (d.isnew ? "<span class='ppill rose'>new</span>" : "") +
-        "<button class='pbtn sm ghost' type='button'>Open (preview)</button></div>";
+        "<span class='tx'><b>" + esc(d.title) + "</b><span>" + esc(tpl(T.documents_fromMeta, { fam: d.fam, when: d.when, of: ofName(d.fam) })) + "</span></span>" +
+        (d.isnew ? "<span class='ppill rose'>" + esc(T.documents_newPill) + "</span>" : "") +
+        "<button class='pbtn sm ghost' type='button'>" + esc(T.documents_openBtn) + "</button></div>";
     }
     function rowOut(d) {
       return "<div class='prow'>" +
         "<span style='font-size:1.15rem'>📤</span>" +
-        "<span class='tx'><b>" + esc(d.title) + "</b><span>to " + esc(d.fam) + " · " + esc(d.when) + "</span></span>" +
-        "<span class='ppill green'>delivered</span></div>";
+        "<span class='tx'><b>" + esc(d.title) + "</b><span>" + esc(tpl(T.documents_toMeta, { fam: d.fam, when: d.when, of: ofName(d.fam) })) + "</span></span>" +
+        "<span class='ppill green'>" + esc(T.documents_deliveredPill) + "</span></div>";
     }
     function render() {
       document.getElementById("doc-in").innerHTML = inbox.map(rowIn).join("");
-      document.getElementById("doc-out").innerHTML = outbox.length ? outbox.map(rowOut).join("") : "<p class='pempty'>Nothing shared yet.</p>";
+      document.getElementById("doc-out").innerHTML = outbox.length ? outbox.map(rowOut).join("") : "<p class='pempty'>" + esc(T.documents_empty) + "</p>";
     }
     render();
 
     document.getElementById("sh-btn").addEventListener("click", function () {
       var t = document.getElementById("sh-title").value.trim();
       if (!t) { document.getElementById("sh-title").focus(); return; }
-      outbox.unshift({ fam: document.getElementById("sh-fam").value, title: t, when: "Just now" });
+      outbox.unshift({ fam: document.getElementById("sh-fam").value, title: t, when: T.documents_justNow });
       document.getElementById("sh-title").value = "";
       render();
     });

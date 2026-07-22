@@ -6,52 +6,53 @@
    Preview: saves to localStorage (ua_pro_profile); TODO-LIVE:
    providers table columns (see provider_portal_setup.sql). */
 import ProviderLayout from "@/layouts/ProviderLayout.astro";
+import DICT from "@/i18n/pro-portal.js";
 ---
-<ProviderLayout title="Profile — UniqueApex Pro" active="profile">
+<ProviderLayout title="Profile — UniqueApex Pro" titleFr="Profil de la clinique" active="profile">
   <div class="pro-prof">
 
     <div class="pc">
-      <div class="pc-h"><b>Clinic profile</b><span>one profile per practice — your <a href="/pro/team" style="color:var(--p-teal);font-weight:700;text-decoration:none">team</a> appears on it. Solo practice? You're a clinic of one.</span></div>
+      <div class="pc-h"><b data-i18n="profile_cardTitle">Clinic profile</b><span><span data-i18n="profile_subA">one profile per practice — your </span><a href="/pro/team" style="color:var(--p-teal);font-weight:700;text-decoration:none" data-i18n="profile_subTeam">team</a><span data-i18n="profile_subB"> appears on it. Solo practice? You're a clinic of one.</span></span></div>
 
-      <label class="pfield"><span>Clinic / practice name</span><input class="pin" id="pf-name" type="text" placeholder="e.g. Clinique Orthophonie Plateau" /></label>
+      <label class="pfield"><span data-i18n="profile_nameLabel">Clinic / practice name</span><input class="pin" id="pf-name" type="text" placeholder="e.g. Clinique Orthophonie Plateau" data-i18n-ph="profile_namePh" /></label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <label class="pfield"><span>Service</span>
+        <label class="pfield"><span data-i18n="profile_serviceLabel">Service</span>
           <select class="pin" id="pf-service">
-            <option>Speech-language therapy</option>
-            <option>Occupational therapy</option>
-            <option>Behaviour support</option>
-            <option>Child psychology</option>
-            <option>Social skills groups</option>
+            <option data-i18n="profile_svcSlp">Speech-language therapy</option>
+            <option data-i18n="profile_svcOt">Occupational therapy</option>
+            <option data-i18n="profile_svcBehaviour">Behaviour support</option>
+            <option data-i18n="profile_svcPsych">Child psychology</option>
+            <option data-i18n="profile_svcSocial">Social skills groups</option>
           </select>
         </label>
-        <label class="pfield"><span>Languages</span><input class="pin" id="pf-langs" type="text" placeholder="FR, EN" /></label>
-        <label class="pfield"><span>Borough / area</span><input class="pin" id="pf-borough" type="text" placeholder="Le Plateau-Mont-Royal" /></label>
-        <label class="pfield"><span>Phone</span><input class="pin" id="pf-phone" type="text" placeholder="(514) 555-0123" /></label>
-        <label class="pfield"><span>Website</span><input class="pin" id="pf-web" type="text" placeholder="https://…" /></label>
-        <label class="pfield"><span>Session fee (range)</span><input class="pin" id="pf-fees" type="text" placeholder="e.g. 120–150 $ / session" /></label>
+        <label class="pfield"><span data-i18n="profile_langsLabel">Languages</span><input class="pin" id="pf-langs" type="text" placeholder="FR, EN" data-i18n-ph="profile_langsPh" /></label>
+        <label class="pfield"><span data-i18n="profile_boroughLabel">Borough / area</span><input class="pin" id="pf-borough" type="text" placeholder="Le Plateau-Mont-Royal" data-i18n-ph="profile_boroughPh" /></label>
+        <label class="pfield"><span data-i18n="profile_phoneLabel">Phone</span><input class="pin" id="pf-phone" type="text" placeholder="(514) 555-0123" data-i18n-ph="profile_phonePh" /></label>
+        <label class="pfield"><span data-i18n="profile_webLabel">Website</span><input class="pin" id="pf-web" type="text" placeholder="https://…" data-i18n-ph="profile_webPh" /></label>
+        <label class="pfield"><span data-i18n="profile_feesLabel">Session fee (range)</span><input class="pin" id="pf-fees" type="text" placeholder="e.g. 120–150 $ / session" data-i18n-ph="profile_feesPh" /></label>
       </div>
-      <label class="pfield"><span>About your practice</span><textarea class="pin" id="pf-bio" rows="4" placeholder="Two or three warm sentences — who you help, how you work, what a first visit looks like."></textarea></label>
+      <label class="pfield"><span data-i18n="profile_bioLabel">About your practice</span><textarea class="pin" id="pf-bio" rows="4" placeholder="Two or three warm sentences — who you help, how you work, what a first visit looks like." data-i18n-ph="profile_bioPh"></textarea></label>
 
-      <div class="pc-h" style="margin-top:6px"><b>Matching & booking</b><span>families see this — and matching will use it</span></div>
+      <div class="pc-h" style="margin-top:6px"><b data-i18n="profile_matchTitle">Matching & booking</b><span data-i18n="profile_matchSub">families see this — and matching will use it</span></div>
       <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:center">
-        <label class="pswitch"><input type="checkbox" id="pf-accepting" checked /> Accepting new clients</label>
-        <label class="pswitch" style="gap:7px">Waitlist&nbsp;
+        <label class="pswitch"><input type="checkbox" id="pf-accepting" checked /> <span data-i18n="profile_accepting">Accepting new clients</span></label>
+        <label class="pswitch" style="gap:7px"><span data-i18n="profile_waitLabel">Waitlist</span>&nbsp;
           <select class="pin" id="pf-wait" style="width:auto;padding:6px 10px">
-            <option value="0">none</option><option value="2">~2 weeks</option><option value="4">~4 weeks</option><option value="8">~8 weeks</option><option value="12">3+ months</option>
+            <option value="0" data-i18n="profile_waitNone">none</option><option value="2" data-i18n="profile_wait2">~2 weeks</option><option value="4" data-i18n="profile_wait4">~4 weeks</option><option value="8" data-i18n="profile_wait8">~8 weeks</option><option value="12" data-i18n="profile_wait12">3+ months</option>
           </select>
         </label>
-        <label class="pswitch"><input type="checkbox" id="pf-booking" /> Let families book my open slots (when booking launches)</label>
+        <label class="pswitch"><input type="checkbox" id="pf-booking" /> <span data-i18n="profile_booking">Let families book my open slots (when booking launches)</span></label>
       </div>
 
       <div style="display:flex;align-items:center;gap:12px;margin-top:16px">
-        <button class="pbtn" id="pf-save" type="button">Save profile</button>
-        <span id="pf-saved" style="font-size:.76rem;color:var(--p-green);font-weight:700;display:none">Saved ✓</span>
+        <button class="pbtn" id="pf-save" type="button" data-i18n="profile_saveBtn">Save profile</button>
+        <span id="pf-saved" style="font-size:.76rem;color:var(--p-green);font-weight:700;display:none" data-i18n="profile_savedOk">Saved ✓</span>
       </div>
     </div>
 
     <div>
       <div class="pc" style="position:sticky;top:52px">
-        <div class="pc-h"><b>Live preview</b><span>the family's view</span></div>
+        <div class="pc-h"><b data-i18n="profile_previewTitle">Live preview</b><span data-i18n="profile_previewSub">the family's view</span></div>
         <div class="pf-card">
           <div class="pf-card-top">
             <span class="pf-av" id="pv-av">C</span>
@@ -60,7 +61,7 @@ import ProviderLayout from "@/layouts/ProviderLayout.astro";
           </div>
           <p class="pf-bio" id="pv-bio">Your description appears here — warm, short, human.</p>
           <div class="pf-tags" id="pv-tags"></div>
-          <button class="pbtn sm" style="width:100%;justify-content:center" type="button" disabled>Request a spot (families see this)</button>
+          <button class="pbtn sm" style="width:100%;justify-content:center" type="button" disabled data-i18n="profile_requestBtn">Request a spot (families see this)</button>
         </div>
       </div>
     </div>
@@ -81,8 +82,10 @@ import ProviderLayout from "@/layouts/ProviderLayout.astro";
   .pf-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 </style>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
   (function () {
+    var T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+    var tpl = function (s, v) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return v && v[k] != null ? v[k] : ""; }); };
     var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
     var F = ["name", "service", "langs", "borough", "phone", "web", "fees", "bio"];
     var $f = function (k) { return document.getElementById("pf-" + k); };
@@ -97,23 +100,23 @@ import ProviderLayout from "@/layouts/ProviderLayout.astro";
     }
 
     function preview() {
-      var name = $f("name").value.trim() || "Your clinic name";
+      var name = $f("name").value.trim() || T.profile_pvNameFallback;
       document.getElementById("pv-name").textContent = name;
       document.getElementById("pv-av").textContent = name[0].toUpperCase();
       document.getElementById("pv-meta").textContent = $f("service").value + ($f("borough").value.trim() ? " · " + $f("borough").value.trim() : "");
-      document.getElementById("pv-bio").textContent = $f("bio").value.trim() || "Your description appears here — warm, short, human.";
+      document.getElementById("pv-bio").textContent = $f("bio").value.trim() || T.profile_pvBioFallback;
       var acc = $f("accepting").checked;
       var wait = +$f("wait").value;
       var pvA = document.getElementById("pv-accept");
-      pvA.textContent = acc ? (wait ? "waitlist ~" + wait + " wk" : "accepting") : "full";
+      pvA.textContent = acc ? (wait ? tpl(T.profile_pillWaitWk, { n: wait }) : T.profile_pillAccepting) : T.profile_pillFull;
       pvA.className = "ppill " + (acc ? (wait ? "amber" : "teal") : "grey");
       var tags = [];
       var teamN = 0;
       try { var tm = JSON.parse(localStorage.getItem("ua_pro_team") || "null"); if (tm) teamN = tm.length; } catch (e) {}
-      if (teamN > 1) tags.push("👥 team of " + teamN);
+      if (teamN > 1) tags.push(tpl(T.profile_tagTeam, { n: teamN }));
       if ($f("langs").value.trim()) tags.push("🗣 " + esc($f("langs").value.trim()));
       if ($f("fees").value.trim()) tags.push("💳 " + esc($f("fees").value.trim()));
-      if ($f("booking").checked) tags.push("📅 online booking");
+      if ($f("booking").checked) tags.push(T.profile_tagBooking);
       document.getElementById("pv-tags").innerHTML = tags.map(function (t) { return "<span class='ppill grey' style='text-transform:none;letter-spacing:0'>" + t + "</span>"; }).join("");
     }
 
@@ -134,5 +137,8 @@ import ProviderLayout from "@/layouts/ProviderLayout.astro";
     });
 
     preview();
+    /* Re-run once the [data-i18n] swap has localized the <option> labels
+       (an option's value feeds pv-meta); English is unchanged, so it's a no-op there. */
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", preview);
   })();
 </script>

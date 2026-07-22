@@ -11,6 +11,7 @@
    ══════════════════════════════════════════════════════════════════ */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
+import DICT from "@/i18n/resources.js";
 
 const T: Record<string, { label: string; dot: string; a: string; b: string }> = {
   start:     { label: "Getting started", dot: "#7C3AED", a: "#C4B5FD", b: "#7C3AED" },
@@ -52,8 +53,12 @@ const VIDEOS = [
   { topic: "daily", title: "Visual schedules that actually get used", blurb: "Building a morning routine board with your child, step by step.", length: "9 min", href: "" },
 ];
 const TOPICKEYS = Object.keys(T);
+/* Bilingual search index: append the French title/blurb/topic so the
+   search box matches French terms even though the visible text is
+   swapped client-side (EN stays the rendered default). */
+const frq = (...codes: string[]) => codes.map((c) => (DICT as any).fr[c] || "").join(" ");
 ---
-<AppFormLayout title="Resources" activeNav="resources">
+<AppFormLayout title="Resources" titleFr="Ressources" activeNav="resources">
   <SectionTabs section="resources" active="learn" />
 
   <div class="rl-wrap">
@@ -62,45 +67,45 @@ const TOPICKEYS = Object.keys(T);
       <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
       <span class="c3-rib-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span>
       <div class="c3-rib-id">
-        <h1>Learn</h1>
-        <p>Practical reads and short videos for the Québec journey — searchable by what you're facing. EN / FR.</p>
+        <h1 data-i18n="learn_title">Learn</h1>
+        <p data-i18n="learn_intro">Practical reads and short videos for the Québec journey — searchable by what you're facing. EN / FR.</p>
       </div>
       <div class="c3-rib-stats">
-        <span class="c3-rstat"><b>{READS.length + 1}</b><span>reads</span></span>
-        <span class="c3-rstat"><b>{VIDEOS.length}</b><span>videos</span></span>
-        <span class="c3-rstat"><b>{TOPICKEYS.length}</b><span>topics</span></span>
+        <span class="c3-rstat"><b>{READS.length + 1}</b><span data-i18n="learn_statReads">reads</span></span>
+        <span class="c3-rstat"><b>{VIDEOS.length}</b><span data-i18n="learn_statVideos">videos</span></span>
+        <span class="c3-rstat"><b>{TOPICKEYS.length}</b><span data-i18n="learn_statTopics">topics</span></span>
       </div>
     </div>
 
     <div class="rl-samplenote cu-rev">
-      <span class="rl-pill">Sample library</span>
-      <span>Previews of what we're writing and recording now — full versions on the way.</span>
+      <span class="rl-pill" data-i18n="learn_samplePill">Sample library</span>
+      <span data-i18n="learn_sampleNote">Previews of what we're writing and recording now — full versions on the way.</span>
     </div>
 
     <!-- toolbar -->
     <div class="rl-bar cu-rev" style="--d:.05s">
       <div class="rl-topics" id="rl-topics">
-        <button class="on" data-topic="all" type="button">All topics</button>
-        {TOPICKEYS.map((k) => <button data-topic={k} type="button"><i style={`background:${T[k].dot}`}></i>{T[k].label}</button>)}
+        <button class="on" data-topic="all" type="button" data-i18n="learn_allTopics">All topics</button>
+        {TOPICKEYS.map((k) => <button data-topic={k} type="button"><i style={`background:${T[k].dot}`}></i><span data-i18n={`learn_topic_${k}`}>{T[k].label}</span></button>)}
       </div>
-      <input class="rl-q" id="rl-q" type="search" placeholder="Search the library…" autocomplete="off" />
+      <input class="rl-q" id="rl-q" type="search" placeholder="Search the library…" data-i18n-ph="learn_searchPh" autocomplete="off" />
     </div>
 
     <!-- featured -->
-    <a class="rl-featured cu-rev" href="#0" data-read data-topic={FEATURED.topic} data-q={(FEATURED.title + " " + FEATURED.blurb).toLowerCase()} style="--d:.08s">
+    <a class="rl-featured cu-rev" href="#0" data-read data-topic={FEATURED.topic} data-q={(FEATURED.title + " " + FEATURED.blurb + " " + frq("learn_featTitle", "learn_featBlurb")).toLowerCase()} style="--d:.08s">
       <div class="rl-fart" style={`background:linear-gradient(135deg,${T[FEATURED.topic].a},${T[FEATURED.topic].b})`}>
         <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 0 1 1 1a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2a1 1 0 0 1 1-1Z"/><path d="M8 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2"/><path d="m9 14 2 2 4-4"/></svg>
-        <span class="rl-fk">START HERE</span>
+        <span class="rl-fk" data-i18n="learn_startHere">START HERE</span>
       </div>
       <div class="rl-fbody">
-        <span class="rl-eyebrow" style={`--dot:${T[FEATURED.topic].dot}`}>{T[FEATURED.topic].label}</span>
-        <h2>{FEATURED.title}</h2>
-        <p>{FEATURED.blurb}</p>
+        <span class="rl-eyebrow" data-i18n={`learn_topic_${FEATURED.topic}`} style={`--dot:${T[FEATURED.topic].dot}`}>{T[FEATURED.topic].label}</span>
+        <h2 data-i18n="learn_featTitle">{FEATURED.title}</h2>
+        <p data-i18n="learn_featBlurb">{FEATURED.blurb}</p>
         <div class="rl-foot">
-          <span class="rl-meta">{FEATURED.minutes} min read</span>
-          <span class="rl-go">Read&nbsp;→</span>
+          <span class="rl-meta">{FEATURED.minutes} <span data-i18n="learn_minRead">min read</span></span>
+          <span class="rl-go" data-i18n="learn_readCta">Read&nbsp;→</span>
         </div>
-        <p class="rl-note" hidden>Coming soon — we're writing this now.</p>
+        <p class="rl-note" hidden data-i18n="learn_noteRead">Coming soon — we're writing this now.</p>
       </div>
     </a>
 
@@ -109,22 +114,22 @@ const TOPICKEYS = Object.keys(T);
       <span class="rl-shelf-ic">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2z"/><path d="M20 5a2 2 0 0 0-2-2h-5v18h5a2 2 0 0 0 2-2z"/></svg>
       </span>
-      <b>To read</b>
-      <span class="rl-shelf-sub">quick answers and full playbooks, 4–10 minutes each</span>
+      <b data-i18n="learn_shelfReadTitle">To read</b>
+      <span class="rl-shelf-sub" data-i18n="learn_shelfReadSub">quick answers and full playbooks, 4–10 minutes each</span>
     </div>
     <div class="rl-grid" id="rl-reads">
       {READS.map((a, i) => (
         <a class="rl-read cu-rev" href={a.href || "#0"} data-read data-topic={a.topic}
-           data-q={(a.title + " " + a.blurb + " " + T[a.topic].label).toLowerCase()}
+           data-q={(a.title + " " + a.blurb + " " + T[a.topic].label + " " + frq(`learn_read${i}Title`, `learn_read${i}Blurb`, `learn_topic_${a.topic}`)).toLowerCase()}
            style={`--d:${(0.12 + Math.min(i, 9) * 0.04).toFixed(2)}s;--edge:${T[a.topic].dot}`}>
-          <span class="rl-eyebrow" style={`--dot:${T[a.topic].dot}`}>{T[a.topic].label}</span>
-          <h3>{a.title}</h3>
-          <p>{a.blurb}</p>
+          <span class="rl-eyebrow" data-i18n={`learn_topic_${a.topic}`} style={`--dot:${T[a.topic].dot}`}>{T[a.topic].label}</span>
+          <h3 data-i18n={`learn_read${i}Title`}>{a.title}</h3>
+          <p data-i18n={`learn_read${i}Blurb`}>{a.blurb}</p>
           <div class="rl-foot">
-            <span class="rl-meta">{a.minutes} min read</span>
-            {a.href ? <span class="rl-go">Read&nbsp;→</span> : <span class="rl-soontag">Coming soon</span>}
+            <span class="rl-meta">{a.minutes} <span data-i18n="learn_minRead">min read</span></span>
+            {a.href ? <span class="rl-go" data-i18n="learn_readCta">Read&nbsp;→</span> : <span class="rl-soontag" data-i18n="learn_comingSoon">Coming soon</span>}
           </div>
-          <p class="rl-note" hidden>Coming soon — we're writing this now.</p>
+          <p class="rl-note" hidden data-i18n="learn_noteRead">Coming soon — we're writing this now.</p>
         </a>
       ))}
     </div>
@@ -134,38 +139,38 @@ const TOPICKEYS = Object.keys(T);
       <span class="rl-shelf-ic">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M10 9.5l5 2.5-5 2.5z"/></svg>
       </span>
-      <b>To watch</b>
-      <span class="rl-shelf-sub">workshop recordings and bite-size explainers</span>
+      <b data-i18n="learn_shelfWatchTitle">To watch</b>
+      <span class="rl-shelf-sub" data-i18n="learn_shelfWatchSub">workshop recordings and bite-size explainers</span>
     </div>
     <div class="rl-vgrid" id="rl-videos">
       {VIDEOS.map((v, i) => (
         <a class="rl-video cu-rev" href={v.href || "#0"} data-read data-topic={v.topic}
-           data-q={(v.title + " " + v.blurb + " " + T[v.topic].label).toLowerCase()}
+           data-q={(v.title + " " + v.blurb + " " + T[v.topic].label + " " + frq(`learn_vid${i}Title`, `learn_vid${i}Blurb`, `learn_topic_${v.topic}`)).toLowerCase()}
            style={`--d:${(0.16 + i * 0.05).toFixed(2)}s`}
            target={v.href ? "_blank" : undefined} rel={v.href ? "noopener" : undefined}>
           <div class="rl-thumb" style={`background:linear-gradient(135deg,${T[v.topic].a}33,${T[v.topic].b}22)`}>
             <span class="rl-play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5l11 6.5-11 6.5z"/></svg></span>
-            {v.href ? <span class="rl-len">{v.length}</span> : <span class="rl-len soon">Coming soon</span>}
+            {v.href ? <span class="rl-len">{v.length}</span> : <span class="rl-len soon" data-i18n="learn_comingSoon">Coming soon</span>}
           </div>
           <div class="rl-vbody">
-            <span class="rl-eyebrow" style={`--dot:${T[v.topic].dot}`}>{T[v.topic].label}</span>
-            <h3>{v.title}</h3>
-            <p>{v.blurb}</p>
-            <p class="rl-note" hidden>Coming soon — recording lands here after the session.</p>
+            <span class="rl-eyebrow" data-i18n={`learn_topic_${v.topic}`} style={`--dot:${T[v.topic].dot}`}>{T[v.topic].label}</span>
+            <h3 data-i18n={`learn_vid${i}Title`}>{v.title}</h3>
+            <p data-i18n={`learn_vid${i}Blurb`}>{v.blurb}</p>
+            <p class="rl-note" hidden data-i18n="learn_noteVideo">Coming soon — recording lands here after the session.</p>
           </div>
         </a>
       ))}
     </div>
 
     <div class="rl-empty" id="rl-empty" hidden>
-      <p>Nothing matches that yet — try another topic, or tell us what's missing below.</p>
+      <p data-i18n="learn_empty">Nothing matches that yet — try another topic, or tell us what's missing below.</p>
     </div>
 
     <div class="rl-cta cu-rev" style="--d:.28s">
-      <p><b>What should we cover next?</b> Every topic here started as a family's question.</p>
+      <p><b data-i18n="learn_ctaTitle">What should we cover next?</b> <span data-i18n="learn_ctaBody">Every topic here started as a family's question.</span></p>
       <div class="rl-cta-btns">
-        <a class="ghost" href="/resources/workshops">Live workshops →</a>
-        <a href="mailto:contact@uniqueapex.com?subject=Library%20topic%20suggestion">Suggest a topic</a>
+        <a class="ghost" href="/resources/workshops" data-i18n="learn_liveWorkshops">Live workshops →</a>
+        <a href="mailto:contact@uniqueapex.com?subject=Library%20topic%20suggestion" data-i18n="learn_suggestTopic">Suggest a topic</a>
       </div>
     </div>
   </div>
@@ -248,11 +253,13 @@ const TOPICKEYS = Object.keys(T);
   .rl-cta a.ghost{background:var(--card);color:var(--violet-700);border:1px solid var(--violet-100)}
 </style>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
   (function () {
     var raw = localStorage.getItem("ua_session"), s = null;
     try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
     if (!s || !s.access_token) { location.href = "/login"; return; }
+    /* Register the French swap for this page's [data-i18n] markup. */
+    if (window.uaI18n) window.uaI18n(DICT);
 
     var topic = "all", q = "";
     var featured = document.querySelector(".rl-featured");

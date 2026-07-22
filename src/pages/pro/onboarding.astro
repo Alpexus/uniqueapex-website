@@ -5,6 +5,8 @@
    clinic's details and message. No backend needed. */
 import "@fontsource-variable/inter/index.css";
 import "../../styles/global.css";
+import I18nBoot from "../../components/I18nBoot.astro";
+import DICT from "../../i18n/pro-portal.js";
 ---
 <!doctype html>
 <html lang="en">
@@ -12,7 +14,8 @@ import "../../styles/global.css";
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Join as a provider — UniqueApex Pro</title>
+    <title data-i18n="onboarding_docTitle">Join as a provider — UniqueApex Pro</title>
+    <I18nBoot />
   </head>
   <body class="ob-body">
     <div class="ob-wrap">
@@ -22,40 +25,40 @@ import "../../styles/global.css";
       </a>
 
       <div class="ob-card" id="ob-form-card">
-        <h1>Join as a provider</h1>
-        <p class="ob-sub">Tell us about your practice — we'll reach out personally. Pilot clinics in Montréal start free.</p>
+        <h1 data-i18n="onboarding_heading">Join as a provider</h1>
+        <p class="ob-sub" data-i18n="onboarding_sub">Tell us about your practice — we'll reach out personally. Pilot clinics in Montréal start free.</p>
 
         <div class="ob-grid">
-          <label class="ob-field"><span>Clinic / practice name *</span><input id="ob-clinic" type="text" placeholder="e.g. Clinique Orthophonie Plateau" /></label>
-          <label class="ob-field"><span>Your name *</span><input id="ob-name" type="text" placeholder="First and last name" /></label>
-          <label class="ob-field"><span>Email *</span><input id="ob-email" type="email" placeholder="you@yourclinic.com" /></label>
-          <label class="ob-field"><span>Phone</span><input id="ob-phone" type="tel" placeholder="(514) 555-0123" /></label>
+          <label class="ob-field"><span data-i18n="onboarding_clinicLabel">Clinic / practice name *</span><input id="ob-clinic" type="text" placeholder="e.g. Clinique Orthophonie Plateau" data-i18n-ph="onboarding_clinicPh" /></label>
+          <label class="ob-field"><span data-i18n="onboarding_nameLabel">Your name *</span><input id="ob-name" type="text" placeholder="First and last name" data-i18n-ph="onboarding_namePh" /></label>
+          <label class="ob-field"><span data-i18n="onboarding_emailLabel">Email *</span><input id="ob-email" type="email" placeholder="you@yourclinic.com" data-i18n-ph="onboarding_emailPh" /></label>
+          <label class="ob-field"><span data-i18n="onboarding_phoneLabel">Phone</span><input id="ob-phone" type="tel" placeholder="(514) 555-0123" data-i18n-ph="onboarding_phonePh" /></label>
         </div>
 
-        <span class="ob-lbl">Services you offer *</span>
+        <span class="ob-lbl" data-i18n="onboarding_servicesLabel">Services you offer *</span>
         <div class="ob-chips" id="ob-services">
-          <label><input type="checkbox" value="Speech-language therapy" /> Speech-language</label>
-          <label><input type="checkbox" value="Occupational therapy" /> Occupational</label>
-          <label><input type="checkbox" value="Behaviour support" /> Behaviour</label>
-          <label><input type="checkbox" value="Child psychology" /> Psychology</label>
-          <label><input type="checkbox" value="Social skills groups" /> Social skills</label>
+          <label><input type="checkbox" value="Speech-language therapy" /> <span data-i18n="onboarding_svcSlp">Speech-language</span></label>
+          <label><input type="checkbox" value="Occupational therapy" /> <span data-i18n="onboarding_svcOt">Occupational</span></label>
+          <label><input type="checkbox" value="Behaviour support" /> <span data-i18n="onboarding_svcBehaviour">Behaviour</span></label>
+          <label><input type="checkbox" value="Child psychology" /> <span data-i18n="onboarding_svcPsych">Psychology</span></label>
+          <label><input type="checkbox" value="Social skills groups" /> <span data-i18n="onboarding_svcSocial">Social skills</span></label>
         </div>
 
-        <label class="ob-field"><span>Area / borough</span><input id="ob-area" type="text" placeholder="e.g. Le Plateau, Montréal" /></label>
-        <label class="ob-field"><span>Anything you'd like us to know? *</span><textarea id="ob-msg" rows="4" placeholder="Team size, waitlist situation, what you'd want from UniqueApex…"></textarea></label>
+        <label class="ob-field"><span data-i18n="onboarding_areaLabel">Area / borough</span><input id="ob-area" type="text" placeholder="e.g. Le Plateau, Montréal" data-i18n-ph="onboarding_areaPh" /></label>
+        <label class="ob-field"><span data-i18n="onboarding_msgLabel">Anything you'd like us to know? *</span><textarea id="ob-msg" rows="4" placeholder="Team size, waitlist situation, what you'd want from UniqueApex…" data-i18n-ph="onboarding_msgPh"></textarea></label>
 
         <input type="text" id="ob-honey" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
         <p id="ob-err" class="ob-err" hidden></p>
-        <button class="ob-btn" id="ob-send" type="button">Send my request</button>
-        <p class="ob-privacy">We only use this to contact you about onboarding — see the <a href="/privacy">privacy policy</a>.</p>
+        <button class="ob-btn" id="ob-send" type="button" data-i18n="onboarding_sendBtn">Send my request</button>
+        <p class="ob-privacy"><span data-i18n="onboarding_privacyA">We only use this to contact you about onboarding — see the </span><a href="/privacy" data-i18n="onboarding_privacyLink">privacy policy</a><span data-i18n="onboarding_privacyB">.</span></p>
       </div>
 
       <div class="ob-card ob-done" id="ob-done" hidden>
         <div style="font-size:2.2rem">🌱</div>
-        <h1>Request received</h1>
-        <p class="ob-sub" style="margin-bottom:16px">Thank you — we read every request personally and reply within a few days. In the meantime, feel free to explore the <a href="/pro" style="color:#0E8C82;font-weight:700;text-decoration:none">portal preview</a>.</p>
-        <a class="ob-btn" style="display:inline-block;text-decoration:none;text-align:center" href="/">Back to uniqueapex.com</a>
+        <h1 data-i18n="onboarding_doneHeading">Request received</h1>
+        <p class="ob-sub" style="margin-bottom:16px"><span data-i18n="onboarding_doneA">Thank you — we read every request personally and reply within a few days. In the meantime, feel free to explore the </span><a href="/pro" style="color:#0E8C82;font-weight:700;text-decoration:none" data-i18n="onboarding_doneLink">portal preview</a><span data-i18n="onboarding_doneB">.</span></p>
+        <a class="ob-btn" style="display:inline-block;text-decoration:none;text-align:center" href="/" data-i18n="onboarding_backHome">Back to uniqueapex.com</a>
       </div>
     </div>
 
@@ -94,8 +97,9 @@ import "../../styles/global.css";
   #ob-form-card[hidden]{display:none}
 </style>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
   (function () {
+    var T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
     var $ = function (id) { return document.getElementById(id); };
     var loadTime = Date.now();
 
@@ -111,16 +115,16 @@ import "../../styles/global.css";
       document.querySelectorAll("#ob-services input:checked").forEach(function (c) { services.push(c.value); });
 
       if (!clinic || !name || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) || !msg) {
-        err("Please fill the required fields (clinic, your name, a valid email, and your message).");
+        err(T.onboarding_errRequired);
         return;
       }
-      if (!services.length) { err("Tick at least one service you offer."); return; }
+      if (!services.length) { err(T.onboarding_errServices); return; }
       if ($("ob-honey").value || Date.now() - loadTime < 2500) {
         $("ob-form-card").hidden = true; $("ob-done").hidden = false; return;
       }
 
       var btn = $("ob-send");
-      btn.disabled = true; btn.textContent = "Sending…";
+      btn.disabled = true; btn.textContent = T.onboarding_sending;
 
       fetch("https://api.web3forms.com/submit", {
         method: "POST",
@@ -145,13 +149,13 @@ import "../../styles/global.css";
             $("ob-done").hidden = false;
             window.scrollTo({ top: 0 });
           } else {
-            err("Couldn't send — please try again, or email contact@uniqueapex.com directly.");
-            btn.disabled = false; btn.textContent = "Send my request";
+            err(T.onboarding_errSend);
+            btn.disabled = false; btn.textContent = T.onboarding_sendBtn;
           }
         })
         .catch(function () {
-          err("Couldn't send — please try again, or email contact@uniqueapex.com directly.");
-          btn.disabled = false; btn.textContent = "Send my request";
+          err(T.onboarding_errSend);
+          btn.disabled = false; btn.textContent = T.onboarding_sendBtn;
         });
     });
   })();

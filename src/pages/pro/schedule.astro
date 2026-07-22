@@ -4,27 +4,28 @@
    screen doubles as the future booking engine's data source.
    Preview: state lives in localStorage (ua_pro_schedule). */
 import ProviderLayout from "@/layouts/ProviderLayout.astro";
+import DICT from "@/i18n/pro-portal.js";
 ---
-<ProviderLayout title="Schedule — UniqueApex Pro" active="schedule">
+<ProviderLayout title="Schedule — UniqueApex Pro" titleFr="Horaire" active="schedule">
   <div class="pgrid">
 
     <div class="pc">
-      <div class="pc-h"><b>Working days</b><span>untick a day and its slots close instantly</span></div>
+      <div class="pc-h"><b data-i18n="schedule_daysTitle">Working days</b><span data-i18n="schedule_daysSub">untick a day and its slots close instantly</span></div>
       <div id="day-toggles" style="display:flex;gap:14px;flex-wrap:wrap"></div>
     </div>
 
     <div class="pc" style="padding-bottom:10px">
       <div class="pc-h">
-        <b>This week</b>
-        <span>tap a slot to cycle: open → blocked → open · booked slots are set by accepted requests</span>
+        <b data-i18n="schedule_weekTitle">This week</b>
+        <span data-i18n="schedule_weekSub">tap a slot to cycle: open → blocked → open · booked slots are set by accepted requests</span>
       </div>
       <div class="sch-legend">
-        <span><i class="sq open"></i>open — bookable by families (soon)</span>
-        <span><i class="sq booked"></i>booked</span>
-        <span><i class="sq blocked"></i>blocked</span>
+        <span><i class="sq open"></i><span data-i18n="schedule_legendOpen">open — bookable by families (soon)</span></span>
+        <span><i class="sq booked"></i><span data-i18n="schedule_legendBooked">booked</span></span>
+        <span><i class="sq blocked"></i><span data-i18n="schedule_legendBlocked">blocked</span></span>
       </div>
       <div class="sch-grid" id="sch-grid"></div>
-      <p class="pnote">When booking launches, families you work with see the green slots inside their own portal and book directly — every booking lands on your Dashboard for approval.</p>
+      <p class="pnote" data-i18n="schedule_note">When booking launches, families you work with see the green slots inside their own portal and book directly — every booking lands on your Dashboard for approval.</p>
     </div>
 
   </div>
@@ -47,10 +48,12 @@ import ProviderLayout from "@/layouts/ProviderLayout.astro";
   .slot.blocked{background:#EBEFEE;border-color:#E0E7E5;color:#9DAeAA;color:var(--p-faint)}
 </style>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
   (function () {
+    var T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
     var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
     var DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    var DLABELS = T.schedule_dayLabels || DAYS;
     var HOURS = ["9:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
     var BOOKED = { "Mon-9:00": "Liam", "Mon-10:00": "Noor", "Tue-13:00": "Éloi", "Wed-9:00": "Maya", "Thu-15:00": "Zoé", "Fri-10:00": "Adam" };
 
@@ -60,8 +63,8 @@ import ProviderLayout from "@/layouts/ProviderLayout.astro";
 
     function renderToggles() {
       var host = document.getElementById("day-toggles");
-      host.innerHTML = DAYS.map(function (d) {
-        return "<label class='pswitch'><input type='checkbox' data-day='" + d + "'" + (state.days[d] ? " checked" : "") + " /> " + d + "</label>";
+      host.innerHTML = DAYS.map(function (d, di) {
+        return "<label class='pswitch'><input type='checkbox' data-day='" + d + "'" + (state.days[d] ? " checked" : "") + " /> " + esc(DLABELS[di]) + "</label>";
       }).join("");
       host.querySelectorAll("input").forEach(function (cb) {
         cb.addEventListener("change", function () {
@@ -82,10 +85,10 @@ import ProviderLayout from "@/layouts/ProviderLayout.astro";
         var slots = HOURS.map(function (h) {
           var key = d + "-" + h;
           var cls = BOOKED[key] ? "booked" : state.blocked[key] ? "blocked" : "";
-          var label = BOOKED[key] ? h + " · " + esc(BOOKED[key]) : state.blocked[key] ? h + " · blocked" : h + " · open";
+          var label = BOOKED[key] ? h + " · " + esc(BOOKED[key]) : state.blocked[key] ? h + " · " + esc(T.schedule_slotBlocked) : h + " · " + esc(T.schedule_slotOpen);
           return "<button type='button' class='slot " + cls + "' data-key='" + key + "'" + (BOOKED[key] ? " disabled" : "") + ">" + label + "</button>";
         }).join("");
-        return "<div class='sch-day" + (state.days[d] ? "" : " off") + "'><h4>" + d + "<span>" + date.toLocaleDateString("en-CA", { month: "short", day: "numeric" }) + "</span></h4>" + slots + "</div>";
+        return "<div class='sch-day" + (state.days[d] ? "" : " off") + "'><h4>" + esc(DLABELS[di]) + "<span>" + date.toLocaleDateString(window.uaLocale || "en-CA", { month: "short", day: "numeric" }) + "</span></h4>" + slots + "</div>";
       }).join("");
       host.querySelectorAll(".slot:not(.booked)").forEach(function (b) {
         b.addEventListener("click", function () {

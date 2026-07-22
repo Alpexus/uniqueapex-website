@@ -5,76 +5,79 @@
    Stripe checkout wires in here later without changing the layout. */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
+import DICT from "@/i18n/settings-subscription.js";
 import "@/styles/settings.css";
 ---
-<AppFormLayout title="Settings" activeNav="settings">
+<AppFormLayout title="Settings" titleFr="Paramètres" activeNav="settings">
   <SectionTabs section="settings" active="subscription" />
   <div class="set-wrap">
-    <h1 class="page-title">Subscription</h1>
-    <p class="page-sub">Your plan, what it includes, and your billing history.</p>
+    <h1 class="page-title" data-i18n="title">Subscription</h1>
+    <p class="page-sub" data-i18n="sub">Your plan, what it includes, and your billing history.</p>
 
     <div class="plan-banner">
       <div>
         <div class="pn" id="plan-name">Free</div>
         <div class="pp" id="plan-desc">Every family starts here — one child profile, the Support Wheel, and one outreach batch per service type.</div>
       </div>
-      <span class="pill" id="plan-pill">Current plan</span>
+      <span class="pill" id="plan-pill" data-i18n="currentPlan">Current plan</span>
     </div>
 
     <div class="set-section">
-      <h2>Included in your plan</h2>
+      <h2 data-i18n="includedTitle">Included in your plan</h2>
       <div id="plan-features">
-        <div class="set-row"><div class="l"><h3>Family Passport</h3><p>One child profile — fill it once, export it for any provider or school.</p></div><span class="always">Included</span></div>
-        <div class="set-row"><div class="l"><h3>Support Wheel &amp; insights</h3><p>Your child's profile visualized, with personalized family guidance.</p></div><span class="always">Included</span></div>
-        <div class="set-row"><div class="l"><h3>Provider outreach</h3><p>One outreach batch per service type to matched providers.</p></div><span class="always">Included</span></div>
-        <div class="set-row"><div class="l"><h3>Document storage</h3><p>Keep reports and assessments in one private place.</p></div><span class="always">Included</span></div>
+        <div class="set-row"><div class="l"><h3 data-i18n="featPassport">Family Passport</h3><p data-i18n="featPassportDesc">One child profile — fill it once, export it for any provider or school.</p></div><span class="always" data-i18n="included">Included</span></div>
+        <div class="set-row"><div class="l"><h3 data-i18n="featWheel">Support Wheel &amp; insights</h3><p data-i18n="featWheelDesc">Your child's profile visualized, with personalized family guidance.</p></div><span class="always" data-i18n="included">Included</span></div>
+        <div class="set-row"><div class="l"><h3 data-i18n="featOutreach">Provider outreach</h3><p data-i18n="featOutreachDesc">One outreach batch per service type to matched providers.</p></div><span class="always" data-i18n="included">Included</span></div>
+        <div class="set-row"><div class="l"><h3 data-i18n="featDocs">Document storage</h3><p data-i18n="featDocsDesc">Keep reports and assessments in one private place.</p></div><span class="always" data-i18n="included">Included</span></div>
       </div>
     </div>
 
     <div class="set-section">
-      <h2>Get more support</h2>
+      <h2 data-i18n="moreTitle">Get more support</h2>
       <div class="set-row">
-        <div class="l"><h3>Member &amp; Family+ plans</h3><p>Priority matching, AI report summaries, workshops, community, and concierge credit.</p></div>
-        <a class="set-btn" style="text-decoration:none" href="/pricing">See plans</a>
+        <div class="l"><h3 data-i18n="plansRow">Member &amp; Family+ plans</h3><p data-i18n="plansRowDesc">Priority matching, AI report summaries, workshops, community, and concierge credit.</p></div>
+        <a class="set-btn" style="text-decoration:none" href="/pricing" data-i18n="seePlans">See plans</a>
       </div>
       <div class="set-row">
-        <div class="l"><h3>À la carte</h3><p>AI Report Reader $17/report · Report translation EN↔FR $99/report — no subscription needed.</p></div>
-        <a class="set-btn ghost" style="text-decoration:none" href="/pricing">Learn more</a>
+        <div class="l"><h3 data-i18n="alacarte">À la carte</h3><p data-i18n="alacarteDesc">AI Report Reader $17/report · Report translation EN↔FR $99/report — no subscription needed.</p></div>
+        <a class="set-btn ghost" style="text-decoration:none" href="/pricing" data-i18n="learnMore">Learn more</a>
       </div>
     </div>
 
     <div class="set-section">
-      <h2>Billing history</h2>
+      <h2 data-i18n="billingTitle">Billing history</h2>
       <div id="billing-rows">
         <div class="set-row">
-          <div class="l"><h3>No charges yet</h3><p>You're on the free plan. When you upgrade, receipts will appear here — you'll never be charged without adding a payment method first.</p></div>
+          <div class="l"><h3 data-i18n="noCharges">No charges yet</h3><p data-i18n="noChargesDesc">You're on the free plan. When you upgrade, receipts will appear here — you'll never be charged without adding a payment method first.</p></div>
         </div>
       </div>
     </div>
 
     <div class="set-section">
-      <h2>Questions</h2>
+      <h2 data-i18n="questionsTitle">Questions</h2>
       <div class="set-row">
-        <div class="l"><h3>Billing help</h3><p>Anything unclear about plans or charges — we answer personally.</p></div>
-        <a class="set-btn ghost" style="text-decoration:none" href="mailto:contact@uniqueapex.com?subject=Billing%20question">Contact us</a>
+        <div class="l"><h3 data-i18n="billingHelp">Billing help</h3><p data-i18n="billingHelpDesc">Anything unclear about plans or charges — we answer personally.</p></div>
+        <a class="set-btn ghost" style="text-decoration:none" href="mailto:contact@uniqueapex.com?subject=Billing%20question" data-i18n="contactUs">Contact us</a>
       </div>
     </div>
   </div>
 </AppFormLayout>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
   (function () {
+    var ST = window.uaI18n(DICT);
     var s = null;
     try { s = JSON.parse(localStorage.getItem("ua_session")); } catch(e){}
     if (!s || !s.access_token) { location.href = "/login"; return; }
     /* Plan comes from account metadata; defaults to Free. When Stripe lands,
-       the webhook writes user_metadata.plan and this page just works. */
+       the webhook writes user_metadata.plan and this page just works.
+       Plan NAMES stay canonical; only the descriptions are translated. */
     var meta = (s.user && s.user.user_metadata) || {};
     var plan = meta.plan || "free";
     var PLANS = {
-      free:    { name: "Free",    desc: "Every family starts here — one child profile, the Support Wheel, and one outreach batch per service type." },
-      member:  { name: "Member",  desc: "Priority matching, AI report summaries, workshops and community — everything a family in motion needs." },
-      familyplus: { name: "Family+", desc: "Our most complete plan: everything in Member plus concierge credit and report translation." }
+      free:    { name: "Free",    desc: ST.planFreeDesc },
+      member:  { name: "Member",  desc: ST.planMemberDesc },
+      familyplus: { name: "Family+", desc: ST.planFamilyplusDesc }
     };
     var p = PLANS[plan] || PLANS.free;
     document.getElementById("plan-name").textContent = p.name;

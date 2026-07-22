@@ -63,7 +63,7 @@ const currentPath = Astro.url.pathname;
                class={lang === "fr" ? "text-violet-700 font-bold" : "text-gray-400 hover:text-violet-700"}>FR</a>
           </div>
           <span class="nav-cta-wrap" data-lang={lang}>
-            <Link href="/signin" style="muted" block size="md">{nav.signIn}</Link>
+            <Link href={prefix + "/signin"} style="muted" block size="md">{nav.signIn}</Link>
           </span>
         </div>
       </MenuItems>
@@ -78,7 +78,7 @@ const currentPath = Astro.url.pathname;
              class={lang === "fr" ? "text-violet-700 font-bold" : "text-gray-400 hover:text-violet-700"}>FR</a>
         </div>
         <span class="nav-cta-wrap" data-lang={lang}>
-          <Link href="/signin" size="md">{nav.signIn}</Link>
+          <Link href={prefix + "/signin"} size="md">{nav.signIn}</Link>
         </span>
       </div>
     </div>

@@ -5,7 +5,7 @@
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
-<AppFormLayout title="Providers" activeNav="providers">
+<AppFormLayout title="Providers" titleFr="Professionnels" activeNav="providers">
   <SectionTabs section="providers" active="applications" />
 
   <div class="pa-wrap">
@@ -14,7 +14,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
       <span class="c3-rib-av"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 4.5h12v8H2z"/><path d="M2 5l6 4.5L14 5"/></svg></span>
       <div class="c3-rib-id">
-        <h1>The Outreach Kit</h1>
+        <h1 data-i18n="apps_title">The Outreach Kit</h1>
         <p id="rb-sub">Reaching out is the hardest part — so we wrote it for you, from the passport.</p>
       </div>
       <div class="c3-rib-stats" id="rb-stats"></div>
@@ -24,8 +24,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <div class="pa-card cu-rev" style="--d:.03s">
         <div class="pa-head">
           <span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9;width:36px;height:36px"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg></span>
-          <span class="pa-t"><b>Sent batches</b><span>Every batch we sent on your behalf — date, clinics, status. Replies go straight to your inbox.</span></span>
-          <a class="btn btn-ghost btn-sm" href="/providers">Send a batch</a>
+          <span class="pa-t"><b data-i18n="apps_sentBatchesTitle">Sent batches</b><span data-i18n="apps_sentBatchesSub">Every batch we sent on your behalf — date, clinics, status. Replies go straight to your inbox.</span></span>
+          <a class="btn btn-ghost btn-sm" href="/providers" data-i18n="apps_sendBatch">Send a batch</a>
         </div>
         <div id="pa-history"><p style="font-size:.8rem;color:var(--faint);margin:0">Checking…</p></div>
       </div>
@@ -33,8 +33,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <div class="pa-card cu-rev" style="--d:.05s">
         <div class="pa-head">
           <span class="cu-blob" style="--blob:#F9EDF1;color:#B14A66;width:36px;height:36px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 4.5h12v8H2z"/><path d="M2 5l6 4.5L14 5"/></svg></span>
-          <span class="pa-t"><b>The first email</b><span>Personalized from the passport — edit anything before sending.</span></span>
-          <button class="btn btn-primary btn-sm" id="pa-copy-email" type="button">Copy email</button>
+          <span class="pa-t"><b data-i18n="apps_firstEmailTitle">The first email</b><span data-i18n="apps_firstEmailSub">Personalized from the passport — edit anything before sending.</span></span>
+          <button class="btn btn-primary btn-sm" id="pa-copy-email" type="button" data-i18n="apps_copyEmail">Copy email</button>
         </div>
         <pre class="pa-pre" id="pa-email">Building your email…</pre>
       </div>
@@ -42,8 +42,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <div class="pa-card cu-rev" style="--d:.1s">
         <div class="pa-head">
           <span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9;width:36px;height:36px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3.5 2.5h3l1.5 3.5-2 1a8 8 0 004 4l1-2 3.5 1.5v3a1.5 1.5 0 01-1.5 1.5A12 12 0 012 4a1.5 1.5 0 011.5-1.5z"/></svg></span>
-          <span class="pa-t"><b>The phone script</b><span>For the clinics that only answer the phone.</span></span>
-          <button class="btn btn-ghost btn-sm" id="pa-copy-phone" type="button">Copy</button>
+          <span class="pa-t"><b data-i18n="apps_phoneTitle">The phone script</b><span data-i18n="apps_phoneSub">For the clinics that only answer the phone.</span></span>
+          <button class="btn btn-ghost btn-sm" id="pa-copy-phone" type="button" data-i18n="apps_copyShort">Copy</button>
         </div>
         <pre class="pa-pre" id="pa-phone">…</pre>
       </div>
@@ -51,18 +51,18 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <div class="pa-card cu-rev" style="--d:.15s">
         <div class="pa-head">
           <span class="cu-blob" style="--blob:#E6F4F2;color:#0E8C82;width:36px;height:36px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8.5l3.2 3L13 4.5"/></svg></span>
-          <span class="pa-t"><b>Attach these</b><span>What providers actually want on first contact.</span></span>
+          <span class="pa-t"><b data-i18n="apps_attachTitle">Attach these</b><span data-i18n="apps_attachSub">What providers actually want on first contact.</span></span>
         </div>
         <ul class="pa-list">
-          <li><b>The Family Passport PDF</b> — export it from the Overview; it answers 90% of intake questions. <a href="/child">Export →</a></li>
-          <li><b>The latest evaluation report</b>, if you have one. <a href="/documents">Open the vault →</a></li>
-          <li><b>Your availability</b> — two or three time windows makes scheduling twice as fast.</li>
+          <li><b data-i18n="apps_attach1b">The Family Passport PDF</b><span data-i18n="apps_attach1"> — export it from the Overview; it answers 90% of intake questions. </span><a href="/child" data-i18n="apps_attach1link">Export →</a></li>
+          <li><b data-i18n="apps_attach2b">The latest evaluation report</b><span data-i18n="apps_attach2">, if you have one. </span><a href="/documents" data-i18n="apps_attach2link">Open the vault →</a></li>
+          <li><b data-i18n="apps_attach3b">Your availability</b><span data-i18n="apps_attach3"> — two or three time windows makes scheduling twice as fast.</span></li>
         </ul>
       </div>
     </div>
 
     <div class="pa-note cu-rev" style="--d:.2s">
-      <p><b>Application tracking is coming with the provider directory.</b> Until then, log every call and reply in <a href="/providers/notes">Notes</a> — future you will be grateful.</p>
+      <p><b data-i18n="apps_noteB">Application tracking is coming with the provider directory.</b> <span data-i18n="apps_note1">Until then, log every call and reply in</span> <a href="/providers/notes" data-i18n="apps_noteLink">Notes</a><span data-i18n="apps_note2"> — future you will be grateful.</span></p>
     </div>
   </div>
 </AppFormLayout>
@@ -109,63 +109,57 @@ import SectionTabs from "@/components/SectionTabs.astro";
   import * as UA from "../../lib/ua-data.js";
   import { scoreWheel, DOMAINS, scoreToBand } from "../../lib/wheelScore.js";
   import { notify } from "../../lib/notify.js";
+  import DICT from "../../i18n/providers-sub.js";
 
   const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  /* ---------- i18n (string codes from src/i18n/providers-sub.js) ---------- */
+  const T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+  const tpl = (s, v) => String(s).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? v[k] : ""));
+  const ofName = (n) => (window.uaLang === "fr"
+    ? (/^[aeiouyàâäéèêëìîïòôöùûüh]/i.test(String(n || "")) ? "d'" : "de ")
+    : "");
+  /* Script-owned placeholders — translate the fallbacks before data arrives. */
+  $("rb-sub").textContent = T.apps_ribSub;
+  $("pa-email").textContent = T.apps_buildingEmail;
+  $("pa-history").innerHTML = `<p style="font-size:.8rem;color:var(--faint);margin:0">${esc(T.apps_checking)}</p>`;
 
   (async () => {
     const passports = await UA.getPassports().catch(() => []);
     const p = UA.pickActivePassport(passports);
     const data = (p && p.data) || {};
     const id = UA.childIdentity(data);
-    const first = id.first || "our child";
+    const first = id.first || T.apps_ourChild;
     const scored = scoreWheel(data);
     const g1 = String((data.household && data.household.g1name) || "").replace(/\s*\([^)]*\)\s*$/, "").trim();
+    const parent = g1 || T.apps_parentFallback;
     const needs = DOMAINS.filter((n) => scored[n].score != null).sort((a, b) => scored[b].score - scored[a].score).slice(0, 2);
-    const NICE = { "Communication": "communication", "Social Connection": "social connection", "Sensory Processing": "sensory regulation", "Flexibility & Transitions": "transitions and flexibility", "Emotional Regulation": "emotional regulation", "Executive Function": "attention and organization", "Daily Living Skills": "daily-living independence", "Learning & Play": "learning and play" };
-    const needTxt = needs.length ? needs.map((n) => NICE[n]).join(" and ") : "development";
-    const ageTxt = id.age != null ? id.age + "-year-old " : "";
+    const NICE = T.apps_needNice;
+    const needTxt = needs.length ? needs.map((n) => NICE[n] || n).join(T.apps_needJoin) : T.apps_needFallback;
+    const child = id.age != null ? tpl(T.apps_childAged, { age: id.age }) : T.apps_childPlain;
+    const subj = id.age != null ? tpl(T.apps_subjAge, { age: id.age }) : T.apps_subjYoung;
     const dxTxt = id.dx ? " (" + id.dx + ")" : "";
 
-    const email = `Subject: New client inquiry — ${first}, ${ageTxt.trim() || "young child"}
-
-Hello,
-
-My name is ${g1 || "…"} and I'm reaching out about services for my ${ageTxt}child, ${first}${dxTxt}. We're based in Montréal and looking for support with ${needTxt}.
-
-Could you tell me:
-• whether you're currently accepting new clients (or the waitlist length),
-• your availability and rates,
-• and what you'd need from us for an intake.
-
-I can share a one-page family profile with ${first}'s strengths, needs and history right away — it answers most intake questions.
-
-Thank you so much,
-${g1 || "…"}`;
-
-    const phone = `Hi, my name is ${g1 || "…"} — I'm calling about services for my ${ageTxt}child, ${first}.
-
-1. "Are you accepting new clients, or is there a waitlist I can join today?"
-2. "What does intake look like, and what should I send ahead of time?"
-3. "Is there a cancellation list we could be on?"
-4. Before hanging up: get a NAME and a DATE ("Who should I follow up with, and when?").`;
+    const email = tpl(T.apps_emailBody, { first, parent, child, subj, dx: dxTxt, need: needTxt, of: ofName(first) });
+    const phone = tpl(T.apps_phoneBody, { first, parent, child });
 
     $("pa-email").textContent = email;
     $("pa-phone").textContent = phone;
-    if (id.first) $("rb-sub").textContent = "Reaching out is the hardest part — so we wrote it for you, from " + id.first + "'s passport.";
+    if (id.first) $("rb-sub").textContent = tpl(T.apps_ribSubNamed, { name: id.first, of: ofName(id.first) });
     $("rb-stats").innerHTML = [
-      `<span class="c3-rstat"><b>2</b><span>templates ready</span></span>`,
-      needs[0] ? `<span class="c3-rstat"><b style="font-size:.82rem">${NICE[needs[0]].split(" ")[0]}</b><span>top need inside</span></span>` : "",
+      `<span class="c3-rstat"><b>2</b><span>${esc(T.apps_templatesReady)}</span></span>`,
+      needs[0] ? `<span class="c3-rstat"><b style="font-size:.82rem">${esc(String(NICE[needs[0]] || "").split(" ")[0])}</b><span>${esc(T.apps_topNeedInside)}</span></span>` : "",
     ].join("");
 
     $("pa-copy-email").addEventListener("click", () => {
-      navigator.clipboard && navigator.clipboard.writeText(email).then(() => notify("ok", "Email copied — paste it anywhere ✓")).catch(() => {});
+      navigator.clipboard && navigator.clipboard.writeText(email).then(() => notify("ok", T.apps_emailCopied)).catch(() => {});
     });
     $("pa-copy-phone").addEventListener("click", () => {
-      navigator.clipboard && navigator.clipboard.writeText(phone).then(() => notify("ok", "Phone script copied ✓")).catch(() => {});
+      navigator.clipboard && navigator.clipboard.writeText(phone).then(() => notify("ok", T.apps_phoneCopied)).catch(() => {});
     });
 
     /* ---------- automated outreach history ---------- */
-    const SVCNICE = { slp: "Speech-language therapy", ot: "Occupational therapy", aba: "Behaviour support", psych: "Psychology", social: "Social skills groups" };
     try {
       const s0 = await UA.getValidSession();
       const BASE = "https://eghqufgiudxjkbsddtnx.supabase.co/rest/v1/";
@@ -185,20 +179,21 @@ ${g1 || "…"}`;
             const provs = rp.ok ? await rp.json() : [];
             const nameOf = {};
             provs.forEach((x) => { nameOf[x.id] = x.name; });
-            cons.forEach((c) => { (batchNames[c.request_id] = batchNames[c.request_id] || []).push(nameOf[c.provider_id] || "clinic"); });
+            cons.forEach((c) => { (batchNames[c.request_id] = batchNames[c.request_id] || []).push(nameOf[c.provider_id] || T.apps_clinicFallback); });
           } catch (e2) {}
         }
       }
-      const escX = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
       $("pa-history").innerHTML = rows.length
         ? rows.map((r) => {
             const names = batchNames[r.id] || [];
-            return `<div class="pa-row"><span class="sv">${SVCNICE[r.service_type] || r.service_type}</span><span class="dt">${new Date(r.created_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}</span><span class="ct">sent to ${r.sent_count} clinic${r.sent_count === 1 ? "" : "s"}</span><span class="pa-pill ${r.status}">${r.status}</span></div>`
-              + (names.length ? `<div class="pa-names">${names.map(escX).join(" · ")}</div>` : "");
+            const svcLabel = (T.apps_svcNice && T.apps_svcNice[r.service_type]) || r.service_type;
+            const stLabel = (T.apps_status && T.apps_status[r.status]) || r.status;
+            return `<div class="pa-row"><span class="sv">${esc(svcLabel)}</span><span class="dt">${new Date(r.created_at).toLocaleDateString(window.uaLocale || "en-CA", { month: "short", day: "numeric", year: "numeric" })}</span><span class="ct">${esc(tpl(r.sent_count === 1 ? T.apps_sentToClinics1 : T.apps_sentToClinicsN, { n: r.sent_count }))}</span><span class="pa-pill ${r.status}">${esc(stLabel)}</span></div>`
+              + (names.length ? `<div class="pa-names">${names.map(esc).join(" · ")}</div>` : "");
           }).join("")
-        : `<p style="font-size:.82rem;color:var(--muted);margin:0;line-height:1.55">No batches yet. Go to <a href="/providers" style="color:var(--violet-700);font-weight:700;text-decoration:none">Matches</a>, pick a service, choose your clinics and approve the email — every send is logged here with its date and clinics.</p>`;
+        : `<p style="font-size:.82rem;color:var(--muted);margin:0;line-height:1.55">${esc(T.apps_noBatches1)} <a href="/providers" style="color:var(--violet-700);font-weight:700;text-decoration:none">${esc(T.apps_noBatchesLink)}</a>${esc(T.apps_noBatches2)}</p>`;
     } catch (e) {
-      $("pa-history").innerHTML = `<p style="font-size:.8rem;color:var(--faint);margin:0">Outreach history appears once the outreach setup is deployed.</p>`;
+      $("pa-history").innerHTML = `<p style="font-size:.8rem;color:var(--faint);margin:0">${esc(T.apps_historyUnavailable)}</p>`;
     }
   })().catch((e) => console.error("[applications] hydrate failed", e));
 </script>

@@ -16,7 +16,7 @@
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
-<AppFormLayout title="Growth" activeNav="child">
+<AppFormLayout title="Growth" titleFr="Évolution" activeNav="child">
   <div class="c3-tabs"><SectionTabs section="child" active="growth" /></div>
 
   <div id="gr-gate"></div>
@@ -29,26 +29,26 @@ import SectionTabs from "@/components/SectionTabs.astro";
       <span class="c3-rib-av" id="rb-av">·</span>
       <div class="c3-rib-id">
         <h1 id="rb-title">Growth</h1>
-        <p id="rb-sub">Where you were, where you are — the profile remembers, so you can see how far you've come.</p>
+        <p id="rb-sub" data-i18n="rbSub">Where you were, where you are — the profile remembers, so you can see how far you've come.</p>
       </div>
       <div class="c3-rib-stats" id="rb-stats"></div>
     </div>
 
     <!-- ============ 1 · WHERE THINGS STAND TODAY ============ -->
     <div class="gr-sec cu-rev" style="--d:.05s">
-      <p class="gr-h" id="gr-dev-title">Where things stand today <a class="gr-hlink" id="gr-dev-edit" href="/passport">Edit in passport →</a></p>
+      <p class="gr-h" id="gr-dev-title">Where things stand today <a class="gr-hlink" id="gr-dev-edit" href="/passport" data-i18n="editInPassport">Edit in passport →</a></p>
       <div id="gr-dev"></div>
     </div>
 
     <!-- ============ 2 · THEN vs NOW ============ -->
     <div class="gr-sec cu-rev" style="--d:.1s">
-      <p class="gr-h">Then vs now <span class="gr-hsub" id="gr-since"></span></p>
+      <p class="gr-h"><span data-i18n="thenVsNow">Then vs now</span> <span class="gr-hsub" id="gr-since"></span></p>
       <div class="gr-card" id="gr-trends"></div>
     </div>
 
     <!-- ============ 3 · WHAT CHANGED ============ -->
     <div class="gr-sec cu-rev" id="gr-changes-sec" style="--d:.12s;display:none">
-      <p class="gr-h">What changed <span class="gr-hsub" id="gr-changed-when"></span></p>
+      <p class="gr-h"><span data-i18n="whatChanged">What changed</span> <span class="gr-hsub" id="gr-changed-when"></span></p>
       <div id="gr-changes"></div>
     </div>
 
@@ -59,11 +59,11 @@ import SectionTabs from "@/components/SectionTabs.astro";
         <span class="cu-spark s2" style="top:32px;right:48px">✦</span>
         <div class="grj-head">
           <div>
-            <p class="grj-title">The wins journal</p>
+            <p class="grj-title" data-i18n="winsJournal">The wins journal</p>
             <p class="grj-sub" id="grj-sub">Tiny victories add up — future you will want to read these.</p>
           </div>
           <div class="grj-mo">
-            <div class="grj-days" id="grj-days" aria-label="Wins over the last 7 days"></div>
+            <div class="grj-days" id="grj-days" aria-label="Wins over the last 7 days" data-i18n-aria="winsAria"></div>
             <p class="grj-streak" id="grj-streak"></p>
           </div>
         </div>
@@ -71,7 +71,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
           <input type="text" id="win-input" class="grj-field" maxlength="200" placeholder="Something that went well today…" autocomplete="off" />
           <button class="grj-savebtn" id="win-save" type="button">
             <span class="grj-burst" id="win-burst" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i></span>
-            ✦ Save win
+            <span data-i18n="saveWin">✦ Save win</span>
           </button>
         </div>
       </div>
@@ -81,23 +81,23 @@ import SectionTabs from "@/components/SectionTabs.astro";
     <!-- ============ 5 · THE STORY ============ -->
     <div class="gr-sec cu-rev" style="--d:.18s;margin-bottom:0">
       <p class="gr-h" id="gr-story-title">The story
-        <button class="gr-addbtn" id="tl-addbtn"><span style="font-size:1.1em;line-height:1">+</span> Add a moment</button>
+        <button class="gr-addbtn" id="tl-addbtn"><span style="font-size:1.1em;line-height:1">+</span> <span data-i18n="addMoment">Add a moment</span></button>
       </p>
       <div id="gr-mscta"></div>
       <div class="gr-form" id="tl-form">
         <div class="gr-form-grid">
           <input type="date" id="tl-date" class="gr-field2" />
           <select id="tl-cat" class="gr-field2">
-            <option>Note</option><option>Medical</option><option>Education</option>
-            <option>Therapy</option><option>Assessment</option><option>Funding</option><option>Milestone</option>
+            <option value="Note" data-i18n="catNote">Note</option><option value="Medical" data-i18n="catMedical">Medical</option><option value="Education" data-i18n="catEducation">Education</option>
+            <option value="Therapy" data-i18n="catTherapy">Therapy</option><option value="Assessment" data-i18n="catAssessment">Assessment</option><option value="Funding" data-i18n="catFunding">Funding</option><option value="Milestone" data-i18n="catMilestone">Milestone</option>
           </select>
-          <input type="text" id="tl-title" class="gr-field2" placeholder="What happened?" />
-          <input type="text" id="tl-note" class="gr-field2" placeholder="Add a note (optional)" />
+          <input type="text" id="tl-title" class="gr-field2" placeholder="What happened?" data-i18n-ph="phWhatHappened" />
+          <input type="text" id="tl-note" class="gr-field2" placeholder="Add a note (optional)" data-i18n-ph="phAddNote" />
         </div>
         <div class="gr-form-actions">
           <span id="tl-err" class="gr-err"></span>
-          <button class="gr-ghost" id="tl-cancel">Cancel</button>
-          <button class="gr-savebtn2" id="tl-save">Save</button>
+          <button class="gr-ghost" id="tl-cancel" data-i18n="cancel">Cancel</button>
+          <button class="gr-savebtn2" id="tl-save" data-i18n="save">Save</button>
         </div>
       </div>
       <div id="tl"></div>
@@ -288,6 +288,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
   import { ensureSnapshot, diffData } from "../../lib/history.js";
   import { notify } from "../../lib/notify.js";
   import { getPlan, PLANS, upsellHTML } from "../../lib/plan.js";
+  import DICT from "../../i18n/child-growth.js";
 
   const UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
   const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
@@ -299,10 +300,26 @@ import SectionTabs from "@/components/SectionTabs.astro";
   const uniq = (a) => [...new Set(a)];
   const textToList = (s) => String(s || "").split(/[,\n;•]+/).map((x) => x.trim()).filter(Boolean);
   const isHigh = (v) => v === "Often" || v === "Daily";
-  const listShort = (arr, n) => arr.slice(0, n).join(" & ") + (arr.length > n ? "…" : "");
+  const listShort = (arr, n) => arr.slice(0, n).join(T.shortJoin) + (arr.length > n ? "…" : "");
   const tintOf = (nm, a) => { const i = DOMAINS.indexOf(nm); return i === -1 ? "rgba(109,40,217," + a + ")" : "hsla(" + HUES[i] + ",70%,45%," + a + ")"; };
   const SHORT = { "Communication": "Communication", "Social Connection": "Social", "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility", "Emotional Regulation": "Emotional", "Executive Function": "Executive", "Daily Living Skills": "Daily living", "Learning & Play": "Learning & play" };
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- i18n (string codes from src/i18n/child-growth.js) ---------- */
+  const T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+  const tpl = (s, v) => String(s).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? v[k] : ""));
+  const ofName = (n) => (window.uaLang === "fr"
+    ? (/^[aeiouyàâäéèêëìîïòôöùûüh]/i.test(String(n || "")) ? "d'" : "de ")
+    : "");
+  const LOCALE = window.uaLocale || "en-CA";
+  /* Visible labels for story categories — the VALUES stay English (DB). */
+  const CATLBL = { Note: T.catNote, Medical: T.catMedical, Education: T.catEducation, Therapy: T.catTherapy, Assessment: T.catAssessment, Funding: T.catFunding, Milestone: T.catMilestone, Diagnosis: T.catDiagnosis };
+  /* Script-owned labels — translate the fallbacks before data arrives. */
+  $("rb-title").textContent = T.growthTitle;
+  $("gr-dev-title").firstChild.textContent = T.devToday + " ";
+  $("grj-sub").textContent = T.grjSub;
+  $("gr-story-title").firstChild.textContent = T.storyTitle + " ";
+  $("win-input").placeholder = tpl(T.prompts[0], { name: T.yourChild });
 
   function getSession() { try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch { return null; } }
   function isValid(s) { return s && s.access_token && Math.floor(Date.now() / 1000) < (s.expires_at || 0) - 60; }
@@ -362,8 +379,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
     Medical: { c: "#D4537E", ic: '<path d="M8 4v8M4 8h8"/>' },
     Note: { c: "#7B7491", ic: '<path d="M4.5 3h5l2 2v8h-7z"/><path d="M9.5 3v2h2"/>' },
   };
-  const fmtMY = (dt) => dt.toLocaleDateString("en-CA", { month: "short", year: "numeric" });
-  const fmtD = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" }); };
+  const fmtMY = (dt) => dt.toLocaleDateString(LOCALE, { month: "short", year: "numeric" });
+  const fmtD = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString(LOCALE, { month: "short", day: "numeric", year: "numeric" }); };
   function parseLoose(t) { if (!t) return null; const d = new Date(t); return isNaN(d) ? null : d; }
   function extractYear(t) { const m = String(t || "").match(/\b(19|20)\d\d\b/); return m ? +m[0] : null; }
   function parseAgeMonths(s) { if (s == null) return null; s = ("" + s).toLowerCase().trim(); if (!s) return null; const n = parseFloat(s.replace(/[^0-9.]/g, " ").trim().split(/\s+/)[0]); if (isNaN(n)) return null; if (s.indexOf("year") > -1 || s.indexOf("yr") > -1) return n * 12; if (s.indexOf("month") > -1 || s.indexOf("mo") > -1) return n; return n <= 8 ? n * 12 : n; }
@@ -381,40 +398,40 @@ import SectionTabs from "@/components/SectionTabs.astro";
     let dots = "";
     for (let i = 6; i >= 0; i--) {
       const d = new Date(now); d.setDate(now.getDate() - i);
-      dots += `<span class="grj-day${hitDays.has(dayKey(d)) ? " hit" : ""}${i === 0 ? " today" : ""}"><i></i>${d.toLocaleDateString("en-CA", { weekday: "narrow" })}</span>`;
+      dots += `<span class="grj-day${hitDays.has(dayKey(d)) ? " hit" : ""}${i === 0 ? " today" : ""}"><i></i>${d.toLocaleDateString(LOCALE, { weekday: "narrow" })}</span>`;
     }
     $("grj-days").innerHTML = dots;
     const weeks = new Set(wins.map((w) => weekStart(new Date(w.created_at))));
     let streak = 0, cursor = weekStart(now);
     if (!weeks.has(cursor)) cursor -= 7 * 864e5;
     while (weeks.has(cursor)) { streak++; cursor -= 7 * 864e5; }
-    $("grj-streak").textContent = streak >= 2 ? "✦ " + streak + " weeks in a row" : (weekWinCount() ? "✦ On a roll this week" : "");
+    $("grj-streak").textContent = streak >= 2 ? tpl(T.streakWeeks, { n: streak }) : (weekWinCount() ? T.streakRoll : "");
   }
 
   function groupOf(iso) {
-    const d = new Date(iso); if (isNaN(d)) return "Earlier";
+    const d = new Date(iso); if (isNaN(d)) return T.earlier;
     const today0 = new Date(); today0.setHours(0, 0, 0, 0);
     const t = d.getTime();
-    if (t >= today0.getTime()) return "Today";
-    if (t >= today0.getTime() - 864e5) return "Yesterday";
-    if (t >= weekStart(new Date())) return "This week";
-    return "Earlier";
+    if (t >= today0.getTime()) return T.groupToday;
+    if (t >= today0.getTime() - 864e5) return T.groupYesterday;
+    if (t >= weekStart(new Date())) return T.groupThisWeek;
+    return T.earlier;
   }
   const starIc = '<svg class="st" width="15" height="15" viewBox="0 0 16 16" fill="currentColor" style="display:inline;vertical-align:-2px"><path d="M8 1.6l1.7 4.4 4.6.4-3.5 3 .9 4.5L8 11.9 3.8 14.3l.9-4.5L1.2 6.4l4.6-.4z"/></svg>';
   function renderWins(celebrateFirst) {
-    if (!wins.length) { $("gr-wins").innerHTML = `<p class="gr-empty" style="margin-top:12px">The journal is waiting for its first entry — even "tried a new food" counts. ✦</p>`; return; }
+    if (!wins.length) { $("gr-wins").innerHTML = `<p class="gr-empty" style="margin-top:12px">${esc(T.winsEmpty)}</p>`; return; }
     let h = "", lastG = null;
     wins.forEach((w, i) => {
       const g = groupOf(w.created_at);
-      if (g !== lastG) { h += `<p class="gr-glab">${g}</p>`; lastG = g; }
+      if (g !== lastG) { h += `<p class="gr-glab">${esc(g)}</p>`; lastG = g; }
       const d = new Date(w.created_at);
       const day = isNaN(d) ? "·" : d.getDate();
-      const mon = isNaN(d) ? "" : d.toLocaleDateString("en-CA", { month: "short" });
+      const mon = isNaN(d) ? "" : d.toLocaleDateString(LOCALE, { month: "short" });
       h += `<div class="gr-entry${celebrateFirst && i === 0 ? " gr-cele" : ""}">
         <span class="gr-edate"><b>${day}</b><span>${mon}</span></span>
         <span class="gr-etext">${starIc}${esc(w.text)}</span>
         <span class="gr-ewhen">${esc(w.when)}</span>
-        <button class="gr-del" data-id="${w.id}" aria-label="Delete win">×</button>
+        <button class="gr-del" data-id="${w.id}" aria-label="${esc(T.delWinAria)}">×</button>
       </div>`;
     });
     $("gr-wins").innerHTML = h;
@@ -422,7 +439,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
   }
 
   async function delWin(id) {
-    if (!confirm("Remove this win?")) return;
+    if (!confirm(T.confirmDelWin)) return;
     const s = await getValidSession(); if (!s) return;
     const r = await fetch(UA_URL + "/rest/v1/wins?id=eq." + id, { method: "DELETE", headers: authHeaders(s.access_token) });
     if (r.ok) { wins = wins.filter((w) => String(w.id) !== String(id)); renderWins(); renderMomentum(); }
@@ -436,11 +453,11 @@ import SectionTabs from "@/components/SectionTabs.astro";
       const r = await fetch(UA_URL + "/rest/v1/wins", { method: "POST", headers: Object.assign({}, authHeaders(s.access_token), { Prefer: "return=representation" }), body: JSON.stringify({ user_id: s.user.id, passport_id: activeP.id, text: v }) });
       if (r.ok) {
         const rows = await r.json(), row = rows && rows[0];
-        wins.unshift({ id: row ? row.id : Date.now(), text: v, when: "Just now", created_at: row ? row.created_at : new Date().toISOString() });
+        wins.unshift({ id: row ? row.id : Date.now(), text: v, when: T.justNow, created_at: row ? row.created_at : new Date().toISOString() });
         $("win-input").value = "";
         renderWins(true);
         renderMomentum();
-        notify("ok", "Win saved to the journal ✦");
+        notify("ok", T.winSavedToast);
         if (!reduceMotion) {
           const burst = $("win-burst");
           burst.classList.remove("go"); void burst.offsetWidth; burst.classList.add("go");
@@ -458,38 +475,38 @@ import SectionTabs from "@/components/SectionTabs.astro";
     if (present(dg.date) || (dg.diagnoses && dg.diagnoses.length)) {
       const dt = present(dg.date) ? parseLoose(dg.date) : null;
       const y = dt ? dt.getFullYear() : (present(dg.date) ? extractYear(dg.date) : null);
-      out.push({ cat: "Diagnosis", title: "Diagnosed", note: [(dg.diagnoses && dg.diagnoses.length ? dg.diagnoses.join(", ") : ""), dg.diagnosedBy, (!dt && !y) ? "Add the date in the passport" : ""].filter(Boolean).join(" · "), ts: dt ? dt.getTime() : (y ? new Date(y, 0, 1).getTime() : -8640000000000000), display: dt ? fmtMY(dt) : (present(dg.date) ? dg.date : "Date not set"), y: dt ? dt.getFullYear() : (y || "Undated"), auto: true });
+      out.push({ cat: "Diagnosis", title: T.evDiagnosed, note: [(dg.diagnoses && dg.diagnoses.length ? dg.diagnoses.join(", ") : ""), dg.diagnosedBy, (!dt && !y) ? T.addDateNote : ""].filter(Boolean).join(" · "), ts: dt ? dt.getTime() : (y ? new Date(y, 0, 1).getTime() : -8640000000000000), display: dt ? fmtMY(dt) : (present(dg.date) ? dg.date : T.dateNotSet), y: dt ? dt.getFullYear() : (y || T.undated), auto: true });
     }
-    (d.therapy || []).forEach((t) => { if (present(t.startDate)) { const dt = parseLoose(t.startDate); if (dt) out.push({ cat: "Therapy", title: "Started " + String(t.type).toLowerCase(), note: [t.provider, t.frequency].filter(Boolean).join(" · "), ts: dt.getTime(), display: fmtMY(dt), y: dt.getFullYear(), auto: true }); } });
+    (d.therapy || []).forEach((t) => { if (present(t.startDate)) { const dt = parseLoose(t.startDate); if (dt) out.push({ cat: "Therapy", title: tpl(T.evStarted, { type: String(t.type).toLowerCase(), of: ofName(t.type) }), note: [t.provider, t.frequency].filter(Boolean).join(" · "), ts: dt.getTime(), display: fmtMY(dt), y: dt.getFullYear(), auto: true }); } });
     const dob = d.childProfile && d.childProfile.dob, ms = (d.birth && d.birth.milestones) || {};
-    const MLAB = { sit: "Sat unsupported", crawl: "Crawled", walk: "Walked", firstWord: "First words", phrases: "First phrases", sentences: "First sentences", toiletDay: "Toilet trained (day)", toiletNight: "Toilet trained (night)" };
-    if (dob) Object.keys(MLAB).forEach((k) => { if (present(ms[k])) { const dt = ageToDate(dob, ms[k]); if (dt) out.push({ cat: "Milestone", title: MLAB[k] + " ✦", note: "Around " + ms[k], ts: dt.getTime(), display: fmtMY(dt), y: dt.getFullYear(), auto: true }); } });
+    const MLAB = T.mlab;
+    if (dob) Object.keys(MLAB).forEach((k) => { if (present(ms[k])) { const dt = ageToDate(dob, ms[k]); if (dt) out.push({ cat: "Milestone", title: MLAB[k] + " ✦", note: tpl(T.around, { age: ms[k] }), ts: dt.getTime(), display: fmtMY(dt), y: dt.getFullYear(), auto: true }); } });
     return out;
   }
 
   function renderStory() {
     const list = allEvents.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
-    if (!list.length) { $("tl").innerHTML = `<div class="tl-empty"><p>The story starts here — add the first moment, or fill in the passport and it writes itself.</p></div>`; return; }
+    if (!list.length) { $("tl").innerHTML = `<div class="tl-empty"><p>${esc(T.storyEmpty)}</p></div>`; return; }
     const yearCounts = {};
     list.forEach((e) => { yearCounts[e.y] = (yearCounts[e.y] || 0) + 1; });
     let h = "", lastYear = null, idx = 0;
     list.forEach((e, i) => {
       if (e.y !== lastYear) {
         const yc = yearCounts[e.y] || 0;
-        h += `<div class="tl-year"><b>${esc(String(e.y))}</b><span>${yc} moment${yc === 1 ? "" : "s"}</span></div>`;
+        h += `<div class="tl-year"><b>${esc(String(e.y))}</b><span>${tpl(esc(yc === 1 ? T.moments1 : T.momentsN), { n: yc })}</span></div>`;
         lastYear = e.y;
       }
       const cat = CAT[e.cat] || CAT.Note, last = i === list.length - 1;
-      const del = e.auto ? "" : `<button class="tl-del" data-id="${e.id}" aria-label="Delete event">×</button>`;
+      const del = e.auto ? "" : `<button class="tl-del" data-id="${e.id}" aria-label="${esc(T.delEventAria)}">×</button>`;
       const dl = Math.min(idx * 0.04, 0.4); idx++;
-      h += `<div class="tl-item cu-rev${last ? " last" : ""}${e.cat === "Milestone" ? " ms" : ""}" style="--d:${dl.toFixed(2)}s"><div class="tl-dot" style="background:${cat.c}"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${cat.ic}</svg></div><div class="tl-card">${del}<div class="tl-meta">${esc(e.display)} · <span class="cat" style="color:${cat.c}">${esc(e.cat)}</span></div><div class="tl-title">${esc(e.title)}</div>${e.note ? `<div class="tl-note">${esc(e.note)}</div>` : ""}</div></div>`;
+      h += `<div class="tl-item cu-rev${last ? " last" : ""}${e.cat === "Milestone" ? " ms" : ""}" style="--d:${dl.toFixed(2)}s"><div class="tl-dot" style="background:${cat.c}"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${cat.ic}</svg></div><div class="tl-card">${del}<div class="tl-meta">${esc(e.display)} · <span class="cat" style="color:${cat.c}">${esc(CATLBL[e.cat] || e.cat)}</span></div><div class="tl-title">${esc(e.title)}</div>${e.note ? `<div class="tl-note">${esc(e.note)}</div>` : ""}</div></div>`;
     });
     $("tl").innerHTML = h;
     $("tl").querySelectorAll(".tl-del").forEach((b) => b.addEventListener("click", () => delEvent(b.dataset.id)));
   }
 
   async function delEvent(eid) {
-    if (!confirm("Delete this moment?")) return;
+    if (!confirm(T.confirmDelEvent)) return;
     const s = await getValidSession(); if (!s) return;
     const r = await fetch(UA_URL + "/rest/v1/timeline_events?id=eq." + eid, { method: "DELETE", headers: authHeaders(s.access_token) });
     if (r.ok) { allEvents = allEvents.filter((e) => String(e.id) !== String(eid)); renderStory(); }
@@ -497,8 +514,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
   async function saveEvent() {
     const date = $("tl-date").value, cat = $("tl-cat").value, title = $("tl-title").value.trim(), note = $("tl-note").value.trim();
-    if (!date || !title) { $("tl-err").textContent = "Pick a date and add a title."; return; }
-    $("tl-err").textContent = ""; const btn = $("tl-save"); btn.disabled = true; btn.textContent = "Saving…";
+    if (!date || !title) { $("tl-err").textContent = T.errPickDate; return; }
+    $("tl-err").textContent = ""; const btn = $("tl-save"); btn.disabled = true; btn.textContent = T.saving;
     const s = await getValidSession(); if (!s) { location.href = "/login"; return; }
     const body = { user_id: s.user.id, passport_id: activeP.id, event_date: date, category: cat, title, note };
     try {
@@ -508,16 +525,16 @@ import SectionTabs from "@/components/SectionTabs.astro";
         allEvents.push({ id: ev ? ev.id : Date.now(), cat, title, note, ts: dt.getTime(), display: fmtMY(dt), y: dt.getFullYear(), auto: false });
         $("tl-title").value = ""; $("tl-note").value = ""; $("tl-date").value = "";
         $("tl-form").classList.remove("show"); renderStory();
-      } else { $("tl-err").textContent = "Couldn't save. Is the timeline table set up?"; }
-    } catch (e) { $("tl-err").textContent = "Couldn't save. Check your connection."; }
-    btn.disabled = false; btn.textContent = "Save";
+      } else { $("tl-err").textContent = T.errTable; }
+    } catch (e) { $("tl-err").textContent = T.errConn; }
+    btn.disabled = false; btn.textContent = T.save;
   }
 
   (async () => {
     const passports = await UA.getPassports().catch(() => []);
     const p = UA.pickActivePassport(passports);
     if (!p) {
-      $("gr-gate").innerHTML = `<div class="gr-gate-card"><p>Create your child's passport to start the growth story.</p><a href="/passport">Start the passport →</a></div>`;
+      $("gr-gate").innerHTML = `<div class="gr-gate-card"><p>${esc(T.gateText)}</p><a href="/passport">${esc(T.gateCta)}</a></div>`;
       return;
     }
     activeP = p;
@@ -525,115 +542,108 @@ import SectionTabs from "@/components/SectionTabs.astro";
     const d = p.data || {};
     const id = UA.childIdentity(d);
     firstName = id.first || "";
-    const first = firstName || "your child";
+    const first = firstName || T.yourChild;
     const scored = scoreWheel(d);
     const passportLink = "/passport?id=" + p.id;
 
     $("rb-av").textContent = (firstName || id.name || "·")[0].toUpperCase();
     if (firstName) {
-      $("rb-title").textContent = firstName + "'s Growth";
-      $("gr-dev-title").firstChild.textContent = "Where " + firstName + " stands today ";
-      $("grj-sub").textContent = "Tiny victories add up — the story of " + firstName + " you'll want to reread.";
-      $("gr-story-title").firstChild.textContent = firstName + "'s story ";
+      $("rb-title").textContent = tpl(T.growthTitleNamed, { name: firstName, of: ofName(firstName) });
+      $("gr-dev-title").firstChild.textContent = tpl(T.devTodayNamed, { name: firstName, of: ofName(firstName) }) + " ";
+      $("grj-sub").textContent = tpl(T.grjSubNamed, { name: firstName, of: ofName(firstName) });
+      $("gr-story-title").firstChild.textContent = tpl(T.storyTitleNamed, { name: firstName, of: ofName(firstName) }) + " ";
     }
     $("gr-dev-edit").href = passportLink;
 
     /* rotating journal prompt */
-    const PROMPTS = [
-      "Something that went well today…",
-      "What made you smile today?",
-      "A tiny step counts — what was it?",
-      "What went better than expected?",
-      "What did " + first + " try for the first time?",
-      "A calm moment worth remembering?",
-    ];
+    const PROMPTS = T.prompts.map((s) => tpl(s, { name: first, of: ofName(first) }));
     $("win-input").placeholder = PROMPTS[Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 864e5) % PROMPTS.length];
 
     /* ============ 1 · development profile ============ */
     function commCard() {
       const c = d.communication || {}; const can = [], work = [];
-      if (c.style === "Fluent Verbal" || c.style === "Verbal") can.push("Communicates verbally");
-      const mm = { "Words": "Uses words", "Sentences": "Uses sentences", "Sounds": "Uses sounds", "Pictures (PECS)": "Uses picture cards", "Sign language": "Uses sign language", "Device / AAC app": "Uses an AAC device" };
+      if (c.style === "Fluent Verbal" || c.style === "Verbal") can.push(T.canVerbal);
+      const mm = T.means;
       (c.means || []).forEach((m) => { if (mm[m]) can.push(mm[m]); });
-      if (c.canExpressNeeds === "Consistently") can.push("Expresses needs reliably");
-      else if (c.canExpressNeeds === "Sometimes") can.push("Expresses needs sometimes");
-      if (c.style === "Non-Speaking" || c.style === "Limited Verbal") work.push("Building spoken communication");
-      const cm = { "Requesting": "Requesting things", "Conversation": "Back-and-forth conversation", "Question Answering": "Answering questions", "Emotional Expression": "Putting feelings into words", "Social Communication": "Social communication" };
+      if (c.canExpressNeeds === "Consistently") can.push(T.expressReliably);
+      else if (c.canExpressNeeds === "Sometimes") can.push(T.expressSometimes);
+      if (c.style === "Non-Speaking" || c.style === "Limited Verbal") work.push(T.workSpoken);
+      const cm = T.commCh;
       (c.challenges || []).forEach((x) => { if (cm[x]) work.push(cm[x]); });
-      if (c.canExpressNeeds === "Rarely") work.push("Expressing needs");
-      const groups = []; if (can.length) groups.push({ label: "Can do", tone: "good", items: uniq(can) }); if (work.length) groups.push({ label: "Working on", tone: "work", items: uniq(work) });
-      const sum = [c.style, c.canExpressNeeds ? ("expresses needs " + lc(c.canExpressNeeds)) : ""].filter(present).join(" · ");
+      if (c.canExpressNeeds === "Rarely") work.push(T.workExpressing);
+      const groups = []; if (can.length) groups.push({ label: T.labCanDo, tone: "good", items: uniq(can) }); if (work.length) groups.push({ label: T.labWorkingOn, tone: "work", items: uniq(work) });
+      const sum = [c.style, c.canExpressNeeds ? tpl(T.sumExpresses, { v: lc(c.canExpressNeeds) }) : ""].filter(present).join(" · ");
       return { icon: "msg", name: "Communication", sum, mode: "chips", groups, note: "", empty: !groups.length };
     }
     function socialCard() {
       const b = d.behaviour || {}; const can = [], work = [];
-      if (b.peersInterest === "Yes") can.push("Shows interest in other children");
-      if (b.peersInteract === "Yes") can.push("Plays with peers"); else if (b.peersInteract === "Sometimes") can.push("Plays alongside others");
-      if (b.followsInstructions === "Yes") can.push("Follows familiar instructions");
-      if (b.peersInterest === "No") work.push("Connecting with other children");
-      if (b.peersInteract === "No" || b.peersInteract === "Sometimes") work.push("Back-and-forth play");
-      if (b.followsInstructions === "No" || b.followsInstructions === "Sometimes") work.push("Following instructions");
-      const groups = []; if (can.length) groups.push({ label: "Can do", tone: "good", items: uniq(can) }); if (work.length) groups.push({ label: "Working on", tone: "work", items: uniq(work) });
-      const sum = [b.peersInterest === "Yes" ? "interested in peers" : "", b.peersInteract ? ("plays " + (b.peersInteract === "Yes" ? "with others" : b.peersInteract === "Sometimes" ? "alongside" : "independently")) : ""].filter(Boolean).join(" · ");
+      if (b.peersInterest === "Yes") can.push(T.canPeersInterest);
+      if (b.peersInteract === "Yes") can.push(T.canPlaysWith); else if (b.peersInteract === "Sometimes") can.push(T.canPlaysAlongside);
+      if (b.followsInstructions === "Yes") can.push(T.canFollows);
+      if (b.peersInterest === "No") work.push(T.workConnecting);
+      if (b.peersInteract === "No" || b.peersInteract === "Sometimes") work.push(T.workBackForth);
+      if (b.followsInstructions === "No" || b.followsInstructions === "Sometimes") work.push(T.workFollowing);
+      const groups = []; if (can.length) groups.push({ label: T.labCanDo, tone: "good", items: uniq(can) }); if (work.length) groups.push({ label: T.labWorkingOn, tone: "work", items: uniq(work) });
+      const sum = [b.peersInterest === "Yes" ? T.sumInterested : "", b.peersInteract ? (b.peersInteract === "Yes" ? T.playsWith : b.peersInteract === "Sometimes" ? T.playsAlongside : T.playsIndep) : ""].filter(Boolean).join(" · ");
       return { icon: "users", name: "Social interaction", sum: cap(sum), mode: "chips", groups, note: "", empty: !groups.length };
     }
     function sensoryCard() {
       const s = d.sensory || {};
-      const SENSES = [["auditory", "Sound"], ["visual", "Sight"], ["tactile", "Touch"], ["oral", "Taste & mouth"], ["smell", "Smell"], ["movement", "Movement"], ["body", "Body awareness"]];
+      const SENSES = [["auditory", T.senses.auditory], ["visual", T.senses.visual], ["tactile", T.senses.tactile], ["oral", T.senses.oral], ["smell", T.senses.smell], ["movement", T.senses.movement], ["body", T.senses.body]];
       const seekRe = /seek|fascinat|spinning|crav|crash|rough play|chew|mouth|constantly moving|makes noise/i;
       const avoidRe = /avoid|cover|bother|distress|dislike|fearful|overwhelm|misses|doesn't/i;
       const items = [], sensitive = [], seeking = [];
       SENSES.forEach(([k, label]) => {
         const o = s[k]; if (!o || typeof o !== "object") return;
-        if (o.typical) { items.push({ name: label, badge: "Comfortable", tone: "good" }); return; }
+        if (o.typical) { items.push({ name: label, badge: T.badgeComfortable, tone: "good" }); return; }
         if (o.signs && o.signs.length) {
           const seek = o.signs.some((x) => seekRe.test(x)) && !o.signs.some((x) => avoidRe.test(x));
           if (seek) seeking.push(label.toLowerCase()); else sensitive.push(label.toLowerCase());
-          items.push({ name: label, badge: seek ? "Seeking" : "Sensitive", tone: seek ? "info" : "work", sub: o.signs.slice(0, 2).join(", ") + (o.severity ? " (" + lc(o.severity) + ")" : "") });
+          items.push({ name: label, badge: seek ? T.badgeSeeking : T.badgeSensitive, tone: seek ? "info" : "work", sub: o.signs.slice(0, 2).join(", ") + (o.severity ? " (" + lc(o.severity) + ")" : "") });
         }
       });
-      const parts = []; if (sensitive.length) parts.push("sensitive to " + listShort(sensitive, 2)); if (seeking.length) parts.push("seeks " + listShort(seeking, 2));
-      const sum = cap(parts.join(" · ")) || (items.length ? "No concerns flagged" : "");
+      const parts = []; if (sensitive.length) parts.push(tpl(T.sumSensitive, { list: listShort(sensitive, 2) })); if (seeking.length) parts.push(tpl(T.sumSeeks, { list: listShort(seeking, 2) }));
+      const sum = cap(parts.join(" · ")) || (items.length ? T.noConcerns : "");
       return { icon: "waves", name: "Sensory profile", sum, mode: "grid", items, note: present(s.notes) ? s.notes : "", empty: !items.length };
     }
     function dailyCard() {
       const dl = d.dailyLiving || {};
       const toneFor = (v) => (["Independent", "Fully trained", "Good", "Strong", "None"].indexOf(v) > -1) ? "good" : (["Variable", "Developing", "Mild", "Not applicable"].indexOf(v) > -1) ? "neutral" : "work";
-      const defs = [["eating", "Eating"], ["dressing", "Dressing"], ["toileting", "Toileting"], ["sleep", "Sleep"], ["safety", "Safety"]];
+      const defs = [["eating", T.daily.eating], ["dressing", T.daily.dressing], ["toileting", T.daily.toileting], ["sleep", T.daily.sleep], ["safety", T.daily.safety]];
       const items = []; defs.forEach(([k, label]) => { const v = dl[k]; if (present(v)) items.push({ name: label, badge: v, tone: toneFor(v) }); });
       const indep = items.filter((i) => i.tone === "good"), sup = items.filter((i) => i.tone === "work");
-      const sum = [indep.length ? (cap(indep[0].name) + " independent") : "", sup.length ? (sup[0].name.toLowerCase() + " with support") : ""].filter(Boolean).join(" · ");
-      return { icon: "home", name: "Daily living", sum, mode: "grid", items, note: present(dl.dietaryRestrictions) ? ("Dietary needs: " + dl.dietaryRestrictions) : "", empty: !items.length };
+      const sum = [indep.length ? tpl(T.sumIndep, { x: cap(indep[0].name) }) : "", sup.length ? tpl(T.sumWithSupport, { x: sup[0].name.toLowerCase() }) : ""].filter(Boolean).join(" · ");
+      return { icon: "home", name: "Daily living", sum, mode: "grid", items, note: present(dl.dietaryRestrictions) ? tpl(T.dietaryNeeds, { v: dl.dietaryRestrictions }) : "", empty: !items.length };
     }
     function motorCard() {
       const m = d.motor || {};
       const clean2 = (x) => cap(String(x).replace(/^Difficulty (with |using )?/i, "").trim());
       const work = []; (m.gross || []).forEach((x) => work.push(clean2(x))); (m.fine || []).forEach((x) => work.push(clean2(x)));
       const hasData = (m.gross && m.gross.length) || (m.fine && m.fine.length) || present(m.notes);
-      const can = []; if (hasData) { if (!(m.gross && m.gross.length)) can.push("Gross motor on track"); if (!(m.fine && m.fine.length)) can.push("Fine motor on track"); }
-      const groups = []; if (can.length) groups.push({ label: "On track", tone: "good", items: can }); if (work.length) groups.push({ label: "Working on", tone: "work", items: uniq(work) });
-      const sum = hasData ? [(m.gross && m.gross.length) ? "gross motor support" : "strong gross motor", (m.fine && m.fine.length) ? "fine motor support" : "strong fine motor"].join(" · ") : "";
+      const can = []; if (hasData) { if (!(m.gross && m.gross.length)) can.push(T.grossOnTrack); if (!(m.fine && m.fine.length)) can.push(T.fineOnTrack); }
+      const groups = []; if (can.length) groups.push({ label: T.labOnTrack, tone: "good", items: can }); if (work.length) groups.push({ label: T.labWorkingOn, tone: "work", items: uniq(work) });
+      const sum = hasData ? [(m.gross && m.gross.length) ? T.sumGrossSupport : T.sumGrossStrong, (m.fine && m.fine.length) ? T.sumFineSupport : T.sumFineStrong].join(" · ") : "";
       return { icon: "run", name: "Motor skills", sum: cap(sum), mode: "chips", groups, note: present(m.notes) ? m.notes : "", empty: !hasData };
     }
     function emotionalCard() {
       const b = d.behaviour || {}, ch = b.challenges || {};
       const settled = !isHigh(ch.meltdowns) && !isHigh(ch.emotional) && !isHigh(ch.anxiety);
       const helps = textToList(b.strategies), trig = textToList(b.triggers);
-      const wmap = { meltdowns: "Big reactions / meltdowns", emotional: "Regulating emotions", anxiety: "Anxiety", rigidity: "Coping with change", aggression: "Aggression", selfInjury: "Self-injury", repetitive: "Repetitive behaviours", defiance: "Following directions", hyperactivity: "Focus and impulsivity", elopement: "Safety / flight risk" };
+      const wmap = T.emo;
       const work = Object.keys(wmap).filter((k) => isHigh(ch[k])).map((k) => wmap[k]);
       const hasData = helps.length || trig.length || work.length || Object.keys(ch).some((k) => present(ch[k]));
       const groups = [];
-      if (helps.length) groups.push({ label: "What helps", tone: "good", items: helps });
-      else if (settled && hasData) groups.push({ label: "Strengths", tone: "good", items: ["Generally calm and settled"] });
-      if (trig.length) groups.push({ label: "Triggers", tone: "work", items: trig });
-      if (work.length) groups.push({ label: "Working on", tone: "work", items: work });
-      const sum = !hasData ? "" : (settled ? "Generally settled" : "Working on big reactions");
+      if (helps.length) groups.push({ label: T.labWhatHelps, tone: "good", items: helps });
+      else if (settled && hasData) groups.push({ label: T.labStrengths, tone: "good", items: [T.calmSettled] });
+      if (trig.length) groups.push({ label: T.labTriggers, tone: "work", items: trig });
+      if (work.length) groups.push({ label: T.labWorkingOn, tone: "work", items: work });
+      const sum = !hasData ? "" : (settled ? T.sumSettled : T.sumBigReactions);
       return { icon: "heart", name: "Emotional regulation", sum, mode: "chips", groups, note: "", empty: !hasData || !groups.length };
     }
     function interestsCard() {
       const s = d.strengths || {};
       const loves = textToList(s.interests), avoid = textToList(s.dislikes);
-      const groups = []; if (loves.length) groups.push({ label: "Loves", tone: "good", items: loves.map(cap) }); if (avoid.length) groups.push({ label: "Things to avoid", tone: "warn", items: avoid.map(cap) });
+      const groups = []; if (loves.length) groups.push({ label: T.labLoves, tone: "good", items: loves.map(cap) }); if (avoid.length) groups.push({ label: T.labAvoid, tone: "warn", items: avoid.map(cap) });
       const sum = loves.length ? loves.slice(0, 4).map(cap).join(", ") : "";
       return { icon: "star", name: "Interests & motivators", sum, mode: "chips", groups, note: "", empty: !groups.length };
     }
@@ -641,8 +651,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
     const cards = [commCard(), socialCard(), sensoryCard(), dailyCard(), motorCard(), emotionalCard(), interestsCard()];
     const WHEEL_OF = { "Communication": "Communication", "Social interaction": "Social Connection", "Sensory profile": "Sensory Processing", "Daily living": "Daily Living Skills", "Motor skills": "Daily Living Skills", "Emotional regulation": "Emotional Regulation", "Interests & motivators": "Learning & Play" };
     const chipHtml = (items, tone) => { const t = TONE[tone]; return items.map((x) => `<span class="da-chip" style="background:${t.bg};color:${t.fg}">${TIC[tone]}${esc(x)}</span>`).join(""); };
-    const emptyBody = () => `<p class="da-empty">Not recorded yet. <a href="${passportLink}">Add in passport →</a></p>`;
-    const bodyChips = (c) => { if (c.empty) return emptyBody(); let h = ""; c.groups.forEach((g) => { h += `<p class="da-lab">${g.label}</p><div>${chipHtml(g.items, g.tone)}</div>`; }); if (c.note) h += `<p class="da-note">${esc(c.note)}</p>`; return h; };
+    const emptyBody = () => `<p class="da-empty">${esc(T.notRecorded)}. <a href="${passportLink}">${esc(T.addInPassport)}</a></p>`;
+    const bodyChips = (c) => { if (c.empty) return emptyBody(); let h = ""; c.groups.forEach((g) => { h += `<p class="da-lab">${esc(g.label)}</p><div>${chipHtml(g.items, g.tone)}</div>`; }); if (c.note) h += `<p class="da-note">${esc(c.note)}</p>`; return h; };
     const bodyGrid = (c) => { if (c.empty) return emptyBody(); let h = '<div class="da-tiles">'; c.items.forEach((it) => { const t = TONE[it.tone]; h += `<div class="da-tile"><div class="da-tile-top"><span class="da-tile-name">${esc(it.name)}</span><span class="da-badge" style="background:${t.bg};color:${t.fg}">${esc(it.badge)}</span></div>${it.sub ? `<p class="da-sub">${esc(it.sub)}</p>` : ""}</div>`; }); h += "</div>"; if (c.note) h += `<p class="da-note">${esc(c.note)}</p>`; return h; };
     const bandBar = (wheelDomain) => {
       if (!wheelDomain) return "";
@@ -657,17 +667,17 @@ import SectionTabs from "@/components/SectionTabs.astro";
     $("gr-dev").innerHTML = cards.map((c, ci) => {
       const body = c.mode === "grid" ? bodyGrid(c) : bodyChips(c);
       const isOpen = !c.empty && !opened; if (isOpen) opened = true;
-      const sum = c.empty ? "Not recorded yet" : (c.sum || "");
+      const sum = c.empty ? T.notRecorded : (c.sum || "");
       const wheelDomain = WHEEL_OF[c.name];
       const dc = wheelDomain ? domainColor(wheelDomain) : "#6D28D9";
       const blobTint = wheelDomain ? tintOf(wheelDomain, 0.12) : "rgba(109,40,217,.12)";
       return `<div class="da-card cu-rev ${isOpen ? "open" : ""} ${c.empty ? "muted" : ""}" style="--d:${(ci * 0.05).toFixed(2)}s">
         <div class="da-head" role="button" tabindex="0" aria-expanded="${isOpen ? "true" : "false"}">
           <span class="da-blob" style="--blob:${c.empty ? "var(--bg)" : blobTint};color:${c.empty ? "var(--faint)" : dc}">${IC[c.icon]}</span>
-          <span style="flex:1;min-width:0"><span class="da-name" style="display:block">${esc(c.name)}</span><span class="da-sum" style="display:block">${esc(sum)}</span>${c.empty ? "" : bandBar(wheelDomain)}</span>
+          <span style="flex:1;min-width:0"><span class="da-name" style="display:block">${esc(T.cardNames[c.name] || c.name)}</span><span class="da-sum" style="display:block">${esc(sum)}</span>${c.empty ? "" : bandBar(wheelDomain)}</span>
           ${IC.chev}
         </div>
-        <div class="da-body-wrap"><div class="da-body">${body}${!c.empty && wheelDomain ? `<a class="da-wheel" href="/child/support-wheel?domain=${encodeURIComponent(wheelDomain)}">See in Support Wheel <span class="arr">→</span></a>` : ""}</div></div>
+        <div class="da-body-wrap"><div class="da-body">${body}${!c.empty && wheelDomain ? `<a class="da-wheel" href="/child/support-wheel?domain=${encodeURIComponent(wheelDomain)}">${esc(T.seeInWheel)} <span class="arr">→</span></a>` : ""}</div></div>
       </div>`;
     }).join("");
     $("gr-dev").querySelectorAll(".da-head").forEach((h) => {
@@ -683,22 +693,22 @@ import SectionTabs from "@/components/SectionTabs.astro";
     /* ============ 2+3 · check-ins: trends + diff ============ */
     const snap = await ensureSnapshot(p, snapshotWheel(scored)).catch(() => ({ rows: [], created: false }));
     const rows = snap.rows || [];
-    if (snap.created && rows.length >= 2) notify("info", "Check-in recorded — then-vs-now just updated");
+    if (snap.created && rows.length >= 2) notify("info", T.checkinToast);
     const planKey = await getPlan();
     const allowHistory = PLANS[planKey].history;
     if (!allowHistory && rows.length >= 2) {
       /* history is RECORDING for everyone — reading it back is a plan perk */
       $("gr-since").textContent = "";
       $("gr-trends").innerHTML = `<div style="padding:14px 16px">` + upsellHTML(
-        first + "'s history is safely recording ✦",
-        rows.length + " check-ins saved. Then-vs-now comparisons and the what-changed feed are part of the monthly plans — nothing is lost, it unlocks the moment you upgrade.",
-        "Unlock the history"
+        tpl(esc(T.histTitle), { name: esc(first), of: ofName(first) }),
+        tpl(esc(T.histMsg), { n: rows.length }),
+        esc(T.histCta)
       ) + `</div>`;
       $("gr-changes-sec").style.display = "none";
     } else {
 
     function bandPill(sc) {
-      if (sc == null) return `<span class="gr-band" style="background:#F4F3F8;color:#7B7491">No data</span>`;
+      if (sc == null) return `<span class="gr-band" style="background:#F4F3F8;color:#7B7491">${esc(T.noData)}</span>`;
       const b = scoreToBand(sc);
       let bg = "#E8F6F0", fg = "#0E8F66";
       if (b.key === "moderate") { bg = "#FBF2E2"; fg = "#A8650A"; }
@@ -708,7 +718,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     if (rows.length >= 2) {
       const base = rows[0];
       const baseWheel = base.wheel || {};
-      $("gr-since").textContent = "since " + fmtD(base.taken_at);
+      $("gr-since").textContent = tpl(T.sinceDate, { date: fmtD(base.taken_at) });
       const trendRows = DOMAINS.map((n) => {
         const bw = baseWheel.domains && baseWheel.domains[n] ? baseWheel.domains[n] : baseWheel[n];
         const oldSc = bw ? bw.score : null;
@@ -720,26 +730,26 @@ import SectionTabs from "@/components/SectionTabs.astro";
           ${bandPill(oldSc)}
           <svg class="gr-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9.5 4.5L13 8l-3.5 3.5"/></svg>
           ${bandPill(nowSc)}
-          ${improved ? `<span class="gr-imp">✦ less support needed</span>` : worse ? `<span class="gr-imp" style="color:var(--amber)">needs more right now</span>` : ""}
+          ${improved ? `<span class="gr-imp">${esc(T.lessSupport)}</span>` : worse ? `<span class="gr-imp" style="color:var(--amber)">${esc(T.moreSupport)}</span>` : ""}
         </a>`;
       }).join("");
-      $("gr-trends").innerHTML = trendRows + `<p class="gr-tcap">Bands come from the same wheel engine as everywhere else — tap a row to explore. "Needs more right now" isn't a setback; it's the profile getting more honest.</p>`;
+      $("gr-trends").innerHTML = trendRows + `<p class="gr-tcap">${esc(T.trendCap)}</p>`;
     } else {
       $("gr-since").textContent = "";
       $("gr-trends").innerHTML = `<div class="gr-seed">
         <span class="cu-blob" style="--blob:#EDE9FE;color:#6D28D9;width:40px;height:40px"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg></span>
-        <p><b>Today became ${esc(first)}'s baseline. ✦</b> The profile now remembers where you started — after the next passport update, this turns into a then-vs-now picture of every area. ${rows.length === 0 ? "(If nothing appears after updating, run <b>snapshots_setup.sql</b> in Supabase once.)" : ""}</p>
+        <p><b>${tpl(esc(T.seedLead), { name: esc(first), of: ofName(first) })}</b> ${esc(T.seedBody)} ${rows.length === 0 ? T.seedSetup : ""}</p>
       </div>`;
     }
     if (rows.length >= 2) {
       const prev = rows[rows.length - 2], cur = rows[rows.length - 1];
       const diff = diffData(prev.data, cur.data);
-      $("gr-changed-when").textContent = "since your check-in on " + fmtD(prev.taken_at);
+      $("gr-changed-when").textContent = tpl(T.sinceCheckin, { date: fmtD(prev.taken_at) });
       const chip = (e, cls) => `<span class="gr-chip ${cls}">${esc(e.label)}${e.from || e.to ? `<span class="fromto">${e.from ? esc(e.from) + " → " : ""}${esc(e.to)}</span>` : ""}</span>`;
       let h = "";
-      if (diff.improved.length) h += `<div class="gr-chgroup"><p class="gr-chlab imp">✦ Improvements to celebrate</p>${diff.improved.map((e) => chip(e, "imp")).join("")}</div>`;
-      if (diff.flags.length) h += `<div class="gr-chgroup"><p class="gr-chlab flag">Newly flagged — worth a look</p>${diff.flags.map((e) => chip(e, "flag")).join("")}</div>`;
-      if (diff.other.length) h += `<div class="gr-chgroup"><p class="gr-chlab oth">Updated</p>${diff.other.map((e) => chip(e, "oth")).join("")}</div>`;
+      if (diff.improved.length) h += `<div class="gr-chgroup"><p class="gr-chlab imp">${esc(T.chImproved)}</p>${diff.improved.map((e) => chip(e, "imp")).join("")}</div>`;
+      if (diff.flags.length) h += `<div class="gr-chgroup"><p class="gr-chlab flag">${esc(T.chFlagged)}</p>${diff.flags.map((e) => chip(e, "flag")).join("")}</div>`;
+      if (diff.other.length) h += `<div class="gr-chgroup"><p class="gr-chlab oth">${esc(T.chUpdated)}</p>${diff.other.map((e) => chip(e, "oth")).join("")}</div>`;
       if (h) {
         $("gr-changes").innerHTML = h;
         $("gr-changes-sec").style.display = "block";
@@ -762,13 +772,13 @@ import SectionTabs from "@/components/SectionTabs.astro";
     const msRecorded = Object.keys(MLAB2).filter((k) => present(msData[k]) && !naLike(msData[k])).length;
     const msMissing = Object.keys(MLAB2).length - msRecorded;
     if (msMissing > 0) {
-      $("gr-mscta").innerHTML = `<a class="gr-mscta" href="${passportLink}"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>${msMissing} early milestone${msMissing === 1 ? "" : "s"} still to record — add ages in the passport and they appear in the story</a>`;
+      $("gr-mscta").innerHTML = `<a class="gr-mscta" href="${passportLink}"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>${tpl(esc(msMissing === 1 ? T.msCta1 : T.msCtaN), { n: msMissing })}</a>`;
     }
     allEvents = autoEvents(d);
     const docRows = await restGet("documents?select=id,file_name,created_at&passport_id=eq." + p.id + "&order=created_at.desc&limit=25").catch(() => []);
-    (docRows || []).forEach((doc) => { const dt = new Date(doc.created_at); if (!isNaN(dt)) allEvents.push({ cat: "Assessment", title: (doc.file_name || "Document") + " added", note: "Uploaded to documents", ts: dt.getTime(), display: fmtMY(dt), y: dt.getFullYear(), auto: true }); });
+    (docRows || []).forEach((doc) => { const dt = new Date(doc.created_at); if (!isNaN(dt)) allEvents.push({ cat: "Assessment", title: tpl(T.docAdded, { name: doc.file_name || T.docFallback }), note: T.docNote, ts: dt.getTime(), display: fmtMY(dt), y: dt.getFullYear(), auto: true }); });
     const ev = await restGet("timeline_events?select=id,event_date,category,title,note&passport_id=eq." + p.id + "&order=event_date.desc").catch(() => []);
-    (ev || []).forEach((e) => { const dt = new Date(e.event_date); allEvents.push({ id: e.id, cat: e.category || "Note", title: e.title, note: e.note || "", ts: isNaN(dt) ? 0 : dt.getTime(), display: isNaN(dt) ? e.event_date : fmtMY(dt), y: isNaN(dt) ? "Earlier" : dt.getFullYear(), auto: false }); });
+    (ev || []).forEach((e) => { const dt = new Date(e.event_date); allEvents.push({ id: e.id, cat: e.category || "Note", title: e.title, note: e.note || "", ts: isNaN(dt) ? 0 : dt.getTime(), display: isNaN(dt) ? e.event_date : fmtMY(dt), y: isNaN(dt) ? T.earlier : dt.getFullYear(), auto: false }); });
     renderStory();
     $("tl-addbtn").addEventListener("click", () => { const f = $("tl-form"); f.classList.toggle("show"); if (f.classList.contains("show")) $("tl-title").focus(); });
     $("tl-cancel").addEventListener("click", () => { $("tl-form").classList.remove("show"); $("tl-err").textContent = ""; });
@@ -776,9 +786,9 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
     /* ============ ribbon ============ */
     $("rb-stats").innerHTML = [
-      `<span class="c3-rstat"><b>${wins.length}</b><span>wins in the journal</span></span>`,
-      `<span class="c3-rstat"><b>${rows.length}</b><span>check-in${rows.length === 1 ? "" : "s"} saved</span></span>`,
-      `<span class="c3-rstat"><b>${allEvents.length}</b><span>story moments</span></span>`,
+      `<span class="c3-rstat"><b>${wins.length}</b><span>${esc(T.rbWins)}</span></span>`,
+      `<span class="c3-rstat"><b>${rows.length}</b><span>${esc(rows.length === 1 ? T.rbCheckins1 : T.rbCheckinsN)}</span></span>`,
+      `<span class="c3-rstat"><b>${allEvents.length}</b><span>${esc(T.rbMoments)}</span></span>`,
     ].join("");
   })().catch((e) => console.error("[growth] hydrate failed", e));
 </script>

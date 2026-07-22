@@ -5,37 +5,39 @@
    Preview: saved on-device (ua_pro_team); TODO-LIVE: provider_accounts
    (role owner|staff) + provider_staff rows. */
 import ProviderLayout from "@/layouts/ProviderLayout.astro";
+import DICT from "@/i18n/pro-portal.js";
 ---
-<ProviderLayout title="Team — UniqueApex Pro" active="team">
+<ProviderLayout title="Team — UniqueApex Pro" titleFr="Équipe" active="team">
   <div class="pgrid" style="max-width:760px">
 
     <div class="pc">
-      <div class="pc-h"><b>Your team</b><span>everyone here appears on your public clinic profile</span></div>
+      <div class="pc-h"><b data-i18n="team_title">Your team</b><span data-i18n="team_sub">everyone here appears on your public clinic profile</span></div>
       <div id="tm-list"></div>
-      <p class="pnote">Owners manage the clinic profile, schedule and billing. Staff members see their own calendar, their clients' documents and questions — nothing else. Staff logins arrive with onboarding.</p>
+      <p class="pnote" data-i18n="team_note">Owners manage the clinic profile, schedule and billing. Staff members see their own calendar, their clients' documents and questions — nothing else. Staff logins arrive with onboarding.</p>
     </div>
 
     <div class="pc">
-      <div class="pc-h"><b>Add a team member</b></div>
+      <div class="pc-h"><b data-i18n="team_addTitle">Add a team member</b></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <label class="pfield" style="margin:0"><span>Full name</span><input class="pin" id="tm-name" type="text" placeholder="e.g. Camille Roy" /></label>
-        <label class="pfield" style="margin:0"><span>Title</span><input class="pin" id="tm-title" type="text" placeholder="e.g. Orthophoniste, M.P.O." /></label>
-        <label class="pfield" style="margin:0"><span>Languages</span><input class="pin" id="tm-langs" type="text" placeholder="FR, EN" /></label>
-        <label class="pfield" style="margin:0"><span>Role</span>
-          <select class="pin" id="tm-role"><option value="staff">Staff</option><option value="owner">Owner</option></select>
+        <label class="pfield" style="margin:0"><span data-i18n="team_nameLabel">Full name</span><input class="pin" id="tm-name" type="text" placeholder="e.g. Camille Roy" data-i18n-ph="team_namePh" /></label>
+        <label class="pfield" style="margin:0"><span data-i18n="team_titleLabel">Title</span><input class="pin" id="tm-title" type="text" placeholder="e.g. Orthophoniste, M.P.O." data-i18n-ph="team_titlePh" /></label>
+        <label class="pfield" style="margin:0"><span data-i18n="team_langsLabel">Languages</span><input class="pin" id="tm-langs" type="text" placeholder="FR, EN" data-i18n-ph="team_langsPh" /></label>
+        <label class="pfield" style="margin:0"><span data-i18n="team_roleLabel">Role</span>
+          <select class="pin" id="tm-role"><option value="staff" data-i18n="team_roleStaff">Staff</option><option value="owner" data-i18n="team_roleOwner">Owner</option></select>
         </label>
       </div>
       <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
-        <button class="pbtn" id="tm-add" type="button">+ Add to team</button>
-        <span style="font-size:.72rem;color:var(--p-faint)">Invitation emails go out when onboarding opens.</span>
+        <button class="pbtn" id="tm-add" type="button" data-i18n="team_addBtn">+ Add to team</button>
+        <span style="font-size:.72rem;color:var(--p-faint)" data-i18n="team_inviteNote">Invitation emails go out when onboarding opens.</span>
       </div>
     </div>
 
   </div>
 </ProviderLayout>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
   (function () {
+    var T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
     var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
     var COLORS = ["#0E8C82", "#6D28D9", "#A8650A", "#B14A66", "#2F9E63", "#2563EB"];
 
@@ -53,8 +55,8 @@ import ProviderLayout from "@/layouts/ProviderLayout.astro";
         return "<div class='prow'>" +
           "<span class='av' style='background:" + COLORS[i % COLORS.length] + "'>" + esc(m.name[0]) + "</span>" +
           "<span class='tx'><b>" + esc(m.name) + "</b><span>" + esc(m.title || "") + (m.langs ? " · 🗣 " + esc(m.langs) : "") + "</span></span>" +
-          "<span class='ppill " + (m.role === "owner" ? "teal" : "grey") + "'>" + m.role + "</span>" +
-          (m.role === "owner" ? "" : "<button class='pbtn sm ghost' data-rm='" + i + "' type='button'>Remove</button>") +
+          "<span class='ppill " + (m.role === "owner" ? "teal" : "grey") + "'>" + esc(m.role === "owner" ? T.team_roleOwner : T.team_roleStaff) + "</span>" +
+          (m.role === "owner" ? "" : "<button class='pbtn sm ghost' data-rm='" + i + "' type='button'>" + esc(T.team_removeBtn) + "</button>") +
           "</div>";
       }).join("");
       host.querySelectorAll("[data-rm]").forEach(function (b) {

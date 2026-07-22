@@ -3,60 +3,64 @@
    booking requests to accept/decline, what needs an answer.
    Preview data; TODO-LIVE: load from bookings/questions/documents. */
 import ProviderLayout from "@/layouts/ProviderLayout.astro";
+import DICT from "@/i18n/pro-portal.js";
 ---
-<ProviderLayout title="Dashboard — UniqueApex Pro" active="dashboard">
+<ProviderLayout title="Dashboard — UniqueApex Pro" titleFr="Tableau de bord" active="dashboard">
   <div class="pgrid">
 
     <div class="pkpis">
-      <div class="pkpi teal"><b id="k-today">·</b><span>sessions today</span></div>
-      <div class="pkpi"><b id="k-week">·</b><span>sessions this week</span></div>
-      <div class="pkpi amber"><b id="k-req">·</b><span>booking requests</span></div>
-      <div class="pkpi rose"><b id="k-q">·</b><span>questions waiting</span></div>
-      <div class="pkpi"><b id="k-docs">·</b><span>new documents</span></div>
+      <div class="pkpi teal"><b id="k-today">·</b><span data-i18n="dash_kToday">sessions today</span></div>
+      <div class="pkpi"><b id="k-week">·</b><span data-i18n="dash_kWeek">sessions this week</span></div>
+      <div class="pkpi amber"><b id="k-req">·</b><span data-i18n="dash_kReq">booking requests</span></div>
+      <div class="pkpi rose"><b id="k-q">·</b><span data-i18n="dash_kQ">questions waiting</span></div>
+      <div class="pkpi"><b id="k-docs">·</b><span data-i18n="dash_kDocs">new documents</span></div>
     </div>
 
     <div class="pc">
-      <div class="pc-h"><b>Today</b><span id="today-date"></span></div>
+      <div class="pc-h"><b data-i18n="dash_today">Today</b><span id="today-date"></span></div>
       <div id="today-list"></div>
-      <p class="pnote">Sessions come from your Schedule — families will book the open slots directly once booking launches in the family portal.</p>
+      <p class="pnote" data-i18n="dash_todayNote">Sessions come from your Schedule — families will book the open slots directly once booking launches in the family portal.</p>
     </div>
 
     <div class="pc">
-      <div class="pc-h"><b>Booking requests</b><span>accept or decline — the family is notified either way</span></div>
+      <div class="pc-h"><b data-i18n="dash_reqs">Booking requests</b><span data-i18n="dash_reqsSub">accept or decline — the family is notified either way</span></div>
       <div id="req-list"></div>
     </div>
 
     <div class="pc">
-      <div class="pc-h"><b>Needs your attention</b></div>
+      <div class="pc-h"><b data-i18n="dash_attn">Needs your attention</b></div>
       <div id="attn-list"></div>
     </div>
 
   </div>
 </ProviderLayout>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
   (function () {
     var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    var T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+    var tpl = function (s, v) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return v && v[k] != null ? v[k] : ""; }); };
+    var ofName = function (n) { return window.uaLang === "fr" ? (/^[aeiouyàâäéèêëìîïòôöùûüh]/i.test(String(n || "")) ? "d'" : "de ") : ""; };
     var COLORS = ["#0E8C82", "#6D28D9", "#A8650A", "#B14A66", "#2F9E63", "#2563EB"];
     var col = function (i) { return COLORS[i % COLORS.length]; };
 
     var today = [
-      { t: "9:00", child: "Liam", age: 4, kind: "Speech session · 45 min", status: "confirmed" },
-      { t: "10:30", child: "Noor", age: 6, kind: "Speech session · 45 min", status: "confirmed" },
-      { t: "13:00", child: "Éloi", age: 5, kind: "Parent check-in · 30 min", status: "confirmed" },
-      { t: "15:00", child: "Maya", age: 7, kind: "Assessment · 60 min", status: "confirmed" },
+      { t: "9:00", child: "Liam", age: 4, kind: T.dash_sessSpeech, status: "confirmed" },
+      { t: "10:30", child: "Noor", age: 6, kind: T.dash_sessSpeech, status: "confirmed" },
+      { t: "13:00", child: "Éloi", age: 5, kind: T.dash_sessCheckin, status: "confirmed" },
+      { t: "15:00", child: "Maya", age: 7, kind: T.dash_sessAssess, status: "confirmed" },
     ];
     var reqs = [
-      { child: "Zoé", age: 3, want: "Tue 10:00 or Thu 9:00 · initial consultation", note: "Referred through UniqueApex matching" },
-      { child: "Adam", age: 8, want: "Any weekday after 15:30", note: "Sibling of an existing client" },
+      { child: "Zoé", age: 3, want: T.dash_reqZoe, note: T.dash_reqZoeNote },
+      { child: "Adam", age: 8, want: T.dash_reqAdam, note: T.dash_reqAdamNote },
     ];
     var attn = [
-      { icon: "❓", txt: "2 family questions are waiting for an answer", href: "/pro/questions", pill: "reply", cls: "rose" },
-      { icon: "📄", txt: "Liam's parents sent a new evaluation report", href: "/pro/documents", pill: "review", cls: "amber" },
-      { icon: "👤", txt: "Your public profile is 80% complete — add fees to finish", href: "/pro/profile", pill: "finish", cls: "teal" },
+      { icon: "❓", txt: T.dash_attnQ, href: "/pro/questions", pill: T.dash_attnQPill, cls: "rose" },
+      { icon: "📄", txt: T.dash_attnDoc, href: "/pro/documents", pill: T.dash_attnDocPill, cls: "amber" },
+      { icon: "👤", txt: T.dash_attnProfile, href: "/pro/profile", pill: T.dash_attnProfilePill, cls: "teal" },
     ];
 
-    document.getElementById("today-date").textContent = new Date().toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" });
+    document.getElementById("today-date").textContent = new Date().toLocaleDateString(window.uaLocale || "en-CA", { weekday: "long", month: "long", day: "numeric" });
     document.getElementById("k-today").textContent = today.length;
     document.getElementById("k-week").textContent = 17;
     document.getElementById("k-req").textContent = reqs.length;
@@ -67,7 +71,7 @@ import ProviderLayout from "@/layouts/ProviderLayout.astro";
       return "<div class='prow'>" +
         "<span class='av' style='background:" + col(i) + "'>" + esc(s.child[0]) + "</span>" +
         "<span class='tx'><b>" + s.t + " · " + esc(s.child) + ", " + s.age + "</b><span>" + esc(s.kind) + "</span></span>" +
-        "<span class='ppill green'>confirmed</span></div>";
+        "<span class='ppill green'>" + esc(T.dash_confirmed) + "</span></div>";
     }).join("");
 
     function renderReqs() {
@@ -76,15 +80,15 @@ import ProviderLayout from "@/layouts/ProviderLayout.astro";
         return "<div class='prow' data-i='" + i + "'>" +
           "<span class='av' style='background:" + col(i + 4) + "'>" + esc(r.child[0]) + "</span>" +
           "<span class='tx'><b>" + esc(r.child) + ", " + r.age + " — " + esc(r.want) + "</b><span>" + esc(r.note) + "</span></span>" +
-          "<button class='pbtn sm' data-act='ok'>Accept</button>" +
-          "<button class='pbtn sm ghost' data-act='no'>Decline</button></div>";
-      }).join("") : "<p class='pempty'>No pending requests — new ones appear here the moment a family asks.</p>";
+          "<button class='pbtn sm' data-act='ok'>" + esc(T.dash_accept) + "</button>" +
+          "<button class='pbtn sm ghost' data-act='no'>" + esc(T.dash_decline) + "</button></div>";
+      }).join("") : "<p class='pempty'>" + esc(T.dash_reqEmpty) + "</p>";
       host.querySelectorAll("button").forEach(function (b) {
         b.addEventListener("click", function () {
           var row = b.closest(".prow");
           var i = +row.getAttribute("data-i");
           var ok = b.getAttribute("data-act") === "ok";
-          row.innerHTML = "<span class='tx'><b>" + esc(reqs[i].child) + "'s request " + (ok ? "accepted ✓ — added to your schedule (preview)" : "declined — the family was notified (preview)") + "</b></span>";
+          row.innerHTML = "<span class='tx'><b>" + esc(tpl(ok ? T.dash_accepted : T.dash_declined, { name: reqs[i].child, of: ofName(reqs[i].child) })) + "</b></span>";
           document.getElementById("k-req").textContent = Math.max(0, +document.getElementById("k-req").textContent - 1);
         });
       });

@@ -1,12 +1,16 @@
 ---
-/* PRO-LOGIN-V1 — the provider portal's front door. Future-proof:
+/* PRO-LOGIN-V2 — the provider portal's front door. Future-proof:
    it really signs in against Supabase, then checks provider_accounts
    for a clinic link. Today no links exist (onboarding hasn't opened),
    so a valid login sees a friendly "not linked yet" note; when
    provider_portal_setup.sql runs and links are created, this page
-   starts letting clinics straight in (ua_pro_session → /pro). */
+   starts letting clinics straight in (ua_pro_session → /pro).
+   Bilingual: EN|FR pill (top right), strings in src/i18n/pro-login.js;
+   language resolves ?lang → saved ua_lang → referrer /fr/ → en and the
+   choice persists to ua_lang (shared with the family app). */
 import "@fontsource-variable/inter/index.css";
 import "../../styles/global.css";
+import DICT from "../../i18n/pro-login.js";
 ---
 <!doctype html>
 <html lang="en">
@@ -18,27 +22,33 @@ import "../../styles/global.css";
     <title>Provider sign in — UniqueApex Pro</title>
   </head>
   <body class="pl-body">
+    <div class="pl-lang">
+      <button type="button" id="lang-en" class="on">EN</button>
+      <span>|</span>
+      <button type="button" id="lang-fr">FR</button>
+    </div>
+
     <div class="pl-wrap">
       <a class="pl-brand" href="/">
         <img src="/Logo.png" alt="UniqueApex" />
-        <span><b>UniqueApex</b><i>PRO</i></span>
+        <span><b>UniqueApex</b><i data-i18n="brandSub">PRO</i></span>
       </a>
 
       <div class="pl-card">
-        <h1>Provider sign in</h1>
-        <p class="pl-sub">For clinics and professionals on UniqueApex.</p>
+        <h1 data-i18n="heading">Provider sign in</h1>
+        <p class="pl-sub" data-i18n="sub">For clinics and professionals on UniqueApex.</p>
 
-        <label class="pl-field"><span>Email</span><input id="pl-email" type="email" autocomplete="email" placeholder="you@yourclinic.com" /></label>
-        <label class="pl-field"><span>Password</span><input id="pl-pass" type="password" autocomplete="current-password" placeholder="Your password" /></label>
+        <label class="pl-field"><span data-i18n="email">Email</span><input id="pl-email" type="email" autocomplete="email" placeholder="you@yourclinic.com" /></label>
+        <label class="pl-field"><span data-i18n="password">Password</span><input id="pl-pass" type="password" autocomplete="current-password" placeholder="Your password" /></label>
 
         <div id="pl-msg" class="pl-msg" hidden></div>
 
-        <button class="pl-btn" id="pl-btn" type="button">Sign in</button>
+        <button class="pl-btn" id="pl-btn" type="button" data-i18n="signIn">Sign in</button>
 
         <div class="pl-alt">
-          <p>Not onboarded yet? <a href="/pro/onboarding">Request onboarding</a> — pilot clinics start free.</p>
-          <p><a href="/pro">Peek at the portal preview →</a></p>
-          <p class="pl-parent">Are you a parent? <a href="/login">Family sign in</a></p>
+          <p><span data-i18n="notOnboarded">Not onboarded yet?</span> <a href="/pro/onboarding" data-i18n="requestOnboarding">Request onboarding</a> <span data-i18n="pilotFree">— pilot clinics start free.</span></p>
+          <p><a href="/pro" data-i18n="peek">Peek at the portal preview →</a></p>
+          <p class="pl-parent"><span data-i18n="areParent">Are you a parent?</span> <a href="/login" id="family-link" data-i18n="familySignIn">Family sign in</a></p>
         </div>
       </div>
     </div>
@@ -46,6 +56,10 @@ import "../../styles/global.css";
 <style is:global>
   .pl-body{margin:0;min-height:100vh;font-family:'Inter Variable','Inter',system-ui,sans-serif;background:linear-gradient(150deg,#0B3F3A,#0E8C82 70%,#14B8A6);display:grid;place-items:center;padding:24px;box-sizing:border-box}
   .pl-body *{box-sizing:border-box}
+  .pl-lang{position:fixed;top:18px;right:22px;z-index:40;display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.45);font-size:.82rem;font-weight:700}
+  .pl-lang button{background:none;border:none;padding:2px 4px;cursor:pointer;font:inherit;color:rgba(255,255,255,.55);font-weight:700;letter-spacing:.02em}
+  .pl-lang button:hover{color:#fff}
+  .pl-lang button.on{color:#fff;text-decoration:underline;text-underline-offset:4px}
   .pl-wrap{width:100%;max-width:400px}
   .pl-brand{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;margin-bottom:20px}
   .pl-brand img{height:38px;width:auto}
@@ -73,11 +87,45 @@ import "../../styles/global.css";
   .pl-parent a{color:#6D28D9}
 </style>
 
-<script is:inline>
+<script is:inline define:vars={{ I18N: DICT }}>
   (function () {
     var URL0 = "https://eghqufgiudxjkbsddtnx.supabase.co";
     var KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
     var $ = function (id) { return document.getElementById(id); };
+
+    /* ---------- i18n (strings from src/i18n/pro-login.js) ---------- */
+    function resolveLang() {
+      try {
+        var p = new URLSearchParams(window.location.search).get("lang");
+        if (p === "fr" || p === "en") return p;
+        var saved = localStorage.getItem("ua_lang");
+        if (saved === "fr" || saved === "en") return saved;
+        if (document.referrer && document.referrer.indexOf("/fr") > -1) return "fr";
+      } catch (e) {}
+      return "en";
+    }
+    var LANG = resolveLang();
+    var L = I18N[LANG] || I18N.en;
+
+    function applyLang(lang) {
+      LANG = lang; L = I18N[lang] || I18N.en;
+      try { localStorage.setItem("ua_lang", lang); } catch (e) {}
+      document.documentElement.lang = lang;
+      document.title = L.title;
+      document.querySelectorAll("[data-i18n]").forEach(function (el) {
+        var k = el.getAttribute("data-i18n");
+        if (L[k] && el.id !== "pl-btn") el.textContent = L[k];
+      });
+      var b = $("pl-btn"); if (b && !b.disabled) b.textContent = L.signIn;
+      $("pl-email").placeholder = L.emailPh;
+      $("pl-pass").placeholder = L.passwordPh;
+      $("lang-en").classList.toggle("on", lang === "en");
+      $("lang-fr").classList.toggle("on", lang === "fr");
+      $("family-link").href = "/login" + (lang === "fr" ? "?lang=fr" : "");
+    }
+    $("lang-en").addEventListener("click", function () { applyLang("en"); });
+    $("lang-fr").addEventListener("click", function () { applyLang("fr"); });
+    applyLang(LANG);
 
     function msg(kind, text) {
       var m = $("pl-msg");
@@ -89,10 +137,10 @@ import "../../styles/global.css";
     function go() {
       var email = $("pl-email").value.trim();
       var pass = $("pl-pass").value;
-      if (!email || !pass) { msg("err", "Enter your email and password."); return; }
+      if (!email || !pass) { msg("err", L.errEmpty); return; }
       var btn = $("pl-btn");
       btn.disabled = true;
-      btn.textContent = "Signing in…";
+      btn.textContent = L.signingIn;
 
       fetch(URL0 + "/auth/v1/token?grant_type=password", {
         method: "POST",
@@ -102,8 +150,8 @@ import "../../styles/global.css";
         .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
         .then(function (res) {
           if (!res.ok || !res.d || !res.d.access_token) {
-            msg("err", "That email and password don't match an account.");
-            btn.disabled = false; btn.textContent = "Sign in";
+            msg("err", L.errNoMatch);
+            btn.disabled = false; btn.textContent = L.signIn;
             return;
           }
           var s = res.d;
@@ -119,14 +167,14 @@ import "../../styles/global.css";
                 localStorage.setItem("ua_pro_session", JSON.stringify(s));
                 location.href = "/pro";
               } else {
-                msg("info", "Your login works, but it isn't linked to a clinic yet — provider onboarding opens soon. Want in early? Send us an onboarding request from the link below.");
-                btn.disabled = false; btn.textContent = "Sign in";
+                msg("info", L.infoNotLinked);
+                btn.disabled = false; btn.textContent = L.signIn;
               }
             });
         })
         .catch(function () {
-          msg("err", "Couldn't reach the sign-in service — try again in a moment.");
-          btn.disabled = false; btn.textContent = "Sign in";
+          msg("err", L.errNetwork);
+          btn.disabled = false; btn.textContent = L.signIn;
         });
     }
 

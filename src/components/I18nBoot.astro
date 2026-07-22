@@ -1,0 +1,140 @@
+---
+/* ============================================================
+   I18nBoot.astro — app-shell language bootstrap (APP-I18N-V2)
+   ------------------------------------------------------------
+   Included in the <head> of AppLayout and AppFormLayout, BEFORE
+   any body scripts, so every later script can rely on:
+
+     window.uaLang       "en" | "fr"  (more languages later)
+     window.uaLocale     "en-CA" | "fr-CA"   (for dates/numbers)
+     window.uaI18n(d)    resolve {en:{...},fr:{...}} → merged T
+                         (falls back to EN for missing keys) and
+                         auto-swap [data-i18n] markup on DOM ready
+     window.uaI18nSwap(T, root?)  re-run a swap on injected DOM
+     window.uaSetLang(l) persist choice + reload
+     window.uaShellT     resolved dictionary for the shared shell
+
+   V2: strings moved to the central catalog (src/i18n/shell.js,
+   string-code system) and injected at build time via define:vars.
+   See src/i18n/README.md for how to add strings and languages.
+
+   How the language is chosen (most recent explicit choice first):
+     1. localStorage ua_lang       (login toggle / signup / settings)
+     2. localStorage ua_pref_lang  (settings segment, pre-save)
+     3. ua_session.user.user_metadata.lang  (account, cross-device)
+     4. "en"
+
+   Markup annotations the swap understands:
+     data-i18n="code"       → textContent
+     data-i18n-ph="code"    → placeholder attribute
+     data-i18n-aria="code"  → aria-label attribute
+     data-label-<lang>="…"  → element carries its own translation
+                              (SectionTabs / config-driven labels)
+
+   RULE: never annotate an element whose text a script fills with
+   user data (names, emails) — the owning script translates its own
+   fallback via the dictionary instead. This avoids all races.
+   ============================================================ */
+import SHELL_DICT from "../i18n/shell.js";
+---
+<script is:inline define:vars={{ SHELL: SHELL_DICT }}>
+  (function () {
+    function resolveLang() {
+      try {
+        var l = localStorage.getItem("ua_lang");
+        if (l === "fr" || l === "en") return l;
+        l = localStorage.getItem("ua_pref_lang");
+        if (l === "fr" || l === "en") return l;
+        var s = JSON.parse(localStorage.getItem("ua_session") || "null");
+        var m = s && s.user && s.user.user_metadata;
+        if (m && (m.lang === "fr" || m.lang === "en")) return m.lang;
+      } catch (e) {}
+      return "en";
+    }
+
+    var LANG = resolveLang();
+    window.uaLang = LANG;
+    window.uaLocale = LANG === "fr" ? "fr-CA" : "en-CA";
+    document.documentElement.lang = LANG;
+
+    /* ---------- no-flash cloak (V3) ----------
+       Pages are authored in English, so in French the browser would
+       paint English for a frame before the swap runs ("the blink").
+       Fix: when the language isn't English, keep the body invisible
+       (layout still computes — nothing jumps) until every dictionary
+       registered on this page has swapped, then reveal once, already
+       translated. English pays zero cost. A 1.5s failsafe reveals no
+       matter what, so a script error can never leave a blank page. */
+    var cloaked = false;
+    if (LANG !== "en") {
+      cloaked = true;
+      var cloak = document.createElement("style");
+      cloak.id = "ua-i18n-cloak";
+      cloak.textContent = "body{visibility:hidden !important}";
+      document.head.appendChild(cloak);
+    }
+    function uncloak() {
+      if (!cloaked) return;
+      cloaked = false;
+      var el = document.getElementById("ua-i18n-cloak");
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+    }
+    if (cloaked) {
+      // DOMContentLoaded handlers (the swaps below) run in order; this
+      // listener is registered FIRST, so it schedules the reveal for
+      // right AFTER the whole DCL batch — every swap has run by then.
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.requestAnimationFrame) requestAnimationFrame(uncloak);
+        else setTimeout(uncloak, 0);
+      });
+      setTimeout(uncloak, 1500); /* failsafe */
+    }
+
+    window.uaSetLang = function (l) {
+      try {
+        localStorage.setItem("ua_lang", l);
+        localStorage.setItem("ua_pref_lang", l);
+      } catch (e) {}
+      location.reload();
+    };
+
+    function swap(T, root) {
+      var scope = root || document;
+      scope.querySelectorAll("[data-i18n]").forEach(function (el) {
+        var k = el.getAttribute("data-i18n");
+        if (T[k] != null) el.textContent = T[k];
+      });
+      // Self-carried translations: any element can hold its own text for
+      // the active language in data-label-<lang> (used by SectionTabs,
+      // whose labels come from config, not a dictionary).
+      scope.querySelectorAll("[data-label-" + LANG + "]").forEach(function (el) {
+        el.textContent = el.getAttribute("data-label-" + LANG);
+      });
+      scope.querySelectorAll("[data-i18n-ph]").forEach(function (el) {
+        var k = el.getAttribute("data-i18n-ph");
+        if (T[k] != null) el.setAttribute("placeholder", T[k]);
+      });
+      scope.querySelectorAll("[data-i18n-aria]").forEach(function (el) {
+        var k = el.getAttribute("data-i18n-aria");
+        if (T[k] != null) el.setAttribute("aria-label", T[k]);
+      });
+    }
+    window.uaI18nSwap = swap;
+
+    window.uaI18n = function (dicts) {
+      var base = dicts.en || {};
+      var T = Object.assign({}, base, dicts[LANG] || base);
+      if (LANG !== "en") {
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", function () { swap(T); });
+        } else {
+          swap(T);
+        }
+      }
+      return T;
+    };
+
+    /* Shared shell dictionary (sidebar/header/help) from src/i18n/shell.js */
+    window.uaShellT = window.uaI18n(SHELL);
+  })();
+</script>

@@ -2,18 +2,23 @@
 /* TERMS OF SERVICE — plain-language, protective working version for the
    pilot stage (coordination service, NOT healthcare; providers are
    independent; consent-gated sharing; Québec consumer rights preserved).
-   Get a lawyer review once revenue allows. */
+   Get a lawyer review once revenue allows.
+   Bilingual in one page: /terms opens in English, /fr/terms opens in
+   French (lang prop) — the pill toggle switches either way. */
 import Layout from "@/layouts/Layout.astro";
+
+const { lang = "en" } = Astro.props;
+const isFr = lang === "fr";
 ---
-<Layout title="Terms of Service — UniqueApex">
+<Layout title={isFr ? "Conditions d'utilisation — UniqueApex" : "Terms of Service — UniqueApex"} lang={lang}>
   <div class="legal">
     <div class="lg-toggle">
-      <button class="on" data-lang="en" type="button">English</button>
-      <button data-lang="fr" type="button">Français</button>
+      <button class={isFr ? "" : "on"} data-lang="en" type="button">English</button>
+      <button class={isFr ? "on" : ""} data-lang="fr" type="button">Français</button>
     </div>
 
     <!-- ================= ENGLISH ================= -->
-    <article id="doc-en">
+    <article id="doc-en" hidden={isFr}>
       <h1>Terms of Service</h1>
       <p class="lg-date">Effective July 17, 2026 · UniqueApex is operated by Alpexus Teknoloji Ltd. Şti. (Türkiye). For Québec residents, the French version prevails in case of any difference. By creating an account or using UniqueApex you agree to these terms.</p>
 
@@ -53,7 +58,7 @@ import Layout from "@/layouts/Layout.astro";
     </article>
 
     <!-- ================= FRANÇAIS ================= -->
-    <article id="doc-fr" hidden>
+    <article id="doc-fr" hidden={!isFr}>
       <h1>Conditions d'utilisation</h1>
       <p class="lg-date">En vigueur le 17 juillet 2026 · UniqueApex est exploité par Alpexus Teknoloji Ltd. Şti. (Turquie). Pour les résidents du Québec, la version française prévaut en cas de divergence. En créant un compte ou en utilisant UniqueApex, vous acceptez ces conditions.</p>
 
@@ -74,7 +79,7 @@ import Layout from "@/layouts/Layout.astro";
       <p>Le forfait gratuit est décrit dans l'application. Les forfaits payants, lorsqu'ils seront offerts, afficheront leur prix, leur cycle de facturation et leur contenu au moment de l'achat; les paiements sont traités par Stripe. Vous pouvez annuler en tout temps et conserver l'accès jusqu'à la fin de la période payée. Nous pouvons modifier les forfaits ou les prix pour l'avenir, avec préavis avant que cela touche ce que vous avez déjà payé. Rien dans cette section ne limite vos droits en vertu de la Loi sur la protection du consommateur du Québec.</p>
 
       <h2>6 · Votre contenu</h2>
-      <p>Les renseignements et documents que vous ajoutez demeurent les vôtres. Vous ne nous accordez que la permission nécessaire au fonctionnement du service — stocker vos données, produire des vues comme la Roue de soutien, générer les documents que vous demandez et envoyer les démarches que vous approuvez. Voir la <a href="/privacy">Politique de confidentialité</a>.</p>
+      <p>Les renseignements et documents que vous ajoutez demeurent les vôtres. Vous ne nous accordez que la permission nécessaire au fonctionnement du service — stocker vos données, produire des vues comme la Roue de soutien, générer les documents que vous demandez et envoyer les démarches que vous approuvez. Voir la <a href="/fr/privacy">Politique de confidentialité</a>.</p>
 
       <h2>7 · Utilisation acceptable</h2>
       <p>Ne saisissez pas de renseignements sur un enfant sans en avoir l'autorité; n'usurpez pas d'identité; n'utilisez pas la plateforme pour inonder les fournisseurs ou envoyer du contenu illégal, trompeur ou abusif; ne tentez pas d'accéder aux données d'autres familles, de perturber le service ou d'aspirer le répertoire de fournisseurs. Nous pouvons suspendre ou fermer les comptes qui enfreignent ces règles, avec préavis lorsque raisonnable.</p>

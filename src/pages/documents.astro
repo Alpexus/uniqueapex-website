@@ -8,7 +8,7 @@
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 ---
-<AppFormLayout title="Documents" activeNav="documents">
+<AppFormLayout title="Documents" titleFr="Documents" activeNav="documents">
   <SectionTabs section="documents" active="vault" />
 
   <div class="c3-ribbon rib-teal cu-rev" style="max-width:920px">
@@ -16,8 +16,8 @@ import SectionTabs from "@/components/SectionTabs.astro";
     <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
     <span class="c3-rib-av"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg></span>
     <div class="c3-rib-id">
-      <h1 id="rb-title">The Vault</h1>
-      <p>Reports, evaluations and letters — stored privately in Canada, uploaded once, never dug for again.</p>
+      <h1 id="rb-title" data-i18n="vault_ribTitle">The Vault</h1>
+      <p data-i18n="vault_ribDesc">Reports, evaluations and letters — stored privately in Canada, uploaded once, never dug for again.</p>
     </div>
     <div class="c3-rib-stats" id="rb-stats"></div>
   </div>
@@ -29,24 +29,24 @@ import SectionTabs from "@/components/SectionTabs.astro";
     <div class="dv-drop-ic">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5M8 9l4-4 4 4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
     </div>
-    <p class="dv-drop-t"><b>Drop a file here</b> or click to choose</p>
-    <p class="dv-drop-s">PDF, Word, photos · up to 10 MB · only you can see it</p>
+    <p class="dv-drop-t"><b data-i18n="vault_dropBold">Drop a file here</b> <span data-i18n="vault_dropRest">or click to choose</span></p>
+    <p class="dv-drop-s" data-i18n="vault_dropSub">PDF, Word, photos · up to 10 MB · only you can see it</p>
   </div>
 
   <div id="dv-plan" style="max-width:920px;margin-bottom:12px"></div>
   <div class="dv-pending" id="dv-pending" style="display:none">
     <span class="dv-pname" id="dv-pname"></span>
     <select id="dv-cat" class="dv-select">
-      <option>Evaluation</option><option>Medical</option><option>School</option><option>Funding</option><option>Therapy</option><option>Other</option>
+      <option value="Evaluation">Evaluation</option><option value="Medical">Medical</option><option value="School">School</option><option value="Funding">Funding</option><option value="Therapy">Therapy</option><option value="Other">Other</option>
     </select>
-    <button class="dv-btn" id="dv-upload">Upload</button>
-    <button class="dv-btn ghost" id="dv-cancel">Cancel</button>
+    <button class="dv-btn" id="dv-upload" data-i18n="vault_uploadBtn">Upload</button>
+    <button class="dv-btn ghost" id="dv-cancel" data-i18n="vault_cancel">Cancel</button>
     <span class="dv-msg" id="dv-msg"></span>
   </div>
 
   <div class="dv-bar cu-rev" style="--d:.08s">
     <div class="dv-filters" id="dv-filters"></div>
-    <input type="search" id="dv-search" class="dv-searchbox" placeholder="Search documents…" />
+    <input type="search" id="dv-search" class="dv-searchbox" placeholder="Search documents…" data-i18n-ph="vault_searchPh" />
   </div>
 
   <div class="dv-grid" id="dv-grid"><p class="dv-empty">Loading…</p></div>
@@ -103,11 +103,21 @@ import SectionTabs from "@/components/SectionTabs.astro";
   import * as UA from "../lib/ua-data.js";
   import { notify } from "../lib/notify.js";
   import { getPlan, PLANS, upsellHTML } from "../lib/plan.js";
+  import DICT from "../i18n/documents.js";
 
   const UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
   const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  /* ---------- i18n (string codes from src/i18n/documents.js) ---------- */
+  const T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+  const tpl = (s, v) => String(s).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? v[k] : ""));
+  const catLabel = (c) => (T.cats && T.cats[c] != null ? T.cats[c] : c);
+  /* Script-owned labels — translate before hydration replaces them. The
+     <select> keeps English VALUES; only the visible option text is swapped. */
+  $("dv-grid").innerHTML = `<p class="dv-empty">${esc(T.vault_loading)}</p>`;
+  document.querySelectorAll("#dv-cat option").forEach((o) => { o.textContent = catLabel(o.value); });
 
   function getSession() { try { return JSON.parse(localStorage.getItem("ua_session") || "null"); } catch { return null; } }
   function isValid(s) { return s && s.access_token && Math.floor(Date.now() / 1000) < (s.expires_at || 0) - 60; }
@@ -122,7 +132,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     return s && s.access_token ? s : null;
   }
 
-  const fmtDate = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" }); };
+  const fmtDate = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString(window.uaLocale || "en-CA", { month: "short", day: "numeric", year: "numeric" }); };
   const fileSvg = '<svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.8h5.2L12.4 5v9.2H4z"/><path d="M9 1.8V5h3.4"/></svg>';
   const CAT_COLOR = { Evaluation: ["#EDE9FE", "#6D28D9"], Medical: ["#F9EDF1", "#B14A66"], School: ["#FBF2E2", "#A8650A"], Funding: ["#E6F4F2", "#0E8C82"], Therapy: ["#EAF3DE", "#4C9A2A"], Other: ["#F4F3F8", "#7B7491"] };
 
@@ -137,20 +147,20 @@ import SectionTabs from "@/components/SectionTabs.astro";
     /* live ribbon stats */
     const rb = $("rb-stats");
     if (rb) rb.innerHTML = [
-      `<span class="c3-rstat"><b>${docs.length}</b><span>file${docs.length === 1 ? "" : "s"} stored</span></span>`,
-      `<span class="c3-rstat"><b>${Object.keys(counts).length}</b><span>categories</span></span>`,
-      docs[0] ? `<span class="c3-rstat"><b style="font-size:.82rem">${esc(fmtDate(docs[0].created_at))}</b><span>latest upload</span></span>` : "",
+      `<span class="c3-rstat"><b>${docs.length}</b><span>${docs.length === 1 ? esc(T.vault_filesStoredOne) : esc(T.vault_filesStoredMany)}</span></span>`,
+      `<span class="c3-rstat"><b>${Object.keys(counts).length}</b><span>${esc(T.vault_statCategories)}</span></span>`,
+      docs[0] ? `<span class="c3-rstat"><b style="font-size:.82rem">${esc(fmtDate(docs[0].created_at))}</b><span>${esc(T.vault_latestUpload)}</span></span>` : "",
     ].join("");
     const cats = ["All"].concat(Object.keys(CAT_COLOR).filter((c) => counts[c]));
     $("dv-filters").innerHTML = cats.map((c) =>
-      `<button class="dv-f ${c === filter ? "on" : ""}" data-c="${c}">${c}<span class="fc">${c === "All" ? docs.length : counts[c]}</span></button>`).join("");
+      `<button class="dv-f ${c === filter ? "on" : ""}" data-c="${c}">${esc(catLabel(c))}<span class="fc">${c === "All" ? docs.length : counts[c]}</span></button>`).join("");
     $("dv-filters").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { filter = b.dataset.c; render(); }));
 
     const list = docs.filter((d) =>
       (filter === "All" || (d.category || "Other") === filter) &&
       (!query || (d.file_name || "").toLowerCase().includes(query)));
     if (!list.length) {
-      $("dv-grid").innerHTML = `<p class="dv-empty">${docs.length ? "Nothing matches — try another filter or search." : "The vault is empty. Upload the first document above — a report, a letter, anything you never want to dig for again."}</p>`;
+      $("dv-grid").innerHTML = `<p class="dv-empty">${docs.length ? esc(T.vault_noMatch) : esc(T.vault_empty)}</p>`;
       return;
     }
     $("dv-grid").innerHTML = list.map((d, i) => {
@@ -158,9 +168,9 @@ import SectionTabs from "@/components/SectionTabs.astro";
       return `<div class="dv-card cu-pop" style="--d:${Math.min(i * 0.04, 0.4).toFixed(2)}s">
         <span class="cu-blob" style="--blob:${cc[0]};width:38px;height:38px;color:${cc[1]}">${fileSvg}</span>
         <span style="flex:1;min-width:0">
-          <span class="nm" style="display:block">${esc(d.file_name || "Document")}</span>
-          <span class="mt" style="display:block"><span class="dv-cat" style="background:${cc[0]};color:${cc[1]}">${esc(d.category || "Other")}</span> · ${esc(fmtDate(d.created_at))}</span>
-          <span class="dv-acts">${d.storage_path ? `<button data-dl="${esc(d.storage_path)}">Download</button>` : ""}<button class="del" data-del="${d.id}" data-path="${esc(d.storage_path || "")}">Delete</button></span>
+          <span class="nm" style="display:block">${esc(d.file_name || T.vault_docFallback)}</span>
+          <span class="mt" style="display:block"><span class="dv-cat" style="background:${cc[0]};color:${cc[1]}">${esc(catLabel(d.category || "Other"))}</span> · ${esc(fmtDate(d.created_at))}</span>
+          <span class="dv-acts">${d.storage_path ? `<button data-dl="${esc(d.storage_path)}">${esc(T.vault_download)}</button>` : ""}<button class="del" data-del="${d.id}" data-path="${esc(d.storage_path || "")}">${esc(T.vault_delete)}</button></span>
         </span>
       </div>`;
     }).join("");
@@ -176,11 +186,11 @@ import SectionTabs from "@/components/SectionTabs.astro";
     if (r.ok) {
       const j = await r.json();
       window.open(UA_URL + "/storage/v1" + j.signedURL, "_blank");
-    } else alert("Couldn't create a download link — try again.");
+    } else alert(T.vault_dlFail);
   }
 
   async function remove(id, path) {
-    if (!confirm("Delete this document? This cannot be undone.")) return;
+    if (!confirm(T.vault_confirmDelete)) return;
     const s = await getValidSession(); if (!s) return;
     if (path) await fetch(UA_URL + "/storage/v1/object/documents/" + path, { method: "DELETE", headers: authHeaders(s.access_token, false) }).catch(() => {});
     const r = await fetch(UA_URL + "/rest/v1/documents?id=eq." + id, { method: "DELETE", headers: authHeaders(s.access_token) });
@@ -189,12 +199,12 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
   function showPending(file) {
     if (atLimit()) {
-      notify("warn", "The free vault holds " + PLANS.free.vaultFiles + " files — monthly plans are unlimited.");
+      notify("warn", tpl(T.vault_limitWarn, { n: PLANS.free.vaultFiles }));
       const host = $("dv-plan");
-      if (host && !host.innerHTML) host.innerHTML = upsellHTML("The vault is full ✦", "Free includes " + PLANS.free.vaultFiles + " documents. Upgrade for an unlimited vault — nothing you've stored is ever lost.", "See the plans");
+      if (host && !host.innerHTML) host.innerHTML = upsellHTML(T.vault_fullTitle, tpl(T.vault_fullBody, { n: PLANS.free.vaultFiles }), T.vault_seePlans);
       return;
     }
-    if (file.size > 10 * 1024 * 1024) { alert("That file is over 10 MB — try a smaller version."); return; }
+    if (file.size > 10 * 1024 * 1024) { alert(T.vault_tooBig); return; }
     pendingFile = file;
     $("dv-pname").textContent = file.name;
     $("dv-msg").textContent = "";
@@ -205,7 +215,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     if (!pendingFile) return;
     const s = await getValidSession(); if (!s) { location.href = "/login"; return; }
     const msg = $("dv-msg"), btn = $("dv-upload");
-    btn.disabled = true; msg.textContent = "Uploading…";
+    btn.disabled = true; msg.textContent = T.vault_uploading;
     const safe = pendingFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
     const path = s.user.id + "/" + Date.now() + "_" + safe;
     try {
@@ -229,11 +239,9 @@ import SectionTabs from "@/components/SectionTabs.astro";
       const savedName = pendingFile.name;
       $("dv-pending").style.display = "none"; pendingFile = null;
       render();
-      notify("ok", '"' + savedName + '" is safe in the vault ✓');
+      notify("ok", tpl(T.vault_savedOk, { name: savedName }));
     } catch (e) {
-      msg.textContent = e.message === "setup"
-        ? "Storage isn't set up yet — run documents_setup.sql in Supabase (ask Claude for the steps)."
-        : "Upload failed — check your connection and try again.";
+      msg.textContent = e.message === "setup" ? T.vault_errSetup : T.vault_errUpload;
     }
     btn.disabled = false;
   }
@@ -247,7 +255,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       const r = await fetch(UA_URL + "/rest/v1/documents?select=id,file_name,file_type,category,storage_path,created_at&user_id=eq." + s.user.id + "&order=created_at.desc", { headers: authHeaders(s.access_token) }).catch(() => null);
       if (r && r.ok) docs = await r.json();
       else if (r && (r.status === 404 || r.status === 400)) {
-        $("dv-setup").innerHTML = `<div class="dv-setupnote"><p><strong>One-time setup needed:</strong> the documents table and storage bucket don't exist yet in Supabase. Open <strong>documents_setup.sql</strong> in the project folder and follow the three steps inside (about 3 minutes) — then this page comes alive.</p></div>`;
+        $("dv-setup").innerHTML = `<div class="dv-setupnote"><p>${T.vault_setupNote}</p></div>`;
       }
     }
     render();

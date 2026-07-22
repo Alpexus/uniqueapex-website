@@ -9,6 +9,7 @@
    ══════════════════════════════════════════════════════════════════ */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
+import DICT from "@/i18n/resources.js";
 
 const GROUPS = [
   {
@@ -54,7 +55,7 @@ const ICONS: Record<string, string> = {
   heart: `<path d="M12 20s-7.5-4.7-9.3-9A5 5 0 0112 6.2 5 5 0 0121.3 11c-1.8 4.3-9.3 9-9.3 9z"/>`,
 };
 ---
-<AppFormLayout title="Resources" activeNav="resources">
+<AppFormLayout title="Resources" titleFr="Ressources" activeNav="resources">
   <SectionTabs section="resources" active="community" />
 
   <div class="c3-ribbon rib-amber cu-rev" style="max-width:920px">
@@ -62,12 +63,12 @@ const ICONS: Record<string, string> = {
     <span class="c3-spark s2" style="bottom:14px;right:74px">✦</span>
     <span class="c3-rib-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3.3 2.7-5 6-5s6 1.7 6 5"/><circle cx="17" cy="8.5" r="2.2"/><path d="M16.5 14c2.6.2 4.5 1.7 4.5 5"/></svg></span>
     <div class="c3-rib-id">
-      <h1>Community resources</h1>
-      <p>The organizations, helplines and programs every Québec family should know — gathered in one place.</p>
+      <h1 data-i18n="community_title">Community resources</h1>
+      <p data-i18n="community_intro">The organizations, helplines and programs every Québec family should know — gathered in one place.</p>
     </div>
     <div class="c3-rib-stats">
-      <span class="c3-rstat"><b>{GROUPS.reduce((a, g) => a + g.items.length, 0)}</b><span>resources</span></span>
-      <span class="c3-rstat"><b>2</b><span>helplines</span></span>
+      <span class="c3-rstat"><b>{GROUPS.reduce((a, g) => a + g.items.length, 0)}</b><span data-i18n="community_statResources">resources</span></span>
+      <span class="c3-rstat"><b>2</b><span data-i18n="community_statHelplines">helplines</span></span>
     </div>
   </div>
 
@@ -77,16 +78,16 @@ const ICONS: Record<string, string> = {
         <span class="cu-blob" style={`--blob:${g.bg};width:34px;height:34px;color:${g.hue}`}>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={ICONS[g.icon]} />
         </span>
-        {g.title}
+        <span data-i18n={`community_sec${gi}`}>{g.title}</span>
       </p>
       <div class="rc-grid">
-        {g.items.map((it) => (
+        {g.items.map((it, ii) => (
           <div class="rc-card cu-lift">
-            <b>{it.name}</b>
-            <p>{it.desc}</p>
+            <b data-i18n={DICT.fr[`community_g${gi}i${ii}Name`] ? `community_g${gi}i${ii}Name` : undefined}>{it.name}</b>
+            <p data-i18n={`community_g${gi}i${ii}Desc`}>{it.desc}</p>
             <div class="rc-actions">
-              {it.tel && <a class="rc-btn" href={`tel:${it.tel}`}>Call {it.tel}</a>}
-              {it.href && <a class="rc-btn ghost" href={it.href} target="_blank" rel="noopener">Visit website →</a>}
+              {it.tel && <a class="rc-btn" href={`tel:${it.tel}`}><span data-i18n="community_call">Call</span> {it.tel}</a>}
+              {it.href && <a class="rc-btn ghost" href={it.href} target="_blank" rel="noopener" data-i18n="community_visit">Visit website →</a>}
             </div>
           </div>
         ))}
@@ -95,8 +96,8 @@ const ICONS: Record<string, string> = {
   ))}
 
   <div class="rc-cta cu-rev" style="--d:.36s">
-    <p><b>Know an organization families should hear about?</b> Send it in — this directory grows with the community.</p>
-    <a href="mailto:contact@uniqueapex.com?subject=Community%20resource%20suggestion">Suggest a resource</a>
+    <p><b data-i18n="community_ctaTitle">Know an organization families should hear about?</b> <span data-i18n="community_ctaBody">Send it in — this directory grows with the community.</span></p>
+    <a href="mailto:contact@uniqueapex.com?subject=Community%20resource%20suggestion" data-i18n="community_suggest">Suggest a resource</a>
   </div>
 </AppFormLayout>
 
@@ -120,10 +121,12 @@ const ICONS: Record<string, string> = {
   .rc-cta a:hover{filter:brightness(1.1)}
 </style>
 
-<script is:inline>
+<script is:inline define:vars={{ DICT }}>
   (function () {
     var raw = localStorage.getItem("ua_session"), s = null;
     try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
-    if (!s || !s.access_token) location.href = "/login";
+    if (!s || !s.access_token) { location.href = "/login"; return; }
+    /* Register the French swap for this page's [data-i18n] markup. */
+    if (window.uaI18n) window.uaI18n(DICT);
   })();
 </script>

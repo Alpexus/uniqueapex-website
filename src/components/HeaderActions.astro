@@ -9,35 +9,43 @@
    Used by BOTH AppLayout and AppFormLayout so behavior stays identical. */
 ---
 <div class="header-right">
+  <div class="hdr-lang" title="Language / Langue">
+    <button type="button" id="ua-lang-en" class="on">EN</button>
+    <button type="button" id="ua-lang-fr">FR</button>
+  </div>
+
   <div class="hdr-wrap">
-    <button class="icon-btn" id="ua-bell" aria-label="Notifications" aria-haspopup="true">
+    <button class="icon-btn" id="ua-bell" aria-label="Notifications" aria-haspopup="true" data-i18n-aria="notifications">
       <svg viewBox="0 0 16 16" fill="none" stroke-width="1.6"><path d="M8 2a4 4 0 014 4c0 3 1.2 4 1.2 4H2.8S4 9 4 6a4 4 0 014-4zM6.6 13a1.5 1.5 0 002.8 0"/></svg>
       <span class="dot" id="ua-bell-dot" style="display:none"></span>
     </button>
-    <div class="hdr-panel" id="ua-bell-panel" role="menu" aria-label="Notifications">
-      <div class="hdr-panel-h">Notifications</div>
-      <div id="ua-bell-list"><p class="hdr-empty">Loading…</p></div>
+    <div class="hdr-panel" id="ua-bell-panel" role="menu" aria-label="Notifications" data-i18n-aria="notifications">
+      <div class="hdr-panel-h" data-i18n="notifications">Notifications</div>
+      <div id="ua-bell-list"><p class="hdr-empty" data-i18n="bellLoading">Loading…</p></div>
     </div>
   </div>
 
   <div class="hdr-wrap">
-    <button class="icon-btn" id="ua-user-btn" aria-label="Account menu" aria-haspopup="true">
+    <button class="icon-btn" id="ua-user-btn" aria-label="Account menu" aria-haspopup="true" data-i18n-aria="accountMenu">
       <span class="avatar" id="ua-hdr-avatar" style="width:26px;height:26px;font-size:.62rem">·</span>
     </button>
-    <div class="hdr-panel hdr-user" id="ua-user-menu" role="menu" aria-label="Account">
+    <div class="hdr-panel hdr-user" id="ua-user-menu" role="menu" aria-label="Account" data-i18n-aria="acctAccount">
       <div class="hdr-user-h">
         <span class="avatar" id="ua-menu-avatar" style="width:34px;height:34px;font-size:.75rem">·</span>
         <div class="hdr-user-id"><b id="ua-menu-name">Account</b><span id="ua-menu-email"></span></div>
       </div>
-      <a class="hdr-item" href="/account"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="5" height="5" rx="1.2"/><rect x="9" y="2" width="5" height="5" rx="1.2"/><rect x="2" y="9" width="5" height="5" rx="1.2"/><rect x="9" y="9" width="5" height="5" rx="1.2"/></svg>My dashboard</a>
-      <a class="hdr-item" href="/settings"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.3 1.3M11.1 11.1l1.3 1.3M12.4 3.6l-1.3 1.3M4.9 11.1l-1.3 1.3"/></svg>Settings</a>
+      <a class="hdr-item" href="/account"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="5" height="5" rx="1.2"/><rect x="9" y="2" width="5" height="5" rx="1.2"/><rect x="2" y="9" width="5" height="5" rx="1.2"/><rect x="9" y="9" width="5" height="5" rx="1.2"/></svg><span data-i18n="myDashboard">My dashboard</span></a>
+      <a class="hdr-item" href="/settings"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.3 1.3M11.1 11.1l1.3 1.3M12.4 3.6l-1.3 1.3M4.9 11.1l-1.3 1.3"/></svg><span data-i18n="menuSettings">Settings</span></a>
       <hr class="hdr-sep" />
-      <button class="hdr-item hdr-out" id="ua-signout" type="button"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2H3.5A1.5 1.5 0 002 3.5v9A1.5 1.5 0 003.5 14H6M10.5 11l3-3-3-3M13.5 8H6"/></svg>Sign out</button>
+      <button class="hdr-item hdr-out" id="ua-signout" type="button"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2H3.5A1.5 1.5 0 002 3.5v9A1.5 1.5 0 003.5 14H6M10.5 11l3-3-3-3M13.5 8H6"/></svg><span data-i18n="signOut">Sign out</span></button>
     </div>
   </div>
 </div>
 
 <style is:global>
+  .hdr-lang{display:flex;align-items:center;gap:2px;background:var(--bg,#F7F6FB);border:1px solid var(--line,#EAE7F3);border-radius:9999px;padding:3px;flex-shrink:0}
+  .hdr-lang button{border:none;background:none;font-family:inherit;font-size:.66rem;font-weight:800;color:var(--muted,#7B7491);padding:4px 9px;border-radius:9999px;cursor:pointer}
+  .hdr-lang button.on{background:#6D28D9;color:#fff}
   .hdr-wrap{position:relative}
   .hdr-panel{position:absolute;top:calc(100% + 10px);right:0;width:320px;background:var(--card,#fff);border:1px solid var(--line,#EAE7F3);border-radius:14px;box-shadow:var(--shadow-lg,0 8px 32px rgba(34,27,54,.10));padding:8px;display:none;z-index:70}
   .hdr-panel.open{display:block;animation:hdrIn .16s ease}
@@ -72,6 +80,21 @@
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+  /* Shell dictionary (I18nBoot runs first, in the layout <head>). */
+  const ST = window.uaShellT || {};
+
+  /* ---------- EN|FR pill — switches the whole app's language ---------- */
+  {
+    const en = $("ua-lang-en"), fr = $("ua-lang-fr");
+    const isFr = window.uaLang === "fr";
+    if (en && fr) {
+      en.classList.toggle("on", !isFr);
+      fr.classList.toggle("on", isFr);
+      en.addEventListener("click", () => { if (window.uaLang !== "en" && window.uaSetLang) window.uaSetLang("en"); });
+      fr.addEventListener("click", () => { if (window.uaLang !== "fr" && window.uaSetLang) window.uaSetLang("fr"); });
+    }
+  }
+
   /* ---------- open/close behaviour ---------- */
   const panels = [
     { btn: $("ua-bell"), panel: $("ua-bell-panel") },
@@ -105,6 +128,9 @@
     $("ua-menu-name").textContent = meta.full_name || email.split("@")[0];
     const ini = (meta.full_name || email)[0].toUpperCase();
     const mAv = $("ua-menu-avatar"); if (mAv) mAv.textContent = ini;
+  } else if (ST.accountFallback) {
+    /* script-owned fallback — translated here, not via data-i18n */
+    $("ua-menu-name").textContent = ST.accountFallback;
   }
   $("ua-signout").addEventListener("click", () => {
     localStorage.removeItem("ua_session");
@@ -130,7 +156,7 @@
         .slice(0, 6);
       currentIds = recs.map((r) => r.id);
       if (!recs.length) {
-        list.innerHTML = `<p class="hdr-empty">You're all caught up 🎉</p>`;
+        list.innerHTML = `<p class="hdr-empty">${esc(ST.bellCaughtUp || "You're all caught up 🎉")}</p>`;
       } else {
         const IC = { warn: "!", todo: "→", info: "i" };
         list.innerHTML = recs.map((r) =>
@@ -146,7 +172,7 @@
       const dot = $("ua-bell-dot");
       if (dot) dot.style.display = hasNew ? "" : "none";
     } catch (e) {
-      list.innerHTML = `<p class="hdr-empty">Couldn't load notifications.</p>`;
+      list.innerHTML = `<p class="hdr-empty">${esc(ST.bellFail || "Couldn't load notifications.")}</p>`;
     }
   })();
 </script>

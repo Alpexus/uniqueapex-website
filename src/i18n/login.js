@@ -1,0 +1,48 @@
+// ============================================================
+// Strings: /login — the family sign-in door (standalone page
+// with its own EN|FR toggle; also seeds ua_lang for the app).
+// ============================================================
+export default {
+  en: {
+    title: "Family sign in — UniqueApex",
+    confirmed: "✓ Email confirmed — you can sign in now",
+    brandSub: "FAMILIES",
+    heading: "Welcome back",
+    sub: "Sign in to your child's passport and journey.",
+    email: "Email",
+    password: "Password",
+    emailPh: "you@example.com",
+    passwordPh: "Your password",
+    signIn: "Sign in",
+    signingIn: "Signing in…",
+    noAccount: "Don't have an account?",
+    create: "Create one →",
+    areProvider: "Are you a service provider?",
+    proSignIn: "Provider sign in →",
+    errEmpty: "Please enter your email and password.",
+    errInvalid: "Invalid email or password.",
+    errGeneric: "Something went wrong. Please try again.",
+    errNotConfirmed: "Please confirm your email first — check your inbox for the confirmation link.",
+  },
+  fr: {
+    title: "Connexion famille — UniqueApex",
+    confirmed: "✓ Courriel confirmé — vous pouvez maintenant vous connecter",
+    brandSub: "FAMILLES",
+    heading: "Bon retour",
+    sub: "Connectez-vous au passeport et au parcours de votre enfant.",
+    email: "Courriel",
+    password: "Mot de passe",
+    emailPh: "vous@exemple.com",
+    passwordPh: "Votre mot de passe",
+    signIn: "Se connecter",
+    signingIn: "Connexion…",
+    noAccount: "Pas encore de compte?",
+    create: "Créez-en un →",
+    areProvider: "Vous êtes un professionnel?",
+    proSignIn: "Connexion professionnels →",
+    errEmpty: "Veuillez entrer votre courriel et votre mot de passe.",
+    errInvalid: "Courriel ou mot de passe invalide.",
+    errGeneric: "Une erreur est survenue. Veuillez réessayer.",
+    errNotConfirmed: "Veuillez d'abord confirmer votre courriel — vérifiez votre boîte de réception.",
+  },
+};
