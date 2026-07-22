@@ -415,6 +415,7 @@ import AppLayout from "../layouts/AppLayout.astro";
     import * as UA from "../lib/ua-data.js";
     import { scoreWheel, DOMAINS, wheelCompleteness, scoreToBand, HUES } from "../lib/wheelScore.js";
     import { generateWheelSVG, domainColor } from "../lib/wheelSvg.js";
+    import { domainName, domainLow, bandLabel } from "../lib/libI18n.js";
     import { domainDetail, buildFamilyGuidance } from "../lib/domainInsights.js";
     import { matchAdvice } from "../lib/adviceLibrary.js";
     import { getRecommendations } from "../lib/recommendations.js";
@@ -540,9 +541,9 @@ import AppLayout from "../layouts/AppLayout.astro";
       function levelInfo(score) {
         if (score == null) return { label: T.notEnoughData, bg: "#F4F3F8", fg: "#7B7491", seg: "#D8D3E6" };
         const b = scoreToBand(score);
-        if (b.key === "minimal" || b.key === "low") return { label: b.label, bg: "#E8F6F0", fg: "#0E8F66", seg: "#0E8F66" };
-        if (b.key === "high" || b.key === "intensive") return { label: b.label, bg: "#EDE9FE", fg: "#6D28D9", seg: "#7C3AED" };
-        return { label: b.label, bg: "#FBF2E2", fg: "#A8650A", seg: "#D97706" };
+        if (b.key === "minimal" || b.key === "low") return { label: bandLabel(b), bg: "#E8F6F0", fg: "#0E8F66", seg: "#0E8F66" };
+        if (b.key === "high" || b.key === "intensive") return { label: bandLabel(b), bg: "#EDE9FE", fg: "#6D28D9", seg: "#7C3AED" };
+        return { label: bandLabel(b), bg: "#FBF2E2", fg: "#A8650A", seg: "#D97706" };
       }
 
       function renderToggle() {
@@ -609,7 +610,7 @@ import AppLayout from "../layouts/AppLayout.astro";
           + det.strategies.slice(0, 2).map((t, i) => `<span class="d3d-chip tip cu-pop" style="--d:${(0.18 + i * 0.05).toFixed(2)}s">${esc(t)}</span>`).join("");
         box.style.borderTopColor = dc;
         box.innerHTML = `<div class="d3d-in">`
-          + `<div class="d3d-head"><span class="d3d-dot" style="background:${tintOf(name, 0.14)}"><i style="background:${dc}"></i></span><span class="d3d-name">${esc(name)}</span><span class="d3d-pill" style="background:${L.bg};color:${L.fg}">${L.label}</span></div>`
+          + `<div class="d3d-head"><span class="d3d-dot" style="background:${tintOf(name, 0.14)}"><i style="background:${dc}"></i></span><span class="d3d-name">${esc(domainName(name))}</span><span class="d3d-pill" style="background:${L.bg};color:${L.fg}">${L.label}</span></div>`
           + (dm.score == null
               ? `<p style="font-size:.8rem;color:var(--faint);margin:0">${esc(T.addMorePassport)}</p>`
               : `<div class="d3d-meta"><span class="l">${esc(T.supportLevel)}</span><span class="d3d-segs">${segs}</span></div>`
@@ -625,8 +626,8 @@ import AppLayout from "../layouts/AppLayout.astro";
         const needTop = DOMAINS.filter((n) => scored[n].score != null).sort((a, b) => scored[b].score - scored[a].score).slice(0, 2);
         const strTop = DOMAINS.filter((n) => scored[n].strength != null && scored[n].strength >= 45).sort((a, b) => scored[b].strength - scored[a].strength).slice(0, 2);
         let html = "";
-        if (needTop.length) html += `<div class="d3-tops-row"><span class="lbl">${esc(T.mostSupport)}</span>` + needTop.map((n) => `<a class="d3-topchip" style="background:${tintOf(n, 0.1)};color:${domainColor(n)}" href="${wheelDeep(n)}"><i style="background:${domainColor(n)}"></i>${esc(n)}</a>`).join("") + `</div>`;
-        if (strTop.length) html += `<div class="d3-tops-row"><span class="lbl">${esc(T.goingStrong)}</span>` + strTop.map((n) => `<a class="d3-topchip" style="background:var(--green-bg);color:var(--green)" href="${wheelDeep(n)}"><i style="background:var(--green)"></i>${esc(n)}</a>`).join("") + `</div>`;
+        if (needTop.length) html += `<div class="d3-tops-row"><span class="lbl">${esc(T.mostSupport)}</span>` + needTop.map((n) => `<a class="d3-topchip" style="background:${tintOf(n, 0.1)};color:${domainColor(n)}" href="${wheelDeep(n)}"><i style="background:${domainColor(n)}"></i>${esc(domainName(n))}</a>`).join("") + `</div>`;
+        if (strTop.length) html += `<div class="d3-tops-row"><span class="lbl">${esc(T.goingStrong)}</span>` + strTop.map((n) => `<a class="d3-topchip" style="background:var(--green-bg);color:var(--green)" href="${wheelDeep(n)}"><i style="background:var(--green)"></i>${esc(domainName(n))}</a>`).join("") + `</div>`;
         host.innerHTML = html;
       }
 
@@ -639,7 +640,7 @@ import AppLayout from "../layouts/AppLayout.astro";
         const wc = wheelCompleteness(data);
         const lowConf = DOMAINS.filter((n) => scored[n].confidence === "low");
         $("wheel-warning").innerHTML = wc.pct < 70
-          ? `<div style="background:var(--amber-bg);border:1px solid #f3e2c0;border-radius:12px;padding:10px 14px;font-size:12px;color:var(--amber)">${tpl(T.wheelWarn, { p: wc.pct, a: wc.answered, t: wc.total })}${lowConf.length ? tpl(esc(T.lowerConf), { list: esc(lowConf.join(", ")) }) : ""} <a href="${passportLink}" style="color:var(--amber);font-weight:600;text-decoration:underline">${esc(T.completeMore)}</a></div>`
+          ? `<div style="background:var(--amber-bg);border:1px solid #f3e2c0;border-radius:12px;padding:10px 14px;font-size:12px;color:var(--amber)">${tpl(T.wheelWarn, { p: wc.pct, a: wc.answered, t: wc.total })}${lowConf.length ? tpl(esc(T.lowerConf), { list: esc(lowConf.map((n) => domainName(n)).join(", ")) }) : ""} <a href="${passportLink}" style="color:var(--amber);font-weight:600;text-decoration:underline">${esc(T.completeMore)}</a></div>`
           : "";
         renderToggle();
         renderWheel();
@@ -726,7 +727,7 @@ import AppLayout from "../layouts/AppLayout.astro";
         appliedTaxCredit: fo.rows.some((r) => r.key === "dtc" && r.status !== "not_started"),
         fundingProgramsAvailable: fo.total - fo.started,
         onWaitlists: wl.length > 0,
-        topUnmetNeed: needsSorted.length ? needsSorted[0] + " support" : undefined,
+        topUnmetNeed: needsSorted.length ? ((window.uaLang || "en") === "en" ? needsSorted[0] + " support" : "le soutien en " + domainLow(needsSorted[0])) : undefined,
       };
       const recs = getRecommendations(data, ctx).filter((r) => r.severity !== "done");
       const SEV = {

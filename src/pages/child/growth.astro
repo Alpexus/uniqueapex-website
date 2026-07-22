@@ -285,6 +285,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
   import * as UA from "../../lib/ua-data.js";
   import { scoreWheel, DOMAINS, scoreToBand, snapshotWheel, HUES } from "../../lib/wheelScore.js";
   import { domainColor } from "../../lib/wheelSvg.js";
+  import { bandLabel } from "../../lib/libI18n.js";
   import { ensureSnapshot, diffData } from "../../lib/history.js";
   import { notify } from "../../lib/notify.js";
   import { getPlan, PLANS, upsellHTML } from "../../lib/plan.js";
@@ -363,9 +364,9 @@ import SectionTabs from "@/components/SectionTabs.astro";
   function bandInfo(score) {
     if (score == null) return null;
     const b = scoreToBand(score);
-    if (b.key === "minimal" || b.key === "low") return { label: b.label, bg: "#E8F6F0", fg: "#0E8F66", seg: "#0E8F66", rings: score === 0 ? 0 : b.rings };
-    if (b.key === "high" || b.key === "intensive") return { label: b.label, bg: "#EDE9FE", fg: "#6D28D9", seg: "#7C3AED", rings: b.rings };
-    return { label: b.label, bg: "#FBF2E2", fg: "#A8650A", seg: "#D97706", rings: b.rings };
+    if (b.key === "minimal" || b.key === "low") return { label: bandLabel(b), bg: "#E8F6F0", fg: "#0E8F66", seg: "#0E8F66", rings: score === 0 ? 0 : b.rings };
+    if (b.key === "high" || b.key === "intensive") return { label: bandLabel(b), bg: "#EDE9FE", fg: "#6D28D9", seg: "#7C3AED", rings: b.rings };
+    return { label: bandLabel(b), bg: "#FBF2E2", fg: "#A8650A", seg: "#D97706", rings: b.rings };
   }
 
   /* ================= story bits ================= */

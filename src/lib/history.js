@@ -14,6 +14,8 @@
      and the wheel never disagree.
    ============================================================ */
 import { SCALE_QUESTIONS, SCALE_META } from "../config/wheelConfig.js";
+import { makeT, tpl, dv, scaleLabel, senseLabel } from "./libI18n.js";
+import DICT from "../i18n/lib-history.js";
 
 const UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
 const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
@@ -68,25 +70,28 @@ const get = (obj, path) => path.split(".").reduce((o, k) => (o == null ? undefin
 const blank = (v) => v === undefined || v === null || v === "" || (Array.isArray(v) && !v.length);
 
 /* Ordered selects: earlier → later in the array = improvement.
-   Mirrors the ability maps in wheelConfig's CONTRIBUTIONS. */
+   Mirrors the ability maps in wheelConfig's CONTRIBUTIONS.
+   `order` values are canonical DB values — never translate them;
+   labels + displayed values resolve via lib-history / lib-terms. */
 const ORDERED = [
-  { path: "communication.style", label: "Communication style", order: ["Non-Speaking", "Limited Verbal", "Verbal", "Fluent Verbal"] },
-  { path: "communication.canExpressNeeds", label: "Expresses needs", order: ["Rarely", "Sometimes", "Consistently"] },
-  { path: "dailyLiving.eating", label: "Eating", order: ["Not yet", "With support", "Independent"] },
-  { path: "dailyLiving.dressing", label: "Dressing", order: ["Not yet", "With support", "Independent"] },
-  { path: "dailyLiving.toileting", label: "Toileting", order: ["Not started", "In progress", "Fully trained"] },
-  { path: "dailyLiving.sleep", label: "Sleep", order: ["Poor", "Variable", "Good"] },
-  { path: "dailyLiving.safety", label: "Safety awareness", order: ["Limited", "Developing", "Strong"] },
-  { path: "behaviour.peersInterest", label: "Interest in other children", order: ["No", "Sometimes", "Yes"] },
-  { path: "behaviour.peersInteract", label: "Plays with peers", order: ["No", "Sometimes", "Yes"] },
-  { path: "behaviour.followsInstructions", label: "Follows instructions", order: ["No", "Sometimes", "Yes"] },
+  { path: "communication.style", k: "oh_commStyle", order: ["Non-Speaking", "Limited Verbal", "Verbal", "Fluent Verbal"] },
+  { path: "communication.canExpressNeeds", k: "oh_expressNeeds", order: ["Rarely", "Sometimes", "Consistently"] },
+  { path: "dailyLiving.eating", k: "oh_eating", order: ["Not yet", "With support", "Independent"] },
+  { path: "dailyLiving.dressing", k: "oh_dressing", order: ["Not yet", "With support", "Independent"] },
+  { path: "dailyLiving.toileting", k: "oh_toileting", order: ["Not started", "In progress", "Fully trained"] },
+  { path: "dailyLiving.sleep", k: "oh_sleep", order: ["Poor", "Variable", "Good"] },
+  { path: "dailyLiving.safety", k: "oh_safety", order: ["Limited", "Developing", "Strong"] },
+  { path: "behaviour.peersInterest", k: "oh_peersInterest", order: ["No", "Sometimes", "Yes"] },
+  { path: "behaviour.peersInteract", k: "oh_peersInteract", order: ["No", "Sometimes", "Yes"] },
+  { path: "behaviour.followsInstructions", k: "oh_follows", order: ["No", "Sometimes", "Yes"] },
 ];
-const CHALLENGES = { meltdowns: "Meltdowns", emotional: "Emotional regulation", anxiety: "Anxiety", rigidity: "Rigidity around routines", aggression: "Aggression", selfInjury: "Self-injury", repetitive: "Repetitive behaviours", defiance: "Defiance", hyperactivity: "Hyperactivity", elopement: "Elopement" };
-const SENSES = { auditory: "Sound", visual: "Sight", tactile: "Touch", oral: "Taste & mouth", smell: "Smell", movement: "Movement & balance", body: "Body awareness" };
+const CHALLENGE_KEYS = ["meltdowns", "emotional", "anxiety", "rigidity", "aggression", "selfInjury", "repetitive", "defiance", "hyperactivity", "elopement"];
+const SENSE_KEYS = ["auditory", "visual", "tactile", "oral", "smell", "movement", "body"];
 
 /** Compare two passport data objects → grouped, parent-friendly changes. */
 export function diffData(oldD, newD) {
   oldD = oldD || {}; newD = newD || {};
+  const t = makeT(DICT);
   const improved = [], flags = [], other = [];
   const push = (arr, label, from, to) => { if (arr.length < 14) arr.push({ label, from: from == null ? "" : String(from), to: to == null ? "" : String(to) }); };
 
@@ -98,11 +103,11 @@ export function diffData(oldD, newD) {
       if (blank(n)) return;
       const oN = blank(o) ? null : Number(o), nN = Number(n);
       if (isNaN(nN)) return;
-      const fromLbl = oN == null ? "not answered" : FREQ5[oN] || o;
-      const toLbl = FREQ5[nN] || n;
-      if (oN == null) { push(other, q.label, fromLbl, toLbl); return; }
+      const fromLbl = oN == null ? t("notAnswered") : dv(FREQ5[oN] || o);
+      const toLbl = dv(FREQ5[nN] || n);
+      if (oN == null) { push(other, scaleLabel(q), fromLbl, toLbl); return; }
       const better = SCALE_META[q.id] && SCALE_META[q.id].reverse ? nN < oN : nN > oN;
-      push(better ? improved : flags, q.label, fromLbl, toLbl);
+      push(better ? improved : flags, scaleLabel(q), fromLbl, toLbl);
     });
   });
 
@@ -110,41 +115,41 @@ export function diffData(oldD, newD) {
   ORDERED.forEach((f) => {
     const o = get(oldD, f.path), n = get(newD, f.path);
     if (o === n || blank(n)) return;
-    if (blank(o)) { push(other, f.label, "not answered", n); return; }
+    if (blank(o)) { push(other, t(f.k), t("notAnswered"), dv(n)); return; }
     const oi = f.order.indexOf(o), ni = f.order.indexOf(n);
-    if (oi === -1 || ni === -1) { push(other, f.label, o, n); return; }
-    push(ni > oi ? improved : flags, f.label, o, n);
+    if (oi === -1 || ni === -1) { push(other, t(f.k), dv(o), dv(n)); return; }
+    push(ni > oi ? improved : flags, t(f.k), dv(o), dv(n));
   });
 
   /* behaviour challenge frequencies (lower = better) */
-  Object.keys(CHALLENGES).forEach((k) => {
+  CHALLENGE_KEYS.forEach((k) => {
     const o = get(oldD, "behaviour.challenges." + k), n = get(newD, "behaviour.challenges." + k);
     if (o === n || blank(n)) return;
-    if (blank(o)) { push(CHFREQ.indexOf(n) >= 3 ? flags : other, CHALLENGES[k], "not noted", n); return; }
+    if (blank(o)) { push(CHFREQ.indexOf(n) >= 3 ? flags : other, t("ch_" + k), t("notNoted"), dv(n)); return; }
     const oi = CHFREQ.indexOf(o), ni = CHFREQ.indexOf(n);
-    if (oi === -1 || ni === -1) { push(other, CHALLENGES[k], o, n); return; }
-    push(ni < oi ? improved : flags, CHALLENGES[k], o, n);
+    if (oi === -1 || ni === -1) { push(other, t("ch_" + k), dv(o), dv(n)); return; }
+    push(ni < oi ? improved : flags, t("ch_" + k), dv(o), dv(n));
   });
 
   /* sensory senses */
-  Object.keys(SENSES).forEach((k) => {
+  SENSE_KEYS.forEach((k) => {
     const o = get(oldD, "sensory." + k) || {}, n = get(newD, "sensory." + k) || {};
-    if (!o.typical && n.typical && (o.signs && o.signs.length)) { push(improved, SENSES[k], "had sensitivities", "now comfortable"); return; }
-    if (o.typical && !n.typical && n.signs && n.signs.length) { push(flags, SENSES[k], "comfortable", "new sensitivities noted"); return; }
+    if (!o.typical && n.typical && (o.signs && o.signs.length)) { push(improved, senseLabel(k), t("hadSens"), t("nowComfortable")); return; }
+    if (o.typical && !n.typical && n.signs && n.signs.length) { push(flags, senseLabel(k), t("comfortable"), t("newSens")); return; }
     if (o.severity && n.severity && o.severity !== n.severity) {
       const oi = SEV.indexOf(o.severity), ni = SEV.indexOf(n.severity);
-      if (oi > -1 && ni > -1) push(ni > oi ? improved : flags, SENSES[k] + " sensitivity", o.severity, n.severity);
+      if (oi > -1 && ni > -1) push(ni > oi ? improved : flags, tpl(t("sensSuffix"), { sense: senseLabel(k) }), dv(o.severity), dv(n.severity));
     }
   });
 
   /* communication means + therapies + diagnoses — additions tell a story */
   const oMeans = get(oldD, "communication.means") || [], nMeans = get(newD, "communication.means") || [];
-  nMeans.filter((m) => !oMeans.includes(m) && m !== "No primary means yet").forEach((m) => push(improved, "New way to communicate", "", m));
-  const oTher = (oldD.therapy || []).map((t) => t && t.type).filter(Boolean);
-  const nTher = (newD.therapy || []).map((t) => t && t.type).filter(Boolean);
-  nTher.filter((t) => !oTher.includes(t)).forEach((t) => push(improved, "Joined the team", "", t));
+  nMeans.filter((m) => !oMeans.includes(m) && m !== "No primary means yet").forEach((m) => push(improved, t("newComm"), "", dv(m)));
+  const oTher = (oldD.therapy || []).map((x) => x && x.type).filter(Boolean);
+  const nTher = (newD.therapy || []).map((x) => x && x.type).filter(Boolean);
+  nTher.filter((x) => !oTher.includes(x)).forEach((x) => push(improved, t("joinedTeam"), "", dv(x)));
   const oDx = get(oldD, "diagnosis.diagnoses") || [], nDx = get(newD, "diagnosis.diagnoses") || [];
-  nDx.filter((d) => !oDx.includes(d)).forEach((d) => push(other, "Diagnosis recorded", "", d));
+  nDx.filter((d) => !oDx.includes(d)).forEach((d) => push(other, t("dxRecorded"), "", dv(d)));
 
   return { improved, flags, other, total: improved.length + flags.length + other.length };
 }

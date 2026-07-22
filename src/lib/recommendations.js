@@ -17,6 +17,9 @@
      • This is v1. Add/adjust rules here in one place.
    ============================================================ */
 
+import { makeT, tpl, dv, ofName } from "./libI18n.js";
+import DICT from "../i18n/lib-recs.js";
+
 const RANK = { warn: 0, todo: 1, info: 2, done: 3 };
 
 // True when a passport section has at least one meaningful value.
@@ -37,7 +40,7 @@ function filled(section) {
 
 export function childFirstName(data) {
   const cp = (data && data.childProfile) || {};
-  return (cp.firstName && String(cp.firstName).trim()) || "your child";
+  return (cp.firstName && String(cp.firstName).trim()) || makeT(DICT)("yourChild");
 }
 
 /**
@@ -47,37 +50,39 @@ export function childFirstName(data) {
  */
 export function getRecommendations(data, ctx = {}) {
   data = data || {};
+  const t = makeT(DICT);
   const name = childFirstName(data);
+  const nv = { name, of: ofName(name) };
   const recs = [];
   const add = (r) => recs.push(r);
 
   /* ---------- My Child: profile completeness ---------- */
   if (!filled(data.diagnosis)) {
     add({ id: "diagnosis", section: "child", severity: "todo",
-      title: "Add the diagnosis details",
-      reason: "It unlocks the funding programs and supports that depend on it.",
-      href: "/child", cta: "Add details" });
+      title: t("dx_title"),
+      reason: t("dx_reason"),
+      href: "/child", cta: t("dx_cta") });
   } else {
     add({ id: "diagnosis-done", section: "child", severity: "done",
-      title: "Diagnosis recorded", reason: "", href: "/child", cta: "" });
+      title: t("dxDone_title"), reason: "", href: "/child", cta: "" });
   }
   if (!filled(data.sensory)) {
     add({ id: "sensory", section: "child", severity: "todo",
-      title: "Complete the sensory profile",
-      reason: `It sharpens ${name}'s Support Wheel and the provider matches.`,
-      href: "/child/support-wheel", cta: "Continue profile" });
+      title: t("sens_title"),
+      reason: tpl(t("sens_reason"), nv),
+      href: "/child/support-wheel", cta: t("cont_cta") });
   }
   if (!filled(data.communication)) {
     add({ id: "communication", section: "child", severity: "todo",
-      title: "Fill in the communication section",
-      reason: "Therapists use it to tailor early goals.",
-      href: "/child/support-wheel", cta: "Continue profile" });
+      title: t("comm_title"),
+      reason: t("comm_reason"),
+      href: "/child/support-wheel", cta: t("cont_cta") });
   }
   if (!filled(data.strengths)) {
     add({ id: "strengths", section: "child", severity: "info",
-      title: `Capture ${name}'s strengths and interests`,
-      reason: "Strength-based notes make plans easier to follow.",
-      href: "/child", cta: "Add strengths" });
+      title: tpl(t("str_title"), nv),
+      reason: t("str_reason"),
+      href: "/child", cta: t("str_cta") });
   }
 
   /* ---------- Documents: recency ---------- */
@@ -86,40 +91,40 @@ export function getRecommendations(data, ctx = {}) {
   const stale = speech && monthsAgo(speech.date) > 6;
   if (!speech || stale) {
     add({ id: "speech-doc", section: "documents", severity: "warn",
-      title: "Upload the latest speech report",
-      reason: speech ? "Your most recent one is over six months old." : "It improves recommendations and most funding reviews ask for it.",
-      href: "/documents", cta: "Upload" });
+      title: t("doc_title"),
+      reason: speech ? t("doc_reasonStale") : t("doc_reasonNone"),
+      href: "/documents", cta: t("doc_cta") });
   }
 
   /* ---------- Funding ---------- */
   if (!ctx.appliedTaxCredit) {
     add({ id: "tax-credit", section: "funding", severity: "warn",
-      title: "Apply for the Québec disability tax credit",
-      reason: "Most families with a diagnosis qualify, and it's often missed.",
-      href: "/funding/tax-credits", cta: "Start application" });
+      title: t("tax_title"),
+      reason: t("tax_reason"),
+      href: "/funding/tax-credits", cta: t("tax_cta") });
   }
   const more = ctx.fundingProgramsAvailable ?? 4;
   if (more > 0) {
     add({ id: "funding-more", section: "funding", severity: "info",
-      title: `${name} may qualify for ${more} more program${more === 1 ? "" : "s"}`,
-      reason: "Based on age and diagnosis on file.",
-      href: "/funding", cta: "See programs" });
+      title: tpl(t(more === 1 ? "fundOne_title" : "fundMany_title"), { name, n: more }),
+      reason: t("fund_reason"),
+      href: "/funding", cta: t("fund_cta") });
   }
 
   /* ---------- Providers ---------- */
   if (!ctx.onWaitlists) {
-    const need = ctx.topUnmetNeed || "Speech therapy";
+    const need = ctx.topUnmetNeed ? dv(ctx.topUnmetNeed) : t("speechTherapy");
     add({ id: "waitlists", section: "providers", severity: "warn",
-      title: "Join provider waitlists",
-      reason: `${need} is currently your highest unmet need, and waitlists are long.`,
-      href: "/providers/waitlists", cta: "Find providers" });
+      title: t("wait_title"),
+      reason: tpl(t("wait_reason"), { need }),
+      href: "/providers/waitlists", cta: t("wait_cta") });
   }
 
   /* ---------- Resources (always relevant, low priority) ---------- */
   add({ id: "resources-relevant", section: "resources", severity: "info",
-    title: `Guides picked for ${name}`,
-    reason: "Matched to the diagnosis and stage on file.",
-    href: "/resources/guides", cta: "Browse guides" });
+    title: tpl(t("res_title"), nv),
+    reason: t("res_reason"),
+    href: "/resources/guides", cta: t("res_cta") });
 
   recs.sort((a, b) => (RANK[a.severity] - RANK[b.severity]));
   return recs;

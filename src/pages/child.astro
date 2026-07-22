@@ -211,6 +211,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
   import * as UA from "../lib/ua-data.js";
   import { scoreWheel, DOMAINS, snapshotWheel, HUES } from "../lib/wheelScore.js";
   import { generateWheelSVG, domainColor } from "../lib/wheelSvg.js";
+  import { dv, domainShort, domainLow } from "../lib/libI18n.js";
   import { buildFamilyGuidance } from "../lib/domainInsights.js";
   import { iconFor } from "../lib/interestIcons.js";
   import { buildJourney } from "../lib/journey.js";
@@ -242,7 +243,9 @@ import SectionTabs from "@/components/SectionTabs.astro";
     if (arr.length === 2) return arr[0] + T.pairJoin + arr[1];
     return arr.slice(0, -1).join(", ") + T.finalJoin + arr[arr.length - 1];
   };
-  const SHORT = { "Communication": "Communication", "Social Connection": "Social", "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility", "Emotional Regulation": "Emotional", "Executive Function": "Executive", "Daily Living Skills": "Daily living", "Learning & Play": "Learning & play" };
+  /* display names resolve per language (libI18n) — EN values unchanged */
+  const SHORT = Object.fromEntries(DOMAINS.map((d) => [d, domainShort(d)]));
+  const domSent = (n) => ((window.uaLang || "en") === "en" ? lc(SHORT[n] || n) : domainLow(n)); /* in-sentence form */
   const tintOf = (nm, a) => { const i = DOMAINS.indexOf(nm); return i === -1 ? "rgba(109,40,217," + a + ")" : "hsla(" + HUES[i] + ",70%,45%," + a + ")"; };
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -283,7 +286,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
     const aboutParts = [];
     if (interests.length) aboutParts.push(tpl(T.enjoys, { list: listPhrase(interests.slice(0, 3).map(lc)) }));
     else if (strengthsText.length) aboutParts.push(tpl(T.strengthsIn, { list: listPhrase(strengthsText.slice(0, 3).map(lc)) }));
-    if (needs.length) aboutParts.push(tpl(T.routines, { list: listPhrase(needs.slice(0, 2).map((n) => lc(SHORT[n] || n))) }));
+    if (needs.length) aboutParts.push(tpl(T.routines, { list: listPhrase(needs.slice(0, 2).map((n) => domSent(n))) }));
     $("ov-about").textContent = aboutParts.join(" ");
 
     /* ---- completion ring ---- */
@@ -316,10 +319,10 @@ import SectionTabs from "@/components/SectionTabs.astro";
     if (strengths.length < 3) {
       DOMAINS.filter((n) => scored[n].strength != null && scored[n].strength >= 55)
         .sort((a, b) => scored[b].strength - scored[a].strength)
-        .forEach((n) => { if (strengths.length < 6) strengths.push(tpl(T.strongX, { x: lc(SHORT[n] || n) })); });
+        .forEach((n) => { if (strengths.length < 6) strengths.push(tpl(T.strongX, { x: domSent(n) })); });
     }
     const sIc = (d, c) => `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="${c}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-    const teamAbbr = team.map((t) => String(t.type).split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase()).join(" + ");
+    const teamAbbr = team.map((t) => String(dv(t.type)).split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase()).join(" + ");
     const stats = [
       [`<b>${Array.isArray(pri) ? pri.length : 0}</b> ${esc(T.statFocus)}`, sIc(`<path d="M8 1.5l2 4.2 4.5.5-3.3 3.1.9 4.5L8 11.7 3.9 13.8l.9-4.5L1.5 6.2 6 5.7z"/>`, "#6D28D9"), pLink],
       [`<b>${team.length}</b> ${esc(T.statProviders)}${teamAbbr ? " · " + esc(teamAbbr) : ""}`, sIc(`<circle cx="6" cy="5" r="2.2"/><path d="M2 13c.4-2.2 2-3.2 4-3.2s3.6 1 4 3.2"/><circle cx="11.5" cy="5.5" r="1.8"/>`, "#0E8C82"), "/providers"],
@@ -393,10 +396,10 @@ import SectionTabs from "@/components/SectionTabs.astro";
 
     /* ---- working on + team ---- */
     $("ov-pri").innerHTML = (Array.isArray(pri) && pri.length)
-      ? pri.map((x, i) => `<span class="ov-pri-tag cu-pop" style="--d:${(0.12 + i * 0.06).toFixed(2)}s">${esc(x)}</span>`).join("")
+      ? pri.map((x, i) => `<span class="ov-pri-tag cu-pop" style="--d:${(0.12 + i * 0.06).toFixed(2)}s">${esc(dv(x))}</span>`).join("")
       : `<p class="ov-empty">${esc(T.priEmpty)} <a href="${pLink}">${esc(T.choosePriorities)}</a></p>`;
     $("ov-team").innerHTML = team.length
-      ? `${esc(T.teamLabel)} <b>${team.map((t) => esc(t.type)).join(" · ")}</b>`
+      ? `${esc(T.teamLabel)} <b>${team.map((t) => esc(dv(t.type))).join(" · ")}</b>`
       : `${esc(T.teamLabel)} <a href="${pLink}" style="color:var(--violet-700);font-weight:600">${tpl(esc(T.addTeam), { name: esc(firstName), of: ofName(firstName) })}</a>`;
 
     /* ---- guidance ---- */

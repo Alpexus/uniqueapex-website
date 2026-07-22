@@ -16,19 +16,21 @@
          g.addEventListener("click", () => selectDomain(g.dataset.domain)));
    · confidenceBadge(conf, answered, total) — counts add a tooltip;
      old 1-argument calls still work.
+   · v3.1 PRESENTATION-ONLY i18n: petal labels, aria-labels, <title> and the
+     confidence badge resolve via libI18n/lib-terms (window.uaLang). SCORING
+     IS UNTOUCHED — this file still only READS scoreToBand. English output
+     is byte-identical to v3.
    ============================================================================ */
 import { DOMAINS, HUES, scoreToBand } from "../config/wheelConfig.js";
+import { makeT, tpl, domainShort } from "./libI18n.js";
+import TERMS from "../i18n/lib-terms.js";
 
 export function generateWheelSVG(scored, mode, selectedDomain) {
   var cx = 240, cy = 210, r0 = 24, R = 130, rings = 5, n = DOMAINS.length;
   var step = (R - r0) / rings, seg = (2 * Math.PI) / n;
   var strengths = mode === "strengths";
-  var shortLabels = {
-    "Communication": "Communication", "Social Connection": "Social",
-    "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility",
-    "Emotional Regulation": "Emotional", "Executive Function": "Executive",
-    "Daily Living Skills": "Daily living", "Learning & Play": "Learning & play",
-  };
+  var wt = makeT(TERMS);
+  var confWord = { low: wt("w_confLowWord"), medium: wt("w_confMediumWord"), high: wt("w_confHighWord") };
   function pt(r, a) { return [(cx + r * Math.cos(a)).toFixed(2), (cy + r * Math.sin(a)).toFixed(2)]; }
   function sector(ir, or_, a0, a1) {
     var p0 = pt(ir, a0), p1 = pt(or_, a0), p2 = pt(or_, a1), p3 = pt(ir, a1);
@@ -57,8 +59,8 @@ export function generateWheelSVG(scored, mode, selectedDomain) {
     var dimmed = selectedDomain && !selected;
     var conf = strengths ? dm.strengthConfidence : dm.confidence;
     var label = hasData
-      ? shortLabels[name] + " — " + (strengths ? "strength" : "support level") + " " + filled + " of 5" + (conf ? ", " + conf + " confidence" : "")
-      : shortLabels[name] + " — not enough answers yet";
+      ? tpl(wt(strengths ? "w_ariaStrength" : "w_ariaLevel"), { d: domainShort(name), n: filled }) + (conf ? tpl(wt("w_ariaConf"), { c: confWord[conf] || conf }) : "")
+      : tpl(wt("w_ariaNone"), { d: domainShort(name) });
 
     svg += '<g data-domain="' + name + '" role="button" tabindex="0" aria-label="' + label + '"' +
       (dimmed ? ' opacity="0.4"' : "") + ' style="cursor:pointer">';
@@ -77,11 +79,11 @@ export function generateWheelSVG(scored, mode, selectedDomain) {
     var mid = a0 + seg / 2, lp = pt(R + 13, mid);
     var anchor = Math.cos(mid) > 0.25 ? "start" : (Math.cos(mid) < -0.25 ? "end" : "middle");
     svg += '<text x="' + lp[0] + '" y="' + lp[1] + '" font-size="10" fill="#475569" text-anchor="' + anchor + '" dominant-baseline="middle"' +
-      (dimmed ? ' opacity="0.5"' : "") + ">" + shortLabels[name] + "</text>";
+      (dimmed ? ' opacity="0.5"' : "") + ">" + domainShort(name) + "</text>";
   }
   svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r0 + '" fill="#fff" stroke="#e2e8f0"/>';
   return '<svg viewBox="0 0 480 420" width="100%" style="max-width:420px;display:block;margin:0 auto" xmlns="http://www.w3.org/2000/svg" role="img">' +
-    "<title>" + (strengths ? "Strengths wheel" : "Support needs wheel") + "</title>" + svg + "</svg>";
+    "<title>" + wt(strengths ? "w_titleStrengths" : "w_titleNeeds") + "</title>" + svg + "</svg>";
 }
 
 /* Domain identity color for dots/labels elsewhere — always matches the petal */
@@ -91,13 +93,14 @@ export function domainColor(name) {
 }
 
 export function confidenceBadge(conf, answered, total) {
+  var wt = makeT(TERMS);
   var map = {
-    high: ["High", "#16a34a", "#dcfce7"], medium: ["Medium", "#b45309", "#fef3c7"],
-    low: ["Low", "#64748b", "#f1f5f9"], none: ["No data", "#94a3b8", "#f8fafc"],
+    high: [wt("w_confHigh"), "#16a34a", "#dcfce7"], medium: [wt("w_confMedium"), "#b45309", "#fef3c7"],
+    low: [wt("w_confLow"), "#64748b", "#f1f5f9"], none: [wt("w_confNone"), "#94a3b8", "#f8fafc"],
   };
   var m = map[conf] || map.none;
   var title = typeof answered === "number" && typeof total === "number"
-    ? ' title="Based on ' + answered + " of " + total + ' related questions"'
+    ? ' title="' + tpl(wt("w_confTitle"), { a: answered, t: total }) + '"'
     : "";
   return '<span' + title + ' style="font-size:11px;font-weight:600;color:' + m[1] + ";background:" + m[2] + ';padding:2px 8px;border-radius:9999px">' + m[0] + "</span>";
 }

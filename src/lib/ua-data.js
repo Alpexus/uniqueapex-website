@@ -19,6 +19,9 @@
 
 import { scoreWheel, domainArray, scoreToBand } from "./wheelScore.js";
 import { notify } from "./notify.js";
+import { makeT, tpl, bandLabel, libLocale } from "./libI18n.js";
+import DICT from "../i18n/lib-data.js";
+const T = () => makeT(DICT);
 
 const SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
 const ANON =
@@ -59,7 +62,7 @@ async function refreshSession(s) {
       const d = await r.json();
       d.expires_at = Math.floor(Date.now() / 1000) + (d.expires_in || 3600);
       localStorage.setItem("ua_session", JSON.stringify(d));
-      notify("info", "Signed back in automatically — everything's still here ✓");
+      notify("info", T()("toast_signedBack"));
       return d;
     } catch {
       return null;
@@ -88,7 +91,7 @@ async function rest(path) {
   } catch (e) {
     if (Date.now() - offlineToastAt > 8000) {
       offlineToastAt = Date.now();
-      notify("warn", "Can't reach the server — check your connection. Nothing is lost.");
+      notify("warn", T()("toast_offline"));
     }
     throw e;
   }
@@ -114,14 +117,17 @@ const FIELD_MAP = {
 };
 
 // ---- the 7 funding programs (from masterfile §15) --------------
+// `key` is canonical (stored in funding_applications.program_key) —
+// name/note/level are DISPLAY ONLY, resolved from lib-data.js.
+const _fp = T();
 export const FUNDING_PROGRAMS = [
-  { key: "dtc",            name: "Disability Tax Credit",                       level: "Federal", note: "Gateway program", amount: 0 },
-  { key: "cdb",            name: "Child Disability Benefit",                    level: "Federal", note: "Up to $3,411/yr",  amount: 3411 },
-  { key: "rdsp",           name: "Registered Disability Savings Plan",          level: "Federal", note: "Grants up to $3,500/yr", amount: 3500 },
-  { key: "qc_supplement",  name: "Supplement for Handicapped Children",         level: "Québec",  note: "$241/month",       amount: 2892 },
-  { key: "qc_exceptional", name: "Supplement — Exceptional Care",               level: "Québec",  note: "Tier 1 ~$1,191/mo", amount: 14292 },
-  { key: "qc_family_alloc",name: "Family Allowance",                            level: "Québec",  note: "Income-based",     amount: 0 },
-  { key: "qc_family_supp", name: "Family Support Program",                      level: "Québec",  note: "Respite & childcare", amount: 0 },
+  { key: "dtc",            name: _fp("fp_dtc"),            level: _fp("level_federal"), note: _fp("fp_dtc_note"), amount: 0 },
+  { key: "cdb",            name: _fp("fp_cdb"),            level: _fp("level_federal"), note: _fp("fp_cdb_note"),  amount: 3411 },
+  { key: "rdsp",           name: _fp("fp_rdsp"),           level: _fp("level_federal"), note: _fp("fp_rdsp_note"), amount: 3500 },
+  { key: "qc_supplement",  name: _fp("fp_qc_supplement"),  level: _fp("level_quebec"),  note: _fp("fp_qc_supplement_note"),       amount: 2892 },
+  { key: "qc_exceptional", name: _fp("fp_qc_exceptional"), level: _fp("level_quebec"),  note: _fp("fp_qc_exceptional_note"), amount: 14292 },
+  { key: "qc_family_alloc",name: _fp("fp_qc_family_alloc"),level: _fp("level_quebec"),  note: _fp("fp_qc_family_alloc_note"),     amount: 0 },
+  { key: "qc_family_supp", name: _fp("fp_qc_family_supp"), level: _fp("level_quebec"),  note: _fp("fp_qc_family_supp_note"), amount: 0 },
 ];
 
 // ---- reads -----------------------------------------------------
@@ -179,7 +185,7 @@ export function childIdentity(data) {
   const m = FIELD_MAP.child;
   const first = c[m.first] || "";
   const last = c[m.last] || "";
-  const name = [first, last].filter(Boolean).join(" ") || "Your child";
+  const name = [first, last].filter(Boolean).join(" ") || T()("yourChild");
   let age = null;
   const dob = c[m.dob];
   if (dob) {
@@ -238,11 +244,11 @@ export function domainSnapshot(data) {
 }
 
 export function levelFor(support) {
-  if (support == null) return { cls: "mod", label: "Not enough data" };
+  if (support == null) return { cls: "mod", label: T()("notEnoughData") };
   const b = scoreToBand(support);
-  if (b.key === "minimal" || b.key === "low") return { cls: "low", label: b.label };
-  if (b.key === "high" || b.key === "intensive") return { cls: "high", label: b.label };
-  return { cls: "mod", label: b.label };
+  if (b.key === "minimal" || b.key === "low") return { cls: "low", label: bandLabel(b) };
+  if (b.key === "high" || b.key === "intensive") return { cls: "high", label: bandLabel(b) };
+  return { cls: "mod", label: bandLabel(b) };
 }
 
 // ---- derived: rule-based insights (v1) -------------------------
@@ -261,9 +267,10 @@ export function insights(data, snapshot, comp, docCount) {
     .map((r) => r.domain);
 
   const actions = [];
-  if (comp.pct < 100) actions.push({ label: `Complete the ${comp.total - comp.done} remaining profile section${comp.total - comp.done === 1 ? "" : "s"}`, href: "/children" });
-  if (!docCount) actions.push({ label: "Upload your child's latest report", href: "/documents" });
-  actions.push({ label: "Review funding options for 2026", href: "/funding" });
+  const t = T(), remaining = comp.total - comp.done;
+  if (comp.pct < 100) actions.push({ label: remaining === 1 ? t("act_completeOne") : tpl(t("act_completeMany"), { n: remaining }), href: "/children" });
+  if (!docCount) actions.push({ label: t("act_upload"), href: "/documents" });
+  actions.push({ label: t("act_funding"), href: "/funding" });
 
   return { strengths, watch, actions: actions.slice(0, 3) };
 }
@@ -286,21 +293,24 @@ export function fundingOverview(apps) {
 // ---- small formatters ------------------------------------------
 export function fmtDate(iso) {
   const d = new Date(iso);
-  return isNaN(d) ? "" : d.toLocaleDateString("en-CA", { month: "short", day: "numeric" });
+  return isNaN(d) ? "" : d.toLocaleDateString(libLocale(), { month: "short", day: "numeric" });
 }
 export function relTime(iso) {
   const d = new Date(iso); if (isNaN(d)) return "";
+  const t = T();
   const days = Math.floor((Date.now() - d) / 86400000);
-  if (days <= 0) return "today";
-  if (days === 1) return "yesterday";
-  if (days < 7) return days + " days ago";
-  if (days < 14) return "1 week ago";
-  return Math.floor(days / 7) + " weeks ago";
+  if (days <= 0) return t("rel_today");
+  if (days === 1) return t("rel_yesterday");
+  if (days < 7) return tpl(t("rel_days"), { n: days });
+  if (days < 14) return t("rel_week1");
+  return tpl(t("rel_weeks"), { n: Math.floor(days / 7) });
 }
+/* status KEYS are canonical (stored in funding_applications.status) — labels display only */
+const _st = T();
 export const STATUS_PILL = {
-  not_started: { cls: "new", label: "Not started" },
-  started:     { cls: "wait", label: "Started" },
-  submitted:   { cls: "wait", label: "Submitted" },
-  approved:    { cls: "ok", label: "Approved" },
-  denied:      { cls: "new", label: "Denied" },
+  not_started: { cls: "new", label: _st("st_not_started") },
+  started:     { cls: "wait", label: _st("st_started") },
+  submitted:   { cls: "wait", label: _st("st_submitted") },
+  approved:    { cls: "ok", label: _st("st_approved") },
+  denied:      { cls: "new", label: _st("st_denied") },
 };

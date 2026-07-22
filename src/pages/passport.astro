@@ -2,6 +2,15 @@
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import { SCALE_QUESTIONS, SCALE_IDS } from "@/config/wheelConfig.js";
 import DICT from "@/i18n/passport.js";
+import TERMS from "@/i18n/lib-terms.js";
+/* sq_* display map per language for the 36 scored questions (frozen
+   wheelConfig labels stay canonical; this is display only) */
+const SQMAP = {};
+for (const lang of Object.keys(TERMS)) {
+  if (lang === "en") continue;
+  SQMAP[lang] = {};
+  for (const [k, v] of Object.entries(TERMS[lang])) if (k.startsWith("sq_")) SQMAP[lang][k.slice(3)] = v;
+}
 const inputCls = "w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white";
 const cardCls = "bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-5";
 const labelCls = "block text-sm font-medium text-slate-600 mb-2";
@@ -263,7 +272,7 @@ const OPT_CODE = {
               <div class="space-y-2">
                 {SCALE_QUESTIONS.communication.map((q) => (
                   <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-                    <span class="text-sm text-slate-600 flex-1">{q.label}</span>
+                    <span class="text-sm text-slate-600 flex-1" data-sq={q.id}>{q.label}</span>
                     <select name={q.id} class={sel + " sm:w-44 shrink-0"}>
                       <option value="">—</option>
                       {scale4.map((o) => <option value={o.v} data-i18n={o.c}>{o.l}</option>)}
@@ -361,7 +370,7 @@ const OPT_CODE = {
             <div class="space-y-2">
               {SCALE_QUESTIONS.executive.map((q) => (
                 <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <span class="text-sm text-slate-600 flex-1">{q.label}</span>
+                  <span class="text-sm text-slate-600 flex-1" data-sq={q.id}>{q.label}</span>
                   <select name={q.id} class={sel + " sm:w-44 shrink-0"}>
                     <option value="">—</option>
                     {scale4.map((o) => <option value={o.v} data-i18n={o.c}>{o.l}</option>)}
@@ -482,7 +491,7 @@ const OPT_CODE = {
             <div class="space-y-2">
               {SCALE_QUESTIONS.social.map((q) => (
                 <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <span class="text-sm text-slate-600 flex-1">{q.label}</span>
+                  <span class="text-sm text-slate-600 flex-1" data-sq={q.id}>{q.label}</span>
                   <select name={q.id} class={sel + " sm:w-44 shrink-0"}><option value="">—</option>{scale4.map((o) => <option value={o.v} data-i18n={o.c}>{o.l}</option>)}</select>
                 </div>
               ))}
@@ -491,7 +500,7 @@ const OPT_CODE = {
             <div class="space-y-2">
               {SCALE_QUESTIONS.flexibility.map((q) => (
                 <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <span class="text-sm text-slate-600 flex-1">{q.label}</span>
+                  <span class="text-sm text-slate-600 flex-1" data-sq={q.id}>{q.label}</span>
                   <select name={q.id} class={sel + " sm:w-44 shrink-0"}><option value="">—</option>{scale4.map((o) => <option value={o.v} data-i18n={o.c}>{o.l}</option>)}</select>
                 </div>
               ))}
@@ -500,7 +509,7 @@ const OPT_CODE = {
             <div class="space-y-2">
               {SCALE_QUESTIONS.emotional.map((q) => (
                 <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <span class="text-sm text-slate-600 flex-1">{q.label}</span>
+                  <span class="text-sm text-slate-600 flex-1" data-sq={q.id}>{q.label}</span>
                   <select name={q.id} class={sel + " sm:w-44 shrink-0"}><option value="">—</option>{scale4.map((o) => <option value={o.v} data-i18n={o.c}>{o.l}</option>)}</select>
                 </div>
               ))}
@@ -520,7 +529,7 @@ const OPT_CODE = {
             <div class="space-y-2">
               {SCALE_QUESTIONS.learning.map((q) => (
                 <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <span class="text-sm text-slate-600 flex-1">{q.label}</span>
+                  <span class="text-sm text-slate-600 flex-1" data-sq={q.id}>{q.label}</span>
                   <select name={q.id} class={sel + " sm:w-44 shrink-0"}><option value="">—</option>{scale4.map((o) => <option value={o.v} data-i18n={o.c}>{o.l}</option>)}</select>
                 </div>
               ))}
@@ -660,9 +669,18 @@ const OPT_CODE = {
   .pv-row { display: flex; justify-content: space-between; gap: 24px; font-size: 12px; padding: 3px 0; border-bottom: 1px solid #f1f5f9; }
   .pv-label { color: #64748b; } .pv-val { color: #0f172a; text-align: right; }
 </style>
-<script is:inline define:vars={{ DICT }}>
+<script is:inline define:vars={{ DICT, SQMAP }}>
   /* ---------- i18n (string codes from src/i18n/passport.js) ---------- */
   var T = window.uaI18n ? window.uaI18n(DICT) : DICT.en;
+  /* the 36 scored-question labels (display map from lib-terms — values stay canonical) */
+  (function () {
+    var SQL = window.uaLang && SQMAP[window.uaLang];
+    if (!SQL) return;
+    document.querySelectorAll("[data-sq]").forEach(function (el) {
+      var v = SQL[el.getAttribute("data-sq")];
+      if (v) el.textContent = v;
+    });
+  })();
   var tpl = function (s, v) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return v && v[k] != null ? v[k] : ""; }); };
   var ofName = function (n) { return window.uaLang === "fr" ? (/^[aeiouyàâäéèêëìîïòôöùûüh]/i.test(String(n || "")) ? "d'" : "de ") : ""; };
   var currentStep = 1;

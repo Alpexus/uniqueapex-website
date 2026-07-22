@@ -1,5 +1,5 @@
 /* ============================================================
-   familyReport.js — FAMILY-INTAKE-V3 (complete questionnaire)
+   familyReport.js — FAMILY-INTAKE-V4 (bilingual)
    ------------------------------------------------------------
    The passport export is a COMPLETE professional intake form —
    every question from the passport questionnaire is printed,
@@ -13,35 +13,41 @@
    · One "parent-reported support snapshot" wheel section
    · Completed-by + signature + date block
    · NO advice/guidance in this document (that lives in the app)
+   V4: prints in the active language (window.uaLang). Labels live
+   in src/i18n/lib-report.js; option VALUES stay canonical English
+   for checkbox matching and are DISPLAYED via lib-terms (dv).
    ============================================================ */
 import { DOMAINS, HUES, SCALE_QUESTIONS } from "../config/wheelConfig.js";
 import { scoreWheel } from "./wheelScore.js";
+import { makeT, tpl, dv, ofName, domainShort, senseLabel, scaleLabel, libLocale } from "./libI18n.js";
+import DICT from "../i18n/lib-report.js";
+
+let _t = makeT(DICT); /* refreshed on every buildReportHTML call */
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const has = (v) => !(v == null || v === "" || (Array.isArray(v) && !v.length));
-const fmt = (v) => Array.isArray(v) ? v.join(", ") : String(v);
-const SHORTLBL = { "Communication": "Communication", "Social Connection": "Social", "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility", "Emotional Regulation": "Emotional", "Executive Function": "Executive", "Daily Living Skills": "Daily living", "Learning & Play": "Learning & play" };
+const fmt = (v) => Array.isArray(v) ? v.map((x) => dv(x)).join(", ") : String(dv(v));
 
 /* ---------- form atoms (every question always renders) ---------- */
-const line = (label, val, grow) => `<div class="fi-f${grow ? " grow" : ""}"><span class="fi-k">${esc(label)}:</span><span class="fi-v">${has(val) ? esc(fmt(val)) : '<i class="fi-na">N/A</i>'}</span></div>`;
+const line = (label, val, grow) => `<div class="fi-f${grow ? " grow" : ""}"><span class="fi-k">${esc(label)}:</span><span class="fi-v">${has(val) ? esc(fmt(val)) : '<i class="fi-na">' + esc(_t("na")) + "</i>"}</span></div>`;
 const cb = (on) => `<span class="fi-cb${on ? " on" : ""}">${on ? '<svg viewBox="0 0 10 10" width="8" height="8"><path d="M1.5 5.5l2.2 2.2L8.5 2.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>' : ""}</span>`;
-const opts = (label, options, val, grow) => `<div class="fi-f${grow ? " grow" : ""}"><span class="fi-k">${esc(label)}:</span><span class="fi-opts">${options.map((o) => `<span class="fi-opt">${cb(val === o)}${esc(o)}</span>`).join("")}</span></div>`;
-const checklist = (label, options, selected) => `<div class="fi-f grow" style="display:block"><span class="fi-k">${esc(label)}:</span><div class="fi-checks">${options.map((o) => `<span class="fi-opt">${cb((selected || []).includes(o))}${esc(o)}</span>`).join("")}</div></div>`;
+const opts = (label, options, val, grow) => `<div class="fi-f${grow ? " grow" : ""}"><span class="fi-k">${esc(label)}:</span><span class="fi-opts">${options.map((o) => `<span class="fi-opt">${cb(val === o)}${esc(dv(o))}</span>`).join("")}</span></div>`;
+const checklist = (label, options, selected) => `<div class="fi-f grow" style="display:block"><span class="fi-k">${esc(label)}:</span><div class="fi-checks">${options.map((o) => `<span class="fi-opt">${cb((selected || []).includes(o))}${esc(dv(o))}</span>`).join("")}</div></div>`;
 const banner = (t) => `<div class="fi-banner">${esc(t)}</div>`;
 
 /* ---------- the 0–4 frequency grid for the wheel scale questions ---------- */
-const SCALE_LBLS = ["Never", "Rarely", "Sometimes", "Often", "Consistently"];
+const SCALE_LBLS = ["Never", "Rarely", "Sometimes", "Often", "Consistently"]; /* canonical — displayed via dv */
 function scaleGrid(title, groupKeys, scales) {
   scales = scales || {};
   let rows = "";
   groupKeys.forEach((gk) => {
     (SCALE_QUESTIONS[gk] || []).forEach((q) => {
       const v = scales[q.id];
-      rows += `<tr><td>${esc(q.label)}</td>${SCALE_LBLS.map((_, i) => `<td>${cb(String(v) === String(i))}</td>`).join("")}</tr>`;
+      rows += `<tr><td>${esc(scaleLabel(q))}</td>${SCALE_LBLS.map((_, i) => `<td>${cb(String(v) === String(i))}</td>`).join("")}</tr>`;
     });
   });
   if (!rows) return "";
-  return `<table class="fi-tbl"><tr><th>${esc(title)}</th>${SCALE_LBLS.map((l) => `<th>${l}</th>`).join("")}</tr>${rows}</table>`;
+  return `<table class="fi-tbl"><tr><th>${esc(title)}</th>${SCALE_LBLS.map((l) => `<th>${esc(dv(l))}</th>`).join("")}</tr>${rows}</table>`;
 }
 
 /* ---------- wheel ---------- */
@@ -60,7 +66,7 @@ function roseSVG(scored) {
     const mid = a0 + (seg - 0.06) / 2;
     const lx = cx + (R + 11) * Math.cos(mid), ly = cy + (R + 11) * Math.sin(mid);
     const anchor = Math.cos(mid) > 0.25 ? "start" : (Math.cos(mid) < -0.25 ? "end" : "middle");
-    s += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="8.5" fill="#7B7491" text-anchor="${anchor}" dominant-baseline="middle">${SHORTLBL[name]}</text>`;
+    s += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="8.5" fill="#7B7491" text-anchor="${anchor}" dominant-baseline="middle">${domainShort(name)}</text>`;
   });
   for (let k = 1; k <= 4; k++) s += `<circle cx="${cx}" cy="${cy}" r="${(r0 + (R - r0) * k / 5).toFixed(1)}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.1"/>`;
   s += `<circle cx="${cx}" cy="${cy}" r="${r0}" fill="#fff" stroke="#EAE7F3"/>`;
@@ -69,6 +75,8 @@ function roseSVG(scored) {
 
 export function buildReportHTML(p, included) {
   p = p || {};
+  _t = makeT(DICT);
+  const t = _t;
   const inc = (k) => !included || included[k] !== false;
   const cp = p.childProfile || {}, hh = p.household || {}, dg = p.diagnosis || {}, bi = p.birth || {},
         co = p.communication || {}, se = p.sensory || {}, dl = p.dailyLiving || {}, mo = p.motor || {},
@@ -76,7 +84,7 @@ export function buildReportHTML(p, included) {
         sv = p.services || {}, gl = p.goals || {}, sc = p.scales || {};
   const bch = bh.challenges || {};
   const name = [cp.firstName, cp.lastName].filter(Boolean).join(" ") || "";
-  const today = new Date().toLocaleDateString("en-CA", { year: "numeric", month: "long", day: "numeric" });
+  const today = new Date().toLocaleDateString(libLocale(), { year: "numeric", month: "long", day: "numeric" });
   const scored = scoreWheel(p);
   const anyWheel = DOMAINS.some((n) => scored[n] && scored[n].score != null);
   const YN = ["Yes", "No"];
@@ -129,217 +137,218 @@ export function buildReportHTML(p, included) {
 
   let html = css + `<div class="fi-top">
     <div>
-      <h1>FAMILY PASSPORT</h1>
-      <p class="fi-tag">Completed by the family${cp.firstName ? " for " + esc(cp.firstName) + "'s care team" : ""} · Confidential</p>
+      <h1>${esc(t("title"))}</h1>
+      <p class="fi-tag">${esc(t("tag_completed"))}${cp.firstName ? esc(tpl(t("tag_forTeam"), { name: cp.firstName, of: ofName(cp.firstName) })) : ""} · ${esc(t("tag_conf"))}</p>
     </div>
     <img src="/logo3.png" alt="UniqueApex"/>
   </div>`;
 
   /* ============ 1 · CHILD INFORMATION ============ */
-  if (inc("childProfile")) html += `${banner("Child information")}<div class="fi-grid">
-    ${line("First name", cp.firstName)}${line("Last name", cp.lastName)}
-    ${line("Date of birth", cp.dob)}${line("Gender", cp.gender)}
-    ${line("City", cp.city)}${line("Country", cp.country)}
-    ${line("Health insurance #", cp.healthInsurance)}${line("Home languages", cp.homeLanguages)}
-    ${line("Understands best in", cp.bestLanguage)}${line("Date prepared", today)}
+  if (inc("childProfile")) html += `${banner(t("b_child"))}<div class="fi-grid">
+    ${line(t("f_first"), cp.firstName)}${line(t("f_last"), cp.lastName)}
+    ${line(t("f_dob"), cp.dob)}${line(t("f_gender"), cp.gender)}
+    ${line(t("f_city"), cp.city)}${line(t("f_country"), cp.country)}
+    ${line(t("f_insurance"), cp.healthInsurance)}${line(t("f_homeLang"), cp.homeLanguages)}
+    ${line(t("f_bestLang"), cp.bestLanguage)}${line(t("f_datePrepared"), today)}
   </div>`;
 
   /* ============ 2 · PARENTS & HOUSEHOLD ============ */
-  if (inc("household")) html += `${banner("Parents & household")}<div class="fi-grid">
-    ${line("Guardian 1 name", hh.g1name)}${line("Relationship", hh.g1rel)}
-    ${line("Email", hh.g1email)}${line("Phone", hh.g1phone)}
-    ${line("Guardian 2 name", hh.g2name)}${line("Relationship", hh.g2rel)}
-    ${line("Email", hh.g2email)}${line("Phone", hh.g2phone)}
-    ${opts("Custody", ["Guardians together", "Joint custody", "Single custody", "Other"], hh.custody, true)}
-    ${opts("Family status", ["Married", "Living together", "Separated", "Divorced", "Single", "Other"], hh.maritalStatus, true)}
-    ${checklist("Child lives with", ["Both parents", "Mother", "Father", "Siblings", "Grandparents", "Foster family", "Other"], hh.livesWith)}
-    ${line("Siblings (names / ages)", hh.siblings, true)}
-    ${opts("Receives government funding", YN, hh.funding)}${line("Funding type", hh.fundingType)}
+  if (inc("household")) html += `${banner(t("b_household"))}<div class="fi-grid">
+    ${line(t("f_g1name"), hh.g1name)}${line(t("f_rel"), hh.g1rel)}
+    ${line(t("f_email"), hh.g1email)}${line(t("f_phone"), hh.g1phone)}
+    ${line(t("f_g2name"), hh.g2name)}${line(t("f_rel"), hh.g2rel)}
+    ${line(t("f_email"), hh.g2email)}${line(t("f_phone"), hh.g2phone)}
+    ${opts(t("f_custody"), ["Guardians together", "Joint custody", "Single custody", "Other"], hh.custody, true)}
+    ${opts(t("f_famStatus"), ["Married", "Living together", "Separated", "Divorced", "Single", "Other"], hh.maritalStatus, true)}
+    ${checklist(t("f_livesWith"), ["Both parents", "Mother", "Father", "Siblings", "Grandparents", "Foster family", "Other"], hh.livesWith)}
+    ${line(t("f_siblings"), hh.siblings, true)}
+    ${opts(t("f_govFunding"), YN, hh.funding)}${line(t("f_fundingType"), hh.fundingType)}
   </div>`;
 
   /* ============ 3 · DIAGNOSIS & FAMILY HISTORY ============ */
-  if (inc("diagnosis")) html += `${banner("Diagnosis & family history")}
-    ${opts("Status", ["Diagnosed", "Assessment Pending", "Self-Identified Concerns"], dg.status, true)}
-    ${checklist("Diagnoses", ["Autism", "ADHD", "Speech / Language Disorder", "Global Developmental Delay", "Intellectual Disability", "Learning Difficulty", "Dyspraxia / DCD", "Sensory Processing", "Anxiety", "Depression", "OCD", "Tourette's / Tics", "Epilepsy / Seizures", "Genetic Condition", "Other"], dg.diagnoses)}
-    <div class="fi-grid">${line("Diagnosed / referred by", dg.diagnosedBy)}${line("Date of diagnosis", dg.date)}${line("Awaiting assessment", dg.awaiting, true)}</div>
-    ${checklist("Family history of", ["Developmental / language delay", "Learning difficulties", "Autism", "ADHD", "Anxiety", "Depression", "OCD", "Bipolar", "Tourette's / tics", "Intellectual disability", "Epilepsy / seizures", "Genetic disorder", "Substance use"], dg.familyHistory)}
-    ${line("Family history notes", dg.familyHistoryNotes, true)}`;
+  if (inc("diagnosis")) html += `${banner(t("b_dx"))}
+    ${opts(t("f_status"), ["Diagnosed", "Assessment Pending", "Self-Identified Concerns"], dg.status, true)}
+    ${checklist(t("f_diagnoses"), ["Autism", "ADHD", "Speech / Language Disorder", "Global Developmental Delay", "Intellectual Disability", "Learning Difficulty", "Dyspraxia / DCD", "Sensory Processing", "Anxiety", "Depression", "OCD", "Tourette's / Tics", "Epilepsy / Seizures", "Genetic Condition", "Other"], dg.diagnoses)}
+    <div class="fi-grid">${line(t("f_dxBy"), dg.diagnosedBy)}${line(t("f_dxDate"), dg.date)}${line(t("f_awaiting"), dg.awaiting, true)}</div>
+    ${checklist(t("f_famHistory"), ["Developmental / language delay", "Learning difficulties", "Autism", "ADHD", "Anxiety", "Depression", "OCD", "Bipolar", "Tourette's / tics", "Intellectual disability", "Epilepsy / seizures", "Genetic disorder", "Substance use"], dg.familyHistory)}
+    ${line(t("f_famHistNotes"), dg.familyHistoryNotes, true)}`;
 
   /* ============ 4 · BIRTH & DEVELOPMENT ============ */
   if (inc("birth")) {
     const ms = bi.milestones || {};
-    html += `${banner("Birth & development")}<div class="fi-grid">
-      ${line("Pregnancy", bi.pregnancy)}${line("Weeks at birth", bi.gestation)}
-      ${line("Birth weight", bi.birthWeight)}${line("Complications", bi.complications)}
-      ${opts("Lost previously acquired skills", YN, bi.regression)}${line("Details", bi.regressionNotes)}
+    html += `${banner(t("b_birth"))}<div class="fi-grid">
+      ${line(t("f_pregnancy"), bi.pregnancy)}${line(t("f_gestation"), bi.gestation)}
+      ${line(t("f_birthWeight"), bi.birthWeight)}${line(t("f_complications"), bi.complications)}
+      ${opts(t("f_regression"), YN, bi.regression)}${line(t("f_details"), bi.regressionNotes)}
     </div>
-    <p class="fi-sub">Developmental milestones — age reached</p>
+    <p class="fi-sub">${esc(t("sub_milestones"))}</p>
     <div class="fi-grid3">
-      ${line("Sat unsupported", ms.sit)}${line("Crawled", ms.crawl)}${line("Walked", ms.walk)}
-      ${line("First word", ms.firstWord)}${line("First phrases", ms.phrases)}${line("First sentences", ms.sentences)}
-      ${line("Toilet trained (day)", ms.toiletDay)}${line("Toilet trained (night)", ms.toiletNight)}
+      ${line(t("f_sat"), ms.sit)}${line(t("f_crawled"), ms.crawl)}${line(t("f_walked"), ms.walk)}
+      ${line(t("f_firstWord"), ms.firstWord)}${line(t("f_firstPhrases"), ms.phrases)}${line(t("f_firstSentences"), ms.sentences)}
+      ${line(t("f_toiletDay"), ms.toiletDay)}${line(t("f_toiletNight"), ms.toiletNight)}
     </div>`;
   }
 
   /* ============ 5 · COMMUNICATION ============ */
-  if (inc("communication")) html += `${banner("Communication")}
-    ${opts("Communication style", ["Fluent Verbal", "Verbal", "Limited Verbal", "Non-Speaking"], co.style, true)}
-    ${checklist("Primary means of communication", ["Words", "Sentences", "Sounds", "Pictures (PECS)", "Sign language", "Device / AAC app", "No primary means yet"], co.means)}
-    ${opts("Can express needs", ["Consistently", "Sometimes", "Rarely"], co.canExpressNeeds, true)}
-    ${checklist("Current challenges", ["Requesting", "Conversation", "Question Answering", "Emotional Expression", "Social Communication"], co.challenges)}
-    ${scaleGrid("Communication skills — how often does your child…", ["communication"], sc)}`;
+  if (inc("communication")) html += `${banner(t("b_comm"))}
+    ${opts(t("f_commStyle"), ["Fluent Verbal", "Verbal", "Limited Verbal", "Non-Speaking"], co.style, true)}
+    ${checklist(t("f_means"), ["Words", "Sentences", "Sounds", "Pictures (PECS)", "Sign language", "Device / AAC app", "No primary means yet"], co.means)}
+    ${opts(t("f_expressNeeds"), ["Consistently", "Sometimes", "Rarely"], co.canExpressNeeds, true)}
+    ${checklist(t("f_challenges"), ["Requesting", "Conversation", "Question Answering", "Emotional Expression", "Social Communication"], co.challenges)}
+    ${scaleGrid(t("grid_comm"), ["communication"], sc)}`;
 
   /* ============ 6 · SENSORY PROFILE ============ */
   if (inc("sensory")) {
     const SENSES = [
-      ["auditory", "Sound", ["Covers ears at loud sounds", "Distressed by sudden noises", "Bothered by background noise", "Seeks loud sounds / makes noise", "Doesn't respond to sounds/name"]],
-      ["visual", "Sight", ["Bothered by bright lights", "Avoids eye contact", "Fascinated by spinning/lights", "Visual clutter overwhelms", "Misses visual details"]],
-      ["tactile", "Touch", ["Bothered by clothing tags/textures", "Dislikes being touched", "Distressed by haircuts/nails", "Seeks deep pressure / tight hugs", "Mouths or chews objects", "High pain tolerance"]],
-      ["oral", "Taste & mouth", ["Very limited food textures", "Strong food preferences", "Gags easily", "Seeks crunchy/chewy foods", "Chews non-food items"]],
-      ["smell", "Smell", ["Bothered by smells", "Seeks out smells", "Doesn't notice strong smells"]],
-      ["movement", "Movement & balance", ["Seeks spinning/swinging", "Avoids movement / cautious", "Fearful when feet leave ground", "Constantly moving", "Poor balance"]],
-      ["body", "Body awareness", ["Bumps into things / clumsy", "Unaware of body position", "Uses too much/little force", "Seeks crashing / rough play"]],
+      ["auditory", ["Covers ears at loud sounds", "Distressed by sudden noises", "Bothered by background noise", "Seeks loud sounds / makes noise", "Doesn't respond to sounds/name"]],
+      ["visual", ["Bothered by bright lights", "Avoids eye contact", "Fascinated by spinning/lights", "Visual clutter overwhelms", "Misses visual details"]],
+      ["tactile", ["Bothered by clothing tags/textures", "Dislikes being touched", "Distressed by haircuts/nails", "Seeks deep pressure / tight hugs", "Mouths or chews objects", "High pain tolerance"]],
+      ["oral", ["Very limited food textures", "Strong food preferences", "Gags easily", "Seeks crunchy/chewy foods", "Chews non-food items"]],
+      ["smell", ["Bothered by smells", "Seeks out smells", "Doesn't notice strong smells"]],
+      ["movement", ["Seeks spinning/swinging", "Avoids movement / cautious", "Fearful when feet leave ground", "Constantly moving", "Poor balance"]],
+      ["body", ["Bumps into things / clumsy", "Unaware of body position", "Uses too much/little force", "Seeks crashing / rough play"]],
     ];
-    html += banner("Sensory profile");
-    SENSES.forEach(([key, label, signs]) => {
+    html += banner(t("b_sensory"));
+    SENSES.forEach(([key, signs]) => {
       const o = se[key] || {};
       html += `<div class="fi-sense">
-        <div class="fi-sense-h"><b>${label}</b>
-          <span class="fi-opt">${cb(!!o.typical)}No concerns / typical</span>
-          <span class="fi-opt" style="margin-left:auto">Severity:</span>
-          ${["Mild", "Moderate", "Significant"].map((s) => `<span class="fi-opt" style="font-size:10px">${cb(!o.typical && o.severity === s)}${s}</span>`).join("")}
+        <div class="fi-sense-h"><b>${esc(senseLabel(key))}</b>
+          <span class="fi-opt">${cb(!!o.typical)}${esc(dv("No concerns / typical"))}</span>
+          <span class="fi-opt" style="margin-left:auto">${esc(t("sev_label"))}</span>
+          ${["Mild", "Moderate", "Significant"].map((s) => `<span class="fi-opt" style="font-size:10px">${cb(!o.typical && o.severity === s)}${esc(dv(s))}</span>`).join("")}
         </div>
-        <div class="fi-checks">${signs.map((sg) => `<span class="fi-opt" style="font-size:10px">${cb(!o.typical && (o.signs || []).includes(sg))}${esc(sg)}</span>`).join("")}</div>
+        <div class="fi-checks">${signs.map((sg) => `<span class="fi-opt" style="font-size:10px">${cb(!o.typical && (o.signs || []).includes(sg))}${esc(dv(sg))}</span>`).join("")}</div>
       </div>`;
     });
-    html += `${checklist("Other signs", ["Insensitive to temperature", "High pain tolerance", "Strong difficulty with transitions"], se.other)}
-    ${line("Sensory notes", se.notes, true)}`;
+    html += `${checklist(t("f_otherSigns"), ["Insensitive to temperature", "High pain tolerance", "Strong difficulty with transitions"], se.other)}
+    ${line(t("f_sensoryNotes"), se.notes, true)}`;
   }
 
   /* ============ 7 · DAILY LIVING & MOTOR ============ */
-  if (inc("dailyLiving")) html += `${banner("Daily living & motor")}<div class="fi-grid">
-    ${opts("Independent eating", ["Independent", "With support", "Not yet"], dl.eating)}
-    ${opts("Independent dressing", ["Independent", "With support", "Not yet"], dl.dressing)}
-    ${opts("Toilet training", ["Fully trained", "In progress", "Not started"], dl.toileting)}
-    ${opts("Sleep quality", ["Good", "Variable", "Poor"], dl.sleep)}
-    ${opts("Safety awareness", ["Strong", "Developing", "Limited"], dl.safety)}
-    ${opts("Multi-step instructions", YSN, dl.multiStep)}
-    ${opts("Group activities", YSN, dl.groupActivities)}
-    ${opts("Feeding difficulties", ["None", "Mild", "Significant"], dl.feeding)}
-    ${line("Dietary restrictions", dl.dietaryRestrictions, true)}
+  if (inc("dailyLiving")) html += `${banner(t("b_daily"))}<div class="fi-grid">
+    ${opts(t("f_eating"), ["Independent", "With support", "Not yet"], dl.eating)}
+    ${opts(t("f_dressing"), ["Independent", "With support", "Not yet"], dl.dressing)}
+    ${opts(t("f_toileting"), ["Fully trained", "In progress", "Not started"], dl.toileting)}
+    ${opts(t("f_sleepQ"), ["Good", "Variable", "Poor"], dl.sleep)}
+    ${opts(t("f_safety"), ["Strong", "Developing", "Limited"], dl.safety)}
+    ${opts(t("f_multiStep"), YSN, dl.multiStep)}
+    ${opts(t("f_group"), YSN, dl.groupActivities)}
+    ${opts(t("f_feeding"), ["None", "Mild", "Significant"], dl.feeding)}
+    ${line(t("f_diet"), dl.dietaryRestrictions, true)}
   </div>
-  ${checklist("Gross motor observations", ["Walks on tiptoes", "Clumsy / bumps into things", "Poor balance", "Low muscle tone", "Difficulty with stairs", "Difficulty running or jumping", "Delayed gross-motor milestones"], mo.gross)}
-  ${checklist("Fine motor observations", ["Difficulty with handwriting / drawing", "Difficulty using utensils", "Difficulty with buttons / zippers", "Difficulty using scissors", "Weak or awkward pencil grip"], mo.fine)}
-  ${line("Motor notes", mo.notes, true)}
-  ${scaleGrid("Focus & organization — how often does your child…", ["executive"], sc)}`;
+  ${checklist(t("f_gross"), ["Walks on tiptoes", "Clumsy / bumps into things", "Poor balance", "Low muscle tone", "Difficulty with stairs", "Difficulty running or jumping", "Delayed gross-motor milestones"], mo.gross)}
+  ${checklist(t("f_fine"), ["Difficulty with handwriting / drawing", "Difficulty using utensils", "Difficulty with buttons / zippers", "Difficulty using scissors", "Weak or awkward pencil grip"], mo.fine)}
+  ${line(t("f_motorNotes"), mo.notes, true)}
+  ${scaleGrid(t("grid_exec"), ["executive"], sc)}`;
 
   /* ============ 8 · HEALTH & MEDICAL ============ */
-  if (inc("health")) html += `${banner("Health & medical")}<div class="fi-grid">
-    ${opts("Dominant hand", ["Right", "Left", "Both"], hl.handedness)}${line("Pediatrician / GP", hl.pediatrician)}
-    ${line("Specialists", hl.specialists, true)}
-    ${line("Food allergies", hl.allergyFood)}${line("Environmental allergies", hl.allergyEnv)}
-    ${line("Other allergies", hl.allergyOther)}${line("Allergy treatment", hl.allergyTreatment)}
-    ${line("Medical conditions", hl.medicalConditions, true)}
-    ${line("Current medications", hl.medications, true)}
-    ${line("Past medications", hl.pastMedications, true)}
-    ${line("Surgeries / hospitalizations", hl.surgeries, true)}
-    ${opts("Had an eye exam", YN, hl.hadEyeExam)}${line("Date of last eye exam", hl.lastEyeExam)}
-    ${opts("Wears glasses", YN, hl.glasses)}${line("Eye exam notes", hl.eyeNotes)}
-    ${opts("Had a hearing test", YN, hl.hadHearingTest)}${line("Date of last hearing test", hl.lastHearingTest)}
-    ${opts("Recurrent ear infections / PE tubes", YN, hl.earInfections)}${line("Hearing notes", hl.hearingNotes)}
+  if (inc("health")) html += `${banner(t("b_health"))}<div class="fi-grid">
+    ${opts(t("f_hand"), ["Right", "Left", "Both"], hl.handedness)}${line(t("f_pediatrician"), hl.pediatrician)}
+    ${line(t("f_specialists"), hl.specialists, true)}
+    ${line(t("f_allergyFood"), hl.allergyFood)}${line(t("f_allergyEnv"), hl.allergyEnv)}
+    ${line(t("f_allergyOther"), hl.allergyOther)}${line(t("f_allergyTx"), hl.allergyTreatment)}
+    ${line(t("f_medConditions"), hl.medicalConditions, true)}
+    ${line(t("f_meds"), hl.medications, true)}
+    ${line(t("f_pastMeds"), hl.pastMedications, true)}
+    ${line(t("f_surgeries"), hl.surgeries, true)}
+    ${opts(t("f_eyeExam"), YN, hl.hadEyeExam)}${line(t("f_eyeDate"), hl.lastEyeExam)}
+    ${opts(t("f_glasses"), YN, hl.glasses)}${line(t("f_eyeNotes"), hl.eyeNotes)}
+    ${opts(t("f_hearingTest"), YN, hl.hadHearingTest)}${line(t("f_hearingDate"), hl.lastHearingTest)}
+    ${opts(t("f_earInfections"), YN, hl.earInfections)}${line(t("f_hearingNotes"), hl.hearingNotes)}
   </div>`;
 
   /* ============ 9 · BEHAVIOUR & SOCIAL ============ */
   if (inc("behaviour")) {
-    const BL = { meltdowns: "Meltdowns", aggression: "Aggression toward others", selfInjury: "Self-injury", elopement: "Elopement / flight risk", anxiety: "Anxiety", rigidity: "Rigidity / difficulty with change", emotional: "Emotional regulation difficulty", repetitive: "Repetitive behaviours", defiance: "Defiance", hyperactivity: "Hyperactivity" };
+    const BL = { meltdowns: t("rb_meltdowns"), aggression: t("rb_aggression"), selfInjury: t("rb_selfInjury"), elopement: t("rb_elopement"), anxiety: t("rb_anxiety"), rigidity: t("rb_rigidity"), emotional: t("rb_emotional"), repetitive: t("rb_repetitive"), defiance: t("rb_defiance"), hyperactivity: t("rb_hyperactivity") };
     const freqs = ["Rarely", "Sometimes", "Often", "Daily"];
-    html += `${banner("Behaviour & social")}
-      <table class="fi-tbl"><tr><th>How often does each happen?</th>${freqs.map((f) => `<th>${f}</th>`).join("")}<th>N/A</th></tr>
+    html += `${banner(t("b_beh"))}
+      <table class="fi-tbl"><tr><th>${esc(t("grid_freqTitle"))}</th>${freqs.map((f) => `<th>${esc(dv(f))}</th>`).join("")}<th>${esc(t("na"))}</th></tr>
       ${Object.keys(BL).map((k) => `<tr><td>${BL[k]}</td>${freqs.map((f) => `<td>${cb(bch[k] === f)}</td>`).join("")}<td>${cb(!has(bch[k]))}</td></tr>`).join("")}</table>
       <div class="fi-grid">
-        ${line("Known triggers", bh.triggers, true)}
-        ${line("Strategies that help at home", bh.strategies, true)}
-        ${opts("Interest in peers", YSN, bh.peersInterest)}${opts("Interacts with peers", YSN, bh.peersInteract)}
-        ${opts("Follows instructions", YSN, bh.followsInstructions)}${opts("Suspended / expelled", YN, bh.suspended)}
-        ${line("Notes", bh.suspendedNotes, true)}
+        ${line(t("f_triggers"), bh.triggers, true)}
+        ${line(t("f_strategies"), bh.strategies, true)}
+        ${opts(t("f_peersInterest"), YSN, bh.peersInterest)}${opts(t("f_peersInteract"), YSN, bh.peersInteract)}
+        ${opts(t("f_follows"), YSN, bh.followsInstructions)}${opts(t("f_suspended"), YN, bh.suspended)}
+        ${line(t("f_notes"), bh.suspendedNotes, true)}
       </div>
-      ${scaleGrid("Social connection — how often does your child…", ["social"], sc)}
-      ${scaleGrid("Flexibility & transitions — how often does your child…", ["flexibility"], sc)}
-      ${scaleGrid("Emotional regulation — how often does your child…", ["emotional"], sc)}`;
+      ${scaleGrid(t("grid_social"), ["social"], sc)}
+      ${scaleGrid(t("grid_flex"), ["flexibility"], sc)}
+      ${scaleGrid(t("grid_emo"), ["emotional"], sc)}`;
   }
 
   /* ============ 10 · STRENGTHS & INTERESTS ============ */
-  if (inc("strengths")) html += `${banner("Strengths & interests")}
-    ${line("Strengths", st.strengths, true)}
-    ${line("Interests & favourite activities", st.interests, true)}
-    ${line("Dislikes / frustrations", st.dislikes, true)}
-    ${scaleGrid("Learning & play — how often does your child…", ["learning"], sc)}`;
+  if (inc("strengths")) html += `${banner(t("b_str"))}
+    ${line(t("f_strengths"), st.strengths, true)}
+    ${line(t("f_interests"), st.interests, true)}
+    ${line(t("f_dislikes"), st.dislikes, true)}
+    ${scaleGrid(t("grid_learning"), ["learning"], sc)}`;
 
   /* ============ 11 · EDUCATION ============ */
-  if (inc("education")) html += `${banner("Education")}<div class="fi-grid">
-    ${line("School name", ed.schoolName)}${opts("Type", ["Mainstream", "Specialized", "Homeschool", "Daycare / preschool", "Not in school yet", "Other"], ed.schoolType, true)}
-    ${line("Grade", ed.grade)}${line("School board", ed.schoolBoard)}
-    ${opts("Has IEP / intervention plan", YN, ed.hasIEP)}
-    ${opts("Classroom support", ["None", "Part-time aide", "Full-time aide", "Other"], ed.classroomSupport)}
-    ${line("Agency support", ed.agencySupport, true)}
-    ${line("Academic concerns", ed.challenges, true)}
-    ${line("School strengths", ed.strengths, true)}
-    ${line("Upcoming transition", ed.upcomingTransition)}${opts("Flight risk at school", YN, ed.flightRisk)}
+  if (inc("education")) html += `${banner(t("b_edu"))}<div class="fi-grid">
+    ${line(t("f_school"), ed.schoolName)}${opts(t("f_schoolType"), ["Mainstream", "Specialized", "Homeschool", "Daycare / preschool", "Not in school yet", "Other"], ed.schoolType, true)}
+    ${line(t("f_grade"), ed.grade)}${line(t("f_board"), ed.schoolBoard)}
+    ${opts(t("f_iep"), YN, ed.hasIEP)}
+    ${opts(t("f_classSupport"), ["None", "Part-time aide", "Full-time aide", "Other"], ed.classroomSupport)}
+    ${line(t("f_agency"), ed.agencySupport, true)}
+    ${line(t("f_acadConcerns"), ed.challenges, true)}
+    ${line(t("f_schoolStrengths"), ed.strengths, true)}
+    ${line(t("f_transition"), ed.upcomingTransition)}${opts(t("f_flightRisk"), YN, ed.flightRisk)}
   </div>`;
 
   /* ============ 12 · THERAPY & SERVICES ============ */
   if (inc("therapy")) {
     const TYPES = ["Speech Therapy", "Occupational Therapy", "ABA / Behaviour", "Psychology", "Psychiatry", "Physiotherapy", "Social Skills Group", "Infant Stimulation", "Other"];
     const byType = {};
-    (p.therapy || []).forEach((t) => { if (t && t.type) byType[t.type] = t; });
-    html += `${banner("Therapy & services")}
-      ${checklist("Current services", TYPES, Object.keys(byType))}`;
+    (p.therapy || []).forEach((x) => { if (x && x.type) byType[x.type] = x; });
+    html += `${banner(t("b_therapy"))}
+      ${checklist(t("f_currentServices"), TYPES, Object.keys(byType))}`;
     Object.keys(byType).forEach((k) => {
-      const t = byType[k];
+      const th = byType[k];
       html += `<div class="fi-grid" style="margin:2px 0 4px">
-        ${line(k + " — provider", t.provider)}${line("Frequency", t.frequency)}
-        ${line("Start date", t.startDate)}${line("Progress", t.progress)}
-        ${line("Goals", t.goals, true)}
+        ${line(tpl(t("f_provider"), { type: dv(k) }), th.provider)}${line(t("f_frequency"), th.frequency)}
+        ${line(t("f_startDate"), th.startDate)}${line(t("f_progress"), th.progress)}
+        ${line(t("f_goals"), th.goals, true)}
       </div>`;
     });
     html += `<div class="fi-grid">
-      ${line("Past services", sv.pastServices, true)}
-      ${opts("Currently on a waitlist", YN, sv.onWaitlist)}${line("Waitlist details", sv.waitlistDetails)}
+      ${line(t("f_pastServices"), sv.pastServices, true)}
+      ${opts(t("f_onWaitlist"), YN, sv.onWaitlist)}${line(t("f_waitlistDetails"), sv.waitlistDetails)}
     </div>`;
   }
 
   /* ============ 13 · GOALS & FOCUS ============ */
-  if (inc("goals")) html += `${banner("Goals & current priorities")}
-    ${line("Main concerns right now", gl.mainConcerns, true)}
-    ${checklist("Family priorities", ["Communication", "Friendships", "Emotional Regulation", "School Success", "Independence", "Daily Living Skills", "Transition Planning", "Employment Preparation"], gl.priorities)}
-    ${line("Focus areas", gl.focusAreas, true)}
-    ${line("Other goals", gl.other, true)}`;
+  if (inc("goals")) html += `${banner(t("b_goals"))}
+    ${line(t("f_mainConcerns"), gl.mainConcerns, true)}
+    ${checklist(t("f_priorities"), ["Communication", "Friendships", "Emotional Regulation", "School Success", "Independence", "Daily Living Skills", "Transition Planning", "Employment Preparation"], gl.priorities)}
+    ${line(t("f_focusAreas"), gl.focusAreas, true)}
+    ${line(t("f_otherGoals"), gl.other, true)}`;
 
   /* ============ SUPPORT SNAPSHOT ============ */
   if (anyWheel) {
     const needs = DOMAINS.filter((n) => scored[n].score != null).sort((a, b) => scored[b].score - scored[a].score);
     const shine = DOMAINS.filter((n) => scored[n].strength != null && scored[n].strength >= 45).sort((a, b) => scored[b].strength - scored[a].strength);
     const dcolor = (n) => `hsl(${HUES[DOMAINS.indexOf(n)]},62%,48%)`;
-    const li = (n, pill, txt) => `<p><span style="width:7px;height:7px;border-radius:50%;background:${dcolor(n)};display:inline-block"></span>${SHORTLBL[n]} <span class="fi-pill ${pill}">${esc(txt)}</span></p>`;
-    html += `${banner("Parent-reported support snapshot")}
+    const li = (n, pill, txt) => `<p><span style="width:7px;height:7px;border-radius:50%;background:${dcolor(n)};display:inline-block"></span>${domainShort(n)} <span class="fi-pill ${pill}">${esc(txt)}</span></p>`;
+    html += `${banner(t("b_snapshot"))}
       <div class="fi-wheelrow">${roseSVG(scored)}
         <div class="fi-legend">
-          <p class="h a">Most support helpful now</p>${needs.slice(0, 3).map((n) => li(n, "amber", "more support")).join("")}
-          <p class="h g">Relative strengths</p>${(shine.length ? shine : needs.slice().reverse()).slice(0, 3).map((n) => li(n, "green", "going strong")).join("")}
+          <p class="h a">${esc(t("legend_needs"))}</p>${needs.slice(0, 3).map((n) => li(n, "amber", t("pill_more"))).join("")}
+          <p class="h g">${esc(t("legend_strengths"))}</p>${(shine.length ? shine : needs.slice().reverse()).slice(0, 3).map((n) => li(n, "green", t("pill_strong"))).join("")}
         </div>
       </div>
-      <p class="fi-small">Petal length reflects how much support the parent reports is helpful in each area today, derived from the frequency grids in this form. Parent-reported snapshot — not a standardized assessment or diagnosis.</p>`;
+      <p class="fi-small">${esc(t("small_note"))}</p>`;
   }
 
   /* ============ SIGNATURE ============ */
-  html += `<p class="fi-statement">Completed by the parent/guardian below. The information in this form reflects the family's observations and records, provided to support ${esc(cp.firstName || "the child")}'s care team.</p>
+  const stName = cp.firstName || t("theChild");
+  html += `<p class="fi-statement">${esc(tpl(t("statement"), { name: stName, of: ofName(stName) }))}</p>
   <div class="fi-sign">
-    ${line("Completed by", hh.g1name)}
-    ${line("Relationship to child", hh.g1rel)}
-    ${line("Date", today)}
-    <div class="fi-f"><span class="fi-k">Signature:</span><span class="fi-v">&nbsp;</span></div>
+    ${line(t("f_completedBy"), hh.g1name)}
+    ${line(t("f_relToChild"), hh.g1rel)}
+    ${line(t("f_date"), today)}
+    <div class="fi-f"><span class="fi-k">${esc(t("f_signature"))}</span><span class="fi-v">&nbsp;</span></div>
   </div>
-  <div class="fi-foot"><span>Generated from the Family Passport · uniqueapex.com</span><span>${esc(name)} · ${today}</span></div>`;
+  <div class="fi-foot"><span>${esc(t("foot_generated"))}</span><span>${esc(name)} · ${today}</span></div>`;
 
   return html;
 }

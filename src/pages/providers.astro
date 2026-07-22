@@ -244,6 +244,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
 <script>
   import * as UA from "../lib/ua-data.js";
   import { scoreWheel, scoreToBand } from "../lib/wheelScore.js";
+  import { domainName } from "../lib/libI18n.js";
   import { notify } from "../lib/notify.js";
   import { getPlan, upsellHTML } from "../lib/plan.js";
   import { coordsForPostal, haversineKm } from "../lib/geo.js";
@@ -372,7 +373,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
         return `<button type="button" class="pv-svc${svc === s.code ? " on" : ""}" data-svc="${s.code}">
           <span class="nm">${esc(L.name || s.name)}</span>
           <span class="fr">${esc(L.sub || s.fr)}</span>
-          ${sug ? `<span class="sug">✦ ${sug === "No diagnosis on file yet" ? esc(T.noDxYet) : tpl(esc(T.flaggedOnWheel), { domain: esc(sug) })}</span>` : ""}
+          ${sug ? `<span class="sug">✦ ${sug === "No diagnosis on file yet" ? esc(T.noDxYet) : tpl(esc(T.flaggedOnWheel), { domain: esc(domainName(sug)) })}</span>` : ""}
         </button>`;
       }).join("");
       $("pv-svcs").querySelectorAll(".pv-svc").forEach((b) => b.addEventListener("click", () => {

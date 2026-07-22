@@ -177,6 +177,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
   import * as UA from "../../lib/ua-data.js";
   import { scoreWheel, DOMAINS, wheelCompleteness, scoreToBand, HUES } from "../../lib/wheelScore.js";
   import { generateWheelSVG, domainColor } from "../../lib/wheelSvg.js";
+  import { domainName, domainShort, bandLabel } from "../../lib/libI18n.js";
   import { domainDetail } from "../../lib/domainInsights.js";
   import { getSnapshots } from "../../lib/history.js";
   import DICT from "../../i18n/child-wheel.js";
@@ -201,14 +202,15 @@ import SectionTabs from "@/components/SectionTabs.astro";
   const icCheck = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
   const icBang = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M8 3.2v6M8 12.3v.2"/></svg>';
   const icStar = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0"><path d="M8 1.5l1.6 4.3L14 7.2l-4.4 1.5L8 13l-1.6-4.3L2 7.2l4.4-1.4z"/></svg>';
-  const SHORTD = { "Communication": "Communication", "Social Connection": "Social", "Sensory Processing": "Sensory", "Flexibility & Transitions": "Flexibility", "Emotional Regulation": "Emotional", "Executive Function": "Executive", "Daily Living Skills": "Daily living", "Learning & Play": "Learning & play" };
+  /* display names resolve per language (libI18n) — EN values unchanged */
+  const SHORTD = Object.fromEntries(DOMAINS.map((d) => [d, domainShort(d)]));
 
   function levelInfo(score) {
     if (score == null) return { label: T.notEnoughData, bg: "#F4F3F8", fg: "#7B7491", seg: "#D8D3E6" };
     const b = scoreToBand(score);
-    if (b.key === "minimal" || b.key === "low") return { label: b.label, bg: "#E8F6F0", fg: "#0E8F66", seg: "#0E8F66" };
-    if (b.key === "high" || b.key === "intensive") return { label: b.label, bg: "#EDE9FE", fg: "#6D28D9", seg: "#7C3AED" };
-    return { label: b.label, bg: "#FBF2E2", fg: "#A8650A", seg: "#D97706" };
+    if (b.key === "minimal" || b.key === "low") return { label: bandLabel(b), bg: "#E8F6F0", fg: "#0E8F66", seg: "#0E8F66" };
+    if (b.key === "high" || b.key === "intensive") return { label: bandLabel(b), bg: "#EDE9FE", fg: "#6D28D9", seg: "#7C3AED" };
+    return { label: bandLabel(b), bg: "#FBF2E2", fg: "#A8650A", seg: "#D97706" };
   }
 
   (async () => {
@@ -369,7 +371,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       const better = nb.rings < ob.rings;
       const when = new Date(baseline.at);
       const whenTxt = isNaN(when) ? T.firstCheckin : when.toLocaleDateString(window.uaLocale || "en-CA", { month: "short", year: "numeric" });
-      return `<span class="swd-trend">${tpl(esc(T.trendSince), { when: esc(whenTxt) })} ${esc(ob.label)} → <span class="${better ? "up" : "dn"}">${esc(nb.label)} ${better ? "✦" : ""}</span></span>`;
+      return `<span class="swd-trend">${tpl(esc(T.trendSince), { when: esc(whenTxt) })} ${esc(bandLabel(ob))} → <span class="${better ? "up" : "dn"}">${esc(bandLabel(nb))} ${better ? "✦" : ""}</span></span>`;
     }
     function block(title, items, cls, dBase, copyBtn) {
       const icon = cls === "str" ? icCheck : cls === "sup" ? icBang : icStar;
@@ -391,7 +393,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       $("sw-detail").style.borderTopColor = dc;
       $("sw-detail").innerHTML = `<div class="swd-in"><div class="swd-cols">
         <div>
-          <div class="swd-head"><span class="swd-dot" style="background:${tintOf(name, 0.14)}"><i style="background:${dc}"></i></span><span class="swd-name">${esc(name)}</span><span class="swd-pill" style="background:${L.bg};color:${L.fg}">${L.label}</span></div>
+          <div class="swd-head"><span class="swd-dot" style="background:${tintOf(name, 0.14)}"><i style="background:${dc}"></i></span><span class="swd-name">${esc(domainName(name))}</span><span class="swd-pill" style="background:${L.bg};color:${L.fg}">${L.label}</span></div>
           ${trendPill(name)}
           ${dm.score == null ? `<p class="swd-none">${esc(T.addMorePassport)}</p>` :
             `<div class="swd-meta"><span class="l">${esc(T.supportLevel)}</span><span class="swd-segs">${segs}</span></div>`
@@ -407,7 +409,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       </div></div>`;
       const cbtn = document.getElementById("swd-copy");
       if (cbtn) cbtn.addEventListener("click", () => {
-        const txt = tpl(T.copyStrategiesHead, { domain: name, who: id.first ? " (" + id.first + ")" : "" }) + "\n"
+        const txt = tpl(T.copyStrategiesHead, { domain: domainName(name), who: id.first ? " (" + id.first + ")" : "" }) + "\n"
           + det.strategies.map((s2) => "• " + s2).join("\n");
         navigator.clipboard && navigator.clipboard.writeText(txt).then(() => {
           cbtn.textContent = T.copied;
