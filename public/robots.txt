@@ -1,4 +1,15 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /account/
+Disallow: /child/
+Disallow: /passport/
+Disallow: /documents/
+Disallow: /providers/
+Disallow: /funding/
+Disallow: /settings/
+Disallow: /resources/
+Disallow: /pro/
+Disallow: /blog/
 
-Sitemap: http://astroship.web3templates.com/sitemap-index.xml
+Sitemap: https://uniqueapex.com/sitemap-index.xml

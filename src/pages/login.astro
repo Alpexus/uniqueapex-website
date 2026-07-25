@@ -49,7 +49,7 @@ import DICT from "../i18n/login.js";
         <button class="fl-btn" id="signin-btn" type="button" data-i18n="signIn">Sign in</button>
 
         <div class="fl-alt">
-          <p><span data-i18n="noAccount">Don't have an account?</span> <a href="/signup" id="signup-link" data-i18n="create">Create one →</a></p>
+          <p><span data-i18n="noAccount">Don't have an account?</span> <a href="/waitlist" id="signup-link" data-i18n="create">Join the waitlist →</a></p>
           <p class="fl-pro"><span data-i18n="areProvider">Are you a service provider?</span> <a href="/pro/login" id="pro-link" data-i18n="proSignIn">Provider sign in →</a></p>
         </div>
       </div>
@@ -119,7 +119,7 @@ import DICT from "../i18n/login.js";
     document.getElementById("lang-en").classList.toggle("on", lang === "en");
     document.getElementById("lang-fr").classList.toggle("on", lang === "fr");
     var qs = lang === "fr" ? "?lang=fr" : "";
-    document.getElementById("signup-link").href = (lang === "fr" ? "/fr/signup" : "/signup");
+    document.getElementById("signup-link").href = (lang === "fr" ? "/fr/waitlist" : "/waitlist");
     document.getElementById("pro-link").href = "/pro/login" + qs;
   }
 

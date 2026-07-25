@@ -38,8 +38,8 @@ const t = {
         blurb: "You should not have to pay just to get matched. Submit one profile and we reach out to verified providers on your behalf.",
         lead: "",
         feats: ["One child profile", "One outreach batch per service type", "Automatic provider matching", "English & French support", "Community access"],
-        cta: "Start for Free",
-        href: "/signup",
+        cta: "Join the Waitlist",
+        href: "/waitlist",
         filled: false,
         pop: false,
         best: false,
@@ -55,8 +55,8 @@ const t = {
         blurb: "When you are juggling providers, services, and waitlists, this keeps you on top of everything.",
         lead: "Everything in Free, plus:",
         feats: ["Unlimited child profiles & outreach", "Expert workshops access", "Documentation tools", "Priority support"],
-        cta: "Start Member",
-        href: "/signup",
+        cta: "Join the Waitlist",
+        href: "/waitlist",
         filled: true,
         pop: true,
         best: false,
@@ -72,8 +72,8 @@ const t = {
         blurb: "When you're coordinating several services at once, Family+ keeps you at the front of every line — with the heavy reading done for you.",
         lead: "Everything in Member, plus:",
         feats: ["Priority matching — your outreach goes to the front of the queue", "AI Report Reader included — plain-language summaries of assessments & IEPs", "1 Concierge engagement credit per year", "Priority support"],
-        cta: "Start Family+",
-        href: "/signup",
+        cta: "Join the Waitlist",
+        href: "/waitlist",
         filled: true,
         pop: false,
         best: true,
@@ -158,8 +158,8 @@ const t = {
         blurb: "Vous ne devriez pas avoir à payer juste pour être jumelé. Soumettez un profil et nous contactons des professionnels vérifiés en votre nom.",
         lead: "",
         feats: ["Un profil enfant", "Une démarche de contact par type de service", "Jumelage automatique", "Soutien en français et en anglais", "Accès à la communauté"],
-        cta: "Commencer gratuitement",
-        href: "/signup",
+        cta: "Rejoindre la liste d'attente",
+        href: "/waitlist",
         filled: false,
         pop: false,
         best: false,
@@ -175,8 +175,8 @@ const t = {
         blurb: "Quand vous jonglez avec les intervenants, les services et les listes d'attente, ce plan vous garde au-dessus de tout.",
         lead: "Tout le plan Gratuit, plus :",
         feats: ["Profils et démarches illimités", "Accès aux ateliers d'experts", "Outils de documentation", "Soutien prioritaire"],
-        cta: "Choisir Membre",
-        href: "/signup",
+        cta: "Rejoindre la liste d'attente",
+        href: "/waitlist",
         filled: true,
         pop: true,
         best: false,
@@ -192,8 +192,8 @@ const t = {
         blurb: "Quand vous coordonnez plusieurs services à la fois, Famille+ vous place en tête de chaque file — et la lecture lourde est faite pour vous.",
         lead: "Tout le plan Membre, plus :",
         feats: ["Jumelage prioritaire — vos démarches passent en tête de file", "Lecteur de rapports IA inclus — résumés en langage clair des évaluations et plans d'intervention", "1 crédit de prise en charge Conciergerie par année", "Soutien prioritaire"],
-        cta: "Choisir Famille+",
-        href: "/signup",
+        cta: "Rejoindre la liste d'attente",
+        href: "/waitlist",
         filled: true,
         pop: false,
         best: true,
@@ -302,10 +302,10 @@ const t = {
     {t.plans.map((p, i) => (
       <div class={`pr-card relative flex flex-col xl:grid xl:grid-rows-subgrid xl:row-span-3 rounded-3xl bg-white ${p.pop ? "border-2 border-violet-600 shadow-xl shadow-violet-200/60" : "border border-violet-100 shadow-sm"}`} data-i={i}>
         {p.pop && (
-          <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 bg-violet-700 text-white text-xs font-bold uppercase tracking-wide rounded-full px-4 py-1.5 whitespace-nowrap shadow-md">{t.popular}</span>
+          <span class="pr-ribbon absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 bg-violet-700 text-white text-xs font-bold uppercase tracking-wide rounded-full px-4 py-1.5 whitespace-nowrap shadow-md">{t.popular}</span>
         )}
         {p.best && (
-          <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 bg-white border-2 border-violet-600 text-violet-700 text-xs font-bold uppercase tracking-wide rounded-full px-4 py-1 whitespace-nowrap shadow-md">{t.best}</span>
+          <span class="pr-ribbon absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 bg-white border-2 border-violet-600 text-violet-700 text-xs font-bold uppercase tracking-wide rounded-full px-4 py-1 whitespace-nowrap shadow-md">{t.best}</span>
         )}
         <span class="pr-foryou absolute -top-3.5 right-4 z-10 bg-emerald-500 text-white text-xs font-bold uppercase tracking-wide rounded-full px-3 py-1.5 whitespace-nowrap shadow-md" style="opacity:0;transform:scale(.8);transition:opacity .25s ease,transform .25s ease">{t.forYou} ✓</span>
         <div class="flex flex-col">
@@ -341,30 +341,7 @@ const t = {
     ))}
   </div>
 
-  <!-- Add-ons -->
-  <div class="pr-rev max-w-3xl mx-auto mb-8">
-    <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide text-center mb-5">{t.addonsLabel}</p>
-    <div class="grid md:grid-cols-2 gap-5">
-      {t.addons.map((a, i) => (
-        <div class="pr-addon bg-white border border-violet-100 rounded-3xl shadow-sm p-6 flex items-start gap-4">
-          <span class="w-12 h-12 rounded-2xl bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              {i === 0 && <><path d="M6 2.5h8L19 8v13.5H6z"/><path d="M13.5 2.5V8H19"/><circle cx="11" cy="14" r="2.6"/><path d="M13 16l2.2 2.2"/></>}
-              {i === 1 && <><path d="M4 5h7M7.5 3v2M10.5 13c-2.6-1.1-4.3-3.2-4.9-5.5M4 13c1.6 0 4.4-1.2 6-6M13 21l4-9 4 9M14.6 17.5h4.8"/></>}
-            </svg>
-          </span>
-          <span class="min-w-0">
-            <span class="flex items-baseline flex-wrap gap-x-2">
-              <span class="text-[16px] font-bold text-slate-800">{a.name}</span>
-              <span class="text-[15px] font-extrabold text-violet-700">{a.price}</span>
-              <span class="text-xs text-slate-400 font-medium">{a.per}</span>
-            </span>
-            <span class="block text-[13.5px] text-slate-500 leading-relaxed mt-1.5">{a.desc}</span>
-          </span>
-        </div>
-      ))}
-    </div>
-  </div>
+  <!-- Add-ons strip hidden for launch — the data still lives in t.addons; restore the markup from git history when ready. -->
 
   <!-- Trust chips -->
   <div class="pr-rev flex flex-wrap justify-center gap-2.5 mb-24">
@@ -462,6 +439,9 @@ const t = {
   #ua-pricing .pr-card{transition:transform .25s ease,box-shadow .25s ease,border-color .2s ease}
   #ua-pricing .pr-card:hover{transform:translateY(-6px);box-shadow:0 18px 36px -16px rgba(124,58,237,.3)}
   #ua-pricing .pr-card.pr-reco{border-color:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.18),0 18px 36px -16px rgba(16,185,129,.25)}
+  /* the static ribbon fades out while the green "For you" tag is shown, so they never overlap */
+  #ua-pricing .pr-card .pr-ribbon{transition:opacity .2s ease}
+  #ua-pricing .pr-card.pr-reco .pr-ribbon{opacity:0}
   #ua-pricing .pr-illo{transition:background-color .3s ease}
   #ua-pricing .pr-card:hover .pr-illo{background:#ede9fe}
   #ua-pricing .pr-img{transition:transform .4s cubic-bezier(.34,1.5,.64,1)}
