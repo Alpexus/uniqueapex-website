@@ -132,7 +132,7 @@ const t = {
   <!-- Steps -->
   <div class="mb-24 space-y-28">
     {t.steps.map((step, i) => (
-      <div class="hiw-step grid md:grid-cols-2 gap-12 items-center" data-i={i}>
+      <div class="hiw-step grid md:grid-cols-2 gap-6 md:gap-12 items-center" data-i={i}>
         <div class={i % 2 === 0 ? "md:order-2" : ""}>
           <p class="text-sm font-bold text-violet-600 uppercase tracking-wider m-0">{t.stepWord} {i + 1}</p>
           <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mt-3">{step.title}</h2>
@@ -148,7 +148,9 @@ const t = {
             <span class="text-[11px] font-semibold text-violet-400 whitespace-nowrap shrink-0">{step.card.time}</span>
           </div>
         </div>
-        <div class={`flex items-center justify-center ${i % 2 === 0 ? "md:order-1" : ""}`}>
+        {/* order-first: on phones every step shows its illustration first, text below;
+            md:order-* restores the desktop zigzag exactly as before */}
+        <div class={`flex items-center justify-center order-first ${i % 2 === 0 ? "md:order-1" : "md:order-none"}`}>
           <img src={step.img} alt={step.alt} class={`w-full ${i === 3 ? "max-w-[368px]" : "max-w-[460px]"}`} />
         </div>
       </div>
