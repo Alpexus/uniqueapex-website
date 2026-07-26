@@ -16,6 +16,7 @@ const t = {
     headingAccent: "It travels with them.",
     body: "Answer a few gentle questions — once. That becomes your child's Family Passport, and the Passport builds everything else for you, automatically.",
     bodyAfter: "No repeating forms. No re-telling your story. It travels with your child everywhere — so you never start from zero again.",
+    imgAlt: "UniqueApex app preview on a phone: add your child, fill out the Family Passport once, and watch their support wheel come to life.",
     passport: "Family Passport",
     child: "Maya · Age 7",
     rows: ["Full history", "Strengths & needs", "Reports & documents"],
@@ -32,6 +33,7 @@ const t = {
     headingAccent: "Elle le suit partout.",
     body: "Répondez à quelques questions simples — une seule fois. Elles deviennent le Passeport familial de votre enfant, et le Passeport construit tout le reste pour vous, automatiquement.",
     bodyAfter: "Aucun formulaire à répéter. Aucune histoire à raconter de nouveau. Il suit votre enfant partout — pour ne plus jamais repartir de zéro.",
+    imgAlt: "Aperçu de l'application UniqueApex sur un téléphone : ajoutez votre enfant, remplissez le Passeport familial une seule fois, et voyez sa roue de soutien prendre vie.",
     passport: "Passeport familial",
     child: "Maya · 7 ans",
     rows: ["Historique complet", "Forces et besoins", "Rapports et documents"],
@@ -54,7 +56,21 @@ const t = {
     <p class="text-slate-500 mt-6 text-lg">{t.body}</p>
   </div>
 
-  <div class="relative max-w-4xl mx-auto" id="pp-stage">
+  <!-- Phones: the illustrated app mockup replaces the stacked diagram
+       (which read as a plain list on small screens). The FR image is
+       public/passport-phone-fr.webp — currently a copy of the EN one;
+       replace that file with the French render when it's ready. -->
+  <div class="md:hidden max-w-sm mx-auto px-2">
+    <img
+      src={lang === "fr" ? "/passport-phone-fr.webp" : "/passport-phone-en.webp"}
+      alt={t.imgAlt}
+      width="900" height="1350"
+      class="w-full h-auto rounded-3xl shadow-xl shadow-violet-200/60"
+      loading="lazy"
+    />
+  </div>
+
+  <div class="relative max-w-4xl mx-auto hidden md:block" id="pp-stage">
     <svg id="pp-svg" class="hidden md:block absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
       <line class="pp-line" stroke="#C4B5FD" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round" />
       <line class="pp-line" stroke="#C4B5FD" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round" />
@@ -103,7 +119,8 @@ const t = {
     </div>
   </div>
 
-  <p class="text-center text-slate-500 italic text-lg mt-14 max-w-2xl mx-auto">{t.bodyAfter}</p>
+  <!-- hidden on phones: the mockup image already carries this exact tagline -->
+  <p class="hidden md:block text-center text-slate-500 italic text-lg mt-14 max-w-2xl mx-auto">{t.bodyAfter}</p>
 </section>
 
 <style is:global>
