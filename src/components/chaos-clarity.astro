@@ -167,7 +167,7 @@ const bottomIdx = [7, 8];
           <div class="cc-item -rotate-6" style="--dur:7s;--del:0s;transition-delay:.05s">
             <p class="cc-drift cc-hand bg-yellow-100 border border-yellow-200/70 rounded-lg shadow-md shadow-orange-200/40 px-3.5 py-2.5 text-xl leading-tight text-slate-700 m-0 w-[126px]">{t.sticky1}</p>
           </div>
-          <div class="cc-item rotate-2 mt-5" style="--dur:6.4s;--del:.5s;transition-delay:.1s">
+          <div class="cc-item rotate-2 mt-5 ml-auto md:ml-0" style="--dur:6.4s;--del:.5s;transition-delay:.1s">
             <div class="cc-drift bg-white rounded-xl shadow-md shadow-orange-200/50 px-3 py-2.5 flex items-center gap-2.5">
               <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-500 flex items-center justify-center shrink-0">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8L19 8v13.5H6z"/><path d="M13.5 2.5V8H19"/></svg>
@@ -210,7 +210,7 @@ const bottomIdx = [7, 8];
         </div>
 
         <!-- row 3 -->
-        <div class="flex flex-wrap items-start justify-between gap-x-2 gap-y-3 pl-1 pr-1">
+        <div class="flex flex-wrap items-start justify-end md:justify-between gap-x-2 gap-y-3 pl-1 pr-1">
           <div class="cc-item -rotate-1 mt-2 hidden md:block" style="--dur:6.8s;--del:1.1s;transition-delay:.3s">
             <div class="cc-drift bg-white rounded-xl shadow-md shadow-orange-200/50 px-3 py-2.5 w-[112px]">
               <span class="block text-[12.5px] font-bold text-slate-700 leading-tight">{t.chaos.notes.title}</span>
@@ -392,7 +392,7 @@ const bottomIdx = [7, 8];
         <!-- left orbit column -->
         <div class="contents xl:col-start-1 xl:row-start-1 xl:flex xl:flex-col xl:gap-4 xl:items-end xl:justify-center">
           {leftIdx.map((f, i) => (
-            <div class="cc-rcard cc-feature relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/50 px-3.5 py-3 flex items-start gap-2.5 w-full xl:max-w-[230px]" style={`transition-delay:${(0.55 + i * 0.1).toFixed(2)}s`}>
+            <div class="cc-rcard cc-feature relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/50 px-3.5 py-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-2.5 w-full xl:max-w-[230px]" style={`transition-delay:${(0.55 + i * 0.1).toFixed(2)}s`}>
               <span class={`w-9 h-9 rounded-xl ${featureMeta[f].tile} flex items-center justify-center shrink-0`}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={featureMeta[f].paths} />
               </span>
@@ -407,7 +407,7 @@ const bottomIdx = [7, 8];
         <!-- right orbit column -->
         <div class="contents xl:col-start-3 xl:row-start-1 xl:flex xl:flex-col xl:gap-4 xl:items-start xl:justify-center">
           {rightIdx.map((f, i) => (
-            <div class="cc-rcard cc-feature relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/50 px-3.5 py-3 flex items-start gap-2.5 w-full xl:max-w-[230px]" style={`transition-delay:${(0.6 + i * 0.1).toFixed(2)}s`}>
+            <div class="cc-rcard cc-feature relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/50 px-3.5 py-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-2.5 w-full xl:max-w-[230px]" style={`transition-delay:${(0.6 + i * 0.1).toFixed(2)}s`}>
               <span class={`w-9 h-9 rounded-xl ${featureMeta[f].tile} flex items-center justify-center shrink-0`}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={featureMeta[f].paths} />
               </span>
@@ -422,7 +422,7 @@ const bottomIdx = [7, 8];
         <!-- bottom pair -->
         <div class="contents xl:col-span-3 xl:row-start-2 xl:flex xl:justify-center xl:gap-4 xl:mt-3">
           {bottomIdx.map((f, i) => (
-            <div class="cc-rcard cc-feature relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/50 px-3.5 py-3 flex items-start gap-2.5 w-full xl:w-auto xl:max-w-[230px]" style={`transition-delay:${(0.8 + i * 0.1).toFixed(2)}s`}>
+            <div class="cc-rcard cc-feature relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/50 px-3.5 py-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-2.5 w-full xl:w-auto xl:max-w-[230px]" style={`transition-delay:${(0.8 + i * 0.1).toFixed(2)}s`}>
               <span class={`w-9 h-9 rounded-xl ${featureMeta[f].tile} flex items-center justify-center shrink-0`}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={featureMeta[f].paths} />
               </span>

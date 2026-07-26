@@ -410,7 +410,23 @@ const t = {
       <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{t.faqLabel}</p>
       <h2 class="text-3xl md:text-4xl font-bold mt-3 text-slate-800">{t.faqTitle}</h2>
     </div>
-    <div class="grid md:grid-cols-2 gap-5">
+    <!-- Mobile: collapsible accordion — tap a question to read its answer -->
+    <div class="md:hidden space-y-3">
+      {t.faqs.map((faq) => (
+        <details class="bg-white border border-violet-100 rounded-2xl shadow-sm group">
+          <summary class="flex items-center gap-3 px-4 py-3.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+            <span class="w-8 h-8 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </span>
+            <span class="flex-1 text-slate-800 font-semibold text-[14.5px] leading-snug">{faq.q}</span>
+            <svg class="w-4 h-4 text-violet-500 shrink-0 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <p class="px-4 pb-4 pt-1 text-slate-500 text-[14.5px] leading-relaxed m-0">{faq.a}</p>
+        </details>
+      ))}
+    </div>
+    <!-- Desktop: the full conversation view -->
+    <div class="hidden md:grid md:grid-cols-2 gap-5">
       {t.faqs.map((faq) => (
         <div class="pr-qa bg-white border border-violet-100 rounded-3xl p-6 shadow-sm">
           <div class="flex items-start gap-3">
