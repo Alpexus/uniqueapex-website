@@ -83,7 +83,10 @@ const stageIcons = [
 ];
 ---
 
-<section class="py-16 my-4" id="ua-journey">
+<!-- hidden on phones: seven stacked stage cards made the mobile page ~2,700px
+     longer and overwhelming. From md (768px, 2-col grid) up it works — so the
+     section only renders there. Remove "hidden md:block" to restore on mobile. -->
+<section class="hidden md:block py-16 my-4" id="ua-journey">
   <div class="text-center max-w-3xl mx-auto">
     <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{t.label}</p>
     <h2 class="text-3xl md:text-4xl font-bold mt-3 text-slate-800 leading-tight">

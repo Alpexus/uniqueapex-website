@@ -192,6 +192,28 @@ import Layout from "@/layouts/Layout.astro";
       </form>
     </div>
 
+    <!-- Privacy Policy modal — opens the policy in place so nobody loses the form.
+         Content is pulled from the real /privacy page (single source of truth);
+         if anything fails, the link falls back to opening the page normally. -->
+    <div id="pp-modal" role="dialog" aria-modal="true" aria-label="Privacy Policy" style="display:none;position:fixed;inset:0;z-index:100">
+      <div id="pp-backdrop" style="position:absolute;inset:0;background:rgba(15,23,42,.55)"></div>
+      <div style="position:relative;max-width:760px;max-height:85vh;margin:7.5vh auto 0;background:#fff;border-radius:20px;box-shadow:0 30px 80px rgba(15,23,42,.35);display:flex;flex-direction:column;overflow:hidden;width:calc(100% - 32px)">
+        <div style="display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #EDE9FE;flex-shrink:0">
+          <b style="font-size:15px;color:#1E293B">Privacy Policy</b>
+          <a href="/privacy" target="_blank" rel="noopener" style="font-size:12.5px;color:#6D28D9;font-weight:600;text-decoration:none;margin-left:auto">Open full page ↗</a>
+          <button id="pp-close" type="button" aria-label="Close" style="width:32px;height:32px;border:none;border-radius:10px;background:#F5F3FF;color:#6D28D9;font-size:18px;line-height:1;cursor:pointer">×</button>
+        </div>
+        <div id="pp-body" style="padding:8px 24px 28px;overflow-y:auto;font-size:14.5px;line-height:1.65;color:#334155">Loading…</div>
+      </div>
+    </div>
+    <style is:inline>
+      #pp-body h1{font-size:1.35rem;font-weight:800;color:#1E293B;margin:18px 0 4px}
+      #pp-body h2{font-size:1.02rem;font-weight:700;color:#3C3489;margin:20px 0 6px}
+      #pp-body p{margin:8px 0}
+      #pp-body ul{margin:8px 0;padding-left:20px}
+      #pp-body a{color:#6D28D9;font-weight:600}
+      #pp-body .lg-date{font-size:12.5px;color:#94A3B8}
+    </style>
   </Container>
 </Layout>
 
@@ -357,4 +379,49 @@ import Layout from "@/layouts/Layout.astro";
     });
 
   });
+
+  /* ---------- Privacy Policy modal (in-page, form state preserved) ---------- */
+  (function () {
+    var modal = document.getElementById("pp-modal");
+    var body = document.getElementById("pp-body");
+    var closeBtn = document.getElementById("pp-close");
+    var backdrop = document.getElementById("pp-backdrop");
+    if (!modal) return;
+    var loaded = false, lastFocus = null;
+
+    function openModal() {
+      lastFocus = document.activeElement;
+      modal.style.display = "block";
+      document.documentElement.style.overflow = "hidden";
+      closeBtn.focus();
+      if (loaded) return;
+      fetch("/privacy/").then(function (r) { return r.text(); }).then(function (html) {
+        var doc = new DOMParser().parseFromString(html, "text/html");
+        var article = doc.getElementById("doc-en");
+        if (!article) throw new Error("no article");
+        article.removeAttribute("hidden");
+        /* links inside the policy open in a new tab so the form is never lost */
+        article.querySelectorAll("a[href]").forEach(function (a) {
+          if ((a.getAttribute("href") || "").indexOf("mailto:") !== 0) { a.target = "_blank"; a.rel = "noopener"; }
+        });
+        body.innerHTML = article.innerHTML;
+        loaded = true;
+      }).catch(function () {
+        closeModal();
+        window.open("/privacy", "_blank", "noopener");
+      });
+    }
+    function closeModal() {
+      modal.style.display = "none";
+      document.documentElement.style.overflow = "";
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+    document.querySelectorAll('a[href="/privacy"]').forEach(function (a) {
+      if (modal.contains(a)) return; /* the "Open full page" link keeps its normal behaviour */
+      a.addEventListener("click", function (e) { e.preventDefault(); openModal(); });
+    });
+    closeBtn.addEventListener("click", closeModal);
+    backdrop.addEventListener("click", closeModal);
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && modal.style.display === "block") closeModal(); });
+  })();
 </script>
