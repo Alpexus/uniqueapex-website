@@ -36,6 +36,7 @@ const t = {
     watchLab: "Watch areas",
     watch: "Transitions · Social connection",
     action: "Upload Maya's latest report",
+    imgAlt: "The UniqueApex dashboard on a laptop — passport progress, today's tip, suggested next steps and the support wheel, all in one place.",
   },
   fr: {
     badge: "Un aperçu",
@@ -64,6 +65,7 @@ const t = {
     watchLab: "À surveiller",
     watch: "Transitions · Lien social",
     action: "Téléverser le dernier rapport de Maya",
+    imgAlt: "Le tableau de bord UniqueApex sur un portable — progrès du Passeport, conseil du jour, prochaines étapes et roue de soutien au même endroit.",
   },
 }[lang] || {};
 
@@ -89,7 +91,16 @@ const howHref = lang === "fr" ? "/fr/howitworks" : "/howitworks";
       </div>
     </div>
 
-    <!-- Right: fictional app preview (mirrors the real dashboard) -->
+    <!-- Right — EN: upscaled laptop render of the dashboard (public/app-laptop-en.webp).
+         FR keeps the hand-built CSS mockup below, because it is fully French while the
+         render's UI text is English. If a good French render is made later, save it as
+         public/app-laptop-fr.webp, and swap the two lang gates for a src ternary. -->
+    {lang === "en" && (
+      <div class="ua-sc-app rounded-2xl overflow-hidden bg-white border border-violet-100 shadow-xl shadow-violet-200/50 select-none">
+        <img src="/app-laptop-en.webp" alt={t.imgAlt} width="2000" height="1214" class="w-full h-auto" loading="lazy" />
+      </div>
+    )}
+    {lang !== "en" && (
     <div class="ua-sc-app bg-white rounded-2xl border border-violet-100 shadow-xl shadow-violet-200/50 overflow-hidden select-none" aria-hidden="true">
       <!-- top bar -->
       <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
@@ -200,6 +211,7 @@ const howHref = lang === "fr" ? "/fr/howitworks" : "/howitworks";
         </div>
       </div>
     </div>
+    )}
   </div>
 </section>
 
