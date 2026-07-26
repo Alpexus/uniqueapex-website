@@ -1,19 +1,17 @@
 ---
 // =============================================================================
-// UniqueApex · Journey v2 — "We're with you from the very first concern"
-// Save as: src/components/journey.astro  (replaces the interactive rail version)
+// UniqueApex · Journey v3 — interactive timeline: icons are the navigation
+// Save as: src/components/journey.astro
+//
+// v3 · 2026-07-26 — one stage shows at a time. The wavy icon strip is now
+//   clickable (all md+ widths, not just xl): clicking an icon slides its stage
+//   panel down below. Replaces the 7-cards-at-once grid, which felt crowded.
+//   All 7 panels are server-rendered (SEO + i18n intact); JS only toggles.
 //
 // ILLUSTRATIONS — put these 7 PNGs in /public (any size, white/transparent bg):
-//   /journey-1-first-concern.png
-//   /journey-2-assessment.png
-//   /journey-3-first-provider.png
-//   /journey-4-ongoing-therapy.png
-//   /journey-5-school-entry.png
-//   /journey-6-iep-transitions.png
-//   /journey-7-adolescence.png
-// Until a file exists, its card shows a soft violet placeholder (no broken-
+//   /journey-1-first-concern.png ... /journey-7-adolescence.png
+// Until a file exists, its panel shows a soft violet placeholder (no broken-
 // image icon). The moment you add the PNG, it appears — no code changes.
-// v2 · 2026-07-06
 // =============================================================================
 const { lang = "en" } = Astro.props;
 
@@ -27,6 +25,7 @@ const t = {
     banner2: "We're here when you need us, at every step.",
     startHere: "Start here",
     how: "How we help:",
+    hint: "Tap a step to explore the journey",
     outro: "Every stage asks something new of you. Here's how UniqueApex keeps up —",
     stages: [
       { title: "First Concern", desc: "You notice something is different and want to understand more.", help: ["Understand early signs", "Learn what to look for", "Get guidance right away", "Plan your next steps"] },
@@ -47,6 +46,7 @@ const t = {
     banner2: "On est là quand vous en avez besoin, à chaque étape.",
     startHere: "Commencez ici",
     how: "Comment on aide :",
+    hint: "Appuyez sur une étape pour explorer le parcours",
     outro: "Chaque étape vous demande quelque chose de nouveau. Voici comment UniqueApex suit le rythme —",
     stages: [
       { title: "Premières préoccupations", desc: "Vous remarquez quelque chose de différent et voulez mieux comprendre.", help: ["Comprendre les premiers signes", "Savoir quoi observer", "Des conseils dès maintenant", "Planifier les prochains pas"] },
@@ -83,9 +83,8 @@ const stageIcons = [
 ];
 ---
 
-<!-- hidden on phones: seven stacked stage cards made the mobile page ~2,700px
-     longer and overwhelming. From md (768px, 2-col grid) up it works — so the
-     section only renders there. Remove "hidden md:block" to restore on mobile. -->
+<!-- hidden on phones: the timeline needs horizontal room. From md (768px) up
+     it renders as an interactive strip + one open stage panel. -->
 <section class="hidden md:block py-16 my-4" id="ua-journey">
   <div class="text-center max-w-3xl mx-auto">
     <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{t.label}</p>
@@ -105,46 +104,60 @@ const stageIcons = [
     </div>
   </div>
 
-  <!-- wavy dotted icon timeline (only when the 7 cards sit in one row) -->
-  <div id="jn2-strip" class="hidden xl:block relative mt-10 mb-4 h-[104px]">
+  <!-- wavy dotted icon timeline — the icons ARE the navigation:
+       click one and its stage panel slides open below -->
+  <div id="jn2-strip" class="relative mt-10 h-[104px]">
     <svg id="jn2-wave" class="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true"></svg>
-    {t.stages.map((_, i) => (
+    {t.stages.map((s, i) => (
       <span class="jn2-dot absolute" style={`left:${(((i + 0.5) * 100) / 7).toFixed(3)}%;top:${i % 2 === 0 ? "36%" : "64%"};transition-delay:${(0.15 + i * 0.08).toFixed(2)}s`}>
-        <span class="jn2-bob flex w-[72px] h-[72px] rounded-full bg-white shadow-lg shadow-violet-200/60 items-center justify-center text-violet-700" style={`--bd:${(4.8 + i * 0.4).toFixed(1)}s;--bl:${(i * 0.35).toFixed(2)}s`}>
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" set:html={stageIcons[i]} />
-        </span>
+        <button
+          type="button"
+          class={`jn2-bob jn2-icon relative flex w-[64px] h-[64px] xl:w-[72px] xl:h-[72px] rounded-full bg-white shadow-lg shadow-violet-200/60 items-center justify-center text-violet-700 cursor-pointer ${i === 0 ? "jn2-active" : ""}`}
+          style={`--bd:${(4.8 + i * 0.4).toFixed(1)}s;--bl:${(i * 0.35).toFixed(2)}s`}
+          data-step={i}
+          title={s.title}
+          aria-label={`${String(i + 1).padStart(2, "0")} · ${s.title}`}
+        >
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" set:html={stageIcons[i]} />
+          <span class="jn2-num absolute -top-1 -right-1 w-6 h-6 rounded-full bg-violet-700 text-white text-[10px] font-bold flex items-center justify-center border-2 border-white">{i + 1}</span>
+        </button>
       </span>
     ))}
   </div>
+  <p class="jn2-hintline text-center text-[13px] text-violet-400 font-medium mt-3 mb-0">{t.hint}</p>
 
-  <!-- 7 stage cards -->
-  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 xl:grid-rows-[auto_auto_1fr_auto] xl:gap-y-0 mt-8 xl:mt-0">
+  <!-- stage panels — server-rendered for all 7 (SEO + FR intact); only the
+       active one is displayed. Roomy padding so the bottom never feels tight. -->
+  <div id="jn2-panels" class="mt-6 max-w-4xl mx-auto">
     {t.stages.map((s, i) => (
-      <div class="jn2-card relative flex flex-col xl:grid xl:grid-rows-subgrid xl:row-span-4 bg-white border border-violet-100 rounded-2xl shadow-md shadow-violet-100/50 p-3" style={`transition-delay:${(0.2 + i * 0.07).toFixed(2)}s`}>
-        <span class="absolute top-2.5 left-2.5 z-10 rounded-lg bg-violet-700 text-white text-[10px] font-bold px-1.5 py-0.5">{String(i + 1).padStart(2, "0")}</span>
-
-        <!-- illustration slot: placeholder shows until the PNG exists in /public -->
-        <div class="relative h-36 xl:h-40 rounded-xl bg-gradient-to-br from-violet-50 to-white flex items-center justify-center overflow-hidden mb-3">
-          <svg class="w-14 h-14 text-violet-200" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" set:html={stageIcons[i]} />
-          <img src={imgs[i]} alt={s.title} class="absolute inset-0 w-full h-full object-contain" loading="lazy" onerror="this.style.display='none'" />
-        </div>
-
-        <div>
-          <span class="block text-[15px] font-bold text-slate-800 leading-tight">{s.title}</span>
-          {i === 0 && (
-            <span class="inline-block mt-1.5 rounded-full bg-violet-100 text-violet-700 text-[9px] font-bold uppercase tracking-wide px-2 py-0.5">{t.startHere}</span>
-          )}
-        </div>
-        <p class="text-[11.5px] text-slate-500 leading-snug mt-1.5 mb-3 xl:mb-0 m-0 self-start">{s.desc}</p>
-
-        <div class="mt-auto xl:mt-3 xl:h-full rounded-xl bg-violet-50/70 border border-violet-100/70 p-2.5">
-          <span class="block text-[10px] font-bold text-violet-700 mb-1.5">{t.how}</span>
-          {s.help.map((h) => (
-            <span class="flex items-start gap-1.5 text-[10.5px] text-slate-600 leading-snug mt-1">
-              <svg class="w-3 h-3 text-violet-500 shrink-0 mt-[1px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-              {h}
-            </span>
-          ))}
+      <div class={`jn2-panel ${i === 0 ? "jn2-open" : ""} bg-white border border-violet-100 rounded-3xl shadow-xl shadow-violet-100/60 p-6 md:p-8`} data-panel={i}>
+        <div class="grid md:grid-cols-[minmax(0,320px)_1fr] gap-6 md:gap-10 items-center">
+          <!-- illustration slot: placeholder shows until the PNG exists in /public -->
+          <div class="relative h-52 md:h-60 rounded-2xl bg-gradient-to-br from-violet-50 to-white flex items-center justify-center overflow-hidden">
+            <svg class="w-16 h-16 text-violet-200" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" set:html={stageIcons[i]} />
+            <img src={imgs[i]} alt={s.title} class="absolute inset-0 w-full h-full object-contain" loading={i === 0 ? "eager" : "lazy"} onerror="this.style.display='none'" />
+          </div>
+          <div>
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="rounded-lg bg-violet-700 text-white text-[11px] font-bold px-2 py-1">{String(i + 1).padStart(2, "0")}</span>
+              <h3 class="text-2xl font-bold text-slate-800 m-0 leading-tight">{s.title}</h3>
+              {i === 0 && (
+                <span class="rounded-full bg-violet-100 text-violet-700 text-[10px] font-bold uppercase tracking-wide px-2.5 py-1">{t.startHere}</span>
+              )}
+            </div>
+            <p class="text-slate-500 text-[15px] leading-relaxed mt-3 m-0">{s.desc}</p>
+            <div class="mt-5 rounded-2xl bg-violet-50/70 border border-violet-100/70 px-5 py-4">
+              <span class="block text-[12px] font-bold text-violet-700 mb-2.5">{t.how}</span>
+              <div class="grid sm:grid-cols-2 gap-x-8 gap-y-2">
+                {s.help.map((h) => (
+                  <span class="flex items-start gap-2 text-[13.5px] text-slate-600 leading-snug">
+                    <svg class="w-3.5 h-3.5 text-violet-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                    {h}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     ))}
@@ -167,20 +180,31 @@ const stageIcons = [
   @keyframes jn2Flow{to{stroke-dashoffset:-546}}
   #ua-journey .jn2-pulse{transform-origin:center;animation:jn2Pulse 2.4s ease-in-out infinite}
   @keyframes jn2Pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
-  #ua-journey .jn2-card img{transition:transform .4s ease}
-  #ua-journey.ua-in .jn2-card:hover{transform:translateY(-4px)}
-  #ua-journey .jn2-card:hover img{transform:scale(1.06)}
-  #ua-journey .jn2-card{opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .5s ease,box-shadow .25s ease}
-  #ua-journey.ua-in .jn2-card{opacity:1;transform:none}
-  #ua-journey.ua-in .jn2-card:hover{box-shadow:0 12px 28px -12px rgba(124,58,237,.25)}
+  #ua-journey .jn2-hintline{opacity:0;transition:opacity .6s ease .5s}
+  #ua-journey.ua-in .jn2-hintline{opacity:1}
+  /* icon buttons: hover glow + filled active state (no transform here — the
+     bob animation owns this element's transform) */
+  #ua-journey .jn2-icon{border:0;padding:0;transition:background-color .25s ease,color .25s ease,box-shadow .25s ease}
+  #ua-journey .jn2-icon:hover{box-shadow:0 12px 28px -8px rgba(124,58,237,.5);animation-play-state:paused}
+  #ua-journey .jn2-icon:focus-visible{outline:3px solid #a78bfa;outline-offset:2px}
+  #ua-journey .jn2-icon.jn2-active{background:#6D28D9;color:#fff}
+  #ua-journey .jn2-icon.jn2-active .jn2-num{background:#fff;color:#6D28D9}
+  #ua-journey .jn2-icon.jn2-active svg [stroke="#ffffff"]{stroke:#6D28D9}
+  /* one panel at a time, sliding down when it opens */
+  #ua-journey .jn2-panel{display:none}
+  #ua-journey .jn2-panel.jn2-open{display:block;animation:jn2Slide .5s cubic-bezier(.22,.9,.36,1)}
+  @keyframes jn2Slide{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+  #ua-journey .jn2-panel img{transition:transform .4s ease}
+  #ua-journey .jn2-panel:hover img{transform:scale(1.04)}
   @media (prefers-reduced-motion: reduce){
-    #ua-journey .jn2-banner,#ua-journey .jn2-card{opacity:1;transform:none;transition:none}
+    #ua-journey .jn2-banner{opacity:1;transform:none;transition:none}
     #ua-journey .jn2-dot{opacity:1;transform:translate(-50%,-50%);transition:none}
     #ua-journey #jn2-wave{opacity:1;transition:none}
+    #ua-journey .jn2-hintline{opacity:1;transition:none}
     #ua-journey.ua-in .jn2-bob,#ua-journey .jn2-pulse{animation:none}
     #ua-journey.ua-in #jn2-wave .jn2-flow{animation:none}
-    #ua-journey.ua-in .jn2-card:hover{transform:none}
-    #ua-journey .jn2-card:hover img{transform:none}
+    #ua-journey .jn2-panel.jn2-open{animation:none}
+    #ua-journey .jn2-panel:hover img{transform:none}
   }
 </style>
 
@@ -193,7 +217,7 @@ const stageIcons = [
       var strip = document.getElementById("jn2-strip");
       var svg = document.getElementById("jn2-wave");
       if (!strip || !svg) return;
-      if (!window.matchMedia("(min-width: 1280px)").matches) { svg.innerHTML = ""; return; }
+      if (!window.matchMedia("(min-width: 768px)").matches) { svg.innerHTML = ""; return; }
       var w = strip.clientWidth, h = strip.clientHeight;
       if (!w) return;
       svg.setAttribute("viewBox", "0 0 " + w + " " + h);
@@ -213,6 +237,25 @@ const stageIcons = [
         '<path class="jn2-flow" fill="none" stroke="#A78BFA" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="0.1 9" d="' + d + '"/>' +
         '<path fill="none" stroke="#A78BFA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M' + (tx - 8) + " " + (ty - 7) + " L " + (tx + 1) + " " + ty + " L " + (tx - 8) + " " + (ty + 7) + '"/>';
     }
+
+    // icon → panel wiring: one open at a time, replaying the slide animation
+    var btns = root.querySelectorAll(".jn2-icon");
+    var panels = root.querySelectorAll(".jn2-panel");
+    function select(idx) {
+      btns.forEach(function (b, j) { b.classList.toggle("jn2-active", j === idx); });
+      panels.forEach(function (p, j) {
+        if (j === idx) {
+          p.classList.remove("jn2-open");
+          void p.offsetWidth; /* reflow so the slide animation replays */
+          p.classList.add("jn2-open");
+        } else {
+          p.classList.remove("jn2-open");
+        }
+      });
+    }
+    btns.forEach(function (b) {
+      b.addEventListener("click", function () { select(parseInt(this.dataset.step, 10)); });
+    });
 
     requestAnimationFrame(drawWave);
     window.addEventListener("load", drawWave);
