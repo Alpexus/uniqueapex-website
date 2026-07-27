@@ -25,6 +25,7 @@ const t = {
     location: "Montréal, Québec, Canada",
     follow: "Follow Us",
     rights: "All rights reserved.",
+    registered: "Registered in England and Wales no. 17363673",
     privacyShort: "Privacy",
     termsShort: "Terms",
     languages: "Montréal · English & French",
@@ -45,6 +46,7 @@ const t = {
     location: "Montréal, Québec, Canada",
     follow: "Suivez-nous",
     rights: "Tous droits réservés.",
+    registered: "Société enregistrée en Angleterre et au pays de Galles, n° 17363673",
     privacyShort: "Confidentialité",
     termsShort: "Conditions",
     languages: "Montréal · Français & English",
@@ -118,8 +120,9 @@ const t = {
 
     <!-- Bottom bar -->
     <div class="border-t border-slate-200 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-      <p class="text-sm text-slate-400">
-        © {new Date().getFullYear()} UniqueApex. {t.rights}
+      <p class="text-xs text-slate-400 leading-relaxed text-center md:text-left">
+        © {new Date().getFullYear()} Alpexus Technologies Ltd (UniqueApex). {t.rights}<br />
+        {t.registered} · 71–75 Shelton Street, Covent Garden, London WC2H 9JQ
       </p>
       <p class="text-sm text-slate-400">
         <a href={prefix + "/privacy"} class="hover:text-violet-700 transition">{t.privacyShort}</a>
