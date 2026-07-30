@@ -8,7 +8,12 @@
      signed-in only) — flags clinics missing an email
    · Quick links: Supabase, Resend, Vercel, webmail, function logs
    Self-contained styles + is:inline JS (lessons learned: no Tailwind
-   CDN, no `all:initial`). Password gate unchanged. */
+   CDN, no `all:initial`).
+   V3.1 — the hardcoded password gate is GONE. The gate is now a real
+   Supabase Auth sign-in (coordinator email + password, verified
+   server-side). No secret lives in this file or the repo. Requires
+   security_lockdown.sql to have been run so only the coordinator
+   account can read/update the waitlist. */
 import Layout from "@/layouts/AdminLayout.astro";
 ---
 <Layout title="UniqueApex — Coordinator Console">
@@ -20,7 +25,8 @@ import Layout from "@/layouts/AdminLayout.astro";
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10.5" width="16" height="9.5" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/><path d="M12 14.5v2"/></svg>
       </div>
       <h2>Coordinator Console</h2>
-      <p>UniqueApex team only.</p>
+      <p>UniqueApex team only — sign in with the coordinator account.</p>
+      <input type="email" id="gate-email" placeholder="Coordinator email" autocomplete="username" />
       <input type="password" id="gate-pass" placeholder="Password" autocomplete="current-password" />
       <p id="gate-err" hidden>That's not it — try again.</p>
       <button id="gate-btn" type="button">Open the console</button>
@@ -345,27 +351,78 @@ import Layout from "@/layouts/AdminLayout.astro";
 <script is:inline>
   var SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
   var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
-  var ADMIN_PASSWORD = "qPL!gVM$#Wpj&n";
 
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   var $id = function (i) { return document.getElementById(i); };
 
-  /* ---------- gate ---------- */
-  function unlock() {
-    if ($id("gate-pass").value === ADMIN_PASSWORD) {
-      $id("gate").style.display = "none";
-      $id("console").hidden = false;
-      loadWaitlist();
-      loadProviders();
-    } else {
-      $id("gate-err").hidden = false;
-      $id("gate-pass").value = "";
-      $id("gate-pass").focus();
+  /* ---------- gate: a REAL sign-in (Supabase Auth), no secret in this file.
+     The account must also pass the waitlist RLS from security_lockdown.sql —
+     any other login is signed in but rejected by the probe below. ---------- */
+  function gateErr(msg) {
+    $id("gate-err").textContent = msg;
+    $id("gate-err").hidden = false;
+    $id("gate-pass").value = "";
+    $id("gate-pass").focus();
+  }
+
+  async function probeWaitlist(tok) {
+    try {
+      var r = await fetch(SUPABASE_URL + "/rest/v1/waitlist?select=id&limit=1",
+        { headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + tok } });
+      return r.ok;
+    } catch (e) { return false; }
+  }
+
+  function openConsole() {
+    $id("gate").style.display = "none";
+    $id("console").hidden = false;
+    loadWaitlist();
+    loadProviders();
+  }
+
+  async function unlock() {
+    var em = $id("gate-email").value.trim();
+    var pw = $id("gate-pass").value;
+    if (!em || !pw) { gateErr("Enter your email and password."); return; }
+    var btn = $id("gate-btn");
+    btn.disabled = true;
+    btn.textContent = "Checking…";
+    try {
+      var r = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=password", {
+        method: "POST",
+        headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ email: em, password: pw })
+      });
+      var d = null;
+      try { d = await r.json(); } catch (e) {}
+      if (!r.ok || !d || !d.access_token) { gateErr("That's not it — try again."); return; }
+      d.expires_at = Math.floor(Date.now() / 1000) + (d.expires_in || 3600);
+      localStorage.setItem("ua_session", JSON.stringify(d));
+      if (!(await probeWaitlist(d.access_token))) {
+        gateErr("Signed in, but this account can't open the console.");
+        return;
+      }
+      openConsole();
+    } catch (e) {
+      gateErr("Couldn't reach the server — try again.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Open the console";
     }
   }
   $id("gate-btn").addEventListener("click", unlock);
   $id("gate-pass").addEventListener("keydown", function (e) { if (e.key === "Enter") unlock(); });
-  $id("btn-lock").addEventListener("click", function () { location.reload(); });
+  $id("gate-email").addEventListener("keydown", function (e) { if (e.key === "Enter") unlock(); });
+  /* Lock = real sign-out (clears the shared app session), back to the gate */
+  $id("btn-lock").addEventListener("click", function () {
+    localStorage.removeItem("ua_session");
+    location.reload();
+  });
+  /* already signed in as the coordinator? skip the gate */
+  (async function autoOpen() {
+    var tok = await freshAppToken();
+    if (tok && (await probeWaitlist(tok))) openConsole();
+  })();
 
   /* ---------- rail panels ---------- */
   document.querySelectorAll(".adx-nav-btn").forEach(function (b) {
@@ -482,9 +539,10 @@ import Layout from "@/layouts/AdminLayout.astro";
       sel.addEventListener("change", function () {
         var id = +sel.getAttribute("data-id");
         freshAppToken().then(function (tok2) {
+          if (!tok2) { alert("Session expired — press Lock and sign in again."); return; }
           return fetch(SUPABASE_URL + "/rest/v1/waitlist?id=eq." + id, {
             method: "PATCH",
-            headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + (tok2 || SUPABASE_KEY), "Content-Type": "application/json", Prefer: "return=minimal" },
+            headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + tok2, "Content-Type": "application/json", Prefer: "return=minimal" },
             body: JSON.stringify({ status: sel.value })
           });
         });
