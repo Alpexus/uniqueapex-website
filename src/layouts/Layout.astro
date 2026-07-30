@@ -14,7 +14,7 @@ export interface Props {
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 
 const resolvedImageWithDomain = new URL(
-  "/og-cover.jpg",
+  "/og-social.png",
   Astro.site
 ).toString();
 
@@ -44,6 +44,7 @@ const altURL = new URL(altPath, Astro.site).toString();
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
@@ -78,7 +79,7 @@ const altURL = new URL(altPath, Astro.site).toString();
             : "UniqueApex — Helping families find therapy support in Montréal",
           width: 2400,
           height: 1260,
-          type: "image/jpeg",
+          type: "image/png",
         },
       }}
     />
