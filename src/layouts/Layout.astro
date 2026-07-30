@@ -14,7 +14,7 @@ export interface Props {
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 
 const resolvedImageWithDomain = new URL(
-  "/og-home.jpg",
+  "/og-cover.jpg",
   Astro.site
 ).toString();
 
@@ -76,8 +76,8 @@ const altURL = new URL(altPath, Astro.site).toString();
           alt: lang === "fr"
             ? "UniqueApex — Aider les familles à trouver du soutien thérapeutique à Montréal"
             : "UniqueApex — Helping families find therapy support in Montréal",
-          width: 1200,
-          height: 630,
+          width: 2400,
+          height: 1260,
           type: "image/jpeg",
         },
       }}

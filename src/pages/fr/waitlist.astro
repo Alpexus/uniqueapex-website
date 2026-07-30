@@ -120,6 +120,14 @@ import Layout from "@/layouts/Layout.astro";
                 <option value="Developmental delay">Retard de développement</option>
                 <option value="Other">Autre</option>
               </select>
+              <input
+                type="text"
+                name="diagnosis_other"
+                id="wl-diag-other"
+                placeholder="Précisez votre préoccupation"
+                style="display:none"
+                class="mt-2 w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
+              />
               <p id="error-diagnosis" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></p>
             </div>
           </div>
@@ -300,6 +308,12 @@ import Layout from "@/layouts/Layout.astro";
       langOtherInput.style.display = (this.checked && this.value === "Other") ? "block" : "none";
     });
   });
+  // préoccupation « Autre » → champ pour la décrire
+  var diagSel = document.querySelector('select[name="diagnosis"]');
+  var diagOtherInput = document.getElementById("wl-diag-other");
+  diagSel.addEventListener("change", function () {
+    diagOtherInput.style.display = this.value === "Other" ? "block" : "none";
+  });
   // service « Autre » → champ pour le préciser
   var svcOtherCheck = document.querySelector('input[name="service_other"]');
   var svcOtherInput = document.getElementById("wl-service-other");
@@ -386,9 +400,18 @@ import Layout from "@/layouts/Layout.astro";
     }
 
     var diagnosis = formData.get("diagnosis");
+    var diagnosisValue = diagnosis;
     if (!diagnosis) {
       showError("error-diagnosis", "Veuillez sélectionner un domaine de préoccupation.");
       valid = false;
+    } else if (diagnosis === "Other") {
+      var diagTyped = (formData.get("diagnosis_other") || "").trim();
+      if (diagTyped === "") {
+        showError("error-diagnosis", "Veuillez préciser votre préoccupation.");
+        valid = false;
+      } else {
+        diagnosisValue = diagTyped;
+      }
     }
 
     var slp = formData.get("service_slp");
@@ -445,7 +468,7 @@ import Layout from "@/layouts/Layout.astro";
       phone: formData.get("phone") || null,
       language: languageValue || null,
       child_age: formData.get("child_age") || null,
-      diagnosis: formData.get("diagnosis") || null,
+      diagnosis: diagnosisValue || null,
       service_slp: formData.get("service_slp") || null,
       service_ot: formData.get("service_ot") || null,
       service_aba: formData.get("service_aba") || null,

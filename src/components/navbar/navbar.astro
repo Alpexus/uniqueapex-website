@@ -39,11 +39,11 @@ const currentPath = Astro.url.pathname;
     <Astronav>
       <div class="flex w-full lg:w-auto items-center justify-between">
         <a href={prefix + "/"} class="flex items-center gap-2">
-          <img src="/Logo.png" alt="UniqueApex" class="h-10 w-auto" />
-          <span class="text-lg"><span class="font-bold text-slate-800">Unique</span><span class="font-bold text-violet-700">Apex</span></span>
+          <img src="/Logo.png" alt="UniqueApex" class="h-12 lg:h-10 w-auto" />
+          <span class="text-xl lg:text-lg"><span class="font-bold text-slate-800">Unique</span><span class="font-bold text-violet-700">Apex</span></span>
         </a>
-        <div class="block lg:hidden">
-          <MenuIcon class="w-4 h-4 text-gray-800" />
+        <div class="block lg:hidden p-1">
+          <MenuIcon class="w-7 h-7 text-gray-800" />
         </div>
       </div>
       <MenuItems class="hidden w-full lg:w-auto mt-2 lg:flex lg:mt-0">
