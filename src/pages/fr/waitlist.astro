@@ -10,10 +10,10 @@ import Layout from "@/layouts/Layout.astro";
     <div class="text-center max-w-3xl mx-auto mt-16 mb-16">
       <p class="text-2xl font-semibold text-violet-700 uppercase tracking-wide">Liste d'attente</p>
       <h1 class="text-5xl font-bold text-slate-800 leading-tight mt-3">
-        Soyez parmi les premières <span class="text-violet-700">familles à Montréal</span>
+        Soyez parmi les premières <span class="text-violet-700">familles</span>
       </h1>
       <p class="text-slate-600 leading-relaxed text-lg mt-6">
-        UniqueApex lance son projet pilote à Montréal. Inscrivez-vous à la liste d'attente et nous vous contacterons dès que l'accès sera disponible dans votre secteur.
+        UniqueApex lance son projet pilote à Montréal — mais les familles de partout peuvent s'inscrire. Dites-nous où vous êtes, et nous vous contacterons dès que l'accès s'ouvrira dans votre région.
       </p>
     </div>
 
@@ -75,7 +75,19 @@ import Layout from "@/layouts/Layout.astro";
                 <input type="radio" name="language" value="Both" class="accent-violet-700" />
                 <span class="text-slate-600">Les deux</span>
               </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="language" value="Other" class="accent-violet-700" />
+                <span class="text-slate-600">Autre</span>
+              </label>
             </div>
+            <input
+              type="text"
+              name="language_other"
+              id="wl-lang-other"
+              placeholder="Votre langue préférée"
+              style="display:none"
+              class="mt-3 w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
+            />
             <p id="error-language" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></p>
           </div>
         </div>
@@ -131,6 +143,14 @@ import Layout from "@/layouts/Layout.astro";
                 <span class="text-slate-600 text-sm">Autre</span>
               </label>
             </div>
+            <input
+              type="text"
+              name="service_other_text"
+              id="wl-service-other"
+              placeholder="Quel service recherchez-vous?"
+              style="display:none"
+              class="mt-2 w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
+            />
             <p id="error-services" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></p>
           </div>
         </div>
@@ -140,25 +160,62 @@ import Layout from "@/layouts/Layout.astro";
           <h2 class="text-lg font-bold text-slate-800">Localisation et informations supplémentaires</h2>
           <div class="grid grid-cols-2 gap-4">
             <div>
+              <select
+                name="country"
+                id="wl-country"
+                class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 text-slate-600 bg-white">
+                <option value="Canada" selected>Canada</option>
+                <option value="United States">États-Unis</option>
+                <option value="Germany">Allemagne</option>
+                <option value="Austria">Autriche</option>
+                <option value="Belgium">Belgique</option>
+                <option value="Denmark">Danemark</option>
+                <option value="Spain">Espagne</option>
+                <option value="Estonia">Estonie</option>
+                <option value="Finland">Finlande</option>
+                <option value="France">France</option>
+                <option value="Greece">Grèce</option>
+                <option value="Ireland">Irlande</option>
+                <option value="Italy">Italie</option>
+                <option value="Luxembourg">Luxembourg</option>
+                <option value="Norway">Norvège</option>
+                <option value="Netherlands">Pays-Bas</option>
+                <option value="Poland">Pologne</option>
+                <option value="Portugal">Portugal</option>
+                <option value="Romania">Roumanie</option>
+                <option value="United Kingdom">Royaume-Uni</option>
+                <option value="Sweden">Suède</option>
+                <option value="Switzerland">Suisse</option>
+                <option value="Czechia">Tchéquie</option>
+                <option value="Türkiye">Turquie</option>
+                <option value="Other">Autre pays</option>
+              </select>
+            </div>
+            <div>
               <input
                 type="text"
-                name="location"
-                placeholder="Ville / Arrondissement à Montréal"
+                name="location_city"
+                id="wl-city"
+                placeholder="Ville / arrondissement"
                 class="w-full px-4 py-3 border border-slate-200 placeholder:text-slate-400 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
               />
               <p id="error-location" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></p>
             </div>
-            <select
-              name="referral"
-              class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 text-slate-500 bg-white">
-              <option value="" disabled selected>Comment avez-vous entendu parler de nous?</option>
-              <option value="Social media">Réseaux sociaux</option>
-              <option value="Google">Google</option>
-              <option value="Friend or family">Ami(e) ou famille</option>
-              <option value="Healthcare provider">Professionnel de la santé</option>
-              <option value="Other">Autre</option>
-            </select>
           </div>
+          <!-- affiché quand le pays n'est pas le Canada : s'inscrire = « on veut ça ici aussi » -->
+          <p id="intl-note" style="display:none" class="text-[13.5px] leading-relaxed text-violet-800 bg-violet-50 border border-violet-100 rounded-xl px-4 py-3 m-0">
+            💜 UniqueApex démarre à Montréal — en vous inscrivant depuis un autre pays, vous nous dites <b>« on veut ça ici aussi »</b>. Vous serez parmi les premiers avertis quand nous arriverons près de chez vous.
+          </p>
+          <select
+            name="referral"
+            class="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 text-slate-500 bg-white">
+            <option value="" disabled selected>Comment avez-vous entendu parler de nous?</option>
+            <option value="Social media">Réseaux sociaux</option>
+            <option value="Google">Google</option>
+            <option value="Friend or family">Ami(e) ou famille</option>
+            <option value="Healthcare provider">Professionnel de la santé</option>
+            <option value="Other">Autre</option>
+          </select>
           <textarea
             name="additional_info"
             placeholder="Autre chose que vous aimeriez nous dire? (optionnel)"
@@ -225,6 +282,31 @@ import Layout from "@/layouts/Layout.astro";
   var result = document.getElementById("waitlist-result");
   var submitBtn = document.getElementById("submit-btn");
 
+  // pays → affiche la note « on veut ça ici aussi » + ajuste le champ ville
+  var countrySel = document.getElementById("wl-country");
+  var cityInput = document.getElementById("wl-city");
+  function syncCountry() {
+    var v = countrySel.value;
+    document.getElementById("intl-note").style.display = v === "Canada" ? "none" : "block";
+    cityInput.placeholder = v === "Canada" ? "Ville / arrondissement" : (v === "Other" ? "Ville, Pays" : "Ville (optionnel)");
+  }
+  countrySel.addEventListener("change", syncCountry);
+  syncCountry();
+
+  // langue « Autre » → champ pour la préciser
+  var langOtherInput = document.getElementById("wl-lang-other");
+  document.querySelectorAll('input[name="language"]').forEach(function (r) {
+    r.addEventListener("change", function () {
+      langOtherInput.style.display = (this.checked && this.value === "Other") ? "block" : "none";
+    });
+  });
+  // service « Autre » → champ pour le préciser
+  var svcOtherCheck = document.querySelector('input[name="service_other"]');
+  var svcOtherInput = document.getElementById("wl-service-other");
+  svcOtherCheck.addEventListener("change", function () {
+    svcOtherInput.style.display = this.checked ? "block" : "none";
+  });
+
   // protections anti-bots
   var formLoadTime = Date.now();
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -283,9 +365,18 @@ import Layout from "@/layouts/Layout.astro";
     }
 
     var language = formData.get("language");
+    var languageValue = language;
     if (!language) {
       showError("error-language", "Veuillez sélectionner une langue préférée.");
       valid = false;
+    } else if (language === "Other") {
+      var langTyped = (formData.get("language_other") || "").trim();
+      if (langTyped === "") {
+        showError("error-language", "Veuillez indiquer votre langue préférée.");
+        valid = false;
+      } else {
+        languageValue = langTyped;
+      }
     }
 
     var childAge = formData.get("child_age");
@@ -308,12 +399,24 @@ import Layout from "@/layouts/Layout.astro";
       showError("error-services", "Veuillez sélectionner au moins un service.");
       valid = false;
     }
+    var svcOtherTyped = (formData.get("service_other_text") || "").trim();
+    if (other && svcOtherTyped === "") {
+      showError("error-services", "Veuillez préciser le service recherché.");
+      valid = false;
+    }
 
-    var location = formData.get("location");
-    if (!location || location.trim() === "") {
+    var country = formData.get("country") || "Canada";
+    var city = (formData.get("location_city") || "").trim();
+    if (country === "Canada" && city === "") {
       showError("error-location", "Veuillez entrer votre ville ou arrondissement.");
       valid = false;
     }
+    if (country === "Other" && city === "") {
+      showError("error-location", "Veuillez indiquer votre ville et votre pays.");
+      valid = false;
+    }
+    // le pays voyage dans le champ location existant — aucun changement backend requis
+    var locationValue = country === "Canada" ? city : (country === "Other" ? city : (city === "" ? country : city + ", " + country));
 
     if (!document.getElementById("wl-consent").checked) {
       showError("error-consent", "Veuillez cocher la case de consentement pour vous inscrire.");
@@ -340,14 +443,14 @@ import Layout from "@/layouts/Layout.astro";
       full_name: formData.get("full_name") || null,
       email: formData.get("email") || null,
       phone: formData.get("phone") || null,
-      language: formData.get("language") || null,
+      language: languageValue || null,
       child_age: formData.get("child_age") || null,
       diagnosis: formData.get("diagnosis") || null,
       service_slp: formData.get("service_slp") || null,
       service_ot: formData.get("service_ot") || null,
       service_aba: formData.get("service_aba") || null,
-      service_other: formData.get("service_other") || null,
-      location: formData.get("location") || null,
+      service_other: other ? svcOtherTyped : null,
+      location: locationValue || null,
       referral: formData.get("referral") || null,
       additional_info: formData.get("additional_info") || null,
       company: honey || null,
