@@ -44,6 +44,13 @@ const t = {
       { l1: "Save time &", l2: "reduce stress" },
       { l1: "A community", l2: "that cares" },
     ],
+    // phones only: the 8 cards combine into these 4 rows
+    mob: [
+      { icon: 0, title: "Every report — understood & safely stored", desc: "Plain-language summaries of complex reports, kept in one private place." },
+      { icon: 3, title: "Milestones & appointments in one place", desc: "Track development wins and every meeting in one smart calendar." },
+      { icon: 4, title: "Workshops, guides & mentors", desc: "Learn from experts and from parents who've been there." },
+      { icon: 7, title: "A community that cares — about you too", desc: "Support for your child's journey, and for yours." },
+    ],
   },
   fr: {
     label: "Votre partenaire. Votre guide. Votre système de soutien.",
@@ -72,6 +79,13 @@ const t = {
       { l1: "Privé et", l2: "sécurisé" },
       { l1: "Gagnez du temps,", l2: "moins de stress" },
       { l1: "Une communauté", l2: "bienveillante" },
+    ],
+    // téléphones seulement : les 8 cartes combinées en 4 rangées
+    mob: [
+      { icon: 0, title: "Chaque rapport — compris et bien conservé", desc: "Des résumés clairs des rapports complexes, gardés en lieu sûr et privé." },
+      { icon: 3, title: "Jalons et rendez-vous au même endroit", desc: "Suivez les progrès et chaque rencontre dans un seul calendrier." },
+      { icon: 4, title: "Ateliers, guides et mentors", desc: "Apprenez d'experts et de parents passés par là." },
+      { icon: 7, title: "Une communauté qui pense à vous aussi", desc: "Du soutien pour le parcours de votre enfant — et pour le vôtre." },
     ],
   },
 }[lang] || {};
@@ -137,8 +151,23 @@ const nodePos = [
         </div>
       </div>
 
-      <!-- left cards -->
-      <div class="grid sm:grid-cols-2 gap-3 lg:col-start-1 lg:row-start-1 lg:flex lg:flex-col lg:gap-4 lg:justify-center">
+      <!-- phones: the eight cards condense into four combined rows in one card -->
+      <div class="sm:hidden bg-white rounded-2xl shadow-md shadow-violet-200/40 divide-y divide-violet-50 px-4">
+        {t.mob.map((c, i) => (
+          <div class="ps-card ps-mob flex items-start gap-3 py-3.5" style={`transition-delay:${(0.15 + i * 0.08).toFixed(2)}s`}>
+            <span class="w-11 h-11 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icons[c.icon]} />
+            </span>
+            <span class="min-w-0">
+              <span class="block text-[14px] font-bold text-slate-800 leading-tight">{c.title}</span>
+              <span class="block text-[12px] text-slate-500 leading-snug mt-0.5">{c.desc}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <!-- left cards (hidden on phones — combined into the rows above) -->
+      <div class="hidden sm:grid sm:grid-cols-2 gap-3 lg:col-start-1 lg:row-start-1 lg:flex lg:flex-col lg:gap-4 lg:justify-center">
         {t.left.map((c, i) => (
           <div class="ps-card relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/40 px-4 py-4 flex items-start gap-3.5" style={`transition-delay:${(0.15 + i * 0.08).toFixed(2)}s`}>
             <span class="w-14 h-14 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
@@ -152,8 +181,8 @@ const nodePos = [
         ))}
       </div>
 
-      <!-- right cards -->
-      <div class="grid sm:grid-cols-2 gap-3 lg:col-start-3 lg:row-start-1 lg:flex lg:flex-col lg:gap-4 lg:justify-center">
+      <!-- right cards (hidden on phones — combined into the rows above) -->
+      <div class="hidden sm:grid sm:grid-cols-2 gap-3 lg:col-start-3 lg:row-start-1 lg:flex lg:flex-col lg:gap-4 lg:justify-center">
         {t.right.map((c, i) => (
           <div class="ps-card relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/40 px-4 py-4 flex items-start gap-3.5" style={`transition-delay:${(0.2 + i * 0.08).toFixed(2)}s`}>
             <span class="w-14 h-14 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
@@ -229,7 +258,7 @@ const nodePos = [
       var st = stage.getBoundingClientRect();
       var cx = st.left - pr.left + st.width / 2;
       var cy = st.top - pr.top + st.height / 2;
-      var cards = panel.querySelectorAll(".ps-card");
+      var cards = panel.querySelectorAll(".ps-card:not(.ps-mob)");
 
       var linesHtml = "";
       var nodesHtml = "";
