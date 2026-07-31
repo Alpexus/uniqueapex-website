@@ -8,68 +8,74 @@ import { Icon } from "astro-icon/components";
 <Layout title="Contact">
   <Container>
 
-    <div class="grid md:grid-cols-2 gap-16 items-start mt-16 mb-24">
+    <div class="mt-10 md:mt-16 mb-16 md:mb-24">
 
-      <!-- Left: Contact Info -->
-      <div class="space-y-10">
+      <div class="grid md:grid-cols-2 gap-10 lg:gap-16 items-start">
+
+        <!-- Left: Contact Info -->
         <div>
-          <p class="text-2xl font-semibold text-violet-700 uppercase tracking-wide">Contact Us</p>
+          <p class="text-lg sm:text-2xl font-semibold text-violet-700 uppercase tracking-wide">Contact Us</p>
           <h1 class="text-4xl font-bold text-slate-800 leading-tight mt-3">
             Got questions? <span class="text-violet-700">We are here.</span>
           </h1>
-          <p class="text-slate-600 leading-relaxed text-lg mt-6">
+          <p class="text-slate-600 leading-relaxed text-base sm:text-lg mt-5 sm:mt-6">
             Whether you are a family looking for support, a provider wanting to join our network, or just curious about what we are building — we would love to hear from you.
           </p>
+
+          <!-- info items: boxed single-column rows on mobile, open 2x2 grid on larger screens
+               (single column again at md, where the page splits into two columns and the left one narrows) -->
+          <div class="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
+            <div class="flex items-center sm:items-start gap-3.5 sm:gap-4 rounded-2xl border border-slate-100 bg-slate-50/80 px-4 py-3 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0">
+              <div class="bg-violet-100 rounded-xl p-2.5 sm:p-3 shrink-0">
+                <Icon class="text-violet-700 w-5 h-5 sm:w-6 sm:h-6" name="uil:envelope" />
+              </div>
+              <div class="min-w-0">
+                <p class="font-bold text-slate-800 text-[15px] sm:text-base">Email</p>
+                <a href="mailto:contact@uniqueapex.com" class="block text-slate-500 text-sm break-words hover:text-violet-700 transition-colors">contact@uniqueapex.com</a>
+              </div>
+            </div>
+            <div class="flex items-center sm:items-start gap-3.5 sm:gap-4 rounded-2xl border border-slate-100 bg-slate-50/80 px-4 py-3 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0">
+              <div class="bg-violet-100 rounded-xl p-2.5 sm:p-3 shrink-0">
+                <Icon class="text-violet-700 w-5 h-5 sm:w-6 sm:h-6" name="uil:globe" />
+              </div>
+              <div class="min-w-0">
+                <p class="font-bold text-slate-800 text-[15px] sm:text-base">Website</p>
+                <a href="https://uniqueapex.com" class="block text-slate-500 text-sm break-words hover:text-violet-700 transition-colors">uniqueapex.com</a>
+              </div>
+            </div>
+            <div class="flex items-center sm:items-start gap-3.5 sm:gap-4 rounded-2xl border border-slate-100 bg-slate-50/80 px-4 py-3 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0">
+              <div class="bg-violet-100 rounded-xl p-2.5 sm:p-3 shrink-0">
+                <Icon class="text-violet-700 w-5 h-5 sm:w-6 sm:h-6" name="uil:map-marker" />
+              </div>
+              <div class="min-w-0">
+                <p class="font-bold text-slate-800 text-[15px] sm:text-base">Location</p>
+                <p class="text-slate-500 text-sm">Montréal, Québec, Canada</p>
+              </div>
+            </div>
+            <div class="flex items-center sm:items-start gap-3.5 sm:gap-4 rounded-2xl border border-slate-100 bg-slate-50/80 px-4 py-3 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0">
+              <div class="bg-violet-100 rounded-xl p-2.5 sm:p-3 shrink-0">
+                <Icon class="text-violet-700 w-5 h-5 sm:w-6 sm:h-6" name="uil:clock" />
+              </div>
+              <div class="min-w-0">
+                <p class="font-bold text-slate-800 text-[15px] sm:text-base">Response time</p>
+                <p class="text-slate-500 text-sm">Within one business day</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-6">
-          <div class="flex items-start gap-4">
-            <div class="bg-violet-100 rounded-xl p-3 shrink-0">
-              <Icon class="text-violet-700 w-6 h-6" name="uil:envelope" />
-            </div>
-            <div>
-              <p class="font-bold text-slate-800">Email</p>
-              <a href="mailto:contact@uniqueapex.com" class="text-slate-500 text-sm hover:text-violet-700 transition-colors">contact@uniqueapex.com</a>
-            </div>
-          </div>
-          <div class="flex items-start gap-4">
-            <div class="bg-violet-100 rounded-xl p-3 shrink-0">
-              <Icon class="text-violet-700 w-6 h-6" name="uil:globe" />
-            </div>
-            <div>
-              <p class="font-bold text-slate-800">Website</p>
-              <a href="https://uniqueapex.com" class="text-slate-500 text-sm hover:text-violet-700 transition-colors">uniqueapex.com</a>
-            </div>
-          </div>
-          <div class="flex items-start gap-4">
-            <div class="bg-violet-100 rounded-xl p-3 shrink-0">
-              <Icon class="text-violet-700 w-6 h-6" name="uil:map-marker" />
-            </div>
-            <div>
-              <p class="font-bold text-slate-800">Location</p>
-              <p class="text-slate-500 text-sm">Montréal, Québec, Canada</p>
-            </div>
-          </div>
-          <div class="flex items-start gap-4">
-            <div class="bg-violet-100 rounded-xl p-3 shrink-0">
-              <Icon class="text-violet-700 w-6 h-6" name="uil:clock" />
-            </div>
-            <div>
-              <p class="font-bold text-slate-800">Response time</p>
-              <p class="text-slate-500 text-sm">Within one business day</p>
-            </div>
-          </div>
+        <!-- Right: Form in a card -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-8" style="box-shadow:0 18px 40px -24px rgba(109,40,217,.25)">
+          <h2 class="text-xl font-bold text-slate-800">Send us a message</h2>
+          <p class="text-sm text-slate-500 mt-1.5 mb-6">We read and answer every message ourselves.</p>
+          <Contactform />
         </div>
 
-        <p class="text-xs text-slate-400 leading-relaxed">
-          UniqueApex is operated by Alpexus Technologies Ltd · Registered in England and Wales no. 17363673 · Registered office: 71–75 Shelton Street, Covent Garden, London WC2H 9JQ, United Kingdom.
-        </p>
       </div>
 
-      <!-- Right: Form -->
-      <div class="pt-16 pl-16">
-        <Contactform />
-      </div>
+      <p class="mt-12 md:mt-16 pt-5 border-t border-slate-100 text-[11px] sm:text-xs text-slate-400 leading-relaxed">
+        UniqueApex is operated by Alpexus Technologies Ltd · Registered in England and Wales no. 17363673 · Registered office: 71–75 Shelton Street, Covent Garden, London WC2H 9JQ, United Kingdom.
+      </p>
 
     </div>
 
