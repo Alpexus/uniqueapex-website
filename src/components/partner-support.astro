@@ -44,7 +44,8 @@ const t = {
       { l1: "Save time &", l2: "reduce stress" },
       { l1: "A community", l2: "that cares" },
     ],
-    // phones only: the 8 cards combine into these 4 rows
+    orbitHint: "Tap a circle to explore",
+    // phones only (older layout, kept for reference)
     mob: [
       { icon: 0, title: "Every report — understood & safely stored", desc: "Plain-language summaries of complex reports, kept in one private place." },
       { icon: 3, title: "Milestones & appointments in one place", desc: "Track development wins and every meeting in one smart calendar." },
@@ -80,7 +81,8 @@ const t = {
       { l1: "Gagnez du temps,", l2: "moins de stress" },
       { l1: "Une communauté", l2: "bienveillante" },
     ],
-    // téléphones seulement : les 8 cartes combinées en 4 rangées
+    orbitHint: "Touchez un cercle pour explorer",
+    // téléphones (ancienne mise en page, gardée en référence)
     mob: [
       { icon: 0, title: "Chaque rapport — compris et bien conservé", desc: "Des résumés clairs des rapports complexes, gardés en lieu sûr et privé." },
       { icon: 3, title: "Jalons et rendez-vous au même endroit", desc: "Suivez les progrès et chaque rencontre dans un seul calendrier." },
@@ -106,6 +108,13 @@ const icons = [
 // upper / mid-upper / mid-lower / lower on each side, just outside the circle.
 // Left 0–3 (top→bottom), right 4–7 (top→bottom). The SVG draws each node AND
 // bends its line at these exact points.
+// all 8 promises in orbit order (mobile mini-orbit uses these)
+const promises = [];
+if (t.left && t.right) {
+  t.left.forEach((c, i) => promises.push({ ...c, icon: i }));
+  t.right.forEach((c, i) => promises.push({ ...c, icon: i + 4 }));
+}
+
 const nodePos = [
   [11, 19.5],
   [1.8, 38.9],
@@ -133,7 +142,7 @@ const nodePos = [
 
     <div class="relative grid gap-4 lg:grid-cols-[1fr_auto_1fr] lg:gap-x-10 xl:gap-x-16 items-center">
       <!-- center: badge + circle (first on small screens) -->
-      <div class="order-first lg:order-none lg:col-start-2 lg:row-start-1 flex flex-col items-center gap-5">
+      <div class="order-first lg:order-none lg:col-start-2 lg:row-start-1 hidden sm:flex flex-col items-center gap-5">
         <div class="ps-badge relative z-20 inline-flex items-center gap-3 rounded-2xl bg-violet-700 text-white px-5 py-3 shadow-lg shadow-violet-300/50 max-w-[300px]">
           <span class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8.6c1.1-2.1 4.2-2.1 5.1.2.8 2.1-1.5 4-5.1 6.6-3.6-2.6-5.9-4.5-5.1-6.6.9-2.3 4-2.3 5.1-.2z"/></svg>
@@ -151,19 +160,45 @@ const nodePos = [
         </div>
       </div>
 
-      <!-- phones: the eight cards condense into four combined rows in one card -->
-      <div class="sm:hidden bg-white rounded-2xl shadow-md shadow-violet-200/40 divide-y divide-violet-50 px-4">
-        {t.mob.map((c, i) => (
-          <div class="ps-card ps-mob flex items-start gap-3 py-3.5" style={`transition-delay:${(0.15 + i * 0.08).toFixed(2)}s`}>
-            <span class="w-11 h-11 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icons[c.icon]} />
-            </span>
-            <span class="min-w-0">
-              <span class="block text-[14px] font-bold text-slate-800 leading-tight">{c.title}</span>
-              <span class="block text-[12px] text-slate-500 leading-snug mt-0.5">{c.desc}</span>
-            </span>
+      <!-- phones: the MINI-ORBIT — the desktop's soul, miniaturized. The photo
+           sits in the middle; the 8 promises orbit slowly as icon bubbles on a
+           dashed ring. Tap a bubble → orbit pauses, its text shows below. -->
+      <div class="sm:hidden" id="ps-m">
+        <!-- handwritten title: bold first line, warm Caveat second line (her pick) -->
+        <div class="ps-badge relative z-20 text-center px-4">
+          <span class="block text-[18px] font-extrabold text-slate-800 leading-snug">{t.badge1}</span>
+          <span class="ps-hand block text-[27px] font-bold text-violet-700" style="line-height:1.15;margin-top:2px">{t.badge2}<span style="font-size:18px;white-space:nowrap">&nbsp;💜</span></span>
+        </div>
+
+        <div class="relative mx-auto mt-6" style="width:260px;height:260px">
+          <svg class="absolute" style="inset:0" width="260" height="260" viewBox="0 0 260 260" aria-hidden="true">
+            <circle cx="130" cy="130" r="104" fill="none" stroke="#C4B5FD" stroke-width="2" stroke-dasharray="3 9" stroke-linecap="round" />
+          </svg>
+          <div id="ps-orbit" class="absolute" style="inset:0">
+            {promises.map((p, i) => (
+              <button
+                type="button"
+                class="ps-ob"
+                style={`transform:rotate(${i * 45 - 90}deg) translate(104px) rotate(${90 - i * 45}deg)`}
+                data-t={p.title}
+                data-d={p.desc}
+                aria-label={p.title}
+              >
+                <span class="ps-ob-in">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icons[p.icon]} />
+                </span>
+              </button>
+            ))}
           </div>
-        ))}
+          <div class="ps-hero absolute rounded-full bg-white shadow-xl shadow-violet-200/70 z-10" style="inset:0;margin:auto;width:118px;height:118px;padding:5px">
+            <img src="/mother-son.png" alt={t.imgAlt} class="w-full h-full rounded-full object-cover" loading="lazy" />
+          </div>
+        </div>
+
+        <div class="ps-card bg-white rounded-2xl shadow-md shadow-violet-200/40 px-5 py-4 mt-5 text-center" style="min-height:96px">
+          <span id="ps-cap-t" class="block text-[15px] font-bold text-slate-800 leading-snug">👆 {t.orbitHint}</span>
+          <span id="ps-cap-d" class="block text-[12.5px] text-slate-500 leading-snug mt-1.5"></span>
+        </div>
       </div>
 
       <!-- left cards (hidden on phones — combined into the rows above) -->
@@ -227,6 +262,8 @@ const nodePos = [
 </section>
 
 <style is:global>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap');
+  #ua-partner .ps-hand{font-family:'Caveat','Segoe Script',cursive}
   #ua-partner .ps-card{opacity:0;transform:translateY(10px) scale(.97);transition:opacity .5s ease,transform .5s ease}
   #ua-partner.ua-in .ps-card{opacity:1;transform:none}
   #ua-partner .ps-hero{opacity:0;transform:scale(.94);transition:opacity .6s ease,transform .6s ease;transition-delay:.15s}
@@ -235,9 +272,20 @@ const nodePos = [
   #ua-partner.ua-in .ps-badge{opacity:1;transform:none}
   #ua-partner #ps-svg{opacity:0;transition:opacity .7s ease .35s}
   #ua-partner.ua-in #ps-svg{opacity:1}
+  /* ---- mobile mini-orbit (plain CSS on purpose) ---- */
+  #ps-orbit{animation:psSpin 44s linear infinite}
+  #ps-m .ps-ob-in{animation:psSpinRev 44s linear infinite}
+  #ps-m.ps-paused #ps-orbit,#ps-m.ps-paused .ps-ob-in{animation-play-state:paused}
+  @keyframes psSpin{to{transform:rotate(360deg)}}
+  @keyframes psSpinRev{to{transform:rotate(-360deg)}}
+  #ps-m .ps-ob{position:absolute;top:50%;left:50%;width:44px;height:44px;margin:-22px;border:0;padding:0;background:#fff;border-radius:9999px;box-shadow:0 6px 14px -6px rgba(124,58,237,.4);cursor:pointer;color:#7C3AED;transition:background-color .25s ease,color .25s ease}
+  #ps-m .ps-ob.on{background:#6D28D9;color:#fff}
+  #ps-m .ps-ob-in{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+  #ps-m .ps-hero{transition-delay:.1s}
   @media (prefers-reduced-motion: reduce){
     #ua-partner .ps-card,#ua-partner .ps-hero,#ua-partner .ps-badge{opacity:1;transform:none;transition:none}
     #ua-partner #ps-svg{opacity:1;transition:none}
+    #ps-orbit,#ps-m .ps-ob-in{animation:none}
   }
 </style>
 
@@ -295,5 +343,24 @@ const nodePos = [
       entries.forEach(function (e) { if (e.isIntersecting) { root.classList.add("ua-in"); draw(); io.disconnect(); } });
     }, { threshold: 0.15 });
     io.observe(root);
+  })();
+</script>
+
+<script is:inline>
+  /* mobile mini-orbit: tap a bubble → pause the orbit, show that promise */
+  (function () {
+    var wrap = document.getElementById("ps-m");
+    if (!wrap) return;
+    var capT = document.getElementById("ps-cap-t");
+    var capD = document.getElementById("ps-cap-d");
+    wrap.querySelectorAll(".ps-ob").forEach(function (b) {
+      b.addEventListener("click", function () {
+        wrap.classList.add("ps-paused");
+        wrap.querySelectorAll(".ps-ob").forEach(function (x) { x.classList.remove("on"); });
+        b.classList.add("on");
+        capT.textContent = b.getAttribute("data-t");
+        capD.textContent = b.getAttribute("data-d");
+      });
+    });
   })();
 </script>
