@@ -1,18 +1,20 @@
 ---
 import Container from "@/components/container.astro";
 import Layout from "@/layouts/Layout.astro";
+// @ts-ignore
+import { Icon } from "astro-icon/components";
 ---
 
 <Layout title="Join the Waitlist">
   <Container>
 
     <!-- Hero -->
-    <div class="text-center max-w-3xl mx-auto mt-16 mb-16">
-      <p class="text-2xl font-semibold text-violet-700 uppercase tracking-wide">Join the Waitlist</p>
-      <h1 class="text-5xl font-bold text-slate-800 leading-tight mt-3">
+    <div class="text-center max-w-3xl mx-auto mt-10 sm:mt-16 mb-8 sm:mb-14">
+      <p class="text-lg sm:text-2xl font-semibold text-violet-700 uppercase tracking-wide">Join the Waitlist</p>
+      <h1 class="text-[32px] leading-[1.15] sm:text-5xl font-bold text-slate-800 sm:leading-tight mt-3">
         Be among the first <span class="text-violet-700">families</span>
       </h1>
-      <p class="text-slate-600 leading-relaxed text-lg mt-6">
+      <p class="text-slate-600 leading-relaxed text-base sm:text-lg mt-4 sm:mt-6">
         UniqueApex is launching its pilot in Montréal — but families anywhere can join. Tell us where you are, and we'll reach out the moment access opens in your area.
       </p>
     </div>
@@ -32,9 +34,12 @@ import Layout from "@/layouts/Layout.astro";
         </div>
 
         <!-- About You -->
-        <div class="bg-slate-50 rounded-2xl p-8 space-y-4">
-          <h2 class="text-lg font-bold text-slate-800">About you</h2>
-          <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-8 space-y-4" style="box-shadow:0 16px 36px -28px rgba(109,40,217,.25)">
+          <h2 class="flex items-center gap-3 text-lg font-bold text-slate-800">
+            <span class="bg-violet-100 rounded-xl p-2 flex-none"><Icon class="text-violet-700 w-5 h-5" name="uil:user" /></span>
+            About you
+          </h2>
+          <div class="grid sm:grid-cols-2 gap-4">
             <div>
               <input
                 type="text"
@@ -62,7 +67,7 @@ import Layout from "@/layouts/Layout.astro";
           />
           <div>
             <label class="block text-sm font-medium text-slate-600 mb-3">Preferred Language</label>
-            <div class="flex gap-6">
+            <div class="flex flex-wrap gap-x-5 gap-y-2.5">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input type="radio" name="language" value="English" class="accent-violet-700" />
                 <span class="text-slate-600">English</span>
@@ -93,9 +98,28 @@ import Layout from "@/layouts/Layout.astro";
         </div>
 
         <!-- About Your Child -->
-        <div class="bg-slate-50 rounded-2xl p-8 space-y-4">
-          <h2 class="text-lg font-bold text-slate-800">About your child</h2>
-          <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-8 space-y-4" style="box-shadow:0 16px 36px -28px rgba(109,40,217,.25)">
+          <h2 class="flex items-center gap-3 text-lg font-bold text-slate-800">
+            <span class="bg-violet-100 rounded-xl p-2 flex-none"><Icon class="text-violet-700 w-5 h-5" name="uil:kid" /></span>
+            About your child
+          </h2>
+
+          <!-- lets supporters without children join too — child questions only show for parents -->
+          <div>
+            <label class="block text-sm font-medium text-slate-600 mb-3">Do you have a child who needs support today?</label>
+            <div class="grid sm:grid-cols-2 gap-2">
+              <label class="wl-seg"><input type="radio" name="has_child" value="yes" checked /><b>Yes — support is for my child</b></label>
+              <label class="wl-seg"><input type="radio" name="has_child" value="not_yet" /><b>Not yet — I'm following the project</b></label>
+            </div>
+          </div>
+
+          <!-- warm note for supporters (shown when "not yet" is picked) -->
+          <p id="wl-nochild-note" style="display:none" class="text-[13.5px] leading-relaxed text-violet-800 bg-violet-50 border border-violet-100 rounded-xl px-4 py-3 m-0">
+            💜 Wonderful — you'll follow along as we build, and your spot will be ready if you ever need it.
+          </p>
+
+          <div id="wl-child-fields" class="space-y-4">
+          <div class="grid sm:grid-cols-2 gap-4">
             <div>
               <select
                 name="child_age"
@@ -133,7 +157,7 @@ import Layout from "@/layouts/Layout.astro";
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-600 mb-3">Services Needed</label>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid sm:grid-cols-2 gap-2">
               <label class="flex items-center gap-3 cursor-pointer bg-white border border-slate-200 rounded-xl px-4 py-3 hover:border-violet-300 transition-colors">
                 <input type="checkbox" name="service_slp" value="Speech-Language Therapy" class="accent-violet-700 w-4 h-4" />
                 <span class="text-slate-600 text-sm">Speech-Language Therapy</span>
@@ -161,12 +185,16 @@ import Layout from "@/layouts/Layout.astro";
             />
             <p id="error-services" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></p>
           </div>
+          </div><!-- /wl-child-fields -->
         </div>
 
         <!-- Location & Additional -->
-        <div class="bg-slate-50 rounded-2xl p-8 space-y-4">
-          <h2 class="text-lg font-bold text-slate-800">Location & additional info</h2>
-          <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-8 space-y-4" style="box-shadow:0 16px 36px -28px rgba(109,40,217,.25)">
+          <h2 class="flex items-center gap-3 text-lg font-bold text-slate-800">
+            <span class="bg-violet-100 rounded-xl p-2 flex-none"><Icon class="text-violet-700 w-5 h-5" name="uil:map-marker" /></span>
+            Location & additional info
+          </h2>
+          <div class="grid sm:grid-cols-2 gap-4">
             <div>
               <select
                 name="country"
@@ -239,7 +267,7 @@ import Layout from "@/layouts/Layout.astro";
           <label class="flex items-start gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer mb-3">
             <input type="checkbox" id="wl-consent" class="accent-violet-700 w-4 h-4 mt-0.5 flex-shrink-0" />
             <span class="text-sm text-slate-600 leading-relaxed">
-              I consent to UniqueApex storing the information in this form — including details about my child — to contact me about the service, as described in the <a href="/privacy" target="_blank" rel="noopener" class="text-violet-700 font-semibold hover:underline">Privacy Policy</a>. I can withdraw at any time.
+              I consent to UniqueApex storing the information in this form — including any details about my child — to contact me about the service, as described in the <a href="/privacy" target="_blank" rel="noopener" class="text-violet-700 font-semibold hover:underline">Privacy Policy</a>. I can withdraw at any time.
             </span>
           </label>
           <p id="error-consent" style="display:none;color:#ef4444;font-size:13px;margin:0 0 12px;text-align:center">Please tick the consent box to join.</p>
@@ -278,6 +306,12 @@ import Layout from "@/layouts/Layout.astro";
       #pp-body ul{margin:8px 0;padding-left:20px}
       #pp-body a{color:#6D28D9;font-weight:600}
       #pp-body .lg-date{font-size:12.5px;color:#94A3B8}
+      /* segmented "do you have a child" choice */
+      .wl-seg{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:12px 16px;cursor:pointer;transition:border-color .15s ease,background .15s ease}
+      .wl-seg:hover{border-color:#C4B5FD}
+      .wl-seg:has(input:checked){border-color:#6D28D9;background:#F5F3FF}
+      .wl-seg input{accent-color:#6D28D9;width:16px;height:16px;flex:none}
+      .wl-seg b{font-size:14px;color:#334155;font-weight:600;line-height:1.35}
     </style>
   </Container>
 </Layout>
@@ -319,6 +353,20 @@ import Layout from "@/layouts/Layout.astro";
   var svcOtherInput = document.getElementById("wl-service-other");
   svcOtherCheck.addEventListener("change", function () {
     svcOtherInput.style.display = this.checked ? "block" : "none";
+  });
+  // "Not yet" (no child) → hide the child questions, show the warm note
+  var childFields = document.getElementById("wl-child-fields");
+  var noChildNote = document.getElementById("wl-nochild-note");
+  function hasChildNow() {
+    var picked = document.querySelector('input[name="has_child"]:checked');
+    return !picked || picked.value !== "not_yet";
+  }
+  document.querySelectorAll('input[name="has_child"]').forEach(function (r) {
+    r.addEventListener("change", function () {
+      var show = hasChildNow();
+      childFields.style.display = show ? "" : "none";
+      noChildNote.style.display = show ? "none" : "block";
+    });
   });
 
   // bot defenses
@@ -393,39 +441,46 @@ import Layout from "@/layouts/Layout.astro";
       }
     }
 
-    var childAge = formData.get("child_age");
-    if (!childAge) {
-      showError("error-child_age", "Please select an age range.");
-      valid = false;
-    }
+    // child questions only apply when there IS a child — supporters skip them
+    var hasChild = hasChildNow();
 
-    var diagnosis = formData.get("diagnosis");
-    var diagnosisValue = diagnosis;
-    if (!diagnosis) {
-      showError("error-diagnosis", "Please select an area of concern.");
-      valid = false;
-    } else if (diagnosis === "Other") {
-      var diagTyped = (formData.get("diagnosis_other") || "").trim();
-      if (diagTyped === "") {
-        showError("error-diagnosis", "Please tell us more about your concern.");
+    var diagnosisValue = null;
+    var slp = null, ot = null, aba = null, other = null, svcOtherTyped = "";
+    if (hasChild) {
+      var childAge = formData.get("child_age");
+      if (!childAge) {
+        showError("error-child_age", "Please select an age range.");
         valid = false;
-      } else {
-        diagnosisValue = diagTyped;
       }
-    }
 
-    var slp = formData.get("service_slp");
-    var ot = formData.get("service_ot");
-    var aba = formData.get("service_aba");
-    var other = formData.get("service_other");
-    if (!slp && !ot && !aba && !other) {
-      showError("error-services", "Please select at least one service.");
-      valid = false;
-    }
-    var svcOtherTyped = (formData.get("service_other_text") || "").trim();
-    if (other && svcOtherTyped === "") {
-      showError("error-services", "Please tell us which service you're looking for.");
-      valid = false;
+      var diagnosis = formData.get("diagnosis");
+      diagnosisValue = diagnosis;
+      if (!diagnosis) {
+        showError("error-diagnosis", "Please select an area of concern.");
+        valid = false;
+      } else if (diagnosis === "Other") {
+        var diagTyped = (formData.get("diagnosis_other") || "").trim();
+        if (diagTyped === "") {
+          showError("error-diagnosis", "Please tell us more about your concern.");
+          valid = false;
+        } else {
+          diagnosisValue = diagTyped;
+        }
+      }
+
+      slp = formData.get("service_slp");
+      ot = formData.get("service_ot");
+      aba = formData.get("service_aba");
+      other = formData.get("service_other");
+      if (!slp && !ot && !aba && !other) {
+        showError("error-services", "Please select at least one service.");
+        valid = false;
+      }
+      svcOtherTyped = (formData.get("service_other_text") || "").trim();
+      if (other && svcOtherTyped === "") {
+        showError("error-services", "Please tell us which service you're looking for.");
+        valid = false;
+      }
     }
 
     var country = formData.get("country") || "Canada";
@@ -467,12 +522,14 @@ import Layout from "@/layouts/Layout.astro";
       email: formData.get("email") || null,
       phone: formData.get("phone") || null,
       language: languageValue || null,
-      child_age: formData.get("child_age") || null,
-      diagnosis: diagnosisValue || null,
-      service_slp: formData.get("service_slp") || null,
-      service_ot: formData.get("service_ot") || null,
-      service_aba: formData.get("service_aba") || null,
-      service_other: other ? svcOtherTyped : null,
+      /* supporters without children ride in the same columns — no backend change.
+         "No child yet" is the canonical English marker her admin list will show. */
+      child_age: hasChild ? (formData.get("child_age") || null) : "No child yet",
+      diagnosis: hasChild ? (diagnosisValue || null) : "No child yet",
+      service_slp: hasChild ? (slp || null) : null,
+      service_ot: hasChild ? (ot || null) : null,
+      service_aba: hasChild ? (aba || null) : null,
+      service_other: hasChild && other ? svcOtherTyped : null,
       location: locationValue || null,
       referral: formData.get("referral") || null,
       additional_info: formData.get("additional_info") || null,
