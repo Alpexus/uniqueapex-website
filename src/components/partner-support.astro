@@ -36,14 +36,6 @@ const t = {
       { title: "Find Your People", desc: "Join a community that listens, supports, and celebrates with you." },
       { title: "Emotional Support", desc: "Because this journey is not just about your child, it's about you too." },
     ],
-    bandTitle1: "You are not alone.",
-    bandTitle2: "We're with you, every step.",
-    minis: [
-      { l1: "Expert guidance", l2: "you can trust" },
-      { l1: "Private &", l2: "secure" },
-      { l1: "Save time &", l2: "reduce stress" },
-      { l1: "A community", l2: "that cares" },
-    ],
     orbitHint: "Tap a circle to explore",
     // phones only (older layout, kept for reference)
     mob: [
@@ -72,14 +64,6 @@ const t = {
       { title: "Être jumelé à un mentor", desc: "Des parents d'expérience qui comprennent vraiment votre parcours." },
       { title: "Trouver votre communauté", desc: "Une communauté qui écoute, soutient et célèbre avec vous." },
       { title: "Soutien émotionnel", desc: "Parce que ce parcours ne concerne pas seulement votre enfant — vous aussi." },
-    ],
-    bandTitle1: "Vous n'êtes pas seuls.",
-    bandTitle2: "On est là, à chaque étape.",
-    minis: [
-      { l1: "Des conseils d'experts", l2: "fiables" },
-      { l1: "Privé et", l2: "sécurisé" },
-      { l1: "Gagnez du temps,", l2: "moins de stress" },
-      { l1: "Une communauté", l2: "bienveillante" },
     ],
     orbitHint: "Touchez un cercle pour explorer",
     // téléphones (ancienne mise en page, gardée en référence)
@@ -233,32 +217,7 @@ const nodePos = [
     </div>
   </div>
 
-  <!-- reassurance band -->
-  <div class="mt-6 rounded-3xl border border-violet-100 bg-violet-50/60 px-6 lg:px-10 py-6 flex flex-col lg:flex-row items-center gap-6 lg:gap-10">
-    <div class="flex items-center gap-4 shrink-0 lg:pr-10 lg:border-r lg:border-slate-200">
-      <svg class="w-16 h-16 text-violet-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8.8c1.1-2.1 4.3-2.1 5.2.2.8 2.1-1.5 4.1-5.2 6.7-3.7-2.6-6-4.6-5.2-6.7.9-2.3 4.1-2.3 5.2-.2z"/><path d="M3.5 16.5c2.2 2.9 5.2 4.4 8.5 4.4s6.3-1.5 8.5-4.4"/></svg>
-      <span>
-        <span class="block text-[19px] font-bold text-slate-800 leading-tight">{t.bandTitle1}</span>
-        <span class="block text-[19px] font-bold text-violet-700 leading-tight">{t.bandTitle2}</span>
-      </span>
-    </div>
-    <div class="flex-1 w-full grid grid-cols-2 gap-y-5 lg:flex lg:items-center">
-      {t.minis.map((m, i) => (
-        <span class={`flex items-center justify-start gap-3 pl-4 lg:pl-0 lg:justify-center lg:flex-1 ${i === 0 ? "" : "lg:border-l lg:border-slate-200"}`}>
-          <span class="text-violet-600 shrink-0 w-8 h-8 flex items-center justify-center">
-            {i === 0 && <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="8" r="3.5"/><path d="M3 20c.8-3.5 3.4-5.4 6.5-5.4 1.2 0 2.3.3 3.2.8"/><path d="M14.5 17.5l2 2 3.5-4"/></svg>}
-            {i === 1 && <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4.5"/></svg>}
-            {i === 2 && <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2.5"/></svg>}
-            {i === 3 && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8.6c1.1-2.1 4.2-2.1 5.1.2.8 2.1-1.5 4-5.1 6.6-3.6-2.6-5.9-4.5-5.1-6.6.9-2.3 4-2.3 5.1-.2z"/></svg>}
-          </span>
-          <span class="text-[14px] font-semibold text-slate-700 leading-snug">
-            <span class="block">{m.l1}</span>
-            <span class="block">{m.l2}</span>
-          </span>
-        </span>
-      ))}
-    </div>
-  </div>
+  <!-- (the "You are not alone" reassurance band moved to the end of How It Works) -->
 </section>
 
 <style is:global>
