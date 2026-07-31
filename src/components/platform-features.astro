@@ -160,8 +160,9 @@ const content = {
 </section>
 
 <style is:global>
-  #pf2 .pf2-card{position:relative;overflow:hidden;opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .25s ease,border-color .2s ease,box-shadow .25s ease}
-  #pf2 .pf2-card.pf2-in{opacity:1;transform:none}
+  #pf2 .pf2-card{position:relative;overflow:hidden;opacity:0;transition:transform .25s ease,border-color .2s ease,box-shadow .25s ease}
+  #pf2 .pf2-card.pf2-in{opacity:1;animation:pf2Rise .65s cubic-bezier(.22,.9,.36,1) backwards}
+  @keyframes pf2Rise{from{opacity:0;transform:translateY(26px) scale(.98)}to{opacity:1;transform:none}}
   #pf2 .pf2-card.pf2-in:hover{transform:translateY(-4px);border-color:#c4b5fd;box-shadow:0 12px 32px -12px rgba(124,58,237,.25)}
   #pf2 .pf2-card::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(124,58,237,.10),transparent 65%);opacity:0;transition:opacity .25s ease;pointer-events:none}
   #pf2 .pf2-card:hover::before{opacity:1}
@@ -204,11 +205,21 @@ const content = {
       if (txt) txt.setAttribute("data-less", lessLabels[txt.getAttribute("data-more")] || "Less");
     });
 
-    function reveal() { cards.forEach(function (c, i) { setTimeout(function () { c.classList.add("pf2-in"); }, i * 80); }); }
-    if (!("IntersectionObserver" in window)) { reveal(); return; }
+    /* each card reveals on ITS OWN scroll arrival (box by box), with a tiny
+       stagger inside a desktop row so side-by-side cards don't pop as one */
+    if (!("IntersectionObserver" in window)) {
+      cards.forEach(function (c) { c.classList.add("pf2-in"); });
+      return;
+    }
     var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { if (e.isIntersecting) { io.disconnect(); reveal(); } });
-    }, { threshold: 0.1 });
-    io.observe(grid);
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var c = e.target;
+        io.unobserve(c);
+        var i = Array.prototype.indexOf.call(cards, c);
+        setTimeout(function () { c.classList.add("pf2-in"); }, (i % 3) * 90);
+      });
+    }, { threshold: 0.15, rootMargin: "600% 0px -8% 0px" }); /* huge top margin: anything scrolled PAST counts as seen — no card can stay invisible after a fast scroll */
+    cards.forEach(function (c) { io.observe(c); });
   })();
 </script>
