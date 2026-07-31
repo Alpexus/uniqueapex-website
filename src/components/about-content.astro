@@ -62,6 +62,7 @@ const t = {
       title3: "mean?",
       unique: { title: "Unique", body: "Every neurodivergent child is unique — with their own strengths, their own timeline, and their own path. There is no one-size-fits-all support system." },
       apex: { title: "Apex", body: "Every family is climbing toward its own version of progress, growth, and wellbeing. UniqueApex exists to make that climb less isolating." },
+      hint: "Tap to flip",
     },
     values: {
       label: "Our Values",
@@ -124,6 +125,7 @@ const t = {
       title3: "?",
       unique: { title: "Unique", body: "Chaque enfant neurodivergent est unique — avec ses propres forces, son propre rythme et son propre chemin. Il n'existe pas de solution universelle." },
       apex: { title: "Apex", body: "Chaque famille grimpe vers sa propre version du progrès, de la croissance et du bien-être. UniqueApex existe pour rendre cette ascension moins isolante." },
+      hint: "Touchez pour retourner",
     },
     values: {
       label: "Nos valeurs",
@@ -142,7 +144,7 @@ const t = {
 <div id="ua-about">
   <!-- signature font — loaded as a <link> (NOT a CSS @import: Astro bundles styles
        and a mid-file @import gets silently ignored by browsers, breaking the font) -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Allison&display=swap" />
 
   <!-- Hero + Brand Story (text-only — the climbing illustration was retired) -->
   <div class="ab-hero max-w-3xl mx-auto text-center mt-10 md:mt-16 mb-16 md:mb-28 space-y-5 md:space-y-6">
@@ -157,6 +159,8 @@ const t = {
 
   <!-- Founder -->
   <div class="ab-rev relative bg-violet-50/60 border border-violet-100 rounded-3xl p-6 sm:p-10 md:p-16 mb-16 md:mb-32 overflow-hidden">
+    <!-- section label sits at the very top of the card, above the photo -->
+    <p class="relative text-sm font-semibold text-violet-700 uppercase tracking-wide text-center mt-0 mb-8 md:mb-12">{t.founder.label}</p>
     <div class="relative grid md:grid-cols-3 gap-8 md:gap-12 items-center">
       <div class="flex flex-col items-center text-center">
         <div class="relative w-40 h-40 sm:w-56 sm:h-56">
@@ -167,8 +171,7 @@ const t = {
         <p class="text-violet-700 font-medium m-0">{t.founder.role}</p>
       </div>
       <div class="md:col-span-2">
-        <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{t.founder.label}</p>
-        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mt-4 text-slate-800 leading-tight tracking-tight">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mt-0 text-slate-800 leading-tight tracking-tight">
           {t.founder.quote1} <span class="text-violet-700">{t.founder.quote2}</span>
         </h2>
         {t.founder.paras.map((p, i) => (
@@ -184,7 +187,7 @@ const t = {
   <div class="ab-rev relative overflow-hidden bg-gradient-to-b from-violet-50/70 to-white border border-violet-100 rounded-3xl p-6 sm:p-10 md:p-14 mb-16 md:mb-32">
     <div class="grid md:grid-cols-2 gap-8 md:gap-14 items-center">
       <div class="flex items-center justify-center">
-        <img src="/mission-illustration.png" alt={t.mission.imgAlt} class="w-full max-w-[300px] sm:max-w-[400px] md:max-w-[460px]" />
+        <img src="/vision-illustration.png" alt={t.vision.imgAlt} class="w-full max-w-[300px] sm:max-w-[400px] md:max-w-[460px]" />
       </div>
       <div>
         <div>
@@ -216,16 +219,27 @@ const t = {
       </h2>
     </div>
     <div class="grid md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
-      <div class="nm-card relative bg-white border border-violet-100 rounded-3xl p-6 sm:p-8 text-center shadow-sm">
-        <img src="/icon-unique.png" alt="" class="w-28 h-28 sm:w-36 sm:h-36 mx-auto" />
-        <span class="block text-2xl font-bold text-slate-800 mt-3 sm:mt-4">{t.name.unique.title}</span>
-        <span class="block text-slate-500 text-[15px] sm:text-base leading-relaxed mt-2.5 max-w-sm mx-auto">{t.name.unique.body}</span>
-      </div>
-      <div class="nm-card relative bg-white border border-violet-100 rounded-3xl p-6 sm:p-8 text-center shadow-sm">
-        <img src="/icon-apex.png" alt="" class="w-28 h-28 sm:w-36 sm:h-36 mx-auto" />
-        <span class="block text-2xl font-bold text-violet-700 mt-3 sm:mt-4">{t.name.apex.title}</span>
-        <span class="block text-slate-500 text-[15px] sm:text-base leading-relaxed mt-2.5 max-w-sm mx-auto">{t.name.apex.body}</span>
-      </div>
+      {[
+        { img: "/icon-unique.png", data: t.name.unique, dark: true },
+        { img: "/icon-apex.png", data: t.name.apex, dark: false },
+      ].map((c) => (
+        <button type="button" class="nm-flip" aria-pressed="false">
+          <span class="nm-inner">
+            <span class="nm-face nm-front">
+              <img src={c.img} alt="" class="w-28 h-28 sm:w-36 sm:h-36" />
+              <span class={`block text-2xl font-bold mt-2 ${c.dark ? "text-slate-800" : "text-violet-700"}`}>{c.data.title}</span>
+              <span class="mt-3 inline-flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-wider text-violet-500">
+                {t.name.hint}
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v5h-5"/></svg>
+              </span>
+            </span>
+            <span class="nm-face nm-back">
+              <span class="block text-xl font-bold text-white">{c.data.title}</span>
+              <span class="block text-violet-100 text-[15px] sm:text-base leading-relaxed mt-3 max-w-sm mx-auto">{c.data.body}</span>
+            </span>
+          </span>
+        </button>
+      ))}
     </div>
   </div>
 
@@ -235,23 +249,15 @@ const t = {
       <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{t.values.label}</p>
       <h2 class="text-[28px] md:text-4xl font-bold mt-3 text-slate-800">{t.values.title}</h2>
     </div>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
-      {t.values.items.map((item, vi) => (
-        <div class="ab-card relative bg-white border border-violet-100 rounded-3xl px-5 py-7 text-center shadow-sm">
-          <div class="relative w-24 h-24 mx-auto mb-5">
-            <div class="ab-blob absolute inset-1.5" style={["border-radius:46% 54% 58% 42% / 52% 44% 56% 48%","border-radius:58% 42% 46% 54% / 44% 56% 48% 52%","border-radius:52% 48% 42% 58% / 56% 46% 54% 44%","border-radius:44% 56% 54% 46% / 48% 58% 42% 56%"][vi]}></div>
-            {vi === 0 ? (
-              <svg class="ab-acc absolute -top-1 right-0 w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"><path d="M16 6l3-3M18 11h4M12 5V1"/></svg>
-            ) : (
-              <svg class="ab-acc ab-spark absolute -top-1 -right-1 w-4 h-4" viewBox="0 0 24 24"><path d="M12 2l2.2 6.6L21 12l-6.8 3.4L12 22l-2.2-6.6L3 12l6.8-3.4z" fill="#c4b5fd"/></svg>
-            )}
-            <svg class="ab-acc ab-spark ab-spark2 absolute bottom-0 -left-1 w-3 h-3" viewBox="0 0 24 24"><path d="M12 2l2.2 6.6L21 12l-6.8 3.4L12 22l-2.2-6.6L3 12l6.8-3.4z" fill="#ddd6fe"/></svg>
-            <span class="ab-ic absolute inset-0 flex items-center justify-center text-violet-600">
-              <Icon class="w-10 h-10" name={item.icon} />
-            </span>
-          </div>
-          <span class="block text-lg font-bold text-slate-800 leading-snug">{item.title}</span>
-          <span class="block text-sm text-slate-500 leading-relaxed mt-2">{item.body}</span>
+    <!-- light, non-clickable-looking items: no boxes, no hover lift -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8 sm:gap-x-6 max-w-5xl mx-auto">
+      {t.values.items.map((item) => (
+        <div class="text-center px-1 sm:px-2">
+          <span class="w-14 h-14 rounded-2xl bg-violet-100 text-violet-700 flex items-center justify-center mx-auto mb-3.5">
+            <Icon class="w-7 h-7" name={item.icon} />
+          </span>
+          <span class="block text-[15.5px] sm:text-lg font-bold text-slate-800 leading-snug">{item.title}</span>
+          <span class="block text-[13px] sm:text-sm text-slate-500 leading-relaxed mt-1.5">{item.body}</span>
         </div>
       ))}
     </div>
@@ -260,38 +266,23 @@ const t = {
 
 <style is:global>
   /* the signature: black ink, script — the font itself is loaded via <link> above */
-  #ua-about .ab-sign{font-family:'Great Vibes','Segoe Script','Brush Script MT',cursive;font-size:clamp(2rem,7vw,2.6rem);line-height:1.2;color:#111827}
+  #ua-about .ab-sign{font-family:'Allison','Segoe Script','Brush Script MT',cursive;font-size:clamp(2.5rem,8.5vw,3.1rem);line-height:1.15;color:#111827}
   #ua-about .ab-hero{animation:abUp .7s ease both}
   @keyframes abUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
   #ua-about .ab-rev{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
   #ua-about .ab-rev.ab-in{opacity:1;transform:none}
-  #ua-about .ab-card{opacity:0;transition:transform .25s ease,box-shadow .25s ease,border-color .2s ease}
-  #ua-about .ab-values.ab-in .ab-card{animation:abCardIn .5s ease both}
-  #ua-about .ab-values.ab-in .ab-card:nth-child(1){animation-delay:.05s}
-  #ua-about .ab-values.ab-in .ab-card:nth-child(2){animation-delay:.15s}
-  #ua-about .ab-values.ab-in .ab-card:nth-child(3){animation-delay:.25s}
-  #ua-about .ab-values.ab-in .ab-card:nth-child(4){animation-delay:.35s}
-  @keyframes abCardIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
-  #ua-about .ab-card:hover{transform:translateY(-6px);border-color:#c4b5fd;box-shadow:0 16px 32px -14px rgba(124,58,237,.28)}
-  #ua-about .ab-card:active{transform:translateY(-2px) scale(.99)}
-  #ua-about .ab-blob{background:#EDE9FE;transition:transform .5s cubic-bezier(.34,1.5,.64,1)}
-  #ua-about .ab-card:hover .ab-blob{transform:scale(1.12) rotate(9deg)}
-  #ua-about .ab-ic{transition:transform .35s cubic-bezier(.34,1.6,.64,1)}
-  #ua-about .ab-card:hover .ab-ic{transform:scale(1.14) rotate(-5deg)}
-  #ua-about .ab-acc{opacity:.85}
-  #ua-about .ab-card:hover .ab-spark{animation:abTwinkle 1s ease infinite}
-  #ua-about .ab-card:hover .ab-spark2{animation-delay:.3s}
-  @keyframes abTwinkle{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.35);opacity:1}}
-  #ua-about .nm-card{transition:transform .25s ease,box-shadow .25s ease,border-color .2s ease}
-  #ua-about .nm-card:hover{transform:translateY(-6px);border-color:#c4b5fd;box-shadow:0 16px 32px -14px rgba(124,58,237,.28)}
+  /* ---- flippable name cards (plain CSS on purpose — bracket utilities are unreliable for 3D) ---- */
+  #ua-about .nm-flip{perspective:1200px;background:transparent;border:0;padding:0;cursor:pointer;display:block;width:100%;-webkit-tap-highlight-color:transparent}
+  #ua-about .nm-inner{position:relative;display:block;width:100%;min-height:300px;transition:transform .65s cubic-bezier(.35,.15,.25,1);transform-style:preserve-3d}
+  #ua-about .nm-flip.nm-flipped .nm-inner{transform:rotateY(180deg)}
+  #ua-about .nm-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px 26px;text-align:center}
+  #ua-about .nm-front{background:#fff;border:1px solid #EDE9FE;box-shadow:0 1px 3px rgba(15,23,42,.06);transition:box-shadow .25s ease,border-color .2s ease}
+  #ua-about .nm-flip:hover .nm-front{border-color:#C4B5FD;box-shadow:0 14px 30px -16px rgba(124,58,237,.3)}
+  #ua-about .nm-back{background:linear-gradient(150deg,#7C3AED,#5B21B6);transform:rotateY(180deg);box-shadow:0 16px 34px -16px rgba(109,40,217,.5)}
   @media (prefers-reduced-motion: reduce){
     #ua-about .ab-hero{animation:none}
     #ua-about .ab-rev{opacity:1;transform:none;transition:none}
-    #ua-about .ab-card{opacity:1;animation:none;transition:none}
-    #ua-about .ab-card:hover,#ua-about .ab-card:hover .ab-ic,#ua-about .ab-card:hover .ab-blob{transform:none}
-    #ua-about .ab-spark,#ua-about .ab-card:hover .ab-spark,#ua-about .ab-card:hover .ab-spark2{animation:none}
-    #ua-about .nm-card{transition:none}
-    #ua-about .nm-card:hover{transform:none}
+    #ua-about .nm-inner{transition:none}
   }
 </style>
 
@@ -299,6 +290,14 @@ const t = {
   (function () {
     var root = document.getElementById("ua-about");
     if (!root) return;
+
+    // ---- Name cards: click to flip ----
+    root.querySelectorAll(".nm-flip").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var on = b.classList.toggle("nm-flipped");
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+    });
 
     // ---- Scroll reveals ----
     var els = root.querySelectorAll(".ab-rev");
