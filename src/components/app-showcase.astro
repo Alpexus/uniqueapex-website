@@ -85,7 +85,8 @@ const howHref = lang === "fr" ? "/fr/howitworks" : "/howitworks";
         {t.title1} <span class="text-violet-700">{t.title2}</span>
       </h2>
       <p class="mt-4 text-slate-600 leading-relaxed">{t.sub}</p>
-      <div class="mt-7 flex flex-wrap gap-3">
+      {/* buttons are desktop-only — on phones the hero and closing CTA already carry these links */}
+      <div class="mt-7 hidden sm:flex flex-wrap gap-3">
         <a href={waitlistHref} class="inline-block rounded-full bg-violet-700 hover:bg-violet-800 text-white text-sm font-semibold px-6 py-3 transition">{t.cta}</a>
         <a href={howHref} class="inline-block rounded-full border border-violet-300 text-violet-700 hover:bg-white text-sm font-semibold px-6 py-3 transition">{t.cta2}</a>
       </div>

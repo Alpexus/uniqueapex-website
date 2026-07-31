@@ -17,18 +17,8 @@ const allFaqs = {
       question: "Is my child's information kept private?",
       answer: "Absolutely. Your child's profile is only shared with the providers you choose. Data is hosted in Canada, we follow strict privacy standards, and we never sell your information.",
     },
-    {
-      question: "Is UniqueApex free to use?",
-      answer: "The core platform is free: one child profile and one outreach batch per service type, at no cost. Our Concierge service — a real person handling follow-ups and waitlists for you — is a paid upgrade, and a membership with expert workshops and a parent community is coming.",
-    },
-    {
-      question: "Do I need a diagnosis to start?",
-      answer: "No. UniqueApex is built to help from the very first concern — long before a diagnosis. Your child's profile helps you prepare for assessments, and then keeps growing with them afterwards.",
-    },
-    {
-      question: "Can I add more than one child?",
-      answer: "Yes. Each child gets their own Family Passport, profile, Support Wheel, and timeline — all under one family account, and you can switch between them anytime. Siblings rarely need the same support, and UniqueApex is built with that in mind.",
-    },
+    /* pricing questions (free plan, diagnosis, multiple children) live on the
+       Pricing page's own FAQ now — kept off the home page to shorten it */
     {
       question: "What is the Family Passport?",
       answer: "A living profile that captures your child's history, strengths, needs, winning strategies, and reports. It travels with them to every provider, school, and transition — shareable in one click, exportable as a PDF, and you always control what's visible.",
@@ -55,18 +45,7 @@ const allFaqs = {
       question: "Les informations de mon enfant sont-elles protégées?",
       answer: "Absolument. Le profil de votre enfant n'est partagé qu'avec les professionnels que vous choisissez. Les données sont hébergées au Canada, nous suivons des normes strictes de confidentialité et nous ne vendons jamais vos informations.",
     },
-    {
-      question: "Est-ce que UniqueApex est gratuit?",
-      answer: "Le cœur de la plateforme est gratuit : un profil enfant et une démarche de contact par type de service, sans frais. Notre service de conciergerie — une vraie personne qui gère les suivis et les listes d'attente pour vous — est offert en option payante, et un abonnement avec ateliers d'experts et communauté de parents s'en vient.",
-    },
-    {
-      question: "Faut-il un diagnostic pour commencer?",
-      answer: "Non. UniqueApex est conçu pour aider dès les premières inquiétudes — bien avant un diagnostic. Le profil de votre enfant vous aide à préparer les évaluations, puis continue de grandir avec lui par la suite.",
-    },
-    {
-      question: "Puis-je ajouter plus d'un enfant?",
-      answer: "Oui. Chaque enfant a son propre Passeport familial, son profil, sa Roue de soutien et sa ligne du temps — le tout dans un seul compte familial, et vous pouvez passer de l'un à l'autre en tout temps. Les frères et sœurs ont rarement les mêmes besoins, et UniqueApex est conçu en ce sens.",
-    },
+    /* les questions de tarification vivent dans la FAQ de la page Tarifs */
     {
       question: "Qu'est-ce que le Passeport familial?",
       answer: "Un profil vivant qui rassemble l'historique, les forces, les besoins, les stratégies gagnantes et les rapports de votre enfant. Il le suit chez chaque professionnel, à l'école et dans chaque transition — partageable en un clic, exportable en PDF, et c'est toujours vous qui contrôlez ce qui est visible.",
@@ -94,13 +73,13 @@ const section = {
 }[lang];
 ---
 
-<div class="mt-24 grid md:grid-cols-2 gap-16">
+<div class="mt-16 md:mt-24 grid md:grid-cols-2 gap-8 md:gap-16">
   <div>
     <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide">{section.label}</p>
-    <h2 class="text-4xl font-bold mt-3 leading-tight">
+    <h2 class="text-[28px] md:text-4xl font-bold mt-3 leading-tight">
       {section.heading}
     </h2>
-    <p class="text-slate-500 mt-6">{section.helpText}</p>
+    <p class="text-slate-500 mt-4 md:mt-6">{section.helpText}</p>
     <a href={prefix + "/contact"} class="inline-flex items-center gap-2 text-violet-700 font-semibold mt-2 hover:underline">
       {section.link}
     </a>
@@ -109,12 +88,12 @@ const section = {
   <div class="divide-y divide-slate-200">
     {
       faqs.map((faq) => (
-        <details class="group py-5 cursor-pointer rounded-xl px-4 hover:bg-violet-50 transition-colors duration-200">
-          <summary class="flex justify-between items-center font-semibold text-lg list-none transition-colors duration-200">
+        <details class="group py-3.5 md:py-5 cursor-pointer rounded-xl px-3 md:px-4 hover:bg-violet-50 transition-colors duration-200">
+          <summary class="flex justify-between items-center font-semibold text-[15px] md:text-lg leading-snug list-none transition-colors duration-200 [&::-webkit-details-marker]:hidden">
             {faq.question}
-            <span class="text-violet-700 group-open:rotate-45 transition-transform duration-200 text-2xl shrink-0 ml-4">+</span>
+            <span class="text-violet-700 group-open:rotate-45 transition-transform duration-200 text-xl md:text-2xl shrink-0 ml-4">+</span>
           </summary>
-          <p class="text-slate-500 mt-3 leading-relaxed">{faq.answer}</p>
+          <p class="text-slate-500 mt-2.5 md:mt-3 text-[14px] md:text-base leading-relaxed">{faq.answer}</p>
         </details>
       ))
     }

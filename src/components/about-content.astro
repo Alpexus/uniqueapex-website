@@ -38,6 +38,7 @@ const t = {
       role: "Founder & CEO",
       imgAlt: "Pelin İpek Temurcan",
     },
+    mv: { label: "Mission & Vision", title1: "Why UniqueApex", title2: "exists" },
     vision: {
       badge: "Our Vision",
       title1: "A world where no family navigates",
@@ -101,6 +102,7 @@ const t = {
       role: "Fondatrice et PDG",
       imgAlt: "Pelin İpek Temurcan",
     },
+    mv: { label: "Mission et vision", title1: "Pourquoi UniqueApex", title2: "existe" },
     vision: {
       badge: "Notre vision",
       title1: "Un monde où aucune famille ne navigue",
@@ -183,28 +185,36 @@ const t = {
     </div>
   </div>
 
-  <!-- Vision + Mission — one section, designed around a single illustration -->
-  <div class="ab-rev relative overflow-hidden bg-gradient-to-b from-violet-50/70 to-white border border-violet-100 rounded-3xl p-6 sm:p-10 md:p-14 mb-16 md:mb-32">
-    <div class="grid md:grid-cols-2 gap-8 md:gap-14 items-center">
-      <div class="flex items-center justify-center">
-        <img src="/vision-illustration.png" alt={t.vision.imgAlt} class="w-full max-w-[300px] sm:max-w-[400px] md:max-w-[460px]" />
-      </div>
-      <div>
-        <div>
-          <span class="inline-block bg-violet-100 text-violet-700 text-sm font-semibold px-4 py-1 rounded-full mb-4 sm:mb-5">{t.vision.badge}</span>
-          <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 leading-tight mb-3 sm:mb-4">
-            {t.vision.title1} <span class="text-violet-700">{t.vision.title2}</span>
-          </h2>
-          <p class="text-slate-500 leading-relaxed text-base sm:text-lg m-0">{t.vision.body}</p>
+  <!-- Mission + Vision — one section, with its own header like the others -->
+  <div class="ab-rev mb-16 md:mb-32">
+    <div class="max-w-3xl mx-auto text-center mb-8 md:mb-12">
+      <p class="text-sm font-semibold text-violet-700 uppercase tracking-wide mb-4">{t.mv.label}</p>
+      <h2 class="text-[28px] leading-tight md:text-4xl font-bold text-slate-800 md:leading-tight">
+        {t.mv.title1} <span class="text-violet-700">{t.mv.title2}</span>
+      </h2>
+    </div>
+    <div class="relative overflow-hidden bg-gradient-to-b from-violet-50/70 to-white border border-violet-100 rounded-3xl p-6 sm:p-10 md:p-14">
+      <div class="grid md:grid-cols-2 gap-8 md:gap-14 items-center">
+        <div class="flex items-center justify-center">
+          <img src="/vision-illustration.png" alt={t.vision.imgAlt} class="w-full max-w-[300px] sm:max-w-[400px] md:max-w-[460px]" />
         </div>
-        <div class="border-t border-violet-100 mt-7 sm:mt-9 pt-7 sm:pt-9">
-          <span class="inline-block bg-violet-100 text-violet-700 text-sm font-semibold px-4 py-1 rounded-full mb-4 sm:mb-5">{t.mission.badge}</span>
-          <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 leading-tight mb-3 sm:mb-4">
-            {t.mission.title1} <span class="text-violet-700">{t.mission.title2}</span>
-          </h2>
-          {t.mission.paras.map((p, i) => (
-            <p class={`text-slate-500 leading-relaxed text-base sm:text-lg ${i === 0 ? "m-0" : "mt-4 mb-0"}`}>{p}</p>
-          ))}
+        <div>
+          <div>
+            <span class="inline-block bg-violet-100 text-violet-700 text-sm font-semibold px-4 py-1 rounded-full mb-4 sm:mb-5">{t.mission.badge}</span>
+            <h3 class="text-2xl sm:text-3xl font-bold text-slate-800 leading-tight mb-3 sm:mb-4">
+              {t.mission.title1} <span class="text-violet-700">{t.mission.title2}</span>
+            </h3>
+            {t.mission.paras.map((p, i) => (
+              <p class={`text-slate-500 leading-relaxed text-base sm:text-lg ${i === 0 ? "m-0" : "mt-4 mb-0"}`}>{p}</p>
+            ))}
+          </div>
+          <div class="border-t border-violet-100 mt-7 sm:mt-9 pt-7 sm:pt-9">
+            <span class="inline-block bg-violet-100 text-violet-700 text-sm font-semibold px-4 py-1 rounded-full mb-4 sm:mb-5">{t.vision.badge}</span>
+            <h3 class="text-2xl sm:text-3xl font-bold text-slate-800 leading-tight mb-3 sm:mb-4">
+              {t.vision.title1} <span class="text-violet-700">{t.vision.title2}</span>
+            </h3>
+            <p class="text-slate-500 leading-relaxed text-base sm:text-lg m-0">{t.vision.body}</p>
+          </div>
         </div>
       </div>
     </div>
