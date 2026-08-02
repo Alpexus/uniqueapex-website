@@ -1,9 +1,10 @@
 ---
 // =============================================================================
-// UniqueApex · Platform Features v2 — modern interactive cards
+// UniqueApex · Platform Features v3 — bento layout
 // Replaces: src/components/platform-features.astro
-// Cards expand on click for one extra detail line; violet glow follows cursor.
-// v2.1 · 2026-07-04 — messaging pass: intro ends "for your family" (EN + FR)
+// v3.0 · 2026-08-02 — bento redesign: 2 feature cards with mini-UI vignettes
+// (outreach status list + passport progress) over a 4-card row. All v2.1 copy,
+// badges, More/Less expanders, cursor glow and reveal behavior preserved.
 // =============================================================================
 // @ts-ignore
 import { Icon } from "astro-icon/components";
@@ -22,6 +23,23 @@ const content = {
     more: "More",
     less: "Less",
     badges: { beta: "Available in Beta", soon: "Coming Soon" },
+    ui: {
+      outreach: {
+        rows: [
+          { name: "Speech-language clinic", label: "Replied", tone: "green" },
+          { name: "Occupational therapy", label: "Sent", tone: "violet" },
+          { name: "Psychoeducation service", label: "Waitlist", tone: "amber" },
+        ],
+        foot: "One batch · replies tracked automatically",
+      },
+      passport: {
+        name: "Maya Flores",
+        meta: "Age 6 · Autism",
+        label: "Passport",
+        pct: "93% complete",
+        chips: ["Strengths", "Sensory profile", "Care team", "Goals"],
+      },
+    },
     features: [
       {
         title: "Provider Matching & Outreach",
@@ -74,6 +92,23 @@ const content = {
     more: "Plus",
     less: "Moins",
     badges: { beta: "Offert en version bêta", soon: "À venir" },
+    ui: {
+      outreach: {
+        rows: [
+          { name: "Clinique d'orthophonie", label: "Réponse", tone: "green" },
+          { name: "Ergothérapie", label: "Envoyé", tone: "violet" },
+          { name: "Psychoéducation", label: "Attente", tone: "amber" },
+        ],
+        foot: "Un seul envoi · réponses suivies automatiquement",
+      },
+      passport: {
+        name: "Maya Flores",
+        meta: "6 ans · Autisme",
+        label: "Passeport",
+        pct: "complété à 93 %",
+        chips: ["Forces", "Profil sensoriel", "Équipe de soins", "Objectifs"],
+      },
+    },
     features: [
       {
         title: "Jumelage et démarches auprès des professionnels",
@@ -120,6 +155,15 @@ const content = {
     ],
   },
 }[lang];
+
+const bigFeatures = content.features.slice(0, 2);
+const smallFeatures = content.features.slice(2);
+
+const pillTones: Record<string, string> = {
+  green: "bg-emerald-50 text-emerald-700",
+  violet: "bg-violet-50 text-violet-700",
+  amber: "bg-amber-50 text-amber-700",
+};
 ---
 
 <section class="py-16 my-4" id="pf2">
@@ -132,30 +176,92 @@ const content = {
     </p>
   </div>
 
-  <div id="pf2-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 mt-14 gap-5">
-    {
-      content.features.map((item) => (
-        <button type="button" class="pf2-card group flex flex-col text-left p-6 rounded-3xl border border-slate-200 bg-white cursor-pointer" aria-expanded="false">
-          <div class="flex items-center justify-between mb-4 relative">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center shadow-md shadow-violet-200 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-3">
-              <Icon class="text-white w-6 h-6" name={item.icon} />
+  <div id="pf2-grid" class="mt-14">
+    <!-- Row 1 — two feature cards with mini-UI vignettes -->
+    <div class="grid lg:grid-cols-2 gap-5">
+      {
+        bigFeatures.map((item, i) => (
+          <button type="button" class={`pf2-card group flex flex-col text-left p-6 sm:p-7 rounded-3xl border border-slate-200 cursor-pointer ${i === 1 ? "bg-gradient-to-b from-violet-50/80 via-white to-white" : "bg-white"}`} aria-expanded="false">
+            <div class="flex items-center justify-between mb-4 relative">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center shadow-md shadow-violet-200 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-3">
+                <Icon class="text-white w-6 h-6" name={item.icon} />
+              </div>
+              <span class={`text-xs font-semibold px-3 py-1 rounded-full ${item.status === "beta" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-slate-100 text-slate-500 border border-slate-200"}`}>
+                {content.badges[item.status as keyof typeof content.badges]}
+              </span>
             </div>
-            <span class={`text-xs font-semibold px-3 py-1 rounded-full ${item.status === "beta" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-slate-100 text-slate-500 border border-slate-200"}`}>
-              {content.badges[item.status as keyof typeof content.badges]}
+            <h3 class="font-semibold text-xl text-slate-800 group-hover:text-violet-700 transition-colors relative">{item.title}</h3>
+            <p class="text-slate-500 mt-2 leading-relaxed text-[15px] relative">{item.description}</p>
+
+            {i === 0 ? (
+              <div class="mt-5 bg-white border border-slate-200 rounded-2xl p-4 shadow-[0_12px_30px_rgba(84,51,168,0.08)] relative" aria-hidden="true">
+                {content.ui.outreach.rows.map((row) => (
+                  <p class="flex items-center justify-between gap-2 py-2 border-b border-slate-100 last:border-0 text-[14px] text-slate-600 m-0">
+                    <span>{row.name}</span>
+                    <span class={`text-xs font-bold rounded-full px-2.5 py-0.5 ${pillTones[row.tone]}`}>{row.label}</span>
+                  </p>
+                ))}
+                <p class="text-[13px] font-semibold text-violet-700 mt-2 m-0">{content.ui.outreach.foot}</p>
+              </div>
+            ) : (
+              <div class="mt-5 bg-white border border-slate-200 rounded-2xl p-4 shadow-[0_12px_30px_rgba(84,51,168,0.08)] relative" aria-hidden="true">
+                <div class="flex items-center gap-3">
+                  <span class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-violet-400 text-white font-bold flex items-center justify-center">M</span>
+                  <span>
+                    <span class="block font-semibold text-slate-800 text-[15px] leading-tight">{content.ui.passport.name}</span>
+                    <span class="block text-xs text-slate-400">{content.ui.passport.meta}</span>
+                  </span>
+                </div>
+                <div class="h-2 rounded-full bg-violet-100 mt-3 overflow-hidden">
+                  <div class="h-full rounded-full bg-gradient-to-r from-violet-600 to-violet-400" style="width:93%"></div>
+                </div>
+                <p class="flex justify-between text-xs text-slate-400 mt-1 m-0"><span>{content.ui.passport.label}</span><span>{content.ui.passport.pct}</span></p>
+                <div class="flex flex-wrap gap-1.5 mt-3">
+                  {content.ui.passport.chips.map((c) => (
+                    <span class="text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-full px-2.5 py-0.5">{c}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div class="pf2-more relative">
+              <p class="text-[14.5px] leading-relaxed text-violet-800 bg-violet-50 border border-violet-100 rounded-xl px-3.5 py-2.5 m-0">{item.detail}</p>
+            </div>
+            <span class="pf2-toggle mt-auto pt-4 inline-flex items-center gap-1 text-xs font-bold text-violet-600 uppercase tracking-wide relative">
+              <span class="pf2-toggle-txt">{content.more}</span>
+              <svg class="pf2-chev transition-transform duration-200" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </span>
-          </div>
-          <h3 class="font-semibold text-lg text-slate-800 group-hover:text-violet-700 transition-colors relative">{item.title}</h3>
-          <p class="text-slate-500 mt-2 leading-relaxed text-[15px] relative">{item.description}</p>
-          <div class="pf2-more relative">
-            <p class="text-[14.5px] leading-relaxed text-violet-800 bg-violet-50 border border-violet-100 rounded-xl px-3.5 py-2.5 m-0">{item.detail}</p>
-          </div>
-          <span class="pf2-toggle mt-auto pt-4 inline-flex items-center gap-1 text-xs font-bold text-violet-600 uppercase tracking-wide relative">
-            <span class="pf2-toggle-txt">{content.more}</span>
-            <svg class="pf2-chev transition-transform duration-200" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-          </span>
-        </button>
-      ))
-    }
+          </button>
+        ))
+      }
+    </div>
+
+    <!-- Row 2 — four compact cards -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-5">
+      {
+        smallFeatures.map((item) => (
+          <button type="button" class="pf2-card group flex flex-col text-left p-5 rounded-3xl border border-slate-200 bg-white cursor-pointer" aria-expanded="false">
+            <div class="flex items-center justify-between mb-4 gap-2 relative">
+              <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center shadow-md shadow-violet-200 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-3">
+                <Icon class="text-white w-5 h-5" name={item.icon} />
+              </div>
+              <span class={`text-[11px] font-semibold px-2.5 py-1 rounded-full text-right ${item.status === "beta" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-slate-100 text-slate-500 border border-slate-200"}`}>
+                {content.badges[item.status as keyof typeof content.badges]}
+              </span>
+            </div>
+            <h3 class="font-semibold text-base text-slate-800 group-hover:text-violet-700 transition-colors relative">{item.title}</h3>
+            <p class="text-slate-500 mt-2 leading-relaxed text-[14px] relative">{item.description}</p>
+            <div class="pf2-more relative">
+              <p class="text-[13.5px] leading-relaxed text-violet-800 bg-violet-50 border border-violet-100 rounded-xl px-3 py-2 m-0">{item.detail}</p>
+            </div>
+            <span class="pf2-toggle mt-auto pt-4 inline-flex items-center gap-1 text-xs font-bold text-violet-600 uppercase tracking-wide relative">
+              <span class="pf2-toggle-txt">{content.more}</span>
+              <svg class="pf2-chev transition-transform duration-200" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </span>
+          </button>
+        ))
+      }
+    </div>
   </div>
 </section>
 
@@ -167,7 +273,7 @@ const content = {
   #pf2 .pf2-card::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(124,58,237,.10),transparent 65%);opacity:0;transition:opacity .25s ease;pointer-events:none}
   #pf2 .pf2-card:hover::before{opacity:1}
   #pf2 .pf2-more{max-height:0;overflow:hidden;transition:max-height .3s ease,margin-top .3s ease;margin-top:0}
-  #pf2 .pf2-card.pf2-open .pf2-more{max-height:180px;margin-top:10px}
+  #pf2 .pf2-card.pf2-open .pf2-more{max-height:220px;margin-top:10px}
   #pf2 .pf2-card.pf2-open .pf2-chev{transform:rotate(180deg)}
   @media (prefers-reduced-motion: reduce){
     #pf2 .pf2-card{opacity:1;transform:none;transition:border-color .2s ease}
