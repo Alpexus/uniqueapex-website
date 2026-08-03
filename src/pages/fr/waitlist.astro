@@ -104,12 +104,13 @@ import { Icon } from "astro-icon/components";
             À propos de votre enfant
           </h2>
 
-          <!-- permet aussi aux sympathisants sans enfant de s'inscrire — les questions sur l'enfant ne s'affichent que pour les parents -->
+          <!-- permet aussi aux sympathisants sans enfant de s'inscrire — les questions sur l'enfant ne s'affichent que pour la première option -->
           <div>
-            <label class="block text-sm font-medium text-slate-600 mb-3">Avez-vous un enfant qui a besoin de soutien aujourd'hui?</label>
-            <div class="grid sm:grid-cols-2 gap-2">
-              <label class="wl-seg"><input type="radio" name="has_child" value="yes" checked /><b>Oui — le soutien est pour mon enfant</b></label>
-              <label class="wl-seg"><input type="radio" name="has_child" value="not_yet" /><b>Pas encore — je suis le projet</b></label>
+            <label class="block text-sm font-medium text-slate-600 mb-3">Qu'est-ce qui vous amène chez UniqueApex aujourd'hui?</label>
+            <div class="grid gap-2">
+              <label class="wl-seg"><input type="radio" name="has_child" value="yes" checked /><b>Je cherche du soutien pour mon enfant</b></label>
+              <label class="wl-seg"><input type="radio" name="has_child" value="not_yet" /><b>J'explore les options de soutien pour l'avenir</b></label>
+              <label class="wl-seg"><input type="radio" name="has_child" value="not_yet" /><b>Je souhaite suivre ou appuyer le projet</b></label>
             </div>
           </div>
 

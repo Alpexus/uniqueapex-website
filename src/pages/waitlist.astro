@@ -104,12 +104,13 @@ import { Icon } from "astro-icon/components";
             About your child
           </h2>
 
-          <!-- lets supporters without children join too — child questions only show for parents -->
+          <!-- lets supporters without children join too — child questions only show for the first option -->
           <div>
-            <label class="block text-sm font-medium text-slate-600 mb-3">Do you have a child who needs support today?</label>
-            <div class="grid sm:grid-cols-2 gap-2">
-              <label class="wl-seg"><input type="radio" name="has_child" value="yes" checked /><b>Yes — support is for my child</b></label>
-              <label class="wl-seg"><input type="radio" name="has_child" value="not_yet" /><b>Not yet — I'm following the project</b></label>
+            <label class="block text-sm font-medium text-slate-600 mb-3">What brings you to UniqueApex today?</label>
+            <div class="grid gap-2">
+              <label class="wl-seg"><input type="radio" name="has_child" value="yes" checked /><b>I'm looking for support for my child</b></label>
+              <label class="wl-seg"><input type="radio" name="has_child" value="not_yet" /><b>I'm exploring support for the future</b></label>
+              <label class="wl-seg"><input type="radio" name="has_child" value="not_yet" /><b>I'm following or supporting the project</b></label>
             </div>
           </div>
 
