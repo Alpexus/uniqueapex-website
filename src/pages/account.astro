@@ -70,6 +70,76 @@ import AppLayout from "../layouts/AppLayout.astro";
     </div>
   </section>
 
+<!-- ================= NAVIGATION WHEEL ================= -->
+  <section class="card d3-nw cu-rev" style="--d:.05s" aria-labelledby="nw-title">
+    <div class="d3-nw-copy">
+      <h2 id="nw-title" data-i18n="nwTitle">Where to today?</h2>
+      <p data-i18n="nwSub">Your whole toolkit, one tap away.</p>
+    </div>
+    <div class="d3-nw-wheel">
+      <svg viewBox="0 0 360 360" role="group" aria-label="Quick navigation" data-i18n-aria="nwAria">
+        <defs>
+          <radialGradient id="nwg" cx="38%" cy="30%" r="75%">
+            <stop offset="0%" stop-color="#8B5CF6"/>
+            <stop offset="100%" stop-color="#6D28D9"/>
+          </radialGradient>
+        </defs>
+
+        <a class="nw-seg" style="--i:0" href="/child" aria-label="My Child" data-i18n-aria="nwChild">
+          <path d="M 110.97 46.83 A 150 150 0 0 1 249.03 46.83 L 210.37 121.4 A 66 66 0 0 0 149.63 121.4 Z"/>
+          <g class="nw-ico" transform="translate(169,58)"><path d="M19.1 4.2a5 5 0 0 0-7.1 0L11 5.2l-1-1a5 5 0 0 0-7.1 7.1l1 1L11 19l7.1-6.9 1-1a5 5 0 0 0 0-7.1z"/></g>
+          <text x="180" y="103" text-anchor="middle" data-i18n="nwChild">My Child</text>
+        </a>
+
+        <a class="nw-seg" style="--i:1" href="/documents" aria-label="Documents" data-i18n-aria="nwDocuments">
+          <path d="M 260.82 53.63 A 150 150 0 0 1 329.85 173.2 L 245.93 177.01 A 66 66 0 0 0 215.56 124.4 Z"/>
+          <g class="nw-ico" transform="translate(263,106)"><path d="M2.5 6.2a1.8 1.8 0 0 1 1.8-1.8h3.7l1.8 1.8h7.4a1.8 1.8 0 0 1 1.8 1.8v7.4a1.8 1.8 0 0 1-1.8 1.8H4.3a1.8 1.8 0 0 1-1.8-1.8z"/></g>
+          <text x="276" y="151" text-anchor="middle" class="nw-side" data-i18n="nwDocuments">Documents</text>
+        </a>
+
+        <a class="nw-seg" style="--i:2" href="/funding" aria-label="Funding" data-i18n-aria="nwFunding">
+          <path d="M 329.85 186.8 A 150 150 0 0 1 260.82 306.37 L 215.56 235.6 A 66 66 0 0 0 245.93 182.99 Z"/>
+          <g class="nw-ico" transform="translate(263,212)"><path d="M2.7 8.2 11 3.2l8.3 5"/><path d="M4.6 9.4v6.2"/><path d="M8.7 9.4v6.2"/><path d="M13.3 9.4v6.2"/><path d="M17.4 9.4v6.2"/><path d="M2.7 18.4h16.6"/></g>
+          <text x="277" y="256" text-anchor="middle" class="nw-side" data-i18n="nwFunding">Funding</text>
+        </a>
+
+        <a class="nw-seg" style="--i:3" href="/providers" aria-label="Providers" data-i18n-aria="nwProviders">
+          <path d="M 249.03 313.17 A 150 150 0 0 1 110.97 313.17 L 149.63 238.6 A 66 66 0 0 0 210.37 238.6 Z"/>
+          <g class="nw-ico" transform="translate(169,264)"><path d="M19.8 2.2 10 12"/><path d="M19.8 2.2 13.6 19.8l-3.6-7.8-7.8-3.6z"/></g>
+          <text x="180" y="309" text-anchor="middle" data-i18n="nwProviders">Providers</text>
+        </a>
+
+        <a class="nw-seg" style="--i:4" href="/resources" aria-label="Resources" data-i18n-aria="nwResources">
+          <path d="M 99.18 306.37 A 150 150 0 0 1 30.15 186.8 L 114.07 182.99 A 66 66 0 0 0 144.44 235.6 Z"/>
+          <g class="nw-ico" transform="translate(74,212)"><path d="M2 3.2h5.1a3.6 3.6 0 0 1 3.6 3.6v12a2.7 2.7 0 0 0-2.7-2.7H2z"/><path d="M20 3.2h-5.1a3.6 3.6 0 0 0-3.6 3.6v12a2.7 2.7 0 0 1 2.7-2.7H20z"/></g>
+          <text x="85" y="256" text-anchor="middle" class="nw-side" data-i18n="nwResources">Resources</text>
+        </a>
+
+        <a class="nw-seg" style="--i:5" href="/passport" aria-label="Passport" data-i18n-aria="nwPassport">
+          <path d="M 30.15 173.2 A 150 150 0 0 1 99.18 53.63 L 144.44 124.4 A 66 66 0 0 0 114.07 177.01 Z"/>
+          <g class="nw-ico" transform="translate(74,106)"><rect x="1.8" y="3.7" width="18.4" height="14.7" rx="2.7"/><circle cx="7.3" cy="9.2" r="1.8"/><path d="M13.8 8.3h4.1"/><path d="M13.8 11.9h4.1"/><path d="M5 15c.55-1.35 1.35-1.8 2.3-1.8s1.75.45 2.3 1.8"/></g>
+          <text x="85" y="151" text-anchor="middle" class="nw-side" data-i18n="nwPassport">Passport</text>
+        </a>
+
+        <g class="nw-center" aria-hidden="true">
+          <circle cx="180" cy="180" r="56"/>
+          <g transform="translate(180,162)" fill="#fff"><path d="M-17 13 L-5.5 -5 L1.5 6.5 L7.5 -2.5 L17 13 Z"/><path d="M-5.5 -5 V-15" stroke="#fff" stroke-width="1.7"/><path d="M-5.5 -15 h6.5 v4.6 h-6.5 z"/></g>
+          <text x="180" y="197" text-anchor="middle" data-i18n="nwCenterA">You're not</text>
+          <text x="180" y="212" text-anchor="middle" data-i18n="nwCenterB">alone ✦</text>
+        </g>
+
+        <g class="nw-dots" aria-hidden="true">
+          <circle cx="255" cy="50.1" r="4" fill="#2DD4BF"/>
+          <circle cx="330" cy="180" r="4" fill="#FBBF24"/>
+          <circle cx="255" cy="309.9" r="4" fill="#F472B6"/>
+          <circle cx="105" cy="309.9" r="4" fill="#60A5FA"/>
+          <circle cx="30" cy="180" r="4" fill="#34D399"/>
+          <circle cx="105" cy="50.1" r="4" fill="#A78BFA"/>
+        </g>
+      </svg>
+    </div>
+  </section>
+
   <!-- ================= TODAY STRIP ================= -->
   <div class="d3-today">
 
@@ -408,6 +478,36 @@ import AppLayout from "../layouts/AppLayout.astro";
       .d3-burst.go i{animation:none}
       #d-ring{transition:none!important}
     }
+
+/* ---- navigation wheel (dashboard quick nav) ---- */
+.d3-nw{display:flex;align-items:center;gap:28px;padding:20px 28px;margin:14px 0 2px}
+.d3-nw-copy{flex:1;min-width:200px}
+.d3-nw-copy h2{margin:0 0 6px;font-size:1.18rem;font-weight:800;letter-spacing:-.01em;color:#1E293B}
+.d3-nw-copy p{margin:0;font-size:.92rem;color:#64748B}
+.d3-nw-wheel{flex:0 0 auto;width:min(330px,80vw);margin-inline:auto}
+.d3-nw-wheel svg{width:100%;height:auto;display:block;overflow:visible}
+.nw-seg{cursor:pointer;transform-box:view-box;transform-origin:center;animation:nwPop .6s cubic-bezier(.22,1,.36,1) backwards;animation-delay:calc(.07s * var(--i))}
+.nw-seg path:first-of-type,.nw-seg > path{fill:#F7F5FC;stroke:#fff;stroke-width:3;transition:fill .2s ease,transform .3s cubic-bezier(.34,1.56,.64,1);transform-box:view-box;transform-origin:center}
+.nw-seg .nw-ico{fill:none;stroke:#7C3AED;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s;pointer-events:none}
+.nw-seg .nw-ico rect,.nw-seg .nw-ico circle{fill:none}
+.nw-seg text{fill:#334155;font-weight:600;font-size:12.5px;pointer-events:none;transition:fill .2s}
+.nw-seg text.nw-side{font-size:11px}
+.nw-seg:hover > path,.nw-seg:focus-visible > path{fill:#EDE9FE;transform:scale(1.04)}
+.nw-seg:hover .nw-ico,.nw-seg:focus-visible .nw-ico{stroke:#5B21B6}
+.nw-seg:hover text,.nw-seg:focus-visible text{fill:#5B21B6}
+.nw-seg:focus-visible{outline:none}
+.nw-seg:focus-visible > path{stroke:#7C3AED;stroke-width:2.5}
+.nw-center circle{fill:url(#nwg)}
+.nw-center text{fill:#fff;font-weight:700;font-size:11.5px}
+.nw-dots circle{opacity:.85}
+@keyframes nwPop{from{opacity:0;transform:scale(.7) rotate(-6deg)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .nw-seg{animation:none}
+  .nw-seg:hover > path,.nw-seg:focus-visible > path{transform:none}
+}
+@media (max-width:840px){
+  .d3-nw{flex-direction:column;gap:12px;padding:18px 14px;text-align:center}
+}
   </style>
 
   <!-- ============ HYDRATION ============ -->
