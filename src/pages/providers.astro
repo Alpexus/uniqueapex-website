@@ -174,6 +174,9 @@ import SectionTabs from "@/components/SectionTabs.astro";
   .pv-results-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
   @media (max-width:860px){.pv-results-grid{grid-template-columns:1fr}}
   .pv-mlist{display:flex;flex-direction:column;gap:8px}
+  .pv-loc{flex:none;margin-left:8px;width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--faint);cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+  .pv-loc:hover{color:var(--violet-700,#6D28D9);border-color:#C4B5FD;background:#F5F3FF}
+  .pv-loc:focus-visible{outline:2px solid #7C3AED;outline-offset:2px}
   .pv-m{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:15px;padding:13px 15px;cursor:pointer;transition:border-color .15s,background .15s;opacity:0;animation:pvCard .4s ease forwards;animation-delay:var(--cd,0s)}
   @keyframes pvCard{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   .pv-m:hover{border-color:#DDD2F5}
@@ -446,11 +449,28 @@ import SectionTabs from "@/components/SectionTabs.astro";
             <span class="mt">${esc(x.borough || x.city || "")}${x.languages ? " · " + esc(x.languages) : ""}${x.phone ? " · " + esc(x.phone) : ""}</span>
           </span>
           <span class="dist${x._d == null ? " far" : ""}">${x._d == null ? esc(T.distNA) : x._d < 1 ? "< 1 km" : km1(x._d) + " km"}</span>
+          <button type="button" class="pv-loc" data-loc="${x.id}" title="${esc(T.showOnMap)}" aria-label="${esc(T.showOnMap)}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg></button>
         </label>`).join("");
       $("pv-res-notes").innerHTML =
         `<p class="pv-mnote">${tpl(esc(T.mnoteMain), { n: BATCH })} ${home.km === 0 && all.length > 15 ? esc(T.mnoteNearest15) + " " : ""}${esc(T.mnoteMatched)}</p>`
         + (nProt ? `<p class="pv-protected">${tpl(esc(nProt === 1 ? T.protected1 : T.protectedN), { n: nProt })}</p>` : "");
       const relabel = () => { $("pv-to3").textContent = T.reviewEmailBtn; };
+      /* "show on map": overlapping pins can hide each other, so every clinic
+         stays reachable from the list — pan, zoom in and open its bubble. */
+      $("pv-mlist").querySelectorAll(".pv-loc").forEach((btn) => {
+        btn.addEventListener("click", (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          const id = btn.dataset.loc;
+          const mk = gPins.find((m2) => String(m2.__uaId) === String(id));
+          if (!gmap || !mk) return;
+          const idx = matches.findIndex((m2) => String(m2.id) === String(id));
+          gmap.panTo(mk.getPosition());
+          if (gmap.getZoom() < 16) gmap.setZoom(16);
+          if (idx > -1) { gInfo.setContent(iwHTML(matches[idx], idx + 1)); gInfo.open({ map: gmap, anchor: mk }); }
+          document.getElementById("pv-map").scrollIntoView({ block: "nearest", behavior: "smooth" });
+        });
+      });
       $("pv-mlist").querySelectorAll(".pv-m").forEach((row) => {
         const cb = row.querySelector("input");
         cb.addEventListener("change", () => {
@@ -510,14 +530,43 @@ import SectionTabs from "@/components/SectionTabs.astro";
     function syncPins() {
       gPins.forEach((m2) => m2.setOpacity(selection.has(m2.__uaId) ? 1 : 0.35));
     }
+    /* Clinics that share a street address (or, until the geocoding pass runs,
+       a postal-district centroid) land on the SAME point and hide each other.
+       Fan any such cluster out on a ~25 m ring so every pin stays clickable;
+       the info window still shows each clinic's real address. */
+    function spreadOverlaps(list) {
+      const groups = new Map();
+      list.forEach((x) => {
+        if (typeof x.lat !== "number" || typeof x.lng !== "number") return;
+        const k = x.lat.toFixed(4) + "," + x.lng.toFixed(4); /* ~11 m grid */
+        if (!groups.has(k)) groups.set(k, []);
+        groups.get(k).push(x);
+      });
+      const out = new Map();
+      groups.forEach((g) => {
+        if (g.length === 1) { out.set(g[0].id, { lat: g[0].lat, lng: g[0].lng }); return; }
+        const rM = 25, latPerM = 1 / 111320;
+        g.forEach((x, n) => {
+          const a = (2 * Math.PI * n) / g.length;
+          out.set(x.id, {
+            lat: x.lat + rM * latPerM * Math.sin(a),
+            lng: x.lng + rM * latPerM * Math.cos(a) / Math.cos(x.lat * Math.PI / 180),
+          });
+        });
+      });
+      return out;
+    }
+
     function drawPins() {
       if (!gmap || !gm) return;
       clearPins();
       const bounds = new gm.LatLngBounds();
+      const spread = spreadOverlaps(matches);
       matches.forEach((x, i) => {
         if (typeof x.lat !== "number" || typeof x.lng !== "number") return;
+        const pos = spread.get(x.id) || { lat: x.lat, lng: x.lng };
         const mk = new gm.Marker({
-          map: gmap, position: { lat: x.lat, lng: x.lng },
+          map: gmap, position: pos,
           icon: { path: gm.SymbolPath.CIRCLE, scale: 13, fillColor: "#6D28D9", fillOpacity: 1, strokeColor: "#fff", strokeWeight: 2.5 },
           label: { text: String(i + 1), color: "#fff", fontSize: "12px", fontWeight: "800" },
           title: x.name,

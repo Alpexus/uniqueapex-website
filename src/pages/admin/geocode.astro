@@ -1,0 +1,289 @@
+---
+/* =============================================================================
+   /admin/geocode — ONE-TIME TOOL (2026-08-04)
+   -----------------------------------------------------------------------------
+   Why: providers.lat/lng were seeded from FSA (postal-district) centroids, so
+   every clinic sharing a postal district sits on the SAME point — map pins stack
+   and distances are ±1–2 km off. This page geocodes each clinic's real street
+   address with the Google Geocoding API and produces UPDATE SQL to paste into
+   the Supabase SQL editor.
+
+   It NEVER writes to the database itself — it only reads providers and prints
+   SQL for a human to review and run. Safe to re-run; safe to delete afterwards.
+
+   Requires (one-time, in Google Cloud console):
+     · APIs & Services → Library → enable "Geocoding API"
+     · Credentials → the Maps key → API restrictions → ALSO tick "Geocoding API"
+   Robots-disallowed via /admin/ in public/robots.txt.
+   ============================================================================= */
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Geocode providers · UniqueApex admin</title>
+  <link rel="icon" type="image/png" href="/Logo.png" />
+  <style is:inline>
+    :root{--ink:#221B36;--mut:#6B647F;--faint:#9A93AC;--line:#E7E3F0;--card:#fff;--bg:#F7F5FB;--violet:#6D28D9;--violet-50:#F5F3FF;--ok:#0E8F66;--warn:#B45309;--bad:#DC2626}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+    .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 80px}
+    h1{font-size:1.5rem;margin:0 0 6px;letter-spacing:-.02em}
+    .sub{color:var(--mut);font-size:.92rem;margin:0 0 22px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(34,27,54,.05)}
+    label{display:block;font-size:.8rem;font-weight:700;margin:0 0 5px}
+    input[type=email],input[type=password]{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font:inherit;margin-bottom:12px}
+    input:focus{outline:none;border-color:var(--violet)}
+    button{font:inherit;font-weight:700;border:0;border-radius:999px;padding:10px 20px;background:var(--violet);color:#fff;cursor:pointer}
+    button:disabled{opacity:.5;cursor:default}
+    button.ghost{background:#fff;color:var(--violet);border:1.5px solid var(--line)}
+    .err{color:var(--bad);font-size:.85rem;margin:6px 0 0}
+    .note{background:var(--violet-50);border:1px solid #E4DBFB;border-radius:12px;padding:12px 14px;font-size:.85rem;color:#5B21B6;line-height:1.55;margin-bottom:16px}
+    .note b{display:block;margin-bottom:4px}
+    .bar{height:9px;background:#EDE9FE;border-radius:999px;overflow:hidden;margin:14px 0 6px}
+    .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7C3AED,#A78BFA);transition:width .2s}
+    .stat{font-size:.82rem;color:var(--mut)}
+    table{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:10px}
+    th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+    th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--faint)}
+    td.mv{white-space:nowrap;font-variant-numeric:tabular-nums}
+    .pill{display:inline-block;font-size:.68rem;font-weight:800;border-radius:999px;padding:2px 8px}
+    .p-ok{background:#E8F6F0;color:var(--ok)}
+    .p-warn{background:#FEF3C7;color:var(--warn)}
+    .p-bad{background:#FEE2E2;color:var(--bad)}
+    textarea{width:100%;height:260px;font:12.5px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;border:1.5px solid var(--line);border-radius:12px;padding:12px;resize:vertical}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .hide{display:none}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Geocode providers</h1>
+    <p class="sub">One-time tool · turns each clinic's street address into exact coordinates and prints SQL for you to run in Supabase.</p>
+
+    <!-- ============ GATE ============ -->
+    <div class="card" id="gate">
+      <div class="note">
+        <b>Before you start</b>
+        In Google Cloud: enable the <strong>Geocoding API</strong> (APIs &amp; Services → Library), then open your Maps key → API restrictions → also tick <strong>Geocoding API</strong> → Save. Without that step every lookup returns "REQUEST_DENIED".
+      </div>
+      <label for="g-email">Admin email</label>
+      <input id="g-email" type="email" autocomplete="username" />
+      <label for="g-pass">Password</label>
+      <input id="g-pass" type="password" autocomplete="current-password" />
+      <button id="g-btn" type="button">Sign in</button>
+      <p class="err hide" id="g-err"></p>
+    </div>
+
+    <!-- ============ CONSOLE ============ -->
+    <div id="console" class="hide">
+      <div class="card">
+        <div class="row">
+          <button id="run" type="button">Start geocoding</button>
+          <button id="stop" class="ghost hide" type="button">Stop</button>
+          <span class="stat" id="loaded"></span>
+        </div>
+        <div class="bar"><i id="bar"></i></div>
+        <p class="stat" id="prog">Ready.</p>
+      </div>
+
+      <div class="card hide" id="sqlcard">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <b>SQL to run in Supabase</b>
+            <p class="stat" style="margin:2px 0 0">Supabase dashboard → SQL Editor → paste → Run. Review the table below first.</p>
+          </div>
+          <button id="copy" class="ghost" type="button">Copy SQL</button>
+        </div>
+        <textarea id="sql" readonly spellcheck="false" style="margin-top:12px"></textarea>
+      </div>
+
+      <div class="card hide" id="tablecard">
+        <b>Results</b>
+        <p class="stat" style="margin:2px 0 0">"Moved" is how far the real address is from the old postal-district guess. Big jumps and anything flagged are worth a spot-check.</p>
+        <div style="overflow-x:auto">
+          <table id="tbl"><thead><tr>
+            <th>#</th><th>Clinic</th><th>Address used</th><th>Matched to</th><th>Precision</th><th>Moved</th>
+          </tr></thead><tbody id="tb"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline>
+    var SUPABASE_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+    var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+    var GMAPS_KEY = "AIzaSyBDT0daNWsr88Lafok6y-mCh8wdQVY-Us8";
+
+    var $ = function (i) { return document.getElementById(i); };
+    var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    var token = null, rows = [], results = [], stopped = false;
+
+    /* ---------- sign in (same pattern as /admin: real Supabase auth) ---------- */
+    function gateErr(m) { $("g-err").textContent = m; $("g-err").classList.remove("hide"); }
+
+    async function unlock() {
+      var em = $("g-email").value.trim(), pw = $("g-pass").value;
+      if (!em || !pw) { gateErr("Enter your email and password."); return; }
+      var b = $("g-btn"); b.disabled = true; b.textContent = "Checking…";
+      try {
+        var r = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=password", {
+          method: "POST",
+          headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
+          body: JSON.stringify({ email: em, password: pw })
+        });
+        var d = await r.json();
+        if (!r.ok || !d.access_token) { gateErr("Sign-in failed."); b.disabled = false; b.textContent = "Sign in"; return; }
+        token = d.access_token;
+        var probe = await fetch(SUPABASE_URL + "/rest/v1/providers?select=id&limit=1",
+          { headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + token } });
+        if (!probe.ok) { gateErr("This account cannot read the providers table."); b.disabled = false; b.textContent = "Sign in"; return; }
+        $("gate").classList.add("hide");
+        $("console").classList.remove("hide");
+        loadProviders();
+      } catch (e) {
+        gateErr("Network error — try again.");
+        b.disabled = false; b.textContent = "Sign in";
+      }
+    }
+    $("g-btn").addEventListener("click", unlock);
+    $("g-pass").addEventListener("keydown", function (e) { if (e.key === "Enter") unlock(); });
+
+    /* ---------- load providers ---------- */
+    async function loadProviders() {
+      var r = await fetch(SUPABASE_URL + "/rest/v1/providers?select=id,name,address,city,borough,lat,lng&order=name.asc",
+        { headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + token } });
+      rows = r.ok ? await r.json() : [];
+      var withAddr = rows.filter(function (x) { return x.address && String(x.address).trim(); }).length;
+      $("loaded").textContent = rows.length + " clinics loaded · " + withAddr + " have a street address";
+    }
+
+    /* ---------- google geocoder ---------- */
+    function loadGoogle() {
+      return new Promise(function (res, rej) {
+        if (window.google && window.google.maps) return res();
+        window.__ready = function () { res(); };
+        var s = document.createElement("script");
+        s.src = "https://maps.googleapis.com/maps/api/js?key=" + encodeURIComponent(GMAPS_KEY) + "&libraries=geocoding&loading=async&callback=__ready";
+        s.onerror = function () { rej(new Error("script")); };
+        document.head.appendChild(s);
+      });
+    }
+
+    function geocodeOne(geocoder, address) {
+      return new Promise(function (res) {
+        geocoder.geocode({ address: address, region: "ca" }, function (out, status) {
+          res({ status: status, out: out });
+        });
+      });
+    }
+
+    function haversineKm(a1, o1, a2, o2) {
+      var R = 6371, dLat = (a2 - a1) * Math.PI / 180, dLng = (o2 - o1) * Math.PI / 180;
+      var s = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(a1 * Math.PI / 180) * Math.cos(a2 * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      return 2 * R * Math.asin(Math.sqrt(s));
+    }
+
+    var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+
+    function precisionPill(t) {
+      if (t === "ROOFTOP") return '<span class="pill p-ok">exact</span>';
+      if (t === "RANGE_INTERPOLATED") return '<span class="pill p-ok">street</span>';
+      if (t === "GEOMETRIC_CENTER") return '<span class="pill p-warn">block</span>';
+      return '<span class="pill p-warn">approx</span>';
+    }
+
+    async function run() {
+      stopped = false;
+      results = [];
+      $("run").disabled = true;
+      $("stop").classList.remove("hide");
+      $("tb").innerHTML = "";
+      $("tablecard").classList.remove("hide");
+      $("prog").textContent = "Loading Google…";
+
+      try { await loadGoogle(); }
+      catch (e) { $("prog").textContent = "Could not load Google Maps — check the API key restrictions."; $("run").disabled = false; return; }
+
+      var geocoder = new google.maps.Geocoder();
+      var todo = rows.filter(function (x) { return x.address && String(x.address).trim(); });
+      var done = 0, failed = 0;
+
+      for (var i = 0; i < todo.length; i++) {
+        if (stopped) break;
+        var p = todo[i];
+        var q = [p.address, p.city || p.borough || "Montréal", "Québec", "Canada"].filter(Boolean).join(", ");
+
+        var r = await geocodeOne(geocoder, q);
+        /* Google throttles bursts — back off and retry a couple of times */
+        var tries = 0;
+        while (r.status === "OVER_QUERY_LIMIT" && tries < 3) {
+          await sleep(1200 * (tries + 1));
+          r = await geocodeOne(geocoder, q);
+          tries++;
+        }
+
+        var tr = document.createElement("tr");
+        if (r.status === "OK" && r.out && r.out[0]) {
+          var g = r.out[0];
+          var lat = +g.geometry.location.lat().toFixed(6);
+          var lng = +g.geometry.location.lng().toFixed(6);
+          var lt = g.geometry.location_type;
+          var moved = (typeof p.lat === "number" && typeof p.lng === "number") ? haversineKm(p.lat, p.lng, lat, lng) : null;
+          results.push({ id: p.id, name: p.name, lat: lat, lng: lng, type: lt, moved: moved });
+          tr.innerHTML = "<td>" + (i + 1) + "</td><td>" + esc(p.name) + "</td><td>" + esc(q) + "</td><td>" +
+            esc(g.formatted_address) + "</td><td>" + precisionPill(lt) + "</td><td class='mv'>" +
+            (moved == null ? "—" : moved.toFixed(2) + " km") + "</td>";
+        } else {
+          failed++;
+          tr.innerHTML = "<td>" + (i + 1) + "</td><td>" + esc(p.name) + "</td><td>" + esc(q) +
+            "</td><td colspan='3'><span class='pill p-bad'>" + esc(r.status) + "</span> — left unchanged</td>";
+        }
+        $("tb").appendChild(tr);
+
+        done++;
+        $("bar").style.width = Math.round(done / todo.length * 100) + "%";
+        $("prog").textContent = done + " / " + todo.length + " · " + failed + " could not be matched";
+        await sleep(160);
+      }
+
+      buildSql();
+      $("run").disabled = false;
+      $("stop").classList.add("hide");
+      $("prog").textContent = "Done — " + results.length + " ready to update, " + failed + " skipped.";
+    }
+
+    function sqlId(v) { return (typeof v === "number") ? String(v) : "'" + String(v).replace(/'/g, "''") + "'"; }
+
+    function buildSql() {
+      if (!results.length) return;
+      var lines = results.map(function (r) {
+        return "  (" + sqlId(r.id) + ", " + r.lat + ", " + r.lng + ")";
+      });
+      var sql =
+        "-- UniqueApex · real street-address coordinates for providers\n" +
+        "-- Generated " + new Date().toISOString().slice(0, 10) + " · " + results.length + " clinics\n" +
+        "-- Review, then run once in the Supabase SQL editor.\n\n" +
+        "UPDATE providers AS p\n" +
+        "SET lat = v.lat, lng = v.lng\n" +
+        "FROM (VALUES\n" + lines.join(",\n") + "\n) AS v(id, lat, lng)\n" +
+        "WHERE p.id = v.id;\n";
+      $("sql").value = sql;
+      $("sqlcard").classList.remove("hide");
+    }
+
+    $("run").addEventListener("click", run);
+    $("stop").addEventListener("click", function () { stopped = true; });
+    $("copy").addEventListener("click", function () {
+      $("sql").select();
+      document.execCommand("copy");
+      $("copy").textContent = "Copied ✓";
+      setTimeout(function () { $("copy").textContent = "Copy SQL"; }, 1600);
+    });
+  </script>
+</body>
+</html>
