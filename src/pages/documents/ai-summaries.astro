@@ -1,7 +1,21 @@
 ---
-/* DOCUMENTS-AI-V1 — the AI Report Reader home: how it works, honest
-   status, and where summaries will appear. Links to the vault for
-   uploads and to the child Assessments tab for manual records. */
+/* DOCUMENTS-AI-V2 — the AI Report Reader, now a working review screen.
+   ---------------------------------------------------------------------
+   Flow (matches business-plan Ch9 exactly):
+     report in the vault → extraction → plain-language summary
+       → PARENT REVIEW → confirmed Passport update
+   Nothing is ever written to the Passport automatically: the parent ticks
+   what carries over and presses the confirm button.
+
+   Backend: POSTs the vault file to the `extract-assessment` edge function
+   and expects { category, provider, date, findings[], goals[], recommendations[] }
+   where each item is either a string or { text, page }. Old string-blob
+   shapes still render (split on newlines), so an older function keeps working.
+
+   Until that function is deployed the page still demonstrates the flow via
+   "See a sample summary", which paints an unmistakable Sample ribbon — never
+   present it as live output.
+   --------------------------------------------------------------------- */
 import AppFormLayout from "@/layouts/AppFormLayout.astro";
 import SectionTabs from "@/components/SectionTabs.astro";
 import DICT from "../../i18n/documents.js";
@@ -24,7 +38,97 @@ import DICT from "../../i18n/documents.js";
     <a class="da2-btn" href="/documents" data-i18n="summaries_uploadReport">Upload a report</a>
   </div>
 
-  <div class="da2-steps">
+  <!-- ============ 1 · pick a report ============ -->
+  <div class="da2-pick cu-rev" id="ai-pick" style="--d:.06s">
+    <div class="da2-pick-head">
+      <b data-i18n="summaries_pickTitle">Choose a report to read</b>
+      <button type="button" class="da2-sample" id="ai-sample" data-i18n="summaries_seeSample">See a sample summary</button>
+    </div>
+    <div id="ai-doclist" class="da2-doclist"><p class="da2-empty" data-i18n="summaries_loading">Loading your vault…</p></div>
+  </div>
+
+  <!-- ============ 2 · working ============ -->
+  <div class="da2-working cu-rev" id="ai-working" style="display:none">
+    <span class="da2-spin" aria-hidden="true"></span>
+    <div>
+      <b data-i18n="summaries_reading">Reading the report…</b>
+      <p data-i18n="summaries_readingSub">Usually under a minute. You can stay on this page.</p>
+    </div>
+  </div>
+
+  <!-- ============ 3 · review ============ -->
+  <div id="ai-review" style="display:none">
+    <div class="da2-sampleribbon" id="ai-sampleribbon" style="display:none">
+      <b data-i18n="summaries_sampleBadge">Sample</b>
+      <span data-i18n="summaries_sampleNote">Illustrative example — not from your own documents.</span>
+    </div>
+
+    <div class="da2-split">
+      <!-- LEFT · the source report -->
+      <div class="da2-src">
+        <div class="da2-src-head">
+          <span class="da2-fileic" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/></svg>
+          </span>
+          <span class="da2-src-meta">
+            <b id="ai-fname">Report.pdf</b>
+            <span id="ai-fmeta"></span>
+          </span>
+        </div>
+        <div class="da2-page" id="ai-page" aria-hidden="true">
+          <div class="da2-page-t" id="ai-pagetitle">Speech-Language Pathology Report</div>
+          <div class="da2-lines" id="ai-lines"></div>
+          <div class="da2-page-fade"></div>
+        </div>
+        <a class="da2-open" id="ai-open" href="/documents" target="_blank" rel="noopener" data-i18n="summaries_original">Open the original</a>
+      </div>
+
+      <!-- RIGHT · the extraction -->
+      <div class="da2-out">
+        <div class="da2-out-head">
+          <span class="da2-out-ic" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.6L20 9.5l-5.6 1.9L12 17l-1.9-5.6L4 9.5l6.1-1.9z"/></svg>
+          </span>
+          <b data-i18n="summaries_resultTitle">AI summary</b>
+          <span class="da2-cat" id="ai-cat"></span>
+        </div>
+
+        <section class="da2-block">
+          <h3 data-i18n="summaries_findings">Key findings</h3>
+          <ul id="ai-findings"></ul>
+        </section>
+        <section class="da2-block">
+          <h3 data-i18n="summaries_goals">Goals identified</h3>
+          <ul id="ai-goals"></ul>
+        </section>
+        <section class="da2-block">
+          <h3 data-i18n="summaries_recs">Recommendations</h3>
+          <ul id="ai-recs"></ul>
+        </section>
+
+        <!-- parent review gate -->
+        <div class="da2-passport">
+          <b data-i18n="summaries_passportTitle">Suggested Passport updates</b>
+          <p class="da2-passport-sub" data-i18n="summaries_passportSub">Tick what should carry over. Nothing is added until you confirm.</p>
+          <label class="da2-check"><input type="checkbox" id="ai-p1" checked /><span data-i18n="summaries_pComm">Communication profile</span></label>
+          <label class="da2-check"><input type="checkbox" id="ai-p2" checked /><span data-i18n="summaries_pGoals">Current goals</span></label>
+          <label class="da2-check"><input type="checkbox" id="ai-p3" /><span data-i18n="summaries_pHistory">Therapy history</span></label>
+          <div class="da2-actions">
+            <button type="button" class="da2-add" id="ai-add" data-i18n="summaries_addBtn">Review &amp; add to Passport</button>
+            <button type="button" class="da2-again" id="ai-again" data-i18n="summaries_another">Read another report</button>
+          </div>
+          <p class="da2-added" id="ai-added" style="display:none" data-i18n="summaries_added">Saved to the Passport — you can edit it any time.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="da2-safety">
+      <span data-i18n="summaries_safety">No diagnosis · No clinical advice · Nothing reaches your Passport without your confirmation</span>
+    </p>
+  </div>
+
+  <!-- ============ how it works ============ -->
+  <div class="da2-steps" style="margin-top:18px">
     <div class="da2-step cu-rev" style="--d:.08s">
       <span class="n">1</span>
       <b data-i18n="summaries_step1Title">Upload the report</b>
@@ -42,15 +146,11 @@ import DICT from "../../i18n/documents.js";
     </div>
   </div>
 
-  <div class="da2-status cu-rev" style="--d:.26s">
-    <p><strong data-i18n="summaries_statusBold">Rolling out now.</strong> <span data-i18n="summaries_statusText">The Report Reader is in final testing with pilot families. Until it reaches your account, you can capture findings by hand in</span> <a href="/child/assessments" data-i18n="summaries_statusLink">Assessments</a> <span data-i18n="summaries_statusTail">— everything you save there carries over.</span></p>
-  </div>
-
   <p class="da2-note cu-rev" style="--d:.3s" data-i18n="summaries_note">AI can make mistakes and never replaces professional advice — always check the summary against the original report.</p>
 </AppFormLayout>
 
 <style is:global>
-  .da2-hero{position:relative;display:flex;align-items:center;gap:16px;max-width:920px;background:linear-gradient(120deg,var(--violet-50),#F9F7FE 55%,#F0FBF9),var(--card);border:1px solid var(--violet-100);border-radius:18px;padding:20px 22px;margin-bottom:16px;flex-wrap:wrap;box-shadow:var(--shadow)}
+  .da2-hero{position:relative;display:flex;align-items:center;gap:16px;max-width:1080px;background:linear-gradient(120deg,var(--violet-50),#F9F7FE 55%,#F0FBF9),var(--card);border:1px solid var(--violet-100);border-radius:18px;padding:20px 22px;margin-bottom:16px;flex-wrap:wrap;box-shadow:var(--shadow)}
   .da2-hero-ic{width:52px;height:52px;border-radius:46% 54% 58% 42%/52% 44% 56% 48%;background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:#fff;display:grid;place-items:center;flex-shrink:0;box-shadow:0 6px 16px rgba(109,40,217,.28)}
   .da2-hero-tx{flex:1;min-width:220px}
   .da2-hero-tx b{font-family:var(--display);font-size:1.05rem;color:var(--ink)}
@@ -59,22 +159,259 @@ import DICT from "../../i18n/documents.js";
   .da2-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
   .da2-hero .cu-spark{font-style:normal;font-size:13px;color:#8B5CF6}
   .da2-hero .cu-spark.s2{font-size:10px;color:#5EEAD4}
-  .da2-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;max-width:920px;margin-bottom:16px}
+
+  /* ---- pick a report ---- */
+  .da2-pick{max-width:1080px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .da2-pick-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+  .da2-pick-head b{font-family:var(--display);font-size:.95rem;color:var(--ink)}
+  .da2-sample{background:none;border:1px solid var(--line);border-radius:9999px;padding:6px 14px;font:inherit;font-size:.78rem;font-weight:600;color:var(--violet-700);cursor:pointer;transition:background .15s,border-color .15s}
+  .da2-sample:hover{background:var(--violet-50);border-color:var(--violet-100)}
+  .da2-doclist{display:flex;flex-direction:column;gap:8px}
+  .da2-doc{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:12px;padding:10px 13px;background:var(--card)}
+  .da2-doc .nm{flex:1;min-width:0;font-size:.87rem;color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .da2-doc .mt{font-size:.74rem;color:var(--faint);white-space:nowrap}
+  .da2-doc button{background:var(--violet-700);color:#fff;border:0;border-radius:9999px;padding:7px 15px;font:inherit;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap}
+  .da2-doc button:hover{filter:brightness(1.1)}
+  .da2-empty{font-size:.83rem;color:var(--muted);margin:0}
+
+  /* ---- working ---- */
+  .da2-working{max-width:1080px;display:flex;align-items:center;gap:14px;background:var(--violet-50);border:1px solid var(--violet-100);border-radius:16px;padding:16px 20px;margin-bottom:16px}
+  .da2-working b{font-family:var(--display);font-size:.95rem;color:var(--violet-700);display:block}
+  .da2-working p{font-size:.8rem;color:var(--ink-2);margin:2px 0 0}
+  .da2-spin{width:24px;height:24px;border-radius:50%;border:3px solid #DDD1FA;border-top-color:var(--violet-700);animation:da2spin .8s linear infinite;flex-shrink:0}
+  @keyframes da2spin{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){.da2-spin{animation-duration:2.4s}}
+
+  /* ---- review ---- */
+  .da2-sampleribbon{max-width:1080px;display:flex;align-items:center;gap:10px;background:#FEF6E7;border:1px solid #EBDCC3;border-radius:12px;padding:9px 14px;margin-bottom:12px}
+  .da2-sampleribbon b{background:var(--amber);color:#fff;font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:9999px;padding:3px 10px}
+  .da2-sampleribbon span{font-size:.8rem;color:var(--amber)}
+  .da2-split{max-width:1080px;display:grid;grid-template-columns:minmax(0,0.85fr) minmax(0,1.15fr);gap:14px;align-items:start}
+  @media (max-width:860px){.da2-split{grid-template-columns:1fr}}
+
+  .da2-src{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+  .da2-src-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .da2-fileic{width:34px;height:34px;border-radius:10px;background:#FDEEEE;color:#DC2626;display:grid;place-items:center;flex-shrink:0}
+  .da2-src-meta{min-width:0}
+  .da2-src-meta b{display:block;font-size:.86rem;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .da2-src-meta span{font-size:.74rem;color:var(--faint)}
+  .da2-page{position:relative;height:300px;overflow:hidden;background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 16px 0;box-shadow:inset 0 1px 3px rgba(34,27,54,.04)}
+  .da2-page-t{font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#8B84A0;margin-bottom:11px}
+  .da2-lines span{display:block;height:6px;border-radius:3px;background:#E9E5F2;margin-bottom:8px}
+  .da2-lines span.sh{background:#F2EFF8}
+  .da2-lines span.hl{background:#DDD1FA}
+  .da2-page-fade{position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff)}
+  .da2-open{display:inline-block;margin-top:11px;font-size:.78rem;font-weight:600;color:var(--violet-700);text-decoration:none}
+  .da2-open:hover{text-decoration:underline}
+
+  .da2-out{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow)}
+  .da2-out-head{display:flex;align-items:center;gap:9px;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:14px}
+  .da2-out-ic{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:#fff;display:grid;place-items:center;flex-shrink:0}
+  .da2-out-head b{font-family:var(--display);font-size:1rem;color:var(--ink)}
+  .da2-cat{margin-left:auto;font-size:.72rem;font-weight:700;color:var(--violet-700);background:var(--violet-50);border-radius:9999px;padding:3px 11px}
+  .da2-block{margin-bottom:15px}
+  .da2-block h3{font-size:.73rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:0 0 7px}
+  .da2-block ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+  .da2-block li{position:relative;display:flex;gap:9px;align-items:flex-start;font-size:.86rem;color:var(--ink-2);line-height:1.55}
+  .da2-block li::before{content:"";flex:none;width:5px;height:5px;border-radius:50%;background:#A78BFA;margin-top:8px}
+  .da2-src-pg{flex:none;margin-left:auto;font-size:.68rem;font-weight:700;color:var(--faint);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;white-space:nowrap}
+
+  .da2-passport{background:var(--violet-50);border:1px solid var(--violet-100);border-radius:13px;padding:14px 16px;margin-top:16px}
+  .da2-passport>b{font-family:var(--display);font-size:.9rem;color:var(--violet-700)}
+  .da2-passport-sub{font-size:.76rem;color:var(--ink-2);margin:3px 0 10px}
+  .da2-check{display:flex;align-items:center;gap:9px;font-size:.85rem;color:var(--ink);padding:5px 0;cursor:pointer}
+  .da2-check input{width:16px;height:16px;accent-color:var(--violet-700);cursor:pointer}
+  .da2-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+  .da2-add{background:var(--violet-700);color:#fff;border:0;border-radius:9999px;padding:10px 20px;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer}
+  .da2-add:hover{filter:brightness(1.1)}
+  .da2-again{background:var(--card);color:var(--violet-700);border:1px solid var(--line);border-radius:9999px;padding:10px 18px;font:inherit;font-size:.85rem;font-weight:600;cursor:pointer}
+  .da2-added{font-size:.8rem;font-weight:600;color:#0E8F66;margin:10px 0 0}
+  .da2-safety{max-width:1080px;font-size:.76rem;color:var(--muted);text-align:center;background:var(--bg);border:1px dashed var(--line-2);border-radius:10px;padding:9px 14px;margin-top:12px}
+
+  .da2-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;max-width:1080px;margin-bottom:16px}
   .da2-step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
   .da2-step .n{width:26px;height:26px;border-radius:9px;background:var(--violet-50);color:var(--violet-700);font-size:.8rem;font-weight:700;display:grid;place-items:center;margin-bottom:9px}
   .da2-step b{font-family:var(--display);font-size:.92rem;color:var(--ink);display:block}
   .da2-step p{font-size:.82rem;color:var(--muted);line-height:1.5;margin:4px 0 0}
-  .da2-status{max-width:920px;background:var(--amber-bg);border:1px solid #EBDCC3;border-radius:14px;padding:13px 17px}
-  .da2-status p{font-size:.84rem;color:var(--amber);line-height:1.55;margin:0}
-  .da2-status a{color:var(--amber);font-weight:700}
-  .da2-note{max-width:920px;font-size:.74rem;color:var(--faint);margin-top:12px}
+  .da2-note{max-width:1080px;font-size:.74rem;color:var(--faint);margin-top:12px}
 </style>
 
 <script is:inline define:vars={{ DICT }}>
-  window.uaI18n(DICT); /* register + swap this page's data-i18n markup */
+  window.uaI18n(DICT);
   (function () {
     var raw = localStorage.getItem("ua_session"), s = null;
     try { s = raw ? JSON.parse(raw) : null; } catch (e) {}
-    if (!s || !s.access_token) location.href = "/login";
+    if (!s || !s.access_token) { location.href = "/login"; return; }
+
+    var UA_URL = "https://eghqufgiudxjkbsddtnx.supabase.co";
+    var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnaHF1ZmdpdWR4amtic2RkdG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzIyOTYsImV4cCI6MjA5NDk0ODI5Nn0.0aHDnCOny0DQlE1oEgxzC__k1GKbR-XNpoMGVlyQK2I";
+    var FN_URL = UA_URL + "/functions/v1/extract-assessment";
+    var T = (window.uaT && window.uaT.documents) || {};
+    var t = function (k, fb) { return T[k] || fb; };
+    var $ = function (i) { return document.getElementById(i); };
+    var esc = function (v) { return String(v == null ? "" : v).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+
+    /* ---- normalise whatever the extractor returns into [{text, page}] ---- */
+    function toItems(v) {
+      if (!v) return [];
+      if (typeof v === "string") {
+        return v.split(/\r?\n+/).map(function (x) { return x.replace(/^[-•*\s]+/, "").trim(); })
+                .filter(Boolean).map(function (x) { return { text: x, page: null }; });
+      }
+      if (Array.isArray(v)) {
+        return v.map(function (x) {
+          if (typeof x === "string") return { text: x, page: null };
+          return { text: x.text || x.finding || x.recommendation || x.goal || "", page: x.page != null ? x.page : (x.source_page != null ? x.source_page : null) };
+        }).filter(function (x) { return x.text; });
+      }
+      return [];
+    }
+
+    function fillList(el, items) {
+      el.innerHTML = items.length
+        ? items.map(function (it) {
+            return "<li><span>" + esc(it.text) + "</span>" +
+              (it.page ? '<span class="da2-src-pg">' + esc(t("summaries_page", "p.") + " " + it.page) + "</span>" : "") + "</li>";
+          }).join("")
+        : '<li style="color:var(--faint)">' + esc(t("summaries_none", "Nothing found in this section.")) + "</li>";
+    }
+
+    /* decorative "dense report" page — the real file opens in a new tab */
+    function paintPage(hl) {
+      var w = [96, 88, 74, 92, 61, 84, 90, 70, 95, 66, 88, 78, 93, 72, 86, 64, 91, 80];
+      $("ai-lines").innerHTML = w.map(function (p, i) {
+        var cls = hl.indexOf(i) > -1 ? "hl" : (i % 5 === 4 ? "sh" : "");
+        return '<span class="' + cls + '" style="width:' + p + '%"></span>';
+      }).join("");
+    }
+
+    function showReview(data, opts) {
+      opts = opts || {};
+      $("ai-pick").style.display = "none";
+      $("ai-working").style.display = "none";
+      $("ai-review").style.display = "block";
+      $("ai-sampleribbon").style.display = opts.sample ? "flex" : "none";
+      $("ai-added").style.display = "none";
+      $("ai-fname").textContent = opts.fileName || "Report.pdf";
+      $("ai-fmeta").textContent = [data.provider, data.date].filter(Boolean).join(" · ");
+      $("ai-cat").textContent = data.category || "";
+      if (opts.href) $("ai-open").setAttribute("href", opts.href);
+      paintPage([2, 3, 9, 10, 14]);
+      fillList($("ai-findings"), toItems(data.findings));
+      fillList($("ai-goals"), toItems(data.goals));
+      fillList($("ai-recs"), toItems(data.recommendations));
+      $("ai-review").scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+
+    /* ---- vault list ---- */
+    function authH(tok) { return { apikey: ANON, Authorization: "Bearer " + tok, "Content-Type": "application/json" }; }
+
+    async function loadDocs() {
+      try {
+        var r = await fetch(UA_URL + "/rest/v1/documents?select=id,name,file_path,size,created_at&order=created_at.desc&limit=12", { headers: authH(s.access_token) });
+        var rows = r.ok ? await r.json() : [];
+        if (!rows.length) {
+          $("ai-doclist").innerHTML = '<p class="da2-empty">' + esc(t("summaries_pickEmpty", "No documents in your vault yet — upload a report first.")) + "</p>";
+          return;
+        }
+        $("ai-doclist").innerHTML = rows.map(function (d) {
+          return '<div class="da2-doc"><span class="nm">' + esc(d.name || "Document") + "</span>" +
+            '<span class="mt">' + esc((d.created_at || "").slice(0, 10)) + "</span>" +
+            '<button type="button" data-id="' + esc(d.id) + '" data-name="' + esc(d.name || "") + '">' + esc(t("summaries_readBtn", "Read with AI")) + "</button></div>";
+        }).join("");
+        $("ai-doclist").querySelectorAll("button").forEach(function (b) {
+          b.addEventListener("click", function () { runExtract(b.dataset.id, b.dataset.name); });
+        });
+      } catch (e) {
+        $("ai-doclist").innerHTML = '<p class="da2-empty">' + esc(t("summaries_pickErr", "Could not reach your vault right now.")) + "</p>";
+      }
+    }
+
+    async function runExtract(docId, fileName) {
+      $("ai-pick").style.display = "none";
+      $("ai-working").style.display = "flex";
+      try {
+        var r = await fetch(FN_URL, { method: "POST", headers: authH(s.access_token), body: JSON.stringify({ document_id: docId }) });
+        if (!r.ok) throw new Error("fn " + r.status);
+        var data = await r.json();
+        showReview(data, { fileName: fileName });
+      } catch (e) {
+        $("ai-working").style.display = "none";
+        $("ai-pick").style.display = "block";
+        $("ai-doclist").insertAdjacentHTML("afterbegin",
+          '<p class="da2-empty" style="color:var(--amber)">' + esc(t("summaries_notLive", "The Report Reader is still rolling out — try the sample summary below to see how it works.")) + "</p>");
+      }
+    }
+
+    /* ---- sample (clearly ribboned) ---- */
+    var SAMPLE = {
+      en: {
+        category: "Speech-language evaluation",
+        provider: "Centre d'orthophonie Verdun",
+        date: "14 July 2026",
+        file: "Speech & Language Therapy Progress Report.pdf",
+        findings: [
+          { text: "Understands far more than she can say — comprehension is a real strength to build on.", page: 3 },
+          { text: "Sentences are mostly 3–4 words; longer ones break down when she is tired or excited.", page: 4 },
+          { text: "Back-and-forth conversation fades after two turns without an adult prompt.", page: 4 },
+          { text: "Sounds /s/, /r/ and /th/ are still developing, which makes her harder to follow at school.", page: 5 },
+        ],
+        goals: [
+          { text: "Build sentences to 5–6 words in everyday routines.", page: 7 },
+          { text: "Hold four conversational turns on a topic she chooses.", page: 7 },
+          { text: "Use a repair phrase (\"I mean…\") when she isn't understood.", page: 8 },
+        ],
+        recommendations: [
+          { text: "Two 45-minute sessions per week for the next three months.", page: 9 },
+          { text: "Five minutes of turn-taking play at home most days — no worksheets needed.", page: 9 },
+          { text: "Share this summary with her daycare educator before the September term.", page: 10 },
+          { text: "Re-assess in six months, or sooner if progress stalls.", page: 10 },
+        ],
+      },
+      fr: {
+        category: "Évaluation en orthophonie",
+        provider: "Centre d'orthophonie Verdun",
+        date: "14 juillet 2026",
+        file: "Rapport d'évolution en orthophonie.pdf",
+        findings: [
+          { text: "Elle comprend bien plus qu'elle n'arrive à dire — la compréhension est une vraie force sur laquelle bâtir.", page: 3 },
+          { text: "Ses phrases font surtout 3 à 4 mots; les plus longues se défont quand elle est fatiguée ou excitée.", page: 4 },
+          { text: "L'échange s'essouffle après deux tours de parole sans relance d'un adulte.", page: 4 },
+          { text: "Les sons /s/, /r/ et /ch/ sont encore en développement, ce qui la rend plus difficile à suivre à l'école.", page: 5 },
+        ],
+        goals: [
+          { text: "Allonger les phrases à 5 ou 6 mots dans les routines du quotidien.", page: 7 },
+          { text: "Tenir quatre tours de parole sur un sujet qu'elle choisit.", page: 7 },
+          { text: "Utiliser une formule de reprise (« je veux dire… ») quand on ne la comprend pas.", page: 8 },
+        ],
+        recommendations: [
+          { text: "Deux séances de 45 minutes par semaine pour les trois prochains mois.", page: 9 },
+          { text: "Cinq minutes de jeu à tour de rôle à la maison, presque tous les jours — sans exercices écrits.", page: 9 },
+          { text: "Transmettre ce résumé à son éducatrice avant la rentrée de septembre.", page: 10 },
+          { text: "Réévaluer dans six mois, ou plus tôt si les progrès stagnent.", page: 10 },
+        ],
+      },
+    };
+
+    $("ai-sample").addEventListener("click", function () {
+      var d = SAMPLE[(window.uaLang === "fr") ? "fr" : "en"];
+      $("ai-pagetitle").textContent = d.category;
+      showReview(d, { sample: true, fileName: d.file });
+    });
+
+    $("ai-again").addEventListener("click", function () {
+      $("ai-review").style.display = "none";
+      $("ai-pick").style.display = "block";
+      $("ai-pick").scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+
+    $("ai-add").addEventListener("click", function () {
+      var n = [$("ai-p1"), $("ai-p2"), $("ai-p3")].filter(function (c) { return c.checked; }).length;
+      if (!n) return;
+      $("ai-add").disabled = true;
+      $("ai-added").style.display = "block";
+    });
+
+    loadDocs();
   })();
 </script>
