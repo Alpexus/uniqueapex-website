@@ -322,7 +322,52 @@ import SectionTabs from "@/components/SectionTabs.astro";
     try { home = Object.assign(home, JSON.parse(localStorage.getItem(GEO_KEY) || "{}")); } catch (e) {}
     let passportPostal = String(((data.household || {}).postal) || ((data.childProfile || {}).postalCode) || "").trim().toUpperCase();
     if (passportPostal) home.postal = passportPostal;
-    const homeCoords = () => coordsForPostal(home.postal);
+    /* Postal → coordinates.
+       The built-in FSA table only covers ~84 districts, so plenty of real
+       Montréal postal codes ("not in our map yet") produced no distances at
+       all. We now fall back to Google geocoding, which resolves the FULL six
+       character code — more accurate than an FSA centroid — and cache the
+       answer per postal code so it costs one lookup per family, ever. */
+    const PGEO_KEY = "ua_postal_geo_v1";
+    function postalCache() {
+      try { return JSON.parse(localStorage.getItem(PGEO_KEY) || "{}"); } catch (e) { return {}; }
+    }
+    function cachePostal(code, ll) {
+      try {
+        const c = postalCache();
+        c[code] = ll;
+        localStorage.setItem(PGEO_KEY, JSON.stringify(c));
+      } catch (e) {}
+    }
+    const normPostal = (v) => String(v || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    function homeCoords() {
+      const code = normPostal(home.postal);
+      if (!code) return null;
+      const cached = postalCache()[code];
+      if (cached && typeof cached[0] === "number") return cached;
+      return coordsForPostal(home.postal);
+    }
+    /* async: only used when the table + cache both miss */
+    async function resolveHomeCoords() {
+      const hit = homeCoords();
+      if (hit) return hit;
+      const code = normPostal(home.postal);
+      if (code.length < 6) return null;              /* need a full code to geocode */
+      try {
+        await loadGoogle();
+        const pretty = code.slice(0, 3) + " " + code.slice(3);
+        const out = await new Promise((res) => {
+          gm2().geocode({ address: pretty + ", Québec, Canada", region: "ca" },
+            (r, st) => res(st === "OK" && r && r[0] ? r[0] : null));
+        });
+        if (!out) return null;
+        const ll = [+out.geometry.location.lat().toFixed(6), +out.geometry.location.lng().toFixed(6)];
+        cachePostal(code, ll);
+        return ll;
+      } catch (e) { return null; }
+    }
+    /* Geocoder constructor is only available after the Maps script loads */
+    const gm2 = function () { return new google.maps.Geocoder(); };
     async function savePostalToPassport(postal) {
       try {
         const s2 = await UA.getValidSession();
@@ -402,12 +447,19 @@ import SectionTabs from "@/components/SectionTabs.astro";
       list.sort((a, b) => (a._d ?? 1e9) - (b._d ?? 1e9));
       return list;
     }
-    $("pv-find").addEventListener("click", () => {
+    $("pv-find").addEventListener("click", async () => {
       if (!svc) return;
       if (home.km > 0 && !homeCoords()) {
-        notify("warn", T.needPostal);
-        $("pv-postal").focus();
-        return;
+        const btn = $("pv-find");
+        btn.disabled = true;
+        const resolved = await resolveHomeCoords();   /* Google fallback */
+        btn.disabled = false;
+        if (!resolved) {
+          notify("warn", T.needPostal);
+          $("pv-postal").focus();
+          return;
+        }
+        $("pv-loc-hint").textContent = "";
       }
       goStep(2);
       $("pv-results").style.display = "none";
@@ -730,13 +782,16 @@ import SectionTabs from "@/components/SectionTabs.astro";
     $("pv-postal").addEventListener("input", () => {
       home.postal = $("pv-postal").value.trim().toUpperCase();
       localStorage.setItem(GEO_KEY, JSON.stringify(home));
-      $("pv-loc-hint").textContent = home.postal && !homeCoords()
-        ? T.postalUnknown
-        : "";
+      /* A full six-character code can be geocoded on Find, so only warn about
+         codes we genuinely cannot place (too short / malformed). */
+      $("pv-loc-hint").textContent =
+        (home.postal && !homeCoords() && normPostal(home.postal).length < 6)
+          ? T.postalUnknown
+          : "";
     });
     $("pv-postal").addEventListener("change", () => {
       const v = $("pv-postal").value.trim().toUpperCase();
-      if (coordsForPostal(v) && v !== passportPostal) savePostalToPassport(v);
+      if ((coordsForPostal(v) || postalCache()[normPostal(v)]) && v !== passportPostal) savePostalToPassport(v);
     });
 
     const topSug = SVCS.find((s) => suggestions[s.code]);

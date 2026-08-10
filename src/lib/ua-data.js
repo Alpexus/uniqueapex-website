@@ -122,10 +122,10 @@ const FIELD_MAP = {
 const _fp = T();
 export const FUNDING_PROGRAMS = [
   { key: "dtc",            name: _fp("fp_dtc"),            level: _fp("level_federal"), note: _fp("fp_dtc_note"), amount: 0 },
-  { key: "cdb",            name: _fp("fp_cdb"),            level: _fp("level_federal"), note: _fp("fp_cdb_note"),  amount: 3411 },
+  { key: "cdb",            name: _fp("fp_cdb"),            level: _fp("level_federal"), note: _fp("fp_cdb_note"),  amount: 3480 },
   { key: "rdsp",           name: _fp("fp_rdsp"),           level: _fp("level_federal"), note: _fp("fp_rdsp_note"), amount: 3500 },
   { key: "qc_supplement",  name: _fp("fp_qc_supplement"),  level: _fp("level_quebec"),  note: _fp("fp_qc_supplement_note"),       amount: 2892 },
-  { key: "qc_exceptional", name: _fp("fp_qc_exceptional"), level: _fp("level_quebec"),  note: _fp("fp_qc_exceptional_note"), amount: 14292 },
+  { key: "qc_exceptional", name: _fp("fp_qc_exceptional"), level: _fp("level_quebec"),  note: _fp("fp_qc_exceptional_note"), amount: 14580 },
   { key: "qc_family_alloc",name: _fp("fp_qc_family_alloc"),level: _fp("level_quebec"),  note: _fp("fp_qc_family_alloc_note"),     amount: 0 },
   { key: "qc_family_supp", name: _fp("fp_qc_family_supp"), level: _fp("level_quebec"),  note: _fp("fp_qc_family_supp_note"), amount: 0 },
 ];
