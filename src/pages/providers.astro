@@ -339,6 +339,20 @@ import SectionTabs from "@/components/SectionTabs.astro";
         localStorage.setItem(PGEO_KEY, JSON.stringify(c));
       } catch (e) {}
     }
+    function cacheArea(code, area) {
+      if (!area) return;
+      try {
+        const c = postalCache();
+        c[code + ":area"] = area;
+        localStorage.setItem(PGEO_KEY, JSON.stringify(c));
+      } catch (e) {}
+    }
+    /* Pull the friendliest place name out of a geocoder result. */
+    function areaOf(res) {
+      const comp = (res && res.address_components) || [];
+      const pick = (t) => (comp.find((c) => (c.types || []).indexOf(t) > -1) || {}).long_name;
+      return pick("neighborhood") || pick("sublocality_level_1") || pick("sublocality") || pick("locality") || "";
+    }
     const normPostal = (v) => String(v || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
     function homeCoords() {
       const code = normPostal(home.postal);
@@ -362,15 +376,39 @@ import SectionTabs from "@/components/SectionTabs.astro";
         });
         if (!out) return null;
         const ll = [+out.geometry.location.lat().toFixed(6), +out.geometry.location.lng().toFixed(6)];
-        /* Grab a human place name for the outreach email ("We live in Verdun.")
-           — friendlier and more useful to a clinic than a radius in km. */
-        const comp = out.address_components || [];
-        const pick = (t) => (comp.find((c) => (c.types || []).indexOf(t) > -1) || {}).long_name;
-        const area = pick("neighborhood") || pick("sublocality_level_1") || pick("sublocality") || pick("locality") || "";
         cachePostal(code, ll);
-        if (area) { try { const c = postalCache(); c[code + ":area"] = area; localStorage.setItem(PGEO_KEY, JSON.stringify(c)); } catch (e) {} }
+        /* Free of charge: this response already carries the place name the
+           outreach email wants ("We live in Verdun."). */
+        cacheArea(code, areaOf(out));
         return ll;
       } catch (e) { return null; }
+    }
+    /* The neighbourhood name has to be resolved INDEPENDENTLY of the
+       coordinates. resolveHomeCoords() returns early whenever the FSA table
+       or the cache already knows where the family lives — which is the common
+       case — so it would never reach the geocoder and every email fell back to
+       the bare city name. One lookup per family, then cached forever. */
+    async function resolveHomeArea() {
+      const code = normPostal(home.postal);
+      if (!code) return null;
+      const known = postalCache()[code + ":area"];
+      if (known) return known;
+      if (code.length < 3) return null;
+      try {
+        await loadGoogle();
+        const pretty = code.length >= 6 ? code.slice(0, 3) + " " + code.slice(3) : code.slice(0, 3);
+        const out = await new Promise((res) => {
+          gm2().geocode({ address: pretty + ", Québec, Canada", region: "ca" },
+            (r, st) => res(st === "OK" && r && r[0] ? r[0] : null));
+        });
+        const area = areaOf(out);
+        cacheArea(code, area);
+        return area || null;
+      } catch (e) { return null; }
+    }
+    /* Never let a slow or unreachable geocoder block the UI. */
+    function withTimeout(promise, ms) {
+      return Promise.race([promise, new Promise((res) => setTimeout(() => res(null), ms))]);
     }
     /* Neighbourhood label for the email; falls back to the city. */
     function areaName() {
@@ -474,6 +512,9 @@ import SectionTabs from "@/components/SectionTabs.astro";
         }
         $("pv-loc-hint").textContent = "";
       }
+      /* Warm the neighbourhood name while she reads her matches, so step 3
+         has it ready. Deliberately not awaited — it must never delay a search. */
+      resolveHomeArea();
       goStep(2);
       $("pv-results").style.display = "none";
       $("pv-searching").style.display = "block";
@@ -721,8 +762,17 @@ import SectionTabs from "@/components/SectionTabs.astro";
         ? upsellHTML(T.upsellTitle, T.upsellMsg, T.upsellCta)
         : "";
     }
-    $("pv-to3").addEventListener("click", () => {
+    $("pv-to3").addEventListener("click", async () => {
       if (!selection.size) { notify("info", T.selectFirst); return; }
+      /* The draft is seeded once and then belongs to her, so the place name
+         must be settled BEFORE the first seed — re-seeding later would wipe
+         anything she had already typed. Normally warm from step 2. */
+      if (!postalCache()[normPostal(home.postal) + ":area"]) {
+        const btn = $("pv-to3");
+        btn.disabled = true;
+        await withTimeout(resolveHomeArea(), 3000);
+        btn.disabled = false;
+      }
       $("pv-review").style.display = "";
       $("pv-sent").style.display = "none";
       renderReview();

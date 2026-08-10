@@ -242,7 +242,7 @@ Warm regards,
     childPlain: "enfant",
     travelUpTo: " et nous pouvons nous déplacer jusqu'à {km} km",
     cityFallback: "Montréal",
-    emailBody: `Je m'appelle {parent} et je vous écris afin de m'informer au sujet {svc} pour mon {child}, {name}{dx}. Nous habitons {area}.
+    emailBody: `Je m'appelle {parent} et je vous écris afin de m'informer au sujet {svc} pour mon {child}, {name}{dx}. Nous habitons dans le secteur {area}.
 
 Pourriez-vous me préciser :
 • Si vous acceptez actuellement de nouveaux clients en pédiatrie — et sinon, s'il est possible de s'inscrire sur votre liste d'attente et quel est le délai approximatif
