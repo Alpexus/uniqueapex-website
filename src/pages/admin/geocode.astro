@@ -271,7 +271,9 @@
         "UPDATE providers AS p\n" +
         "SET lat = v.lat, lng = v.lng\n" +
         "FROM (VALUES\n" + lines.join(",\n") + "\n) AS v(id, lat, lng)\n" +
-        "WHERE p.id = v.id;\n";
+        /* providers.id is uuid; VALUES literals arrive as text, and Postgres
+           will not compare uuid = text without an explicit cast. */
+        "WHERE p.id = v.id" + (typeof results[0].id === "number" ? "" : "::uuid") + ";\n";
       $("sql").value = sql;
       $("sqlcard").classList.remove("hide");
     }
