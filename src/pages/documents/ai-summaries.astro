@@ -33,7 +33,7 @@ import DICT from "../../i18n/documents.js";
     </div>
     <div class="da2-hero-tx">
       <b data-i18n="summaries_readerTitle">AI Report Reader</b>
-      <p data-i18n="summaries_readerDesc">A 20-page evaluation becomes a one-page summary in minutes. Your report never leaves your private vault — the summary is saved right beside it.</p>
+      <p data-i18n="summaries_readerDesc">A 20-page evaluation becomes a one-page summary in minutes. Your report is processed securely and the summary is saved right beside it in your private vault.</p>
     </div>
     <a class="da2-btn" href="/documents" data-i18n="summaries_uploadReport">Upload a report</a>
   </div>
@@ -45,6 +45,7 @@ import DICT from "../../i18n/documents.js";
       <button type="button" class="da2-sample" id="ai-sample" data-i18n="summaries_seeSample">See a sample summary</button>
     </div>
     <div id="ai-doclist" class="da2-doclist"><p class="da2-empty" data-i18n="summaries_loading">Loading your vault…</p></div>
+    <p class="da2-proc"><a href="/privacy" data-i18n="summaries_processNote">To read a report, it is sent securely to our AI provider for that single purpose — details in our privacy policy.</a></p>
   </div>
 
   <!-- ============ 2 · working ============ -->
@@ -173,6 +174,9 @@ import DICT from "../../i18n/documents.js";
   .da2-doc button{background:var(--violet-700);color:#fff;border:0;border-radius:9999px;padding:7px 15px;font:inherit;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap}
   .da2-doc button:hover{filter:brightness(1.1)}
   .da2-empty{font-size:.83rem;color:var(--muted);margin:0}
+  .da2-proc{margin:11px 0 0;font-size:.74rem;line-height:1.5}
+  .da2-proc a{color:var(--faint);text-decoration:none}
+  .da2-proc a:hover{color:var(--violet-700);text-decoration:underline}
 
   /* ---- working ---- */
   .da2-working{max-width:1080px;display:flex;align-items:center;gap:14px;background:var(--violet-50);border:1px solid var(--violet-100);border-radius:16px;padding:16px 20px;margin-bottom:16px}
@@ -351,20 +355,20 @@ import DICT from "../../i18n/documents.js";
         date: "14 July 2026",
         file: "Speech & Language Therapy Progress Report.pdf",
         findings: [
-          { text: "Understands far more than she can say — comprehension is a real strength to build on.", page: 3 },
-          { text: "Sentences are mostly 3–4 words; longer ones break down when she is tired or excited.", page: 4 },
+          { text: "Understands far more than he can say — comprehension is a real strength to build on.", page: 3 },
+          { text: "Sentences are mostly 3–4 words; longer ones break down when he is tired or excited.", page: 4 },
           { text: "Back-and-forth conversation fades after two turns without an adult prompt.", page: 4 },
-          { text: "Sounds /s/, /r/ and /th/ are still developing, which makes her harder to follow at school.", page: 5 },
+          { text: "Sounds /s/, /r/ and /th/ are still developing, which makes him harder to follow at school.", page: 5 },
         ],
         goals: [
           { text: "Build sentences to 5–6 words in everyday routines.", page: 7 },
-          { text: "Hold four conversational turns on a topic she chooses.", page: 7 },
-          { text: "Use a repair phrase (\"I mean…\") when she isn't understood.", page: 8 },
+          { text: "Hold four conversational turns on a topic he chooses.", page: 7 },
+          { text: "Use a repair phrase (\"I mean…\") when he isn't understood.", page: 8 },
         ],
         recommendations: [
           { text: "Two 45-minute sessions per week for the next three months.", page: 9 },
           { text: "Five minutes of turn-taking play at home most days — no worksheets needed.", page: 9 },
-          { text: "Share this summary with her daycare educator before the September term.", page: 10 },
+          { text: "Share this summary with his daycare educator before the September term.", page: 10 },
           { text: "Re-assess in six months, or sooner if progress stalls.", page: 10 },
         ],
       },
@@ -374,15 +378,15 @@ import DICT from "../../i18n/documents.js";
         date: "14 juillet 2026",
         file: "Rapport d'évolution en orthophonie.pdf",
         findings: [
-          { text: "Elle comprend bien plus qu'elle n'arrive à dire — la compréhension est une vraie force sur laquelle bâtir.", page: 3 },
-          { text: "Ses phrases font surtout 3 à 4 mots; les plus longues se défont quand elle est fatiguée ou excitée.", page: 4 },
+          { text: "Il comprend bien plus qu'il n'arrive à dire — la compréhension est une vraie force sur laquelle bâtir.", page: 3 },
+          { text: "Ses phrases font surtout 3 à 4 mots; les plus longues se défont quand il est fatigué ou excité.", page: 4 },
           { text: "L'échange s'essouffle après deux tours de parole sans relance d'un adulte.", page: 4 },
-          { text: "Les sons /s/, /r/ et /ch/ sont encore en développement, ce qui la rend plus difficile à suivre à l'école.", page: 5 },
+          { text: "Les sons /s/, /r/ et /ch/ sont encore en développement, ce qui le rend plus difficile à suivre à l'école.", page: 5 },
         ],
         goals: [
           { text: "Allonger les phrases à 5 ou 6 mots dans les routines du quotidien.", page: 7 },
-          { text: "Tenir quatre tours de parole sur un sujet qu'elle choisit.", page: 7 },
-          { text: "Utiliser une formule de reprise (« je veux dire… ») quand on ne la comprend pas.", page: 8 },
+          { text: "Tenir quatre tours de parole sur un sujet qu'il choisit.", page: 7 },
+          { text: "Utiliser une formule de reprise (« je veux dire… ») quand on ne le comprend pas.", page: 8 },
         ],
         recommendations: [
           { text: "Deux séances de 45 minutes par semaine pour les trois prochains mois.", page: 9 },

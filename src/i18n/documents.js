@@ -66,7 +66,7 @@ export default {
     summaries_title: "AI Summaries",
     summaries_sub: "Dense clinical reports, translated into plain parent language — what was found, what's recommended, what to do next.",
     summaries_readerTitle: "AI Report Reader",
-    summaries_readerDesc: "A 20-page evaluation becomes a one-page summary in minutes. Your report never leaves your private vault — the summary is saved right beside it.",
+    summaries_readerDesc: "A 20-page evaluation becomes a one-page summary in minutes. Your report is processed securely and the summary is saved right beside it in your private vault.",
     summaries_uploadReport: "Upload a report",
     summaries_step1Title: "Upload the report",
     summaries_step1Desc: "Any evaluation PDF — speech, OT, psychoeducational, developmental — into your private vault.",
@@ -81,6 +81,7 @@ export default {
     summaries_note: "AI can make mistakes and never replaces professional advice — always check the summary against the original report.",
     /* ---- v2: review screen ---- */
     summaries_pickTitle: "Choose a report to read",
+    summaries_processNote: "To read a report, it is sent securely to our AI provider for that single purpose — details in our privacy policy.",
     summaries_seeSample: "See a sample summary",
     summaries_loading: "Loading your vault…",
     summaries_pickEmpty: "No documents in your vault yet — upload a report first.",
@@ -186,7 +187,7 @@ export default {
     summaries_title: "Résumés IA",
     summaries_sub: "Des rapports cliniques denses, traduits en mots simples pour les parents — ce qui a été constaté, ce qui est recommandé, quoi faire ensuite.",
     summaries_readerTitle: "Lecteur IA de rapports",
-    summaries_readerDesc: "Une évaluation de 20 pages devient un résumé d'une page en quelques minutes. Votre rapport ne quitte jamais votre coffre privé — le résumé est enregistré juste à côté.",
+    summaries_readerDesc: "Une évaluation de 20 pages devient un résumé d'une page en quelques minutes. Votre rapport est traité de façon sécurisée et le résumé est enregistré juste à côté, dans votre coffre privé.",
     summaries_uploadReport: "Téléverser un rapport",
     summaries_step1Title: "Téléverser le rapport",
     summaries_step1Desc: "Tout PDF d'évaluation — orthophonie, ergothérapie, psychoéducation, développement — dans votre coffre privé.",
@@ -201,6 +202,7 @@ export default {
     summaries_note: "L'IA peut faire des erreurs et ne remplace jamais un avis professionnel — comparez toujours le résumé au rapport original.",
     /* ---- v2 : écran de révision ---- */
     summaries_pickTitle: "Choisissez un rapport à lire",
+    summaries_processNote: "Pour lire un rapport, celui-ci est transmis de façon sécurisée à notre fournisseur d'IA, uniquement à cette fin — détails dans notre politique de confidentialité.",
     summaries_seeSample: "Voir un exemple de résumé",
     summaries_loading: "Chargement de votre coffre-fort…",
     summaries_pickEmpty: "Aucun document dans votre coffre-fort — téléversez d'abord un rapport.",

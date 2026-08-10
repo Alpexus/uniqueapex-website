@@ -536,7 +536,7 @@ documents.vault_setupNote,<strong>One-time setup needed:</strong> the documents 
 documents.summaries_title,AI Summaries,Résumés IA,
 documents.summaries_sub,"Dense clinical reports, translated into plain parent language — what was found, what's recommended, what to do next.","Des rapports cliniques denses, traduits en mots simples pour les parents — ce qui a été constaté, ce qui est recommandé, quoi faire ensuite.",
 documents.summaries_readerTitle,AI Report Reader,Lecteur IA de rapports,
-documents.summaries_readerDesc,A 20-page evaluation becomes a one-page summary in minutes. Your report never leaves your private vault — the summary is saved right beside it.,Une évaluation de 20 pages devient un résumé d'une page en quelques minutes. Votre rapport ne quitte jamais votre coffre privé — le résumé est enregistré juste à côté.,
+documents.summaries_readerDesc,A 20-page evaluation becomes a one-page summary in minutes. Your report is processed securely and the summary is saved right beside it in your private vault.,Une évaluation de 20 pages devient un résumé d'une page en quelques minutes. Votre rapport est traité de façon sécurisée et le résumé est enregistré juste à côté, dans votre coffre privé.,
 documents.summaries_uploadReport,Upload a report,Téléverser un rapport,
 documents.summaries_step1Title,Upload the report,Téléverser le rapport,
 documents.summaries_step1Desc,"Any evaluation PDF — speech, OT, psychoeducational, developmental — into your private vault.","Tout PDF d'évaluation — orthophonie, ergothérapie, psychoéducation, développement — dans votre coffre privé.",
