@@ -174,9 +174,9 @@ import SectionTabs from "@/components/SectionTabs.astro";
   .pv-results-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
   @media (max-width:860px){.pv-results-grid{grid-template-columns:1fr}}
   .pv-mlist{display:flex;flex-direction:column;gap:8px}
-  .pv-loc{flex:none;margin-left:8px;width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--faint);cursor:pointer;transition:color .15s,border-color .15s,background .15s}
-  .pv-loc:hover{color:var(--violet-700,#6D28D9);border-color:#C4B5FD;background:#F5F3FF}
-  .pv-loc:focus-visible{outline:2px solid #7C3AED;outline-offset:2px}
+  .pv-locbtn{flex:none;margin-left:8px;width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--faint);cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+  .pv-locbtn:hover{color:var(--violet-700,#6D28D9);border-color:#C4B5FD;background:#F5F3FF}
+  .pv-locbtn:focus-visible{outline:2px solid #7C3AED;outline-offset:2px}
   .pv-m{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:15px;padding:13px 15px;cursor:pointer;transition:border-color .15s,background .15s;opacity:0;animation:pvCard .4s ease forwards;animation-delay:var(--cd,0s)}
   @keyframes pvCard{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   .pv-m:hover{border-color:#DDD2F5}
@@ -362,10 +362,23 @@ import SectionTabs from "@/components/SectionTabs.astro";
         });
         if (!out) return null;
         const ll = [+out.geometry.location.lat().toFixed(6), +out.geometry.location.lng().toFixed(6)];
+        /* Grab a human place name for the outreach email ("We live in Verdun.")
+           — friendlier and more useful to a clinic than a radius in km. */
+        const comp = out.address_components || [];
+        const pick = (t) => (comp.find((c) => (c.types || []).indexOf(t) > -1) || {}).long_name;
+        const area = pick("neighborhood") || pick("sublocality_level_1") || pick("sublocality") || pick("locality") || "";
         cachePostal(code, ll);
+        if (area) { try { const c = postalCache(); c[code + ":area"] = area; localStorage.setItem(PGEO_KEY, JSON.stringify(c)); } catch (e) {} }
         return ll;
       } catch (e) { return null; }
     }
+    /* Neighbourhood label for the email; falls back to the city. */
+    function areaName() {
+      const code = normPostal(home.postal);
+      const a = code && postalCache()[code + ":area"];
+      return a || T.cityFallback || "Montréal";
+    }
+
     /* Geocoder constructor is only available after the Maps script loads */
     const gm2 = function () { return new google.maps.Geocoder(); };
     async function savePostalToPassport(postal) {
@@ -501,7 +514,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
             <span class="mt">${esc(x.borough || x.city || "")}${x.languages ? " · " + esc(x.languages) : ""}${x.phone ? " · " + esc(x.phone) : ""}</span>
           </span>
           <span class="dist${x._d == null ? " far" : ""}">${x._d == null ? esc(T.distNA) : x._d < 1 ? "< 1 km" : km1(x._d) + " km"}</span>
-          <button type="button" class="pv-loc" data-loc="${x.id}" title="${esc(T.showOnMap)}" aria-label="${esc(T.showOnMap)}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg></button>
+          <button type="button" class="pv-locbtn" data-loc="${x.id}" title="${esc(T.showOnMap)}" aria-label="${esc(T.showOnMap)}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg></button>
         </label>`).join("");
       $("pv-res-notes").innerHTML =
         `<p class="pv-mnote">${tpl(esc(T.mnoteMain), { n: BATCH })} ${home.km === 0 && all.length > 15 ? esc(T.mnoteNearest15) + " " : ""}${esc(T.mnoteMatched)}</p>`
@@ -509,7 +522,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
       const relabel = () => { $("pv-to3").textContent = T.reviewEmailBtn; };
       /* "show on map": overlapping pins can hide each other, so every clinic
          stays reachable from the list — pan, zoom in and open its bubble. */
-      $("pv-mlist").querySelectorAll(".pv-loc").forEach((btn) => {
+      $("pv-mlist").querySelectorAll(".pv-locbtn").forEach((btn) => {
         btn.addEventListener("click", (ev) => {
           ev.preventDefault();
           ev.stopPropagation();
@@ -681,7 +694,7 @@ import SectionTabs from "@/components/SectionTabs.astro";
         child: id.age != null ? tpl(T.childAged, { age: id.age }) : T.childPlain,
         name: first,
         dx: dxTxt ? " (" + dxTxt + ")" : "",
-        travel: home.km > 0 ? tpl(T.travelUpTo, { km: home.km }) : "",
+        area: areaName(),
         parent2: parent || "",
       });
     }

@@ -106,14 +106,18 @@ export default {
     childAged: "{age}-year-old child",
     childPlain: "child",
     travelUpTo: " and can travel up to {km} km",
-    emailBody: `My name is {parent}, and I'm looking for {svc} for my {child}, {name}{dx}. We're in Montréal{travel}.
+    cityFallback: "Montréal",
+    emailBody: `My name is {parent}, and I'm reaching out to inquire about {svc} for my {child}, {name}{dx}. We live in {area}.
 
-A few questions to help us get started:
-• Are you currently accepting new clients — or is there a waitlist we could join?
-• What does your availability look like (days and times), and what are your rates?
-• What would you need from us to book an intake?
+Could you please let me know:
+• Whether you are currently accepting new pediatric clients — and if not, whether we could join your waitlist and what the approximate wait time is
+• Your current availability, including appointment days and times
+• Your assessment and ongoing therapy rates
+• What information, documents or referrals you would need from us to arrange an initial consultation or assessment
 
-Warm thanks,
+Thank you very much for your time. I look forward to hearing from you.
+
+Warm regards,
 {parent2}`,
     footPeek: "Added automatically: a personal \"Hello\" with each clinic's name on top · a short UniqueApex footer with the 90-day no-repeat promise · Reply-To set to your email, so answers land in your inbox.",
     consentText: "I am this child's parent or legal guardian, and I consent to sharing their first name, age and diagnosis with the clinics selected above so they can respond about services.",
@@ -237,14 +241,18 @@ Warm thanks,
     childAged: "enfant de {age} ans",
     childPlain: "enfant",
     travelUpTo: " et nous pouvons nous déplacer jusqu'à {km} km",
-    emailBody: `Je m'appelle {parent} et je cherche {svc} pour mon {child}, {name}{dx}. Nous sommes à Montréal{travel}.
+    cityFallback: "Montréal",
+    emailBody: `Je m'appelle {parent} et je vous écris afin de m'informer au sujet {svc} pour mon {child}, {name}{dx}. Nous habitons {area}.
 
-Quelques questions pour bien commencer :
-• Acceptez-vous de nouveaux clients en ce moment — ou y a-t-il une liste d'attente à laquelle nous pourrions nous inscrire?
-• Quelles sont vos disponibilités (jours et heures) et quels sont vos tarifs?
-• De quoi auriez-vous besoin de notre part pour ouvrir un dossier?
+Pourriez-vous me préciser :
+• Si vous acceptez actuellement de nouveaux clients en pédiatrie — et sinon, s'il est possible de s'inscrire sur votre liste d'attente et quel est le délai approximatif
+• Vos disponibilités actuelles, y compris les jours et les heures de rendez-vous
+• Vos tarifs pour l'évaluation et pour le suivi
+• Les renseignements, documents ou références dont vous auriez besoin de notre part pour organiser une première consultation ou une évaluation
 
-Merci beaucoup,
+Je vous remercie beaucoup de votre temps et j'attends votre réponse avec intérêt.
+
+Cordialement,
 {parent2}`,
     footPeek: "Ajouté automatiquement : un « Bonjour » personnalisé avec le nom de chaque clinique en tête · un court pied de page UniqueApex avec la promesse de 90 jours sans courriel répété · une adresse de réponse (Reply-To) réglée à votre courriel, pour que les réponses arrivent dans votre boîte de réception.",
     consentText: "Je suis le parent ou le tuteur légal de cet enfant et je consens à partager son prénom, son âge et son diagnostic avec les cliniques sélectionnées ci-dessus afin qu'elles puissent nous répondre au sujet des services.",

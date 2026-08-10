@@ -494,6 +494,17 @@ dashboard.winNoPassport,Create the passport first — then wins have a home.,Cr�
 dashboard.winSavedNamed,Saved — {name} is on a roll.,Enregistré — {name} est sur une lancée.,
 dashboard.winSavedNice,Saved — nice one.,Enregistré — bien joué.,
 dashboard.winFail,Couldn't save just now — try again in a moment.,Impossible d'enregistrer pour l'instant — réessayez dans un moment.,
+dashboard.nwTitle,Where to today?,On va où aujourd'hui?,
+dashboard.nwSub,"Your whole toolkit, one tap away.","Toute votre boîte à outils, à un geste.",
+dashboard.nwAria,Quick navigation,Navigation rapide,
+dashboard.nwChild,My Child,Mon enfant,
+dashboard.nwDocuments,Documents,Documents,
+dashboard.nwProviders,Providers,Professionnels,
+dashboard.nwFunding,Funding,Financement,
+dashboard.nwResources,Resources,Ressources,
+dashboard.nwPassport,Passport,Passeport,
+dashboard.nwCenterA,You're not,Vous n'êtes,
+dashboard.nwCenterB,alone ✦,pas seule ✦,
 documents.pillReady,Ready,Prêt,
 documents.pillSoon,Coming soon,À venir,
 documents.vault_ribTitle,The Vault,Le coffre,
@@ -536,7 +547,7 @@ documents.vault_setupNote,<strong>One-time setup needed:</strong> the documents 
 documents.summaries_title,AI Summaries,Résumés IA,
 documents.summaries_sub,"Dense clinical reports, translated into plain parent language — what was found, what's recommended, what to do next.","Des rapports cliniques denses, traduits en mots simples pour les parents — ce qui a été constaté, ce qui est recommandé, quoi faire ensuite.",
 documents.summaries_readerTitle,AI Report Reader,Lecteur IA de rapports,
-documents.summaries_readerDesc,A 20-page evaluation becomes a one-page summary in minutes. Your report is processed securely and the summary is saved right beside it in your private vault.,Une évaluation de 20 pages devient un résumé d'une page en quelques minutes. Votre rapport est traité de façon sécurisée et le résumé est enregistré juste à côté, dans votre coffre privé.,
+documents.summaries_readerDesc,A 20-page evaluation becomes a one-page summary in minutes. Your report is processed securely and the summary is saved right beside it in your private vault.,"Une évaluation de 20 pages devient un résumé d'une page en quelques minutes. Votre rapport est traité de façon sécurisée et le résumé est enregistré juste à côté, dans votre coffre privé.",
 documents.summaries_uploadReport,Upload a report,Téléverser un rapport,
 documents.summaries_step1Title,Upload the report,Téléverser le rapport,
 documents.summaries_step1Desc,"Any evaluation PDF — speech, OT, psychoeducational, developmental — into your private vault.","Tout PDF d'évaluation — orthophonie, ergothérapie, psychoéducation, développement — dans votre coffre privé.",
@@ -549,6 +560,34 @@ documents.summaries_statusText,"The Report Reader is in final testing with pilot
 documents.summaries_statusLink,Assessments,Évaluations,
 documents.summaries_statusTail,— everything you save there carries over.,— tout ce que vous y enregistrez est repris.,
 documents.summaries_note,AI can make mistakes and never replaces professional advice — always check the summary against the original report.,L'IA peut faire des erreurs et ne remplace jamais un avis professionnel — comparez toujours le résumé au rapport original.,
+documents.summaries_pickTitle,Choose a report to read,Choisissez un rapport à lire,
+documents.summaries_processNote,"To read a report, it is sent securely to our AI provider for that single purpose — details in our privacy policy.","Pour lire un rapport, celui-ci est transmis de façon sécurisée à notre fournisseur d'IA, uniquement à cette fin — détails dans notre politique de confidentialité.",
+documents.summaries_seeSample,See a sample summary,Voir un exemple de résumé,
+documents.summaries_loading,Loading your vault…,Chargement de votre coffre-fort…,
+documents.summaries_pickEmpty,No documents in your vault yet — upload a report first.,Aucun document dans votre coffre-fort — téléversez d'abord un rapport.,
+documents.summaries_pickErr,Could not reach your vault right now.,Impossible de joindre votre coffre-fort pour l'instant.,
+documents.summaries_readBtn,Read with AI,Lire avec l'IA,
+documents.summaries_notLive,The Report Reader is still rolling out — try the sample summary to see how it works.,Le Lecteur de rapports est en cours de déploiement — essayez l'exemple pour voir comment il fonctionne.,
+documents.summaries_reading,Reading the report…,Lecture du rapport en cours…,
+documents.summaries_readingSub,Usually under a minute. You can stay on this page.,Moins d'une minute en général. Vous pouvez rester sur cette page.,
+documents.summaries_sampleBadge,Sample,Exemple,
+documents.summaries_sampleNote,Illustrative example — not from your own documents.,Exemple illustratif — ne provient pas de vos propres documents.,
+documents.summaries_original,Open the original,Ouvrir l'original,
+documents.summaries_resultTitle,AI summary,Résumé IA,
+documents.summaries_findings,Key findings,Constats principaux,
+documents.summaries_goals,Goals identified,Objectifs identifiés,
+documents.summaries_recs,Recommendations,Recommandations,
+documents.summaries_page,p.,p.,
+documents.summaries_none,Nothing found in this section.,Rien trouvé dans cette section.,
+documents.summaries_passportTitle,Suggested Passport updates,Mises à jour suggérées du passeport,
+documents.summaries_passportSub,Tick what should carry over. Nothing is added until you confirm.,Cochez ce qui doit être repris. Rien n'est ajouté avant votre confirmation.,
+documents.summaries_pComm,Communication profile,Profil de communication,
+documents.summaries_pGoals,Current goals,Objectifs actuels,
+documents.summaries_pHistory,Therapy history,Historique des services,
+documents.summaries_addBtn,Review & add to Passport,Réviser et ajouter au passeport,
+documents.summaries_another,Read another report,Lire un autre rapport,
+documents.summaries_added,Saved to the Passport — you can edit it any time.,Enregistré dans le passeport — modifiable à tout moment.,
+documents.summaries_safety,No diagnosis · No clinical advice · Nothing reaches your Passport without your confirmation,Aucun diagnostic · Aucun avis clinique · Rien n'entre dans votre passeport sans votre confirmation,
 documents.reports_title,Reports,Rapports,
 documents.reports_sub,"Polished documents generated from your child's profile — made to hand to therapists, schools and agencies.","Des documents soignés générés à partir du profil de votre enfant — conçus pour être remis aux thérapeutes, aux écoles et aux organismes.",
 documents.reports_passportTitle,Family Passport — intake form,Passeport familial — formulaire d'admission,
@@ -2488,7 +2527,8 @@ providers.capMax,✋ Five clinics max per batch — untick one to swap this one 
 providers.adjustSearch,← Adjust search,← Ajuster la recherche,
 providers.reviewEmailBtn,Review the email →,Réviser le courriel →,
 providers.selectFirst,Select at least one clinic first.,Sélectionnez d'abord au moins une clinique.,
-providers.mapHint,Tap a pin for the clinic's details and directions ✦ the gold star is home.,"Touchez une épingle pour voir les détails de la clinique et l'itinéraire ✦ l'étoile dorée, c'est la maison.",
+providers.mapHint,Tap a pin for the clinic's details and directions ✦ the gold star is your search area (approximate — only you can see it).,Touchez une épingle pour voir les détails de la clinique et l'itinéraire ✦ l'étoile dorée est votre secteur de recherche (approximatif — vous seule le voyez).,
+providers.showOnMap,Show on map,Voir sur la carte,
 providers.under1,under 1,moins de 1,
 providers.kmFromHome,{d} km from home,{d} km de la maison,
 providers.website,Website ↗,Site Web ↗,
@@ -2510,22 +2550,29 @@ providers.setAuto,· set automatically,· défini automatiquement,
 providers.childAged,{age}-year-old child,enfant de {age} ans,
 providers.childPlain,child,enfant,
 providers.travelUpTo, and can travel up to {km} km, et nous pouvons nous déplacer jusqu'à {km} km,
-providers.emailBody,"My name is {parent}, and I'm looking for {svc} for my {child}, {name}{dx}. We're in Montréal{travel}.
+providers.cityFallback,Montréal,Montréal,
+providers.emailBody,"My name is {parent}, and I'm reaching out to inquire about {svc} for my {child}, {name}{dx}. We live in {area}.
 
-A few questions to help us get started:
-• Are you currently accepting new clients — or is there a waitlist we could join?
-• What does your availability look like (days and times), and what are your rates?
-• What would you need from us to book an intake?
+Could you please let me know:
+• Whether you are currently accepting new pediatric clients — and if not, whether we could join your waitlist and what the approximate wait time is
+• Your current availability, including appointment days and times
+• Your assessment and ongoing therapy rates
+• What information, documents or referrals you would need from us to arrange an initial consultation or assessment
 
-Warm thanks,
-{parent2}","Je m'appelle {parent} et je cherche {svc} pour mon {child}, {name}{dx}. Nous sommes à Montréal{travel}.
+Thank you very much for your time. I look forward to hearing from you.
 
-Quelques questions pour bien commencer :
-• Acceptez-vous de nouveaux clients en ce moment — ou y a-t-il une liste d'attente à laquelle nous pourrions nous inscrire?
-• Quelles sont vos disponibilités (jours et heures) et quels sont vos tarifs?
-• De quoi auriez-vous besoin de notre part pour ouvrir un dossier?
+Warm regards,
+{parent2}","Je m'appelle {parent} et je vous écris afin de m'informer au sujet {svc} pour mon {child}, {name}{dx}. Nous habitons {area}.
 
-Merci beaucoup,
+Pourriez-vous me préciser :
+• Si vous acceptez actuellement de nouveaux clients en pédiatrie — et sinon, s'il est possible de s'inscrire sur votre liste d'attente et quel est le délai approximatif
+• Vos disponibilités actuelles, y compris les jours et les heures de rendez-vous
+• Vos tarifs pour l'évaluation et pour le suivi
+• Les renseignements, documents ou références dont vous auriez besoin de notre part pour organiser une première consultation ou une évaluation
+
+Je vous remercie beaucoup de votre temps et j'attends votre réponse avec intérêt.
+
+Cordialement,
 {parent2}",
 providers.footPeek,"Added automatically: a personal ""Hello"" with each clinic's name on top · a short UniqueApex footer with the 90-day no-repeat promise · Reply-To set to your email, so answers land in your inbox.","Ajouté automatiquement : un « Bonjour » personnalisé avec le nom de chaque clinique en tête · un court pied de page UniqueApex avec la promesse de 90 jours sans courriel répété · une adresse de réponse (Reply-To) réglée à votre courriel, pour que les réponses arrivent dans votre boîte de réception.",
 providers.consentText,"I am this child's parent or legal guardian, and I consent to sharing their first name, age and diagnosis with the clinics selected above so they can respond about services.","Je suis le parent ou le tuteur légal de cet enfant et je consens à partager son prénom, son âge et son diagnostic avec les cliniques sélectionnées ci-dessus afin qu'elles puissent nous répondre au sujet des services.",
