@@ -14,6 +14,7 @@ import Sidebar from "../components/Sidebar.astro";
 import BottomBar from "../components/BottomBar.astro";
 import HeaderActions from "../components/HeaderActions.astro";
 import I18nBoot from "../components/I18nBoot.astro";
+import AccountBoot from "../components/AccountBoot.astro";
 
 export interface Props {
   title?: string;
@@ -33,6 +34,7 @@ const { title = "UniqueApex", titleFr, activeNav = "dashboard" } = Astro.props;
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <I18nBoot />
+  <AccountBoot />
 </head>
 <body>
   <div class="scrim" id="ua-scrim"></div>
@@ -116,15 +118,11 @@ const { title = "UniqueApex", titleFr, activeNav = "dashboard" } = Astro.props;
       document.getElementById("ua-burger").addEventListener("click", openNav);
       scrim.addEventListener("click", closeNav);
 
-      // --- Account chips from session ---
-      var user = session.user || {};
-      var email = user.email || "";
-      var initial = (email[0] || "U").toUpperCase();
-      ["ua-side-avatar", "ua-hdr-avatar"].forEach(function (id) {
-        var el = document.getElementById(id); if (el) el.textContent = initial;
-      });
-      var sideName = document.getElementById("ua-side-name");
-      if (sideName && email) sideName.textContent = email.split("@")[0];
+      // --- Account chips (name, email, avatar) ---
+      // Nothing to do here: AccountBoot (in <head>) fills every element
+      // carrying data-ua-acct="name|email|initial" with the account
+      // holder's own first/last name, edited in /settings -> Account.
+      // It used to show the email prefix ("pelintemurcan").
 
       // --- Child switcher menu open/close ---
       var childBtn = document.getElementById("ua-child-btn");

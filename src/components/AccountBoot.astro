@@ -1,0 +1,104 @@
+---
+/* ============================================================
+   AccountBoot.astro — account-holder identity (ACCT-NAME-V1)
+   ------------------------------------------------------------
+   Included in the <head> of AppLayout and AppFormLayout, right
+   after I18nBoot, so every later script can rely on:
+
+     window.uaAccount.first        "Pelin"            (may be "")
+     window.uaAccount.last         "Temurcan"         (may be "")
+     window.uaAccount.fullName     "Pelin Temurcan"   ("" when unset)
+     window.uaAccount.displayName  fullName, or the translated
+                                   "Your account" fallback
+     window.uaAccount.email        the sign-in email
+     window.uaAccount.initial      avatar letter
+     window.uaAccount.paint(root?) fills every element carrying
+                                   data-ua-acct="name|first|fullname|email|initial"
+     window.uaAccount.refresh()    re-read the session + repaint
+                                   (call right after saving the name)
+
+   WHY: the sidebar, the account menu and the dashboard greeting
+   used to show the email prefix ("pelintemurcan"). The account
+   holder's own name is now stored on the Supabase auth user
+   (user_metadata.first_name / last_name, with full_name kept in
+   sync for older readers) and edited in exactly ONE place:
+   /settings -> Account. Change it there and every surface
+   follows, because they all read this object.
+
+   NOT the passport: a guardian in the Family Passport can be the
+   other parent, so passport names and the account name stay
+   separate on purpose.
+
+   The session lives in localStorage, so this resolves
+   synchronously in <head> — no fetch, no flash of a wrong name.
+
+   RULE (same as I18nBoot): elements filled from here must NOT
+   carry data-i18n — they hold user data, and this script
+   translates its own fallback via window.uaShellT.
+   ============================================================ */
+---
+<script is:inline>
+  (function () {
+    var A = {};
+
+    function readSession() {
+      try { return JSON.parse(localStorage.getItem("ua_session") || "null"); }
+      catch (e) { return null; }
+    }
+
+    function load() {
+      var s = readSession();
+      var user = (s && s.user) || {};
+      var meta = user.user_metadata || {};
+      var first = String(meta.first_name || "").trim();
+      var last = String(meta.last_name || "").trim();
+
+      /* Accounts created before the split only have full_name —
+         read it as "first … last" (last word = last name) so they
+         show a real name too, without a migration. */
+      if (!first && !last) {
+        var parts = String(meta.full_name || "").trim().split(/\s+/).filter(Boolean);
+        if (parts.length === 1) { first = parts[0]; }
+        else if (parts.length > 1) { last = parts.pop(); first = parts.join(" "); }
+      }
+
+      var ST = window.uaShellT || {};
+      A.session = s;
+      A.email = user.email || "";
+      A.first = first;
+      A.last = last;
+      A.fullName = [first, last].filter(Boolean).join(" ");
+      A.displayName = A.fullName || ST.yourAccount || "Your account";
+      A.initial = String(first || last || A.email || "U").charAt(0).toUpperCase() || "U";
+      return A;
+    }
+
+    var FILL = {
+      name: function () { return A.displayName; },   /* never empty */
+      fullname: function () { return A.fullName; },  /* "" when unset */
+      first: function () { return A.first; },
+      email: function () { return A.email; },
+      initial: function () { return A.initial; }
+    };
+
+    A.paint = function (root) {
+      var scope = root || document;
+      var els = scope.querySelectorAll("[data-ua-acct]");
+      for (var i = 0; i < els.length; i++) {
+        var f = FILL[els[i].getAttribute("data-ua-acct")];
+        if (f) els[i].textContent = f();
+      }
+    };
+
+    A.refresh = function () { load(); A.paint(); return A; };
+
+    load();
+    window.uaAccount = A;
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function () { A.paint(); });
+    } else {
+      A.paint();
+    }
+  })();
+</script>

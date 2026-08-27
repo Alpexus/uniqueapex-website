@@ -577,10 +577,10 @@ import AppLayout from "../layouts/AppLayout.astro";
       $("g-sub").textContent = T.sublines[now.getDay()];
       $("g-date").textContent = now.toLocaleDateString(LOCALE, { weekday: "long", month: "long", day: "numeric" });
     }
-    (function () {
-      const meta = ((getRawSession() || {}).user || {}).user_metadata || {};
-      setGreeting(meta.full_name || "");
-    })();
+    /* The greeting uses the account holder's own name — resolved once by
+       AccountBoot in the layout <head> and edited in /settings -> Account. */
+    const ACCT = window.uaAccount || {};
+    setGreeting(ACCT.fullName || "");
 
     (async () => {
       const passports = await UA.getPassports().catch(() => []);
@@ -591,8 +591,10 @@ import AppLayout from "../layouts/AppLayout.astro";
       const passportLink = "/passport" + (p ? "?id=" + p.id : "");
 
       /* ---------- HERO ---------- */
+      /* Fallback only: a family who filled the passport but never set an
+         account name still gets greeted by name. The account name wins. */
       const g1 = String((data.household && data.household.g1name) || "").replace(/\s*\([^)]*\)\s*$/, "").trim();
-      if (g1) setGreeting(g1);
+      if (!ACCT.fullName && g1) setGreeting(g1);
       $("h-avatar").textContent = (first || id.name || "·")[0].toUpperCase();
       $("h-name").textContent = p ? id.name : T.setupPassport;
       const subBits = [];

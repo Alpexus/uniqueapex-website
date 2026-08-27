@@ -20,10 +20,17 @@ import "@/styles/settings.css";
 
     <div class="set-section">
       <h2 data-i18n="identity">Identity</h2>
-      <div class="set-field">
-        <label for="set-name" data-i18n="fullName">Full name</label>
-        <input class="set-input" id="set-name" type="text" placeholder="Primary account holder" data-i18n-ph="fullNamePh" />
+      <div class="set-2col">
+        <div class="set-field">
+          <label for="set-first" data-i18n="firstName">First name</label>
+          <input class="set-input" id="set-first" type="text" autocomplete="given-name" placeholder="e.g. Marie" data-i18n-ph="firstNamePh" />
+        </div>
+        <div class="set-field">
+          <label for="set-last" data-i18n="lastName">Last name</label>
+          <input class="set-input" id="set-last" type="text" autocomplete="family-name" placeholder="e.g. Tremblay" data-i18n-ph="lastNamePh" />
+        </div>
       </div>
+      <span class="set-hint" data-i18n="nameHint">This is the parent's name — shown in the sidebar and the account menu across the app. It is separate from the guardian names in your child's passport.</span>
       <div class="set-field">
         <label for="set-email" data-i18n="emailLabel">Email address</label>
         <input class="set-input" id="set-email" type="email" placeholder="you@email.com" data-i18n-ph="emailPh" />
@@ -98,16 +105,31 @@ import "@/styles/settings.css";
     }
 
     /* ---------- prefill ---------- */
-    var nameEl = document.getElementById("set-name");
+    var firstEl = document.getElementById("set-first");
+    var lastEl = document.getElementById("set-last");
     var emailEl = document.getElementById("set-email");
     var tzEl = document.getElementById("set-tz");
-    if (meta.full_name) nameEl.value = meta.full_name;
+
+    /* first_name / last_name are the source of truth for the name shown
+       everywhere in the app (see src/components/AccountBoot.astro).
+       Accounts created before the split only have full_name — read it
+       as "first … last" so nobody has to retype their name. */
+    var pFirst = String(meta.first_name || "").trim();
+    var pLast = String(meta.last_name || "").trim();
+    if (!pFirst && !pLast) {
+      var parts = String(meta.full_name || "").trim().split(/\s+/).filter(Boolean);
+      if (parts.length === 1) { pFirst = parts[0]; }
+      else if (parts.length > 1) { pLast = parts.pop(); pFirst = parts.join(" "); }
+    }
+    firstEl.value = pFirst;
+    lastEl.value = pLast;
     if (s.user && s.user.email) emailEl.value = s.user.email;
     tzEl.value = meta.timezone || (function(){ try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch(e){ return ""; } })();
-    var prefName = nameEl.value, prefEmail = emailEl.value, prefTz = tzEl.value;
+    var prefFirst = firstEl.value, prefLast = lastEl.value, prefEmail = emailEl.value, prefTz = tzEl.value;
 
     function isDirty() {
-      return nameEl.value !== prefName || emailEl.value !== prefEmail || tzEl.value !== prefTz ||
+      return firstEl.value !== prefFirst || lastEl.value !== prefLast ||
+        emailEl.value !== prefEmail || tzEl.value !== prefTz ||
         document.getElementById("set-pw1").value !== "" || document.getElementById("set-pw2").value !== "";
     }
 
@@ -146,8 +168,12 @@ import "@/styles/settings.css";
       var msg = document.getElementById("acc-msg");
       msg.textContent = PT.saving; msg.style.color = "";
       var langBtn = document.querySelector('.seg[data-pref="lang"] button.on');
+      var fn = firstEl.value.trim(), ln = lastEl.value.trim();
       var body = { data: {
-        full_name: nameEl.value.trim(),
+        first_name: fn,
+        last_name: ln,
+        /* kept in sync so anything still reading full_name keeps working */
+        full_name: [fn, ln].filter(Boolean).join(" "),
         timezone: tzEl.value.trim(),
         lang: langBtn ? langBtn.dataset.val : "en"
       }};
@@ -156,7 +182,9 @@ import "@/styles/settings.css";
       patchUser(body).then(function(res){
         if (res.ok) {
           saveSessionUser(res.j);
-          prefName = nameEl.value; prefEmail = emailEl.value; prefTz = tzEl.value;
+          prefFirst = firstEl.value; prefLast = lastEl.value; prefEmail = emailEl.value; prefTz = tzEl.value;
+          /* repaint the sidebar + account menu immediately — no reload */
+          if (window.uaAccount && window.uaAccount.refresh) window.uaAccount.refresh();
           msg.textContent = emailChanged
             ? PT.savedEmail1 + emailEl.value.trim() + PT.savedEmail2
             : PT.saved;
