@@ -304,17 +304,18 @@ const nodePos = [
     requestAnimationFrame(draw);
     window.addEventListener("load", draw);
     var rt;
-    window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(draw, 120); });
+    function redraw(ms) { clearTimeout(rt); rt = setTimeout(draw, ms || 120); }
+    window.addEventListener("resize", function () { redraw(120); });
     /* the panel can change height after fonts/images land */
     if ("ResizeObserver" in window) {
-      var ro = new ResizeObserver(function () { clearTimeout(rt); rt = setTimeout(draw, 120); });
       var panelEl = document.getElementById("ps-panel");
-      if (panelEl) ro.observe(panelEl);
+      if (panelEl) new ResizeObserver(function () { redraw(120); }).observe(panelEl);
     }
+    /* the cards rise into place with staggered .5s transitions — redraw once
+       the last one has landed, or every line ends a few px below its card */
+    root.addEventListener("transitionend", function () { redraw(60); });
 
-    /* the cards rise into place over ~.5s — measure again once they've landed,
-       otherwise every line ends ~10px below its card */
-    function reveal() { root.classList.add("ua-in"); draw(); setTimeout(draw, 700); }
+    function reveal() { root.classList.add("ua-in"); draw(); setTimeout(draw, 1200); }
 
     if (!("IntersectionObserver" in window)) { reveal(); return; }
     var io = new IntersectionObserver(function (entries) {
