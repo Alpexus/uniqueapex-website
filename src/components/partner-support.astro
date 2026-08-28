@@ -179,7 +179,7 @@ const nodePos = [
           </div>
         </div>
 
-        <div class="ps-card bg-white rounded-2xl shadow-md shadow-violet-200/40 px-5 py-4 mt-5 text-center" style="min-height:96px">
+        <div class="ps-card ps-mob bg-white rounded-2xl shadow-md shadow-violet-200/40 px-5 py-4 mt-5 text-center" style="min-height:96px">
           <span id="ps-cap-t" class="block text-[15px] font-bold text-slate-800 leading-snug">👆 {t.orbitHint}</span>
           <span id="ps-cap-d" class="block text-[12.5px] text-slate-500 leading-snug mt-1.5"></span>
         </div>
@@ -188,7 +188,7 @@ const nodePos = [
       <!-- left cards (hidden on phones — combined into the rows above) -->
       <div class="hidden sm:grid sm:grid-cols-2 gap-3 lg:col-start-1 lg:row-start-1 lg:flex lg:flex-col lg:gap-4 lg:justify-center">
         {t.left.map((c, i) => (
-          <div class="ps-card relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/40 px-4 py-4 flex items-start gap-3.5" style={`transition-delay:${(0.15 + i * 0.08).toFixed(2)}s`}>
+          <div class="ps-card relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/40 px-4 py-4 flex items-start gap-3.5" data-ps-node={i} style={`transition-delay:${(0.15 + i * 0.08).toFixed(2)}s`}>
             <span class="w-14 h-14 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icons[i]} />
             </span>
@@ -203,7 +203,7 @@ const nodePos = [
       <!-- right cards (hidden on phones — combined into the rows above) -->
       <div class="hidden sm:grid sm:grid-cols-2 gap-3 lg:col-start-3 lg:row-start-1 lg:flex lg:flex-col lg:gap-4 lg:justify-center">
         {t.right.map((c, i) => (
-          <div class="ps-card relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/40 px-4 py-4 flex items-start gap-3.5" style={`transition-delay:${(0.2 + i * 0.08).toFixed(2)}s`}>
+          <div class="ps-card relative z-10 bg-white rounded-2xl shadow-md shadow-violet-200/40 px-4 py-4 flex items-start gap-3.5" data-ps-node={i + 4} style={`transition-delay:${(0.2 + i * 0.08).toFixed(2)}s`}>
             <span class="w-14 h-14 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icons[i + 4]} />
             </span>
@@ -265,17 +265,26 @@ const nodePos = [
       var st = stage.getBoundingClientRect();
       var cx = st.left - pr.left + st.width / 2;
       var cy = st.top - pr.top + st.height / 2;
-      var cards = panel.querySelectorAll(".ps-card:not(.ps-mob)");
+      /* Each desktop card DECLARES which node it belongs to (data-ps-node:
+         0-3 left, 4-7 right). This used to walk ".ps-card" in DOM order, so
+         when the phone mini-orbit gained a .ps-card caption that card silently
+         took slot 0 and every line shifted one seat down: the first line flew
+         off to the panel corner (the hidden card measures 0x0), a left card
+         reached across to a right-hand node, and the last card got no line at
+         all. Markup order can't break the mapping any more. */
+      var cards = panel.querySelectorAll("[data-ps-node]");
 
       var linesHtml = "";
       var nodesHtml = "";
-      cards.forEach(function (card, i) {
+      cards.forEach(function (card) {
+        var i = parseInt(card.getAttribute("data-ps-node"), 10);
         var pos = nodePos[i];
         if (!pos) return;
+        var r = card.getBoundingClientRect();
+        if (!r.width || !r.height) return; /* hidden card: never draw to 0,0 */
         // Node coordinates — THE single source of truth for both line and node
         var nx = st.left - pr.left + (st.width * pos[0]) / 100;
         var ny = st.top - pr.top + (st.height * pos[1]) / 100;
-        var r = card.getBoundingClientRect();
         var ex = (i < 4 ? r.right : r.left) - pr.left;
         var ey = r.top - pr.top + r.height / 2;
         linesHtml +=
@@ -296,10 +305,20 @@ const nodePos = [
     window.addEventListener("load", draw);
     var rt;
     window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(draw, 120); });
+    /* the panel can change height after fonts/images land */
+    if ("ResizeObserver" in window) {
+      var ro = new ResizeObserver(function () { clearTimeout(rt); rt = setTimeout(draw, 120); });
+      var panelEl = document.getElementById("ps-panel");
+      if (panelEl) ro.observe(panelEl);
+    }
 
-    if (!("IntersectionObserver" in window)) { root.classList.add("ua-in"); draw(); return; }
+    /* the cards rise into place over ~.5s — measure again once they've landed,
+       otherwise every line ends ~10px below its card */
+    function reveal() { root.classList.add("ua-in"); draw(); setTimeout(draw, 700); }
+
+    if (!("IntersectionObserver" in window)) { reveal(); return; }
     var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { if (e.isIntersecting) { root.classList.add("ua-in"); draw(); io.disconnect(); } });
+      entries.forEach(function (e) { if (e.isIntersecting) { reveal(); io.disconnect(); } });
     }, { threshold: 0.15 });
     io.observe(root);
   })();
